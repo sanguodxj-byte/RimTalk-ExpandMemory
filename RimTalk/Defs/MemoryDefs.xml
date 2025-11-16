@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<Defs>
-  
-  <!-- Memory System is automatically injected via Harmony patches -->
-  <!-- See InjectMemoryCompPatch.cs for implementation -->
-
-</Defs>

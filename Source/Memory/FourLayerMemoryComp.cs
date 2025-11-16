@@ -206,38 +206,94 @@ namespace RimTalk.Memory
 
             var summary = new StringBuilder();
             
-            // 按内容分组，统计频率
-            var grouped = memories
-                .GroupBy(m => m.content.Length > 20 ? m.content.Substring(0, 20) : m.content)
-                .OrderByDescending(g => g.Count());
-
-            int shown = 0;
-            foreach (var group in grouped.Take(5))
+            // 对话类型：列出主要对话对象
+            if (type == MemoryType.Conversation)
             {
-                if (shown > 0) summary.Append("；");
+                var byPerson = memories
+                    .Where(m => !string.IsNullOrEmpty(m.relatedPawnName))
+                    .GroupBy(m => m.relatedPawnName)
+                    .OrderByDescending(g => g.Count());
                 
-                string content = group.First().content;
-                // 简化内容
-                if (content.Length > 30)
-                    content = content.Substring(0, 30) + "...";
+                int shown = 0;
+                foreach (var group in byPerson.Take(5))
+                {
+                    if (shown > 0) summary.Append("；");
+                    summary.Append($"与{group.Key}对话×{group.Count()}");
+                    shown++;
+                }
                 
-                if (group.Count() > 1)
+                if (shown == 0)
                 {
-                    summary.Append($"{content}×{group.Count()}");
+                    summary.Append($"对话{memories.Count}次");
                 }
-                else
+            }
+            // 行动类型：列出主要行动
+            else if (type == MemoryType.Action)
+            {
+                // 提取行动关键词（动词）
+                var actions = new List<string>();
+                foreach (var m in memories)
                 {
-                    summary.Append(content);
+                    // 简单提取：取前10个字作为行动描述
+                    string action = m.content.Length > 15 ? m.content.Substring(0, 15) : m.content;
+                    actions.Add(action);
                 }
-                shown++;
+                
+                var grouped = actions
+                    .GroupBy(a => a)
+                    .OrderByDescending(g => g.Count());
+                
+                int shown = 0;
+                foreach (var group in grouped.Take(3))
+                {
+                    if (shown > 0) summary.Append("；");
+                    if (group.Count() > 1)
+                    {
+                        summary.Append($"{group.Key}×{group.Count()}");
+                    }
+                    else
+                    {
+                        summary.Append(group.Key);
+                    }
+                    shown++;
+                }
+            }
+            // 其他类型：简单列举
+            else
+            {
+                var grouped = memories
+                    .GroupBy(m => m.content.Length > 20 ? m.content.Substring(0, 20) : m.content)
+                    .OrderByDescending(g => g.Count());
+
+                int shown = 0;
+                foreach (var group in grouped.Take(5))
+                {
+                    if (shown > 0) summary.Append("；");
+                    
+                    string content = group.First().content;
+                    // 不要截断太短
+                    if (content.Length > 40)
+                        content = content.Substring(0, 40) + "...";
+                    
+                    if (group.Count() > 1)
+                    {
+                        summary.Append($"{content}×{group.Count()}");
+                    }
+                    else
+                    {
+                        summary.Append(content);
+                    }
+                    shown++;
+                }
             }
 
-            if (memories.Count > shown)
+            // 添加总数
+            if (summary.Length > 0 && memories.Count > 3)
             {
                 summary.Append($"（共{memories.Count}条）");
             }
 
-            return summary.ToString();
+            return summary.Length > 0 ? summary.ToString() : $"{type}记忆{memories.Count}条";
         }
 
         /// <summary>
@@ -466,37 +522,12 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// 使用 AI 总结（SCM -> ELS）
+        /// 尝试使用 AI 总结记忆
         /// </summary>
         private string TryAISummarize(Pawn pawn, List<MemoryEntry> memories)
         {
-            // 构建提示词
-            var prompt = new StringBuilder();
-            prompt.AppendLine($"请为 {pawn.LabelShort} 总结以下 {memories.Count} 条记忆。");
-            prompt.AppendLine();
-            prompt.AppendLine("**提炼 WHERE / WHO / WHAT：**");
-            prompt.AppendLine("- WHERE: 地点/场景");
-            prompt.AppendLine("- WHO: 相关人物");
-            prompt.AppendLine("- WHAT: 核心事件");
-            prompt.AppendLine();
-            prompt.AppendLine("**要求：**");
-            prompt.AppendLine("1. 极简表达，去除修饰语");
-            prompt.AppendLine("2. 相似事件合并，标注频率（×N）");
-            prompt.AppendLine("3. 不超过 80 字");
-            prompt.AppendLine();
-            prompt.AppendLine("**原始记忆：**");
-
-            int i = 1;
-            foreach (var m in memories.Take(20))
-            {
-                prompt.AppendLine($"{i}. {m.content}");
-                i++;
-            }
-
-            prompt.AppendLine();
-            prompt.AppendLine("直接输出总结：");
-
-            return RimTalk.Memory.Patches.RimTalkAISummarizer.SummarizeMemoriesWithPrompt(pawn, prompt.ToString());
+            // 使用独立的AI总结服务（不依赖RimTalk）
+            return RimTalk.Memory.AI.IndependentAISummarizer.SummarizeMemories(pawn, memories, "standard");
         }
 
         /// <summary>
@@ -504,29 +535,8 @@ namespace RimTalk.Memory
         /// </summary>
         private string TryDeepArchive(Pawn pawn, List<MemoryEntry> memories)
         {
-            var prompt = new StringBuilder();
-            prompt.AppendLine($"为 {pawn.LabelShort} 创建长期记忆档案。");
-            prompt.AppendLine();
-            prompt.AppendLine("**目标：终极概括，提炼人设和关键经历**");
-            prompt.AppendLine();
-            prompt.AppendLine($"源数据：{memories.Count} 条中期记忆摘要");
-            prompt.AppendLine();
-            prompt.AppendLine("**要求：**");
-            prompt.AppendLine("1. 高度概括，用关键词和主题描述");
-            prompt.AppendLine("2. 识别长期模式（如：经常心情低落、擅长社交等）");
-            prompt.AppendLine("3. 不超过 100 字");
-            prompt.AppendLine();
-            prompt.AppendLine("**中期记忆摘要：**");
-
-            foreach (var m in memories.Take(10))
-            {
-                prompt.AppendLine($"- {m.content}");
-            }
-
-            prompt.AppendLine();
-            prompt.AppendLine("直接输出档案总结：");
-
-            return RimTalk.Memory.Patches.RimTalkAISummarizer.SummarizeMemoriesWithPrompt(pawn, prompt.ToString());
+            // 使用独立的AI总结服务
+            return RimTalk.Memory.AI.IndependentAISummarizer.SummarizeMemories(pawn, memories, "deep_archive");
         }
 
         /// <summary>

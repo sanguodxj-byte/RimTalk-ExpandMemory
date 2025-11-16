@@ -85,7 +85,10 @@ namespace RimTalk.Memory
         {
             // Check if conversation memory is enabled
             if (!RimTalkMemoryPatchMod.Settings.enableConversationMemory)
+            {
+                Log.Warning("[RimTalk Memory] ⚠️ Conversation memory is DISABLED in settings!");
                 return;
+            }
             
             // 清理旧的缓存（避免内存泄漏）
             if (Find.TickManager != null && Find.TickManager.TicksGame - lastCleanupTick > CleanupInterval)
@@ -105,36 +108,39 @@ namespace RimTalk.Memory
             if (recordedConversations.Contains(conversationId))
             {
                 if (Prefs.DevMode)
-                    Log.Message($"[RimTalk Memory] Skipped duplicate conversation: {conversationId}");
+                    Log.Message($"[RimTalk Memory] ⏭️ Skipped duplicate in RecordConversation: {conversationId}");
                 return;
             }
             
             // 标记为已记录
             recordedConversations.Add(conversationId);
                 
-            // Record for speaker
+            // Record for speaker（说话者视角）
             var speakerMemory = speaker != null ? speaker.TryGetComp<PawnMemoryComp>() : null;
             if (speakerMemory != null)
             {
-                string listenerName = listener != null ? listener.LabelShort : "someone";
+                string listenerName = listener != null ? listener.LabelShort : "self";
                 string memoryContent = "Said to " + listenerName + ": " + content;
                 speakerMemory.AddMemory(memoryContent, MemoryType.Conversation, 0.6f, listenerName);
             }
 
-            // Record for listener
-            var listenerMemory = listener != null ? listener.TryGetComp<PawnMemoryComp>() : null;
-            if (listenerMemory != null)
+            // Record for listener（听者视角）- 只在listener存在且不是自己时记录
+            if (listener != null && listener != speaker)
             {
-                string speakerName = speaker != null ? speaker.LabelShort : "someone";
-                string memoryContent = speakerName + " said: " + content;
-                listenerMemory.AddMemory(memoryContent, MemoryType.Conversation, 0.5f, speakerName);
+                var listenerMemory = listener.TryGetComp<PawnMemoryComp>();
+                if (listenerMemory != null)
+                {
+                    string speakerName = speaker != null ? speaker.LabelShort : "someone";
+                    string memoryContent = speakerName + " said: " + content;
+                    listenerMemory.AddMemory(memoryContent, MemoryType.Conversation, 0.5f, speakerName);
+                }
             }
             
-            // 统一的日志输出（只输出一次）
+            // 统一的日志输出（成功）
             string speakerLabel = speaker != null ? speaker.LabelShort : "Unknown";
-            string listenerLabel = listener != null ? listener.LabelShort : "Unknown";
+            string listenerLabel = listener != null && listener != speaker ? listener.LabelShort : "self";
             string previewContent = content.Length > 50 ? content.Substring(0, 50) + "..." : content;
-            Log.Message($"[RimTalk Memory] Recorded conversation from {speakerLabel} -> {listenerLabel}: {previewContent}");
+            Log.Message($"[RimTalk Memory] ✅ RECORDED: {speakerLabel} -> {listenerLabel}: {previewContent}");
         }
     }
 }

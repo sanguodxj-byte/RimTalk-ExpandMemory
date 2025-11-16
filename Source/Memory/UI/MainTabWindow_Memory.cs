@@ -93,6 +93,56 @@ namespace RimTalk.Memory.UI
                 Find.WindowStack.Add(new FloatMenu(options));
             }
 
+            // 立即总结按钮（SCM → ELS）
+            if (selectedPawn != null)
+            {
+                Rect summarizeButtonRect = new Rect(rect.x + 470f, rect.y, 200f, 35f);
+                string summarizeLabel = "⚡ 立即总结 (SCM→ELS)";
+                
+                var memoryComp = selectedPawn.TryGetComp<PawnMemoryComp>();
+                bool canSummarize = memoryComp != null && memoryComp.GetSituationalMemoryCount() > 0;
+                
+                if (!canSummarize)
+                {
+                    GUI.color = Color.gray;
+                    summarizeLabel = "立即总结 (无SCM记忆)";
+                }
+                
+                if (Widgets.ButtonText(summarizeButtonRect, summarizeLabel))
+                {
+                    if (canSummarize)
+                    {
+                        Log.Message($"[RimTalk Memory] 🔄 Manual summarization triggered for {selectedPawn.LabelShort}");
+                        memoryComp.DailySummarization();
+                        Messages.Message($"{selectedPawn.LabelShort} 的短期记忆已总结到中期记忆", MessageTypeDefOf.TaskCompletion);
+                    }
+                }
+                
+                GUI.color = Color.white;
+                
+                // 总结所有人按钮
+                Rect summarizeAllButtonRect = new Rect(rect.x + 680f, rect.y, 160f, 35f);
+                if (Widgets.ButtonText(summarizeAllButtonRect, "⚡⚡ 总结所有殖民者"))
+                {
+                    int count = 0;
+                    foreach (var map in Find.Maps)
+                    {
+                        foreach (var pawn in map.mapPawns.FreeColonists)
+                        {
+                            var comp = pawn.TryGetComp<PawnMemoryComp>();
+                            if (comp != null && comp.GetSituationalMemoryCount() > 0)
+                            {
+                                comp.DailySummarization();
+                                count++;
+                            }
+                        }
+                    }
+                    
+                    Log.Message($"[RimTalk Memory] 🔄 Manual summarization triggered for {count} colonists");
+                    Messages.Message($"已为 {count} 名殖民者进行记忆总结", MessageTypeDefOf.TaskCompletion);
+                }
+            }
+
             // Auto-select if only one colonist or none selected
             if (selectedPawn == null && colonists.Count > 0)
             {

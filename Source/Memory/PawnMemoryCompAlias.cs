@@ -91,5 +91,11 @@ namespace RimTalk.Memory
             EventLogMemories.Clear();
             // 不清除 Archive
         }
+        
+        // 新增：获取SCM记忆数量（用于UI判断）
+        public int GetSituationalMemoryCount()
+        {
+            return SituationalMemories.Count;
+        }
     }
 }

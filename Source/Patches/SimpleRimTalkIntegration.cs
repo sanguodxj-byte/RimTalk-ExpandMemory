@@ -21,8 +21,7 @@ namespace RimTalk.Memory.Patches
             Log.Message("[RimTalk Memory] Simple integration initialized");
             Log.Message("[RimTalk Memory] Call RimTalkMemoryAPI.GetMemoryPrompt(pawn, basePrompt) to use memories");
             
-            // 初始化 AI 总结服务
-            RimTalkAISummarizer.Initialize();
+            // AI总结器会通过自己的静态构造函数自动初始化
         }
     }
 
@@ -31,6 +30,11 @@ namespace RimTalk.Memory.Patches
     /// </summary>
     public static class RimTalkMemoryAPI
     {
+        static RimTalkMemoryAPI()
+        {
+            Log.Message("[RimTalk Memory API] 🚀 RimTalkMemoryAPI static constructor called - API is LOADED!");
+        }
+        
         /// <summary>
         /// Get conversation prompt enhanced with pawn's memories
         /// </summary>
@@ -70,6 +74,12 @@ namespace RimTalk.Memory.Patches
         /// </summary>
         public static void RecordConversation(Pawn speaker, Pawn listener, string content)
         {
+            // === API入口日志 ===
+            Log.Message($"[RimTalk Memory API] 🎯 API CALLED! RecordConversation entry point");
+            Log.Message($"[RimTalk Memory API]    speaker: {speaker?.LabelShort ?? "NULL"}");
+            Log.Message($"[RimTalk Memory API]    listener: {listener?.LabelShort ?? "NULL"}");
+            Log.Message($"[RimTalk Memory API]    content: {(content?.Length > 0 ? content.Substring(0, System.Math.Min(50, content.Length)) : "NULL")}...");
+            
             // 直接调用底层方法，由底层统一输出日志
             MemoryAIIntegration.RecordConversation(speaker, listener, content);
             // 不在这里输出日志，避免重复
@@ -99,139 +109,117 @@ namespace RimTalk.Memory.Patches
     }
 
     /// <summary>
-    /// AI-powered memory summarizer using RimTalk's API
-    /// 使用 RimTalk 的 API 进行 AI 驱动的记忆总结
+    /// RimTalk AI 总结器 - 通过反射调用 RimTalk 的 AI API
     /// </summary>
+    [StaticConstructorOnStartup]
     public static class RimTalkAISummarizer
     {
-        private static Type talkServiceType = null;
-        private static MethodInfo generateTalkMethod = null;
         private static bool isAvailable = false;
+        private static Type talkRequestType = null;
+        private static Type aiServiceType = null;
+        private static Type talkResponseType = null;
+        private static MethodInfo chatMethod = null;
+        private static Type settingsType = null;
+        private static MethodInfo getSettingsMethod = null;
 
-        public static bool IsAvailable => isAvailable;
-
-        public static void Initialize()
+        static RimTalkAISummarizer()
         {
             try
             {
                 Log.Message("[RimTalk AI Summarizer] Initializing...");
                 
-                // 列出所有可用的程序集（调试用）
-                if (Prefs.DevMode)
-                {
-                    Log.Message("[RimTalk AI Summarizer] Available assemblies:");
-                    foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        if (asm.GetName().Name.Contains("RimTalk"))
-                        {
-                            Log.Message($"  - {asm.GetName().Name} (v{asm.GetName().Version})");
-                        }
-                    }
-                }
-                
-                // 查找 RimTalk 主 Mod 的程序集
+                // 查找 RimTalk 程序集
                 var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
                     .FirstOrDefault(a => a.GetName().Name == "RimTalk");
 
                 if (rimTalkAssembly == null)
                 {
-                    Log.Warning("[RimTalk AI Summarizer] ❌ RimTalk main mod not found");
-                    Log.Warning("[RimTalk AI Summarizer] AI summarization will be DISABLED");
-                    Log.Warning("[RimTalk AI Summarizer] Fallback: Simple summaries will be used");
+                    Log.Warning("[RimTalk AI Summarizer] ❌ RimTalk not found - AI summarization DISABLED");
                     return;
                 }
                 
-                Log.Message($"[RimTalk AI Summarizer] ✓ Found RimTalk assembly: {rimTalkAssembly.FullName}");
+                Log.Message($"[RimTalk AI Summarizer] ✓ Found RimTalk assembly");
 
-                // 查找 TalkService 类型
-                talkServiceType = rimTalkAssembly.GetType("RimTalk.Service.TalkService");
-                if (talkServiceType == null)
+                // 查找 TalkRequest 类型
+                talkRequestType = rimTalkAssembly.GetType("RimTalk.Data.TalkRequest");
+                if (talkRequestType == null)
                 {
-                    Log.Warning("[RimTalk AI Summarizer] ❌ TalkService type not found");
+                    Log.Warning("[RimTalk AI Summarizer] ❌ TalkRequest type not found");
+                    return;
+                }
+                Log.Message("[RimTalk AI Summarizer] ✓ Found TalkRequest type");
+
+                // 查找 AIService 类型
+                aiServiceType = rimTalkAssembly.GetType("RimTalk.Service.AIService");
+                if (aiServiceType == null)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ❌ AIService type not found");
+                    return;
+                }
+                Log.Message("[RimTalk AI Summarizer] ✓ Found AIService type");
+
+                // 查找 Chat 方法
+                chatMethod = aiServiceType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault(m => m.Name == "Chat" && 
+                                       m.GetParameters().Length == 2 &&
+                                       m.GetParameters()[0].ParameterType.Name == "TalkRequest");
+                
+                if (chatMethod == null)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ❌ AIService.Chat method not found");
+                    return;
+                }
+                Log.Message("[RimTalk AI Summarizer] ✓ Found AIService.Chat method");
+
+                // 查找 TalkResponse 类型
+                talkResponseType = rimTalkAssembly.GetType("RimTalk.Data.TalkResponse");
+                if (talkResponseType == null)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ❌ TalkResponse type not found");
+                    return;
+                }
+
+                // 查找 Settings
+                settingsType = rimTalkAssembly.GetType("RimTalk.Settings");
+                if (settingsType != null)
+                {
+                    getSettingsMethod = settingsType.GetMethod("Get", BindingFlags.Public | BindingFlags.Static);
                     
-                    // 列出所有类型（调试用）
-                    if (Prefs.DevMode)
+                    if (getSettingsMethod != null)
                     {
-                        Log.Message("[RimTalk AI Summarizer] Available types in RimTalk:");
-                        foreach (var type in rimTalkAssembly.GetTypes().Take(20))
+                        var settings = getSettingsMethod.Invoke(null, null);
+                        var isEnabledProp = settingsType.GetProperty("IsEnabled");
+                        if (isEnabledProp != null && settings != null)
                         {
-                            Log.Message($"  - {type.FullName}");
+                            bool isEnabled = (bool)isEnabledProp.GetValue(settings);
+                            if (!isEnabled)
+                            {
+                                Log.Warning("[RimTalk AI Summarizer] ⚠️ RimTalk is DISABLED in settings");
+                                Log.Message("[RimTalk AI Summarizer] AI summarization will be skipped");
+                                return;
+                            }
                         }
                     }
-                    
-                    return;
                 }
-                
-                Log.Message($"[RimTalk AI Summarizer] ✓ Found TalkService type");
-
-                // 查找 GenerateTalk 方法
-                generateTalkMethod = talkServiceType.GetMethod("GenerateTalk", 
-                    BindingFlags.Public | BindingFlags.Static);
-
-                if (generateTalkMethod == null)
-                {
-                    Log.Warning("[RimTalk AI Summarizer] ❌ GenerateTalk method not found");
-                    
-                    // 列出所有方法（调试用）
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[RimTalk AI Summarizer] Available methods in TalkService:");
-                        foreach (var method in talkServiceType.GetMethods(BindingFlags.Public | BindingFlags.Static))
-                        {
-                            var parameters = string.Join(", ", method.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"));
-                            Log.Message($"  - {method.ReturnType.Name} {method.Name}({parameters})");
-                        }
-                    }
-                    
-                    return;
-                }
-                
-                // 显示方法签名
-                var paramInfo = string.Join(", ", generateTalkMethod.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"));
-                Log.Message($"[RimTalk AI Summarizer] ✓ Found GenerateTalk: {generateTalkMethod.ReturnType.Name} GenerateTalk({paramInfo})");
 
                 isAvailable = true;
                 Log.Message("[RimTalk AI Summarizer] ✅ AI summarization ENABLED!");
             }
             catch (Exception ex)
             {
-                Log.Error($"[RimTalk AI Summarizer] ❌ Initialization failed:");
-                Log.Error($"  Exception: {ex.GetType().Name}");
-                Log.Error($"  Message: {ex.Message}");
-                Log.Error($"  StackTrace: {ex.StackTrace}");
+                Log.Error($"[RimTalk AI Summarizer] Initialization failed: {ex.Message}");
+                if (Prefs.DevMode)
+                    Log.Error($"[RimTalk AI Summarizer] Stack trace: {ex.StackTrace}");
                 isAvailable = false;
             }
         }
 
         /// <summary>
-        /// 使用 RimTalk AI 总结记忆列表
+        /// 检查 AI 总结是否可用
         /// </summary>
-        public static string SummarizeMemories(Pawn pawn, System.Collections.Generic.List<MemoryEntry> memories, MemoryType type)
+        public static bool IsAvailable()
         {
-            if (!isAvailable || memories == null || memories.Count == 0)
-                return null;
-
-            try
-            {
-                // 构建总结提示词
-                string prompt = BuildSummarizationPrompt(pawn, memories, type);
-
-                // 调用 RimTalk API
-                var result = generateTalkMethod.Invoke(null, new object[] { pawn, prompt, null });
-                
-                if (result != null)
-                {
-                    string summary = result.ToString();
-                    Log.Message($"[RimTalk AI Summarizer] Generated summary for {pawn.LabelShort}: {summary.Substring(0, System.Math.Min(50, summary.Length))}...");
-                    return summary;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[RimTalk AI Summarizer] Failed to generate summary: {ex.Message}");
-            }
-
-            return null;
+            return isAvailable;
         }
 
         /// <summary>
@@ -242,7 +230,7 @@ namespace RimTalk.Memory.Patches
             if (!isAvailable)
             {
                 if (Prefs.DevMode)
-                    Log.Message($"[RimTalk AI Summarizer] API not available, skipping AI summary");
+                    Log.Message($"[RimTalk AI Summarizer] AI not available, using simple summary");
                 return null;
             }
             
@@ -254,91 +242,254 @@ namespace RimTalk.Memory.Patches
 
             try
             {
-                Log.Message($"[RimTalk AI Summarizer] Calling API for {pawn.LabelShort} (prompt length: {customPrompt.Length})");
+                Log.Message($"[RimTalk AI Summarizer] 🔄 Calling RimTalk AI for {pawn.LabelShort}...");
                 
-                // 调用 RimTalk API
-                var result = generateTalkMethod.Invoke(null, new object[] { pawn, customPrompt, null });
-                
-                if (result == null)
+                // 获取 TalkType 枚举类型 - 注意命名空间是 RimTalk.Source.Data
+                var talkTypeEnum = talkRequestType.Assembly.GetType("RimTalk.Source.Data.TalkType");
+                if (talkTypeEnum == null)
                 {
-                    Log.Warning($"[RimTalk AI Summarizer] API returned null for {pawn.LabelShort}");
+                    // 尝试旧命名空间
+                    talkTypeEnum = talkRequestType.Assembly.GetType("RimTalk.Data.TalkType");
+                }
+                
+                if (talkTypeEnum == null)
+                {
+                    Log.Error("[RimTalk AI Summarizer] ❌ TalkType enum not found");
+                    Log.Error("[RimTalk AI Summarizer] Tried: RimTalk.Source.Data.TalkType and RimTalk.Data.TalkType");
+                    
+                    // 列出可用的类型（调试）
+                    if (Prefs.DevMode)
+                    {
+                        Log.Message("[RimTalk AI Summarizer] Available types in RimTalk.Source.Data:");
+                        foreach (var type in talkRequestType.Assembly.GetTypes().Where(t => t.Namespace == "RimTalk.Source.Data"))
+                        {
+                            Log.Message($"  - {type.FullName}");
+                        }
+                    }
+                    
                     return null;
                 }
                 
-                string summary = result.ToString();
+                Log.Message($"[RimTalk AI Summarizer] ✓ Found TalkType enum: {talkTypeEnum.FullName}");
+                
+                // 解析 TalkType.Other
+                object otherValue;
+                try
+                {
+                    otherValue = System.Enum.Parse(talkTypeEnum, "Other");
+                }
+                catch
+                {
+                    // 如果 "Other" 不存在，尝试 "User" 或使用第一个值
+                    try
+                    {
+                        otherValue = System.Enum.Parse(talkTypeEnum, "User");
+                    }
+                    catch
+                    {
+                        // 使用枚举的第一个值
+                        var values = System.Enum.GetValues(talkTypeEnum);
+                        if (values.Length == 0)
+                        {
+                            Log.Error("[RimTalk AI Summarizer] ❌ TalkType enum has no values");
+                            return null;
+                        }
+                        otherValue = values.GetValue(0);
+                    }
+                }
+                
+                Log.Message($"[RimTalk AI Summarizer] ✓ TalkType value: {otherValue}");
+                
+                // 创建 TalkRequest 对象
+                // TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, TalkType talkType = TalkType.Other)
+                object talkRequest = null;
+                try
+                {
+                    talkRequest = System.Activator.CreateInstance(
+                        talkRequestType,
+                        new object[] { customPrompt, pawn, null, otherValue }
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[RimTalk AI Summarizer] ❌ Failed to create TalkRequest: {ex.Message}");
+                    if (Prefs.DevMode)
+                        Log.Error($"  InnerException: {ex.InnerException?.Message}");
+                    return null;
+                }
+                
+                if (talkRequest == null)
+                {
+                    Log.Error("[RimTalk AI Summarizer] ❌ TalkRequest is null");
+                    return null;
+                }
+                
+                Log.Message("[RimTalk AI Summarizer] ✓ TalkRequest created");
+
+                // 创建空的消息历史 List<(Role, string)>
+                var roleType = talkRequestType.Assembly.GetType("RimTalk.Data.Role");
+                if (roleType == null)
+                {
+                    Log.Error("[RimTalk AI Summarizer] ❌ Role enum not found");
+                    
+                    if (Prefs.DevMode)
+                    {
+                        Log.Message("[RimTalk AI Summarizer] Available types in RimTalk.Data:");
+                        foreach (var type in talkRequestType.Assembly.GetTypes().Where(t => t.Namespace == "RimTalk.Data").Take(20))
+                        {
+                            Log.Message($"  - {type.FullName}");
+                        }
+                    }
+                    
+                    return null;
+                }
+                
+                Log.Message($"[RimTalk AI Summarizer] ✓ Found Role enum: {roleType.FullName}");
+                
+                var tupleType = typeof(System.ValueTuple<,>).MakeGenericType(roleType, typeof(string));
+                var messagesType = typeof(System.Collections.Generic.List<>).MakeGenericType(tupleType);
+                var messages = System.Activator.CreateInstance(messagesType);
+                
+                if (messages == null)
+                {
+                    Log.Error("[RimTalk AI Summarizer] ❌ Failed to create messages list");
+                    return null;
+                }
+                
+                Log.Message("[RimTalk AI Summarizer] ✓ Messages list created");
+                
+                // 调用 AIService.Chat(TalkRequest, messages)
+                Log.Message("[RimTalk AI Summarizer] 🌐 Calling AI API (this may take a few seconds)...");
+                
+                object task = null;
+                try
+                {
+                    task = chatMethod.Invoke(null, new object[] { talkRequest, messages });
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[RimTalk AI Summarizer] ❌ Failed to invoke Chat method: {ex.Message}");
+                    if (ex.InnerException != null)
+                    {
+                        Log.Error($"  InnerException: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                    }
+                    return null;
+                }
+                
+                if (task == null)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ❌ AI API returned null task");
+                    return null;
+                }
+                
+                Log.Message("[RimTalk AI Summarizer] ✓ Task created, waiting for completion...");
+                
+                // 等待 Task 完成
+                var taskType = task.GetType();
+                var isCompletedProp = taskType.GetProperty("IsCompleted");
+                var resultProp = taskType.GetProperty("Result");
+                
+                if (isCompletedProp == null || resultProp == null)
+                {
+                    Log.Error("[RimTalk AI Summarizer] ❌ Task properties not found");
+                    return null;
+                }
+                
+                // 简单的等待（最多10秒）
+                int waitCount = 0;
+                while (!(bool)isCompletedProp.GetValue(task) && waitCount < 100)
+                {
+                    System.Threading.Thread.Sleep(100);
+                    waitCount++;
+                }
+                
+                if (waitCount >= 100)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ⏱️ AI request timed out (10 seconds)");
+                    return null;
+                }
+                
+                Log.Message($"[RimTalk AI Summarizer] ✓ Task completed in {waitCount * 100}ms");
+                
+                // 获取结果 List<TalkResponse>
+                object responsesList = null;
+                try
+                {
+                    responsesList = resultProp.GetValue(task);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[RimTalk AI Summarizer] ❌ Failed to get task result: {ex.Message}");
+                    if (ex.InnerException != null)
+                        Log.Error($"  InnerException: {ex.InnerException.Message}");
+                    return null;
+                }
+                
+                if (responsesList == null)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ❌ AI returned null response");
+                    return null;
+                }
+                
+                // 从 List<TalkResponse> 中提取文本
+                var listType = responsesList.GetType();
+                var countProp = listType.GetProperty("Count");
+                int count = (int)countProp.GetValue(responsesList);
+                
+                if (count == 0)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ⚠️ AI returned empty response list");
+                    return null;
+                }
+                
+                Log.Message($"[RimTalk AI Summarizer] ✓ Got {count} response(s)");
+                
+                var getItemMethod = listType.GetProperty("Item");
+                var firstResponse = getItemMethod.GetValue(responsesList, new object[] { 0 });
+                
+                if (firstResponse == null)
+                {
+                    Log.Warning("[RimTalk AI Summarizer] ❌ First response is null");
+                    return null;
+                }
+                
+                // 获取 TalkResponse.Text
+                var textProp = talkResponseType.GetProperty("Text");
+                if (textProp == null)
+                {
+                    Log.Error("[RimTalk AI Summarizer] ❌ TalkResponse.Text property not found");
+                    return null;
+                }
+                
+                string summary = (string)textProp.GetValue(firstResponse);
                 
                 if (string.IsNullOrEmpty(summary))
                 {
-                    Log.Warning($"[RimTalk AI Summarizer] API returned empty summary for {pawn.LabelShort}");
+                    Log.Warning("[RimTalk AI Summarizer] ⚠️ AI returned empty summary text");
                     return null;
                 }
                 
-                Log.Message($"[RimTalk AI Summarizer] ✅ Generated summary for {pawn.LabelShort}: {summary.Substring(0, System.Math.Min(60, summary.Length))}...");
+                Log.Message($"[RimTalk AI Summarizer] ✅ AI summary generated: {summary.Substring(0, System.Math.Min(60, summary.Length))}...");
                 return summary;
             }
-            catch (TargetInvocationException ex)
+            catch (System.Reflection.TargetInvocationException ex)
             {
-                // 方法调用时的异常
-                Log.Error($"[RimTalk AI Summarizer] ❌ API invocation failed for {pawn.LabelShort}:");
-                Log.Error($"  Inner Exception: {ex.InnerException?.GetType().Name}");
+                Log.Error($"[RimTalk AI Summarizer] ❌ API invocation failed:");
+                Log.Error($"  Inner Exception: {ex.InnerException?.GetType().FullName}");
                 Log.Error($"  Message: {ex.InnerException?.Message}");
-                if (Prefs.DevMode)
-                    Log.Error($"  StackTrace: {ex.InnerException?.StackTrace}");
-            }
-            catch (ArgumentException ex)
-            {
-                // 参数错误
-                Log.Error($"[RimTalk AI Summarizer] ❌ Invalid arguments for {pawn.LabelShort}:");
-                Log.Error($"  Message: {ex.Message}");
+                if (Prefs.DevMode && ex.InnerException != null)
+                    Log.Error($"  StackTrace: {ex.InnerException.StackTrace}");
             }
             catch (Exception ex)
             {
-                // 其他异常
-                Log.Error($"[RimTalk AI Summarizer] ❌ Unexpected error for {pawn.LabelShort}:");
-                Log.Error($"  Exception: {ex.GetType().Name}");
+                Log.Error($"[RimTalk AI Summarizer] ❌ Unexpected error:");
+                Log.Error($"  Exception: {ex.GetType().FullName}");
                 Log.Error($"  Message: {ex.Message}");
                 if (Prefs.DevMode)
                     Log.Error($"  StackTrace: {ex.StackTrace}");
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// 构建 AI 总结的提示词
-        /// </summary>
-        private static string BuildSummarizationPrompt(Pawn pawn, System.Collections.Generic.List<MemoryEntry> memories, MemoryType type)
-        {
-            var prompt = new System.Text.StringBuilder();
-            
-            prompt.AppendLine($"请为 {pawn.LabelShort} 总结以下{memories.Count}条记忆。");
-            prompt.AppendLine($"记忆类型：{type}");
-            prompt.AppendLine();
-            prompt.AppendLine("核心要求：");
-            prompt.AppendLine("1. **只保留关键信息**：WHO（谁）、WHERE（哪里）、WHAT（做了什么/说了什么）");
-            prompt.AppendLine("2. **去除所有修饰语**：不要形容词、副词、情感描述");
-            prompt.AppendLine("3. **极简表达**：用最少的词表达完整信息");
-            prompt.AppendLine("4. **统计频率**：相似事件合并并注明次数（如 ×3）");
-            prompt.AppendLine("5. **长度限制**：总结不超过60字");
-            prompt.AppendLine();
-            prompt.AppendLine("格式示例：");
-            prompt.AppendLine("- 对话类：\"与 Mary 交谈工作安排×3、讨论食物储备×2\"");
-            prompt.AppendLine("- 行动类：\"烹饪简单餐食×5、清理房间×2、种植土豆×3\"");
-            prompt.AppendLine("- 互动类：\"与 John 闲聊×4、与 Sarah 深谈×1\"");
-            prompt.AppendLine();
-            prompt.AppendLine("原始记忆：");
-            
-            int index = 1;
-            foreach (var memory in memories.Take(20))
-            {
-                prompt.AppendLine($"{index}. {memory.content}");
-                index++;
-            }
-            
-            prompt.AppendLine();
-            prompt.AppendLine("请直接输出总结（不要解释）：");
-
-            return prompt.ToString();
         }
     }
 
