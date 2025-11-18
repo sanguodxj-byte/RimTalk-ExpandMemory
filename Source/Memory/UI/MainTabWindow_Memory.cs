@@ -226,7 +226,7 @@ namespace RimTalk.Memory.UI
             }
             if (Mouse.IsOver(abmRect))
             {
-                TooltipHandler.TipRegion(abmRect, "超短期记忆 (Active Buffer Memory)\n当前对话上下文");
+                TooltipHandler.TipRegion(abmRect, "超短期记忆 (Active Buffer Memory)\n当前对话上下文\n\n左键：显示/隐藏");
             }
             
             // SCM 按钮（短期）
@@ -238,32 +238,84 @@ namespace RimTalk.Memory.UI
             }
             if (Mouse.IsOver(scmRect))
             {
-                TooltipHandler.TipRegion(scmRect, "短期记忆 (Situational Context Memory)\n最近几天的事件和互动");
+                TooltipHandler.TipRegion(scmRect, "短期记忆 (Situational Context Memory)\n最近几天的事件和互动\n\n左键：显示/隐藏");
             }
             
-            // ELS 按钮（中期）
+            // ELS 按钮（中期） - 支持右键添加
             Rect elsRect = new Rect(rect.x + buttonWidth * 2, rect.y, buttonWidth - spacing, rect.height);
             string elsLabel = "ELS" + (showELS ? " ✓" : "");
+            
+            // 左键切换显示
             if (Widgets.ButtonText(elsRect, elsLabel))
             {
                 showELS = !showELS;
             }
-            if (Mouse.IsOver(elsRect))
+            
+            // 右键弹出菜单
+            if (Mouse.IsOver(elsRect) && Event.current.type == EventType.MouseDown && Event.current.button == 1)
             {
-                TooltipHandler.TipRegion(elsRect, "中期记忆 (Event Log Summary)\nAI总结的阶段性事件");
+                Event.current.Use();
+                ShowAddMemoryContextMenu(MemoryLayer.EventLog);
             }
             
-            // CLPA 按钮（长期）
+            if (Mouse.IsOver(elsRect))
+            {
+                TooltipHandler.TipRegion(elsRect, "中期记忆 (Event Log Summary)\nAI总结的阶段性事件\n\n左键：显示/隐藏\n右键：添加记忆到此层");
+            }
+            
+            // CLPA 按钮（长期） - 支持右键添加
             Rect clpaRect = new Rect(rect.x + buttonWidth * 3, rect.y, buttonWidth - spacing, rect.height);
             string clpaLabel = "CLPA" + (showCLPA ? " ✓" : "");
+            
+            // 左键切换显示
             if (Widgets.ButtonText(clpaRect, clpaLabel))
             {
                 showCLPA = !showCLPA;
             }
+            
+            // 右键弹出菜单
+            if (Mouse.IsOver(clpaRect) && Event.current.type == EventType.MouseDown && Event.current.button == 1)
+            {
+                Event.current.Use();
+                ShowAddMemoryContextMenu(MemoryLayer.Archive);
+            }
+            
             if (Mouse.IsOver(clpaRect))
             {
-                TooltipHandler.TipRegion(clpaRect, "长期记忆 (Colony Lore & Persona Archive)\n核心人设和重要里程碑");
+                TooltipHandler.TipRegion(clpaRect, "长期记忆 (Colony Lore & Persona Archive)\n核心人设和重要里程碑\n\n左键：显示/隐藏\n右键：添加记忆到此层");
             }
+        }
+
+        /// <summary>
+        /// 显示添加记忆的上下文菜单
+        /// </summary>
+        private void ShowAddMemoryContextMenu(MemoryLayer targetLayer)
+        {
+            if (selectedPawn == null || currentMemoryComp == null) return;
+
+            string layerName = targetLayer == MemoryLayer.EventLog ? "ELS（中期记忆）" : "CLPA（长期记忆）";
+            
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            
+            // 选项1：添加行动记忆
+            options.Add(new FloatMenuOption($"添加行动记忆到 {layerName}", delegate
+            {
+                Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp as FourLayerMemoryComp, targetLayer, MemoryType.Action));
+            }));
+            
+            // 选项2：添加对话记忆
+            options.Add(new FloatMenuOption($"添加对话记忆到 {layerName}", delegate
+            {
+                Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp as FourLayerMemoryComp, targetLayer, MemoryType.Conversation));
+            }));
+            
+            // 选项3：添加互动记忆
+            options.Add(new FloatMenuOption($"添加互动记忆到 {layerName}", delegate
+            {
+                Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp as FourLayerMemoryComp, targetLayer, MemoryType.Interaction));
+            }));
+            
+            Find.WindowStack.Add(new FloatMenu(options));
         }
 
         private void DrawMemoryStats(Rect rect, PawnMemoryComp memoryComp)

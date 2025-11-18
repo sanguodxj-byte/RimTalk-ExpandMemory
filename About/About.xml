@@ -1,24 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
 	<packageId>cj.rimtalk.memorypatch</packageId>
 	<name>RimTalk Memory Patch</name>
 	<author>Community Enhancement</author>
-	<description>为 RimTalk 提供记忆系统支持！
+	<supportedVersions>
+		<li>1.5</li>
+		<li>1.6</li>
+	</supportedVersions>
+	<description>为 RimTalk 提供四层记忆系统支持！
 
-Memory system support for RimTalk!
+Memory system support for RimTalk with Four-Layer Architecture!
 
 核心功能 / Core Features：
-• 记忆系统 - 殖民者记住互动、工作和活动
-• 记忆 UI - 查看和管理记忆
-• 公共 API - RimTalk 可调用记忆数据
-• 长短期记忆 - 自动管理和衰减
-• 记忆去重 - 避免重复内容
+• 四层记忆架构 - ABM/SCM/ELS/CLPA 分层管理
+  Four-Layer Memory - ABM/SCM/ELS/CLPA hierarchical system
+  
+• ABM (Active Buffer Memory) - 超短期记忆，当前对话上下文
+  ABM - Ultra-short term, current conversation context
+  
+• SCM (Situational Context Memory) - 短期记忆，最近几天的事件
+  SCM - Short-term, recent days' events and interactions
+  
+• ELS (Event Log Summary) - 中期记忆，AI 总结的阶段性事件
+  ELS - Medium-term, AI-summarized periodic events
+  
+• CLPA (Colony Lore & Persona Archive) - 长期记忆，核心人设和里程碑
+  CLPA - Long-term, core persona and major milestones
 
-Memory system - Colonists remember interactions, work, and activities
-Memory UI - View and manage memories
-Public API - RimTalk can access memory data
-Short/long-term memory - Auto-managed with decay
-Deduplication - Avoids repetitive content
+• AI 智能总结 - 自动将短期记忆总结为精简的中长期记忆
+  AI Summarization - Auto-convert short-term to concise long-term memories
+  
+• 记忆编辑器 - 手动编辑、固定和管理各层级记忆
+  Memory Editor - Manually edit, pin, and manage memories at all layers
+  
+• 公共 API - RimTalk 可调用完整记忆数据
+  Public API - RimTalk can access complete memory data
 
 ---
 
@@ -26,46 +42,49 @@ Deduplication - Avoids repetitive content
 1. 启用 Harmony
 2. 启用 RimTalk (cj.rimtalk)
 3. 启用此补丁 (cj.rimtalk.memorypatch)
-4. 重启游戏
+4. 在 RimTalk 设置中配置 AI API（可选，用于智能总结）
+5. 重启游戏
 
 1. Enable Harmony
 2. Enable RimTalk (cj.rimtalk)
 3. Enable this patch (cj.rimtalk.memorypatch)
-4. Restart game
+4. Configure AI API in RimTalk settings (optional, for AI summarization)
+5. Restart game
 
 ---
 
 RimTalk 集成 / RimTalk Integration：
-本 Mod 提供记忆数据支持。
-RimTalk 原作者可通过公共 API 调用记忆系统，让对话更有上下文。
+本 Mod 提供完整的分层记忆数据支持。
+RimTalk 可通过 API 获取不同层级的记忆，实现上下文感知对话。
 
-This mod provides memory data support.
-RimTalk authors can integrate via public API for context-aware conversations.
+This mod provides complete hierarchical memory data support.
+RimTalk can access different memory layers via API for context-aware conversations.
+
+技术特性 / Technical Features：
+• 异步 AI 总结，不阻塞游戏主线程
+  Async AI summarization without blocking main thread
+• 回调机制，安全的跨线程更新
+  Callback mechanism for safe cross-thread updates
+• 自动化部署脚本
+  Automated deployment script
 
 详细文档 / Documentation：
-查看 Mod 文件夹中的文档
-See documentation in mod folder
+GitHub: https://github.com/sanguodxj-byte/RimTalk-MemoryPatch
 
 ---
 
-此 Mod 是 RimTalk 的增强补丁，不覆盖原版功能，仅添加记忆系统。
-This is an enhancement patch for RimTalk. It does not override original features.
+版本 / Version: 2.0.0
+最后更新 / Last Updated: 2025-01
 	</description>
-	<supportedVersions>
-		<li>1.5</li>
-		<li>1.6</li>
-	</supportedVersions>
 	<modDependencies>
 		<li>
 			<packageId>brrainz.harmony</packageId>
 			<displayName>Harmony</displayName>
-			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
-			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077</steamWorkshopUrl>
 		</li>
 		<li>
 			<packageId>cj.rimtalk</packageId>
 			<displayName>RimTalk</displayName>
-			<steamWorkshopUrl>steam://url/CommunityFilePage/3551203752</steamWorkshopUrl>
 		</li>
 	</modDependencies>
 	<loadAfter>
