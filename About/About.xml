@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<packageId>cj.rimtalk.memorypatch</packageId>
-	<name>RimTalk Memory Patch</name>
+	<packageId>cj.rimtalk.expandmemory</packageId>
+	<name>RimTalk-Expand Memory</name>
 	<author>Community Enhancement</author>
 	<supportedVersions>
 		<li>1.5</li>
@@ -64,12 +64,12 @@ AI 配置说明 / AI Configuration：
 
 使用方法 / How to use：
 1. 启用 Harmony
-2. 启用此 Mod (cj.rimtalk.memorypatch)
+2. 启用此 Mod (cj.rimtalk.expandmemory)
 3. （可选）在设置中配置 AI API 以启用智能总结
 4. 重启游戏
 
 1. Enable Harmony
-2. Enable this mod (cj.rimtalk.memorypatch)
+2. Enable this mod (cj.rimtalk.expandmemory)
 3. (Optional) Configure AI API in settings for smart summarization
 4. Restart game
 
@@ -101,7 +101,7 @@ AI 配置说明 / AI Configuration：
   Full multi-language support
 
 详细文档 / Documentation：
-GitHub: https://github.com/sanguodxj-byte/RimTalk-MemoryPatch
+GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
 
 ---
 

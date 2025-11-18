@@ -1,4 +1,4 @@
-using Verse;
+﻿using Verse;
 using UnityEngine;
 using HarmonyLib;
 
@@ -12,9 +12,9 @@ namespace RimTalk.MemoryPatch
         {
             Settings = GetSettings<RimTalkMemoryPatchSettings>();
             // Use different Harmony ID to avoid conflicts with original RimTalk
-            var harmony = new Harmony("cj.rimtalk.memorypatch");
+            var harmony = new Harmony("cj.rimtalk.expandmemory");
             harmony.PatchAll();
-            Log.Message("[RimTalk Memory Patch] Memory system enhancement loaded successfully.");
+            Log.Message("[RimTalk-Expand Memory] Memory system enhancement loaded successfully.");
         }
 
         public override void DoSettingsWindowContents(Rect inRect)
@@ -25,7 +25,7 @@ namespace RimTalk.MemoryPatch
 
         public override string SettingsCategory()
         {
-            return "RimTalk_MemoryPatchSettings".Translate();
+            return "RimTalk-Expand Memory";
         }
     }
 }

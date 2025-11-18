@@ -2,17 +2,17 @@
 setlocal
 
 :: =================================================
-:: RimTalk Memory Patch - Deployment Script
+:: RimTalk-Expand Memory - Deployment Script
 :: =================================================
 
 :: --- Configuration ---
 set "PROJECT_DIR=%~dp0"
-set "DEST_DIR=D:\steam\steamapps\common\RimWorld\Mods\RimTalk-MemoryPatch"
+set "DEST_DIR=D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory"
 set "GAME_PROCESS=RimWorldWin64.exe"
 
 :: --- Main Logic ---
 echo.
-echo [DEPLOY] Starting deployment of RimTalk Memory Patch...
+echo [DEPLOY] Starting deployment of RimTalk-Expand Memory...
 echo.
 
 :: 1. Check if RimWorld is running
