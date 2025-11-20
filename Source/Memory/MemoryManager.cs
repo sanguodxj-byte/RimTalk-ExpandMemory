@@ -75,12 +75,12 @@ namespace RimTalk.Memory
             base.WorldComponentTick();
 
             // 每小时衰减记忆活跃度
-            if (Find.TickManager.TicksGame - lastDecayTick > DecayInterval)
+            if (Find.TickManager.TicksGame - lastDecayTick >= DecayInterval)
             {
                 DecayAllMemories();
                 lastDecayTick = Find.TickManager.TicksGame;
                 
-                // 同时检查工作会话超时
+                // 检查工作会话超时
                 WorkSessionAggregator.CheckSessionTimeouts();
             }
             
