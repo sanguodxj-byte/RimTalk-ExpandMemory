@@ -1,0 +1,1016 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using Verse;
+using RimWorld;
+using RimTalk.MemoryPatch;
+
+namespace RimTalk.Memory
+{
+    /// <summary>
+    /// Component attached to pawns to track their memories
+    /// </summary>
+    public class PawnMemoryComp : ThingComp
+    {
+        private List<MemoryEntry> shortTermMemories = new List<MemoryEntry>();
+        private List<MemoryEntry> longTermMemories = new List<MemoryEntry>();
+
+        public List<MemoryEntry> ShortTermMemories 
+        { 
+            get { return shortTermMemories; }
+        }
+        
+        public List<MemoryEntry> LongTermMemories 
+        { 
+            get { return longTermMemories; }
+        }
+
+        public override void PostExposeData()
+        {
+            base.PostExposeData();
+            Scribe_Collections.Look(ref shortTermMemories, "shortTermMemories", LookMode.Deep);
+            Scribe_Collections.Look(ref longTermMemories, "longTermMemories", LookMode.Deep);
+
+            if (shortTermMemories == null)
+                shortTermMemories = new List<MemoryEntry>();
+            if (longTermMemories == null)
+                longTermMemories = new List<MemoryEntry>();
+        }
+
+        public void AddMemory(string content, MemoryType type, float importance = 1f, string relatedPawn = null)
+        {
+            // 短期记忆去重：检查最近3条是否有完全相同的
+            if (IsDuplicateOfRecent(content, type))
+            {
+                return;
+            }
+
+            var memory = new MemoryEntry(content, type, importance, relatedPawn);
+
+            // 短期记忆保留详细信息
+            shortTermMemories.Insert(0, memory);
+
+            // 不再自动触发总结，等待每日总结
+            // TrimMemories(); // 已移除
+            
+            // 只在短期记忆数量过多时进行修剪（防止内存泄漏）
+            int maxShortTerm = RimTalkMemoryPatchMod.Settings.maxShortTermMemories;
+            if (shortTermMemories.Count > maxShortTerm * 2) // 设置为上限的2倍
+            {
+                Log.Warning($"[RimTalk Memory] {parent.LabelShort}: Short-term memory overflow ({shortTermMemories.Count}), removing oldest entries");
+                // 删除最旧的记忆
+                while (shortTermMemories.Count > maxShortTerm)
+                {
+                    shortTermMemories.RemoveAt(shortTermMemories.Count - 1);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检查是否与最近记忆重复
+        /// </summary>
+        private bool IsDuplicateOfRecent(string content, MemoryType type)
+        {
+            var recentMemories = shortTermMemories.Take(3);
+            
+            foreach (var recent in recentMemories)
+            {
+                if (recent.type == type && recent.content == content)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        private void TrimMemories()
+        {
+            int maxShort = RimTalkMemoryPatchMod.Settings.maxShortTermMemories;
+            int maxLong = RimTalkMemoryPatchMod.Settings.maxLongTermMemories;
+
+            // 短期记忆达到上限：智能总结并转换为长期记忆
+            if (shortTermMemories.Count >= maxShort)
+            {
+                Log.Message($"[RimTalk Memory] {parent.LabelShort}: Short-term memory limit reached ({shortTermMemories.Count}/{maxShort})");
+                
+                var summaries = CreateIntelligentSummaries();
+                
+                // 终极保护：如果总结列表为空，直接保存原始记忆
+                if (summaries.Count == 0)
+                {
+                    Log.Error($"[RimTalk Memory] {parent.LabelShort}: CRITICAL - No summaries generated! Saving raw memories instead.");
+                    
+                    // 直接将最重要的短期记忆转为长期记忆
+                    var importantMemories = shortTermMemories
+                        .OrderByDescending(m => m.importance)
+                        .Take(maxShort / 2); // 保留一半最重要的
+                    
+                    foreach (var memory in importantMemories)
+                    {
+                        // 创建简化版本
+                        string simplified = SimplifyContent(memory.content, 100);
+                        
+                        var longTermEntry = new MemoryEntry(
+                            content: $"[原始记忆] {simplified}",
+                            type: memory.type,
+                            importance: memory.importance,
+                            relatedPawn: memory.relatedPawnName
+                        );
+                        
+                        if (!IsDuplicateInLongTerm(longTermEntry))
+                        {
+                            longTermMemories.Add(longTermEntry);
+                            Log.Message($"[RimTalk Memory] Saved raw memory: {simplified.Substring(0, Math.Min(30, simplified.Length))}...");
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var summary in summaries)
+                    {
+                        // 验证总结内容不为空
+                        if (summary != null && !string.IsNullOrWhiteSpace(summary.content))
+                        {
+                            // 长期记忆去重：检查是否已存在相似内容
+                            if (!IsDuplicateInLongTerm(summary))
+                            {
+                                longTermMemories.Add(summary);
+                                Log.Message($"[RimTalk Memory] Added summary: {summary.content.Substring(0, Math.Min(40, summary.content.Length))}...");
+                            }
+                            else
+                            {
+                                Log.Message($"[RimTalk Memory] Skipped duplicate summary");
+                            }
+                        }
+                        else
+                        {
+                            Log.Warning($"[RimTalk Memory] Skipped empty/null summary");
+                        }
+                    }
+                }
+                
+                int oldCount = shortTermMemories.Count;
+                int newCount = summaries.Count;
+                
+                Log.Message($"[RimTalk Memory] {parent.LabelShort}: Summarized {oldCount} short-term -> {newCount} summaries -> {longTermMemories.Count} total long-term");
+                
+                shortTermMemories.Clear();
+            }
+
+            // 长期记忆达到上限：删除最旧且最不重要的
+            while (longTermMemories.Count > maxLong)
+            {
+                var leastImportant = longTermMemories
+                    .OrderBy(m => m.importance)
+                    .ThenBy(m => m.timestamp)
+                    .First();
+                    
+                longTermMemories.Remove(leastImportant);
+                Log.Message($"[RimTalk Memory] {parent.LabelShort}: Removed low-importance long-term memory");
+            }
+        }
+
+        /// <summary>
+        /// 智能总结短期记忆：按类型和时间段分组，生成简洁但不丢失信息的总结
+        /// </summary>
+        private List<MemoryEntry> CreateIntelligentSummaries()
+        {
+            var summaries = new List<MemoryEntry>();
+            
+            if (shortTermMemories.Count == 0)
+                return summaries;
+
+            Log.Message($"[RimTalk Memory] {parent.LabelShort}: Starting to summarize {shortTermMemories.Count} short-term memories");
+
+            // 按类型分组
+            var byType = shortTermMemories.GroupBy(m => m.type);
+            
+            foreach (var typeGroup in byType)
+            {
+                var memories = typeGroup.OrderByDescending(m => m.timestamp).ToList();
+                
+                Log.Message($"[RimTalk Memory] Processing {memories.Count} memories of type {typeGroup.Key}");
+                
+                // 根据类型采用不同的总结策略
+                switch (typeGroup.Key)
+                {
+                    case MemoryType.Conversation:
+                        var convSummaries = SummarizeConversations(memories);
+                        Log.Message($"[RimTalk Memory] Generated {convSummaries.Count} conversation summaries");
+                        summaries.AddRange(convSummaries);
+                        break;
+                        
+                    case MemoryType.Action:
+                        var actionSummary = SummarizeActions(memories);
+                        if (actionSummary != null)
+                        {
+                            Log.Message($"[RimTalk Memory] Generated action summary: {actionSummary.content}");
+                            summaries.Add(actionSummary);
+                        }
+                        else
+                        {
+                            Log.Warning($"[RimTalk Memory] Action summary is null!");
+                        }
+                        break;
+                        
+                    case MemoryType.Interaction:
+                        var intSummaries = SummarizeInteractions(memories);
+                        Log.Message($"[RimTalk Memory] Generated {intSummaries.Count} interaction summaries");
+                        summaries.AddRange(intSummaries);
+                        break;
+                        
+                    case MemoryType.Observation:
+                        var obsSummary = SummarizeObservations(memories);
+                        if (obsSummary != null)
+                        {
+                            Log.Message($"[RimTalk Memory] Generated observation summary: {obsSummary.content}");
+                            summaries.Add(obsSummary);
+                        }
+                        else
+                        {
+                            Log.Warning($"[RimTalk Memory] Observation summary is null!");
+                        }
+                        break;
+                        
+                    default:
+                        var genericSummary = SummarizeGeneric(memories, typeGroup.Key);
+                        if (genericSummary != null)
+                        {
+                            summaries.Add(genericSummary);
+                        }
+                        break;
+                }
+            }
+            
+            var result = summaries.Where(s => s != null && !string.IsNullOrEmpty(s.content)).ToList();
+            Log.Message($"[RimTalk Memory] {parent.LabelShort}: Created {result.Count} valid summaries");
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 总结对话：优先使用 AI，失败时回退到规则总结
+        /// </summary>
+        private List<MemoryEntry> SummarizeConversations(List<MemoryEntry> conversations)
+        {
+            var summaries = new List<MemoryEntry>();
+            
+            // 按对话对象分组
+            var byPerson = conversations.GroupBy(c => c.relatedPawnName ?? "未知");
+            
+            foreach (var personGroup in byPerson)
+            {
+                var convos = personGroup.ToList();
+                if (convos.Count == 0) continue;
+                
+                // 尝试使用 AI 总结
+                string aiSummary = TryAISummarize(convos, MemoryType.Conversation);
+                
+                if (!string.IsNullOrEmpty(aiSummary))
+                {
+                    // AI 总结成功
+                    summaries.Add(new MemoryEntry(
+                        content: aiSummary,
+                        type: MemoryType.Conversation,
+                        importance: convos.Average(c => c.importance) + 0.15f, // AI 总结质量更高
+                        relatedPawn: personGroup.Key
+                    ));
+                }
+                else
+                {
+                    // AI 总结失败，使用规则总结
+                    summaries.Add(SummarizeConversationsRuleBased(convos, personGroup.Key));
+                }
+            }
+            
+            return summaries;
+        }
+
+        /// <summary>
+        /// 规则总结对话（回退方案）- 精简版
+        /// </summary>
+        private MemoryEntry SummarizeConversationsRuleBased(List<MemoryEntry> convos, string personName)
+        {
+            var keyConvos = convos.OrderByDescending(c => c.importance).Take(3).ToList();
+            
+            Log.Message($"[RimTalk Memory] 📝 Summarizing {convos.Count} conversations with {personName}:");
+            foreach (var convo in keyConvos)
+            {
+                Log.Message($"    Original: [{convo.content}]");
+            }
+            
+            StringBuilder summary = new StringBuilder();
+            summary.Append($"与{personName}交谈");
+            
+            if (convos.Count > 1)
+            {
+                summary.Append($"×{convos.Count}");
+            }
+            
+            // 尝试提取关键词
+            var topics = new List<string>();
+            if (keyConvos.Any())
+            {
+                foreach (var convo in keyConvos)
+                {
+                    string topic = ExtractKeywords(convo.content, 10);
+                    Log.Message($"    Extracted topic: [{topic}]");
+                    
+                    if (!string.IsNullOrEmpty(topic))
+                    {
+                        // 去重：只添加不重复的主题
+                        if (!topics.Contains(topic))
+                        {
+                            topics.Add(topic);
+                        }
+                        else
+                        {
+                            Log.Message($"      (skipped - duplicate)");
+                        }
+                    }
+                }
+            }
+            
+            // 如果没有提取到任何主题，使用原始内容
+            if (topics.Count == 0)
+            {
+                Log.Warning($"[RimTalk Memory] ⚠️ No topics extracted for conversations, using original content");
+                foreach (var convo in keyConvos)
+                {
+                    string simplified = SimplifyContent(convo.content, 15);
+                    Log.Message($"    Simplified: [{simplified}]");
+                    
+                    if (!string.IsNullOrEmpty(simplified) && !topics.Contains(simplified))
+                    {
+                        topics.Add(simplified);
+                    }
+                }
+            }
+            
+            // 最终保护：如果还是没有内容，至少保留一条完整记忆
+            if (topics.Count == 0 && convos.Any())
+            {
+                Log.Error($"[RimTalk Memory] ❌ CRITICAL: Still no topics! Using first conversation as-is");
+                string fallback = convos[0].content.Substring(0, Math.Min(20, convos[0].content.Length));
+                topics.Add(fallback);
+                Log.Message($"    Fallback: [{fallback}]");
+            }
+            
+            // 添加主题到总结
+            if (topics.Count > 0)
+            {
+                summary.Append("：");
+                summary.Append(string.Join("、", topics.Take(3)));
+            }
+            
+            string result = summary.ToString();
+            Log.Message($"[RimTalk Memory] ✅ Conversation summary result: [{result}]");
+            
+            return new MemoryEntry(
+                content: result,
+                type: MemoryType.Conversation,
+                importance: convos.Average(c => c.importance) + 0.1f,
+                relatedPawn: personName
+            );
+        }
+
+        /// <summary>
+        /// 总结行动：优先使用 AI
+        /// </summary>
+        private MemoryEntry SummarizeActions(List<MemoryEntry> actions)
+        {
+            if (actions.Count == 0) return null;
+            
+            // 尝试使用 AI 总结
+            string aiSummary = TryAISummarize(actions, MemoryType.Action);
+            
+            if (!string.IsNullOrEmpty(aiSummary))
+            {
+                return new MemoryEntry(
+                    content: aiSummary,
+                    type: MemoryType.Action,
+                    importance: actions.Average(a => a.importance) + 0.1f,
+                    relatedPawn: null
+                );
+            }
+            
+            // AI 失败，使用规则总结
+            return SummarizeActionsRuleBased(actions);
+        }
+
+        /// <summary>
+        /// 规则总结行动（回退方案）- 精简版
+        /// </summary>
+        private MemoryEntry SummarizeActionsRuleBased(List<MemoryEntry> actions)
+        {
+            var actionCounts = new Dictionary<string, int>();
+            
+            foreach (var action in actions)
+            {
+                string key = ExtractKeywords(action.content, 15);
+                
+                if (!string.IsNullOrEmpty(key))
+                {
+                    // 统计相同关键词的出现次数（自动去重）
+                    if (!actionCounts.ContainsKey(key))
+                        actionCounts[key] = 0;
+                    actionCounts[key]++;
+                }
+            }
+            
+            StringBuilder summary = new StringBuilder();
+            summary.Append("行动：");
+            
+            // 如果没有提取到任何关键词，使用原始内容
+            if (actionCounts.Count == 0)
+            {
+                Log.Warning($"[RimTalk Memory] No keywords extracted for actions, using original content");
+                var topActions = actions.OrderByDescending(a => a.importance).Take(3);
+                var parts = new List<string>();
+                foreach (var action in topActions)
+                {
+                    string simplified = SimplifyContent(action.content, 20);
+                    if (!string.IsNullOrEmpty(simplified) && !parts.Contains(simplified))
+                    {
+                        parts.Add(simplified);
+                    }
+                }
+                summary.Append(string.Join("、", parts));
+            }
+            else
+            {
+                var topActions = actionCounts.OrderByDescending(kv => kv.Value).Take(4);
+                var parts = new List<string>();
+                
+                foreach (var kv in topActions)
+                {
+                    if (kv.Value > 1)
+                    {
+                        parts.Add($"{kv.Key}×{kv.Value}");
+                    }
+                    else
+                    {
+                        parts.Add(kv.Key);
+                    }
+                }
+                
+                summary.Append(string.Join("、", parts));
+            }
+            
+            string result = summary.ToString();
+            Log.Message($"[RimTalk Memory] Action summary: {result}");
+            
+            return new MemoryEntry(
+                content: result,
+                type: MemoryType.Action,
+                importance: actions.Average(a => a.importance),
+                relatedPawn: null
+            );
+        }
+
+        /// <summary>
+        /// 总结互动：优先使用 AI
+        /// </summary>
+        private List<MemoryEntry> SummarizeInteractions(List<MemoryEntry> interactions)
+        {
+            var summaries = new List<MemoryEntry>();
+            var byPerson = interactions.GroupBy(i => i.relatedPawnName ?? "未知");
+            
+            foreach (var personGroup in byPerson)
+            {
+                var items = personGroup.ToList();
+                if (items.Count == 0) continue;
+                
+                string aiSummary = TryAISummarize(items, MemoryType.Interaction);
+                
+                if (!string.IsNullOrEmpty(aiSummary))
+                {
+                    summaries.Add(new MemoryEntry(
+                        content: aiSummary,
+                        type: MemoryType.Interaction,
+                        importance: items.Average(i => i.importance) + 0.15f,
+                        relatedPawn: personGroup.Key
+                    ));
+                }
+                else
+                {
+                    summaries.Add(SummarizeInteractionsRuleBased(items, personGroup.Key));
+                }
+            }
+            
+            return summaries;
+        }
+
+        /// <summary>
+        /// 规则总结互动（回退方案）- 精简版
+        /// </summary>
+        private MemoryEntry SummarizeInteractionsRuleBased(List<MemoryEntry> items, string personName)
+        {
+            StringBuilder summary = new StringBuilder();
+            summary.Append($"与{personName}互动×{items.Count}：");
+            
+            var keyItems = items.OrderByDescending(i => i.importance).Take(3);
+            var keywords = new List<string>();
+            
+            foreach (var item in keyItems)
+            {
+                string kw = ExtractKeywords(item.content, 12);
+                if (!string.IsNullOrEmpty(kw))
+                {
+                    // 去重：只添加不重复的关键词
+                    if (!keywords.Contains(kw))
+                    {
+                        keywords.Add(kw);
+                    }
+                }
+            }
+            
+            // 如果没有提取到关键词，使用原始内容
+            if (keywords.Count == 0)
+            {
+                Log.Warning($"[RimTalk Memory] No keywords for interactions, using original");
+                foreach (var item in keyItems)
+                {
+                    string simplified = SimplifyContent(item.content, 15);
+                    if (!string.IsNullOrEmpty(simplified) && !keywords.Contains(simplified))
+                    {
+                        keywords.Add(simplified);
+                    }
+                }
+            }
+            
+            summary.Append(string.Join("、", keywords));
+            
+            string result = summary.ToString();
+            Log.Message($"[RimTalk Memory] Interaction summary: {result}");
+            
+            return new MemoryEntry(
+                content: result,
+                type: MemoryType.Interaction,
+                importance: items.Average(i => i.importance) + 0.1f,
+                relatedPawn: personName
+            );
+        }
+
+        /// <summary>
+        /// 总结观察：优先使用 AI
+        /// </summary>
+        private MemoryEntry SummarizeObservations(List<MemoryEntry> observations)
+        {
+            if (observations.Count == 0) return null;
+            
+            string aiSummary = TryAISummarize(observations, MemoryType.Observation);
+            
+            if (!string.IsNullOrEmpty(aiSummary))
+            {
+                return new MemoryEntry(
+                    content: aiSummary,
+                    type: MemoryType.Observation,
+                    importance: observations.Average(o => o.importance) + 0.1f,
+                    relatedPawn: null
+                );
+            }
+            
+            return SummarizeObservationsRuleBased(observations);
+        }
+
+        /// <summary>
+        /// 规则总结观察（回退方案）- 精简版
+        /// </summary>
+        private MemoryEntry SummarizeObservationsRuleBased(List<MemoryEntry> observations)
+        {
+            StringBuilder summary = new StringBuilder();
+            summary.Append($"观察×{observations.Count}：");
+            
+            var keyObs = observations.OrderByDescending(o => o.importance).Take(3);
+            var keywords = new List<string>();
+            
+            foreach (var obs in keyObs)
+            {
+                string kw = ExtractKeywords(obs.content, 15);
+                if (!string.IsNullOrEmpty(kw))
+                {
+                    // 去重：只添加不重复的关键词
+                    if (!keywords.Contains(kw))
+                    {
+                        keywords.Add(kw);
+                    }
+                }
+            }
+            
+            // 如果没有提取到关键词，使用原始内容
+            if (keywords.Count == 0)
+            {
+                Log.Warning($"[RimTalk Memory] No keywords for observations, using original");
+                foreach (var obs in keyObs)
+                {
+                    string simplified = SimplifyContent(obs.content, 20);
+                    if (!string.IsNullOrEmpty(simplified) && !keywords.Contains(simplified))
+                    {
+                        keywords.Add(simplified);
+                    }
+                }
+            }
+            
+            summary.Append(string.Join("、", keywords));
+            
+            string result = summary.ToString();
+            Log.Message($"[RimTalk Memory] Observation summary: {result}");
+            
+            return new MemoryEntry(
+                content: result,
+                type: MemoryType.Observation,
+                importance: observations.Average(o => o.importance),
+                relatedPawn: null
+            );
+        }
+
+        /// <summary>
+        /// 尝试使用 RimTalk AI 总结记忆
+        /// </summary>
+        private string TryAISummarize(List<MemoryEntry> memories, MemoryType type)
+        {
+            try
+            {
+                if (!RimTalk.Memory.Patches.RimTalkAISummarizer.IsAvailable)
+                    return null;
+
+                var pawn = parent as Pawn;
+                if (pawn == null)
+                    return null;
+
+                return RimTalk.Memory.Patches.RimTalkAISummarizer.SummarizeMemories(pawn, memories, type);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[RimTalk Memory] AI summarization failed: {ex.Message}");
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// 每日总结：在游戏时间每天 0 点触发，使用 AI 提炼 where/who/what
+        /// </summary>
+        public void DailySummarization()
+        {
+            if (shortTermMemories.Count == 0)
+            {
+                Log.Message($"[RimTalk Memory] {parent.LabelShort}: No short-term memories to summarize");
+                return;
+            }
+
+            Log.Message($"[RimTalk Memory] 🌙 {parent.LabelShort}: Starting daily summarization ({shortTermMemories.Count} memories)");
+
+            // 按类型分组
+            var byType = shortTermMemories.GroupBy(m => m.type);
+            int summarizedCount = 0;
+
+            foreach (var typeGroup in byType)
+            {
+                var memories = typeGroup.ToList();
+                Log.Message($"[RimTalk Memory]   Processing {memories.Count} memories of type {typeGroup.Key}");
+
+                // 使用 AI 总结（如果可用）
+                string aiSummary = TryAISummarizeDaily(memories, typeGroup.Key);
+
+                if (!string.IsNullOrEmpty(aiSummary))
+                {
+                    // AI 总结成功
+                    var summaryEntry = new MemoryEntry(
+                        content: aiSummary,
+                        type: typeGroup.Key,
+                        importance: memories.Average(m => m.importance) + 0.2f, // 每日总结重要性更高
+                        relatedPawn: null
+                    );
+
+                    if (!IsDuplicateInLongTerm(summaryEntry))
+                    {
+                        longTermMemories.Add(summaryEntry);
+                        summarizedCount++;
+                        Log.Message($"[RimTalk Memory]   ✅ AI summary added: {aiSummary.Substring(0, Math.Min(50, aiSummary.Length))}...");
+                    }
+                    else
+                    {
+                        Log.Message($"[RimTalk Memory]   ⚠️ Duplicate summary skipped");
+                    }
+                }
+                else
+                {
+                    // AI 不可用，跳过（不使用规则总结）
+                    Log.Warning($"[RimTalk Memory]   ⚠️ AI summarization not available, memories will be kept in short-term");
+                }
+            }
+
+            // 只有在成功生成总结后才清空短期记忆
+            if (summarizedCount > 0)
+            {
+                Log.Message($"[RimTalk Memory] {parent.LabelShort}: Daily summarization complete - {summarizedCount} summaries created, clearing short-term memories");
+                shortTermMemories.Clear();
+            }
+            else
+            {
+                Log.Warning($"[RimTalk Memory] {parent.LabelShort}: No summaries created, keeping short-term memories");
+            }
+        }
+
+        /// <summary>
+        /// 使用 AI 进行每日总结：专注于提炼 where/who/what
+        /// </summary>
+        private string TryAISummarizeDaily(List<MemoryEntry> memories, MemoryType type)
+        {
+            try
+            {
+                if (!RimTalk.Memory.Patches.RimTalkAISummarizer.IsAvailable)
+                {
+                    Log.Warning("[RimTalk Memory] AI summarizer not available");
+                    return null;
+                }
+
+                var pawn = parent as Pawn;
+                if (pawn == null)
+                    return null;
+
+                // 构建专门的每日总结提示词
+                string prompt = BuildDailySummaryPrompt(pawn, memories, type);
+                
+                // 调用 RimTalk API
+                return RimTalk.Memory.Patches.RimTalkAISummarizer.SummarizeMemoriesWithPrompt(pawn, prompt);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[RimTalk Memory] Daily AI summarization failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 构建每日总结的提示词：强调 where/who/what
+        /// </summary>
+        private string BuildDailySummaryPrompt(Pawn pawn, List<MemoryEntry> memories, MemoryType type)
+        {
+            var prompt = new System.Text.StringBuilder();
+
+            prompt.AppendLine($"请为 {pawn.LabelShort} 总结今天的 {memories.Count} 条{type}记忆。");
+            prompt.AppendLine();
+            prompt.AppendLine("**核心要求：只提炼 WHERE / WHO / WHAT**");
+            prompt.AppendLine();
+            prompt.AppendLine("1. **WHERE（地点/场景）**：在哪里发生的？");
+            prompt.AppendLine("2. **WHO（相关人物）**：涉及哪些人？");
+            prompt.AppendLine("3. **WHAT（核心事件）**：做了什么/说了什么/发生了什么？");
+            prompt.AppendLine();
+            prompt.AppendLine("**格式要求：**");
+            prompt.AppendLine("- 极简表达，去除所有修饰语、情感描述、动作细节");
+            prompt.AppendLine("- 只保留事实信息");
+            prompt.AppendLine("- 相似事件合并，标注次数（如 ×3）");
+            prompt.AppendLine("- 总长度不超过 80 字");
+            prompt.AppendLine();
+            prompt.AppendLine("**示例格式：**");
+            switch (type)
+            {
+                case MemoryType.Conversation:
+                    prompt.AppendLine("- \"与Mary讨论食物储备×2、与John商议工作安排×1\"");
+                    break;
+                case MemoryType.Action:
+                    prompt.AppendLine("- \"烹饪区制作餐食×5、仓库整理物资×2\"");
+                    break;
+                case MemoryType.Interaction:
+                    prompt.AppendLine("- \"与Flynn闲聊×3、与Sarah深谈×1\"");
+                    break;
+                case MemoryType.Observation:
+                    prompt.AppendLine("- \"观察到外部威胁×1、发现物资短缺×2\"");
+                    break;
+            }
+            prompt.AppendLine();
+            prompt.AppendLine("**原始记忆列表：**");
+
+            int index = 1;
+            foreach (var memory in memories.Take(30)) // 最多30条
+            {
+                prompt.AppendLine($"{index}. {memory.content}");
+                index++;
+            }
+
+            prompt.AppendLine();
+            prompt.AppendLine("请直接输出总结（不要解释，不要前缀）：");
+
+            return prompt.ToString();
+        }
+
+        public void DecayMemories()
+        {
+            float decayRate = RimTalkMemoryPatchMod.Settings.memoryDecayRate;
+
+            foreach (var memory in shortTermMemories)
+            {
+                memory.importance *= (1f - decayRate * 0.01f);
+            }
+
+            foreach (var memory in longTermMemories)
+            {
+                memory.importance *= (1f - decayRate * 0.005f);
+            }
+
+            // Remove memories with very low importance
+            shortTermMemories.RemoveAll(m => m.importance < 0.1f);
+            longTermMemories.RemoveAll(m => m.importance < 0.05f);
+        }
+
+        public List<MemoryEntry> GetRelevantMemories(int count = 5)
+        {
+            var allMemories = new List<MemoryEntry>();
+            allMemories.AddRange(shortTermMemories.Take(3));
+            allMemories.AddRange(longTermMemories.OrderByDescending(m => m.importance).Take(count - 3));
+            return allMemories;
+        }
+
+        public string GetMemoryContext()
+        {
+            var relevant = GetRelevantMemories(5);
+            
+            if (relevant.Count == 0)
+            {
+                Log.Message($"[RimTalk Memory Context] {parent.LabelShort} has no relevant memories");
+                return "";
+            }
+
+            var context = new StringBuilder();
+            context.AppendLine("=== Character Memory Context ===");
+            context.AppendLine($"{parent.LabelShort}'s recent experiences:");
+            context.AppendLine();
+            
+            foreach (var memory in relevant)
+            {
+                string typeLabel = ("RimTalk_MemoryType_" + memory.type.ToString()).Translate();
+                context.AppendLine($"- [{typeLabel}] {memory.content} ({memory.TimeAgoString})");
+            }
+            
+            context.AppendLine();
+            context.AppendLine("Use this context to make the conversation more natural and contextual.");
+            context.AppendLine("=== End Memory Context ===");
+            
+            string result = context.ToString();
+            Log.Message($"[RimTalk Memory Context] Generated for {parent.LabelShort}:\n{result}");
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 清除所有记忆
+        /// </summary>
+        public void ClearAllMemories()
+        {
+            shortTermMemories.Clear();
+            longTermMemories.Clear();
+            Log.Message($"[RimTalk Memory] Cleared all memories for {parent.LabelShort}");
+        }
+
+        /// <summary>
+        /// 清除短期记忆
+        /// </summary>
+        public void ClearShortTermMemories()
+        {
+            shortTermMemories.Clear();
+            Log.Message($"[RimTalk Memory] Cleared short-term memories for {parent.LabelShort}");
+        }
+
+        /// <summary>
+        /// 清除长期记忆
+        /// </summary>
+        public void ClearLongTermMemories()
+        {
+            longTermMemories.Clear();
+            Log.Message($"[RimTalk Memory] Cleared long-term memories for {parent.LabelShort}");
+        }
+
+        /// <summary>
+        /// 提取关键词：移除修饰语，只保留核心动词和名词
+        /// </summary>
+        private string ExtractKeywords(string content, int maxLength)
+        {
+            if (string.IsNullOrEmpty(content))
+                return "";
+            
+            string original = content;
+            string cleaned = content;
+            
+            Log.Message($"[RimTalk Memory] 🔍 ExtractKeywords: input = [{original.Substring(0, Math.Min(80, original.Length))}...]");
+            
+            // 【关键改进】优先提取冒号后的内容（这通常是对话的核心部分）
+            if (cleaned.Contains(":"))
+            {
+                var parts = cleaned.Split(new[] { ':' }, 2);
+                if (parts.Length > 1 && !string.IsNullOrWhiteSpace(parts[1]))
+                {
+                    cleaned = parts[1].Trim();
+                    Log.Message($"[RimTalk Memory]   → After colon: [{cleaned.Substring(0, Math.Min(80, cleaned.Length))}...]");
+                }
+            }
+            
+            // 【RimTalk 格式处理】移除括号内的动作/情感描述
+            // 例如: "(她轻叹一声...) 实际对话内容" → "实际对话内容"
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\([^)]*\)", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"（[^）]*）", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+            
+            // 移除英文模板
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"Had interaction with\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\s+initiated\s*", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\s+with\s+\w+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            
+            // 移除人名引用 (例如: "Maisie，" "Pope 说得")
+            // 保留对话主体内容
+            
+            // 秼除常见中文修饰语和停用词
+            string[] stopWords = new[] { 
+                "正在", "已经", "刚刚", "非常", "很", "特别", "真的", "确实",
+                "一直", "总是", "经常", "偶尔", "有时", "可能", "也许", "对着", "说得", "轻轻"
+            };
+            
+            foreach (var word in stopWords)
+            {
+                cleaned = cleaned.Replace(word, "");
+            }
+            
+            // 移除多余空格
+            while (cleaned.Contains("  "))
+                cleaned = cleaned.Replace("  ", " ");
+            cleaned = cleaned.Trim();
+            
+            Log.Message($"[RimTalk Memory]   → After cleaning: [{cleaned.Substring(0, Math.Min(80, cleaned.Length))}...]");
+            
+            // 如果清理后为空或太短，使用原始内容的简化版
+            if (string.IsNullOrEmpty(cleaned) || cleaned.Length < 3)
+            {
+                Log.Warning($"[RimTalk Memory]   → Cleaned too short, using simplified original");
+                cleaned = SimplifyContent(original, maxLength * 3); // 使用更大的长度
+            }
+            
+            // 移除部分标点（但保留问号和感叹号，它们有语义）
+            cleaned = cleaned.Replace("，", " ").Replace("。", " ");
+            cleaned = cleaned.Trim();
+            
+            // 提取核心句子：如果有多句话，优先保留包含实际内容的句子
+            // 移除纯粹的连接词开头的部分
+            var sentences = cleaned.Split(new[] { '…', '。', '！', '？' }, StringSplitOptions.RemoveEmptyEntries);
+            if (sentences.Length > 0)
+            {
+                // 选择最长的句子作为核心（通常最长的句子包含主要信息）
+                cleaned = sentences.OrderByDescending(s => s.Length).First().Trim();
+            }
+            
+            // 去重：如果内容中有重复的词，只保留一次
+            var words = cleaned.Split(new[] { ' ', '、' }, StringSplitOptions.RemoveEmptyEntries);
+            var uniqueWords = new List<string>();
+            foreach (var word in words)
+            {
+                string trimmed = word.Trim();
+                if (!uniqueWords.Contains(trimmed) && !string.IsNullOrWhiteSpace(trimmed) && trimmed.Length > 1)
+                {
+                    uniqueWords.Add(trimmed);
+                }
+            }
+            
+            // 重新组合，但限制总长度
+            cleaned = string.Join(" ", uniqueWords);
+            
+            // 【增加长度限制】对于 RimTalk 的富文本，需要更大的长度来保留语义
+            int effectiveMaxLength = Math.Max(maxLength, 30); // 至少30字符
+            
+            // 智能截断到指定长度
+            if (cleaned.Length > effectiveMaxLength)
+            {
+                // 尝试在标点或空格处截断
+                int[] breakPoints = new[] {
+                    cleaned.LastIndexOf('，', effectiveMaxLength),
+                    cleaned.LastIndexOf(' ', effectiveMaxLength),
+                    cleaned.LastIndexOf('、', effectiveMaxLength)
+                };
+                
+                int breakPoint = breakPoints.Max();
+                
+                if (breakPoint > effectiveMaxLength / 2)
+                {
+                    cleaned = cleaned.Substring(0, breakPoint);
+                }
+                else
+                {
+                    cleaned = cleaned.Substring(0, effectiveMaxLength);
+                }
+            }
+            
+            // 最终检查：确保不返回空字符串
+            if (string.IsNullOrWhiteSpace(cleaned))
+            {
+                cleaned = SimplifyContent(original, 50);
+                Log.Warning($"[RimTalk Memory]   → Final fallback to SimplifyContent");
+            }
+            
+            cleaned = cleaned.Trim();
+            Log.Message($"[RimTalk Memory]   → Final result: [{cleaned}]");
+            
+            return cleaned;
+        }
+    }
+}

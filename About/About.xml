@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<packageId>cj.rimtalk.expandmemory</packageId>
+	<name>RimTalk-Expand Memory</name>
+	<author>Community Enhancement</author>
+	<supportedVersions>
+		<li>1.5</li>
+		<li>1.6</li>
+	</supportedVersions>
+	<description>独立的四层记忆系统，为 RimWorld 殖民者提供完整的记忆管理！
+
+Independent Four-Layer Memory System for RimWorld colonists!
+
+核心功能 / Core Features：
+• 四层记忆架构 - ABM/SCM/ELS/CLPA 分层管理
+  Four-Layer Memory - ABM/SCM/ELS/CLPA hierarchical system
+  
+• ABM (Active Buffer Memory) - 超短期记忆，当前对话上下文
+  ABM - Ultra-short term, current conversation context
+  
+• SCM (Situational Context Memory) - 短期记忆，最近几天的事件
+  SCM - Short-term, recent days' events and interactions
+  
+• ELS (Event Log Summary) - 中期记忆，AI 总结的阶段性事件
+  ELS - Medium-term, AI-summarized periodic events
+  
+• CLPA (Colony Lore &amp; Persona Archive) - 长期记忆，核心人设和里程碑
+  CLPA - Long-term, core persona and major milestones
+
+• AI 智能总结 - 可选的 AI 驱动记忆总结功能
+  AI Summarization - Optional AI-powered memory summarization
+  
+• 独立运行 - 无需其他 Mod，完全独立工作
+  Standalone - Works independently, no other mods required
+  
+• 记忆编辑器 - 手动编辑、固定和管理各层级记忆
+  Memory Editor - Manually edit, pin, and manage memories at all layers
+  
+• 公共 API - 其他 Mod 可调用完整记忆数据
+  Public API - Other mods can access complete memory data
+
+---
+
+AI 配置说明 / AI Configuration：
+• 本 Mod 完全独立运行，不依赖其他 Mod
+  This mod runs completely independently, no dependencies required
+
+• AI 总结功能是可选的，可以使用规则总结代替
+  AI summarization is optional, rule-based summary available
+
+• 支持两种 AI 配置方式：
+  Two AI configuration options:
+  
+  1. 独立配置 - 在本 Mod 的设置中配置 API（推荐）
+     Independent - Configure API in this mod's settings (recommended)
+  
+  2. 兼容 RimTalk - 如果安装了 RimTalk，可复用其 AI 配置
+     RimTalk Compatible - Reuse RimTalk's AI config if installed
+
+• 支持的 AI 提供商：OpenAI、Google Gemini
+  Supported AI providers: OpenAI, Google Gemini
+
+---
+
+使用方法 / How to use：
+1. 启用 Harmony
+2. 启用此 Mod (cj.rimtalk.expandmemory)
+3. （可选）在设置中配置 AI API 以启用智能总结
+4. 重启游戏
+
+1. Enable Harmony
+2. Enable this mod (cj.rimtalk.expandmemory)
+3. (Optional) Configure AI API in settings for smart summarization
+4. Restart game
+
+---
+
+与 RimTalk 的关系 / Relationship with RimTalk：
+• 本 Mod 完全独立，不依赖 RimTalk
+  This mod is completely independent, does not require RimTalk
+
+• 可以单独使用或与 RimTalk 配合使用
+  Can be used standalone or together with RimTalk
+
+• 为 RimTalk 提供记忆数据支持（如果同时安装）
+  Provides memory data support for RimTalk (if both installed)
+
+• 可共享 RimTalk 的 AI 配置（可选，非必需）
+  Can optionally share RimTalk's AI configuration (not required)
+
+---
+
+技术特性 / Technical Features：
+• 异步 AI 总结，不阻塞游戏主线程
+  Async AI summarization without blocking main thread
+• 回调机制，安全的跨线程更新
+  Callback mechanism for safe cross-thread updates
+• 自动化部署脚本
+  Automated deployment script
+• 完整的多语言支持
+  Full multi-language support
+
+详细文档 / Documentation：
+GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
+
+---
+
+版本 / Version: 2.0.0
+最后更新 / Last Updated: 2025-01
+	</description>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077</steamWorkshopUrl>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>cj.rimtalk</li>
+	</loadAfter>
+</ModMetaData>
