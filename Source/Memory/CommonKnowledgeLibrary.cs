@@ -791,6 +791,7 @@ namespace RimTalk.Memory
         
         /// <summary>
         /// 提取上下文关键词（简单的中文分词）
+        /// 修复：提高关键词限制，确保Pawn关键词不被挤掉
         /// </summary>
         private List<string> ExtractContextKeywords(string text)
         {
@@ -814,8 +815,9 @@ namespace RimTalk.Memory
                 }
             }
 
-            // 限制关键词数量
-            return keywords.Take(20).ToList();
+            // 修复：从20增加到50，确保Pawn关键词（年龄、名字等）不被挤掉
+            // 原来的20个限制会导致重要关键词丢失，评分过低
+            return keywords.Take(50).ToList();
         }
         
         /// <summary>

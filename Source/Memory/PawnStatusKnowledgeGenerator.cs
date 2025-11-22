@@ -51,6 +51,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 为单个Pawn更新状态常识
         /// 增强版：使用唯一ID避免同名冲突
+        /// 跳过婴幼儿（不会说话的年龄段）
         /// </summary>
         public static void UpdatePawnStatusKnowledge(Pawn pawn, CommonKnowledgeLibrary library, int currentTick)
         {
@@ -58,6 +59,18 @@ namespace RimTalk.Memory
 
             try
             {
+                // 跳过婴幼儿（3岁以下，不会说话）
+                if (pawn.RaceProps != null && pawn.RaceProps.Humanlike)
+                {
+                    float ageYears = pawn.ageTracker.AgeBiologicalYearsFloat;
+                    if (ageYears < 3f)
+                    {
+                        // 婴幼儿不生成状态常识，但需要清理可能存在的旧常识
+                        CleanupPawnStatusKnowledge(pawn);
+                        return;
+                    }
+                }
+                
                 // 计算在殖民地的时间
                 int joinTick = pawn.records.GetAsInt(RecordDefOf.TimeAsColonistOrColonyAnimal);
                 int daysInColony = joinTick / GenDate.TicksPerDay;
@@ -72,14 +85,14 @@ namespace RimTalk.Memory
                 if (existingEntry != null)
                 {
                     // 更新现有常识（只在内容变化时更新）
-                    if (existingEntry.content != content)
+                    if (existingEntry.content != content || Math.Abs(existingEntry.importance - importance) > 0.01f)
                     {
                         existingEntry.content = content;
                         existingEntry.importance = importance;
                         
                         if (Prefs.DevMode)
                         {
-                            Log.Message($"[PawnStatus] Updated status for {pawn.LabelShort}: {content.Substring(0, Math.Min(50, content.Length))}...");
+                            Log.Message($"[PawnStatus] Updated status for {pawn.LabelShort} (importance: {importance:F2}): {content.Substring(0, Math.Min(50, content.Length))}...");
                         }
                     }
                 }
@@ -96,7 +109,7 @@ namespace RimTalk.Memory
                     
                     if (Prefs.DevMode)
                     {
-                        Log.Message($"[PawnStatus] Created status for {pawn.LabelShort}");
+                        Log.Message($"[PawnStatus] Created status for {pawn.LabelShort} (importance: {importance:F2})");
                     }
                 }
             }
@@ -154,23 +167,24 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 根据在殖民地的时间计算重要性
+        /// 修复：婴幼儿问题 - 3岁以下已被跳过，不会调用此方法
         /// </summary>
         private static float GetStatusImportance(int daysInColony)
         {
+            // 新成员（7天内）：最高重要性，需要强调
             if (daysInColony < 7)
             {
-                // 新成员：高重要性，需要强调
-                return 0.95f;
+                return 1.0f;  // 修复：从0.95改为1.0
             }
+            // 适应期（7-30天）：高重要性
             else if (daysInColony < 30)
             {
-                // 中期成员：中等重要性
-                return 0.80f;
+                return 0.85f;  // 修复：从0.80改为0.85
             }
+            // 老成员（30天以上）：中等重要性
             else
             {
-                // 老成员：较低重要性（不需要特别强调）
-                return 0.60f;
+                return 0.70f;  // 修复：从0.60改为0.70
             }
         }
 
