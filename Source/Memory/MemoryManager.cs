@@ -119,13 +119,6 @@ namespace RimTalk.Memory
             
             // CLPA归档：按天数间隔触发
             CheckArchiveInterval(currentDay);
-            
-            // Debug：每天只输出一次当前状态
-            if (Prefs.DevMode && currentDay != lastSummarizationDay)
-            {
-                int archiveInterval = RimTalkMemoryPatchMod.Settings.archiveIntervalDays;
-                Log.Message($"[RimTalk Memory Debug] Day {currentDay}: Waiting for summarization (target hour: {targetHour}, archive interval: {archiveInterval} days)");
-            }
         }
 
         /// <summary>

@@ -211,4 +211,83 @@
     <RimTalk_MinutesAgo>{0} minutes ago</RimTalk_MinutesAgo>
     <RimTalk_HoursAgo>{0} hours ago</RimTalk_HoursAgo>
     <RimTalk_DaysAgo>{0} days ago</RimTalk_DaysAgo>
+    
+    <!-- Settings UI Translations - Added for v2.4.1 -->
+    <!-- Knowledge Library -->
+    <RimTalk_Settings_KnowledgeLibraryTitle>Knowledge Library Management</RimTalk_Settings_KnowledgeLibraryTitle>
+    <RimTalk_Settings_KnowledgeLibraryDesc>Knowledge library can be used to inject worldview, background knowledge and other common information into AI</RimTalk_Settings_KnowledgeLibraryDesc>
+    <RimTalk_Settings_OpenKnowledgeLibrary>Open Knowledge Library Manager</RimTalk_Settings_OpenKnowledgeLibrary>
+    
+    <!-- Dynamic Injection System -->
+    <RimTalk_Settings_DynamicInjectionTitle>Dynamic Injection System</RimTalk_Settings_DynamicInjectionTitle>
+    <RimTalk_Settings_EnableDynamicInjection>Enable Dynamic Memory Injection (Recommended)</RimTalk_Settings_EnableDynamicInjection>
+    <RimTalk_Settings_DynamicInjectionDesc>Dynamically select the most relevant memories and knowledge based on time, importance and keyword matching</RimTalk_Settings_DynamicInjectionDesc>
+    <RimTalk_Settings_StaticInjectionNote>Will use static injection (by layer order)</RimTalk_Settings_StaticInjectionNote>
+    <RimTalk_Settings_MaxInjectedMemories>Max Injected Memories</RimTalk_Settings_MaxInjectedMemories>
+    <RimTalk_Settings_MaxInjectedKnowledge>Max Injected Knowledge</RimTalk_Settings_MaxInjectedKnowledge>
+    <RimTalk_Settings_ScoreThresholdTitle>Score Threshold (content below this score will not be injected):</RimTalk_Settings_ScoreThresholdTitle>
+    <RimTalk_Settings_MemoryScoreThreshold>Memory Score Threshold</RimTalk_Settings_MemoryScoreThreshold>
+    <RimTalk_Settings_KnowledgeScoreThreshold>Knowledge Score Threshold</RimTalk_Settings_KnowledgeScoreThreshold>
+    
+    <!-- Weight Configuration -->
+    <RimTalk_Settings_MemoryWeights>📝 Memory Weights</RimTalk_Settings_MemoryWeights>
+    <RimTalk_Settings_KnowledgeWeights>📘 Knowledge Weights</RimTalk_Settings_KnowledgeWeights>
+    <RimTalk_Settings_TimeDecay>Time Decay</RimTalk_Settings_TimeDecay>
+    <RimTalk_Settings_Importance>Importance</RimTalk_Settings_Importance>
+    <RimTalk_Settings_KeywordMatch>Keyword Match</RimTalk_Settings_KeywordMatch>
+    <RimTalk_Settings_TagMatch>Tag Match</RimTalk_Settings_TagMatch>
+    <RimTalk_Settings_KeywordMatchAuto>Keyword Match: Auto</RimTalk_Settings_KeywordMatchAuto>
+    
+    <!-- Four-Layer Memory Capacity -->
+    <RimTalk_Settings_MemoryCapacityTitle>Four-Layer Memory Capacity</RimTalk_Settings_MemoryCapacityTitle>
+    <RimTalk_Settings_ABMCapacity>ABM (Ultra-short): 6 entries (fixed, not adjustable)</RimTalk_Settings_ABMCapacity>
+    <RimTalk_Settings_SCMCapacity>SCM (Short-term): {0} entries</RimTalk_Settings_SCMCapacity>
+    <RimTalk_Settings_ELSCapacity>ELS (Medium-term): {0} entries</RimTalk_Settings_ELSCapacity>
+    <RimTalk_Settings_CLPACapacity>CLPA (Long-term): Unlimited</RimTalk_Settings_CLPACapacity>
+    <RimTalk_Settings_Entries>entries</RimTalk_Settings_Entries>
+    
+    <!-- Memory Decay Rates -->
+    <RimTalk_Settings_DecayRatesTitle>Memory Decay Rates</RimTalk_Settings_DecayRatesTitle>
+    <RimTalk_Settings_SCMDecay>SCM (per hour)</RimTalk_Settings_SCMDecay>
+    <RimTalk_Settings_ELSDecay>ELS (per hour)</RimTalk_Settings_ELSDecay>
+    <RimTalk_Settings_CLPADecay>CLPA (per hour)</RimTalk_Settings_CLPADecay>
+    
+    <!-- AI Auto-Summarization -->
+    <RimTalk_Settings_SummarizationTitle>AI Auto-Summarization</RimTalk_Settings_SummarizationTitle>
+    <RimTalk_Settings_EnableELSSummarization>Enable ELS Summarization (SCM → ELS)</RimTalk_Settings_EnableELSSummarization>
+    <RimTalk_Settings_TriggerTime>Trigger Time: Daily at {0}:00 (game time)</RimTalk_Settings_TriggerTime>
+    <RimTalk_Settings_MaxSummaryLength>Max Summary Length: {0} characters</RimTalk_Settings_MaxSummaryLength>
+    <RimTalk_Settings_Characters>characters</RimTalk_Settings_Characters>
+    <RimTalk_Settings_EnableCLPAArchive>Enable CLPA Auto-Archive</RimTalk_Settings_EnableCLPAArchive>
+    <RimTalk_Settings_ArchiveInterval>Archive Interval: Every {0} days</RimTalk_Settings_ArchiveInterval>
+    
+    <!-- AI API Configuration -->
+    <RimTalk_Settings_AIConfigTitle>AI API Configuration</RimTalk_Settings_AIConfigTitle>
+    <RimTalk_Settings_PreferRimTalkAI>Prefer RimTalk's AI Configuration</RimTalk_Settings_PreferRimTalkAI>
+    <RimTalk_Settings_WillUseRimTalkConfig>Will attempt to read RimTalk Mod's API configuration</RimTalk_Settings_WillUseRimTalkConfig>
+    <RimTalk_Settings_FallbackToIndependent>If RimTalk is not installed or configured, will use the independent configuration below</RimTalk_Settings_FallbackToIndependent>
+    <RimTalk_Settings_UseIndependentConfig>Will use the independent configuration below, independent of RimTalk</RimTalk_Settings_UseIndependentConfig>
+    <RimTalk_Settings_IndependentAIConfig>=== Independent AI Configuration ===</RimTalk_Settings_IndependentAIConfig>
+    <RimTalk_Settings_Provider>Provider:</RimTalk_Settings_Provider>
+    <RimTalk_Settings_APIKey>API Key:</RimTalk_Settings_APIKey>
+    <RimTalk_Settings_APIURL>API URL:</RimTalk_Settings_APIURL>
+    <RimTalk_Settings_ModelName>Model Name:</RimTalk_Settings_ModelName>
+    
+    <!-- Memory Types -->
+    <RimTalk_Settings_MemoryTypesTitle>Memory Types</RimTalk_Settings_MemoryTypesTitle>
+    <RimTalk_Settings_ActionMemory>Action Memory (work, combat)</RimTalk_Settings_ActionMemory>
+    <RimTalk_Settings_ConversationMemory>Conversation Memory (RimTalk dialogues)</RimTalk_Settings_ConversationMemory>
+    <RimTalk_Settings_PawnStatusKnowledge>Auto-generate Newcomer/Veteran Status Knowledge</RimTalk_Settings_PawnStatusKnowledge>
+    <RimTalk_Settings_PawnStatusDesc>Automatically generate status knowledge based on colonist join time</RimTalk_Settings_PawnStatusDesc>
+    <RimTalk_Settings_PawnStatusExample>Example: Alice is a new member who joined 3 days ago and doesn't know the colony's history</RimTalk_Settings_PawnStatusExample>
+    <RimTalk_Settings_PawnStatusWarning>When disabled, new members may incorrectly talk about events they didn't experience</RimTalk_Settings_PawnStatusWarning>
+    
+    <!-- Debug Tools -->
+    <RimTalk_Settings_DebugToolsTitle>Debug Tools:</RimTalk_Settings_DebugToolsTitle>
+    <RimTalk_Settings_OpenInjectionPreviewer>Open Injection Content Previewer</RimTalk_Settings_OpenInjectionPreviewer>
+    <RimTalk_Settings_PreviewerDesc>Real-time preview of memories and knowledge to be injected to AI (requires entering game)</RimTalk_Settings_PreviewerDesc>
+    
+    <!-- Error Messages -->
+    <RimTalk_Settings_MustEnterGame>Must enter game to manage knowledge library</RimTalk_Settings_MustEnterGame>
+    <RimTalk_Settings_CannotFindManager>Cannot find memory manager</RimTalk_Settings_CannotFindManager>
 </LanguageData>

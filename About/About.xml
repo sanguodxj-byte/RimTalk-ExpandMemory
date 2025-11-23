@@ -12,68 +12,94 @@ Intelligent Memory System for RimWorld AI conversations!
 
 核心功能 / Core Features：
 
-【四层记忆架构】Four-Layer Memory Architecture
+【四层记忆架构 / 四層記憶架構 / Four-Layer Memory Architecture】
 • ABM - 超短期记忆（当前对话）
+  ABM - Ultra-short term memory (current conversation)
 • SCM - 短期记忆（最近事件）
+  SCM - Short-term memory (recent events)
 • ELS - 中期记忆（AI总结）
+  ELS - Medium-term memory (AI summarization)
 • CLPA - 长期记忆（核心人设）
+  CLPA - Long-term memory (core persona)
 
-【动态记忆注入】Dynamic Memory Injection
+【动态记忆注入 / 動態記憶注入 / Dynamic Memory Injection】
 • 智能选择最相关的记忆注入对话
+  Intelligently select the most relevant memories for injection
 • 基于时间、重要性和关键词评分
+  Scoring based on time, importance and keywords
 • 支持静态/动态两种注入模式
+  Support static/dynamic injection modes
 • 类似 CharacterAI 的工作方式
+  Works like CharacterAI
 
-【通用常识库】Common Knowledge System
+【通用常识库 / 通用常識庫 / Common Knowledge System】
 • 管理世界观、背景知识等通用信息
+  Manage worldview, background knowledge and other common information
 • 纯文本格式：[标签|重要性]内容
+  Plain text format: [tag|importance]content
 • 动态注入：基于关键词相关性智能选择
+  Dynamic injection: smart selection based on keyword relevance
 • 可视化管理界面
+  Visual management interface
 
-【Pawn状态常识自动生成】Auto-Generated Pawn Status
+【Pawn状态常识自动生成 / Pawn狀態常識自動生成 / Auto-Generated Pawn Status】
 • 自动检测殖民者加入时间
+  Automatically detect colonist join time
 • 防止新人错误谈论不属于自己的经历
+  Prevent newcomers from talking about experiences they don't have
 • 包含种族信息（人类、美狐族等）
+  Include race information (human, kitsune, etc.)
 • 7个时间段分级（新人→老成员）
+  7 time period classifications (newcomer → veteran)
 
-【注入内容预览器】Injection Preview
+【注入内容预览器 / 注入內容預覽器 / Injection Preview】
 • 实时查看将要注入给AI的内容
+  Real-time preview of content to be injected to AI
 • 显示每条记忆/常识的详细评分
+  Display detailed scores for each memory/knowledge
 • 支持调试和优化注入策略
+  Support debugging and optimizing injection strategies
 
-【AI提供商支持】AI Provider Support
+【AI提供商支持 / AI提供者支持 / AI Provider Support】
 • OpenAI (GPT-3.5/GPT-4)
-• DeepSeek (国产，中文优化)
-• Google Gemini (免费额度大)
+• DeepSeek (国产，中文优化 / Chinese-optimized)
+• Google Gemini (免费额度大 / Large free quota)
 
-【独立运行】Standalone Operation
+【独立运行 / 獨立運行 / Standalone Operation】
 • 无需 RimTalk 即可独立运行
+  Can run independently without RimTalk
 • 可选：与 RimTalk 配合使用获得完整体验
+  Optional: Use with RimTalk for complete experience
 • 提供公共 API 供其他 Mod 调用
+  Provides public API for other mods
 
 ---
 
 推荐配置 / Recommended Settings：
-• 最大注入记忆数：8-10
-• 最大注入常识数：3-5
-• 时间衰减：30% | 重要性：30% | 关键词：40%
+• 最大注入记忆数 Max injected memories：8-10
+• 最大注入常识数 Max injected knowledge：3-5
+• 时间衰减 Time decay：30% | 重要性 Importance：30% | 关键词 Keywords：40%
 
 ---
 
 使用方法 / How to Use：
-1. 启用 Harmony
-2. 启用此 Mod
-3. 进入游戏，打开 Mod 设置
-4. （可选）配置 AI API 启用智能总结
-5. 打开常识库管理，导入示例或自定义
+1. 启用 Harmony / Enable Harmony
+2. 启用此 Mod / Enable this mod
+3. 进入游戏，打开 Mod 设置 / Enter game, open mod settings
+4. （可选）配置 AI API 启用智能总结 / (Optional) Configure AI API for smart summarization
+5. 打开常识库管理，导入示例或自定义 / Open knowledge library, import examples or customize
 
 ---
 
 技术特性 / Technical Features：
 • 高性能：Jaccard 相似度算法，<2ms 延迟
+  High performance: Jaccard similarity algorithm, <2ms latency
 • 异步总结：不阻塞游戏主线程
+  Async summarization: does not block main game thread
 • 多语言支持：英文、中文、日文、韩文等
+  Multi-language support: English, Chinese, Japanese, Korean, etc.
 • 完整 API：供其他 Mod 集成
+  Complete API: for other mod integration
 
 ---
 
@@ -93,5 +119,11 @@ GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
 	<loadAfter>
 		<li>brrainz.harmony</li>
 		<li>cj.rimtalk</li>
+		<li>Core40k.Core</li>
+		<li>RH2.Faction.Astartes</li>
+		<li>OGI.Core40k</li>
 	</loadAfter>
+	<incompatibleWith>
+		<!-- 如果发现与特定Mod不兼容，可以在这里列出 -->
+	</incompatibleWith>
 </ModMetaData>
