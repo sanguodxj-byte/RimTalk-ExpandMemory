@@ -19,6 +19,9 @@ namespace RimTalk.Memory
         public bool isEnabled;      // 是否启用
         public bool isUserEdited;   // 是否被用户编辑过（用于保护手动修改）
         
+        // ⭐ 新增：目标Pawn限制（用于角色专属常识）
+        public int targetPawnId = -1;  // -1表示全局，否则只对特定Pawn有效
+        
         private List<string> cachedTags; // 缓存分割后的标签列表
 
         public CommonKnowledgeEntry()
@@ -27,6 +30,7 @@ namespace RimTalk.Memory
             keywords = new List<string>();
             isEnabled = true;
             importance = 0.5f;
+            targetPawnId = -1; // 默认全局
         }
 
         public CommonKnowledgeEntry(string tag, string content) : this()
@@ -43,6 +47,7 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref importance, "importance", 0.5f);
             Scribe_Values.Look(ref isEnabled, "isEnabled", true);
             Scribe_Values.Look(ref isUserEdited, "isUserEdited", false);
+            Scribe_Values.Look(ref targetPawnId, "targetPawnId", -1); // ⭐ 新增序列化
             Scribe_Collections.Look(ref keywords, "keywords", LookMode.Value);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -478,9 +483,15 @@ namespace RimTalk.Memory
             // 获取阈值设置
             float threshold = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.knowledgeScoreThreshold ?? 0.1f;
 
-            // 计算每个常识的相关性分数（包括详细信息）
-            allScores = entries
+            // ⭐ 过滤常识：只保留全局常识(-1)或专属于当前Pawn的常识
+            var filteredEntries = entries
                 .Where(e => e.isEnabled)
+                .Where(e => e.targetPawnId == -1 || // 全局常识
+                           (currentPawn != null && e.targetPawnId == currentPawn.thingIDNumber)) // 或专属于当前Pawn
+                .ToList();
+
+            // 计算每个常识的相关性分数（包括详细信息）
+            allScores = filteredEntries
                 .Select(e => e.CalculateRelevanceScoreWithDetails(contextKeywords))
                 .OrderByDescending(se => se.TotalScore)
                 .ToList();
@@ -502,6 +513,16 @@ namespace RimTalk.Memory
             if (scoredEntries.Count == 0)
             {
                 return null;
+            }
+
+            // ⭐ 检查是否启用Token压缩
+            bool enableCompression = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableKnowledgeCompression ?? false;
+            
+            if (enableCompression)
+            {
+                // 使用压缩模式 - 节省Token
+                var entries = scoredEntries.Select(s => s.Entry).ToList();
+                return KnowledgeCompressor.CompressKnowledge(entries, 300); // 限制300 tokens
             }
 
             // 格式化为system rule的简洁格式
@@ -755,11 +776,24 @@ namespace RimTalk.Memory
         /// <summary>
         /// 提取上下文关键词（简单的中文分词）
         /// v2.4.1优化：提升关键词限制到100，进一步减少Pawn关键词被挤掉的情况
+        /// ⭐ v2.4.4修复：截断长文本，防止性能问题
         /// </summary>
         private List<string> ExtractContextKeywords(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return new List<string>();
+
+            // ⭐ 修复2: 截断过长文本，防止O(n²)性能问题
+            const int MAX_TEXT_LENGTH = 500; // 最多处理500字符
+            if (text.Length > MAX_TEXT_LENGTH)
+            {
+                text = text.Substring(0, MAX_TEXT_LENGTH);
+                
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[Knowledge] Context text truncated to {MAX_TEXT_LENGTH} chars for performance");
+                }
+            }
 
             var keywords = new HashSet<string>();
 

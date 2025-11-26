@@ -47,6 +47,28 @@ namespace RimTalk.Memory
                 if (archiveMemories == null) archiveMemories = new List<MemoryEntry>();
             }
         }
+        
+        /// <summary>
+        /// ⭐ 修复3: 定期检查并清理工作会话（Pawn死亡/离开时）
+        /// </summary>
+        public override void CompTick()
+        {
+            base.CompTick();
+            
+            // 每5秒检查一次
+            if (Find.TickManager.TicksGame % 300 == 0)
+            {
+                var pawn = parent as Pawn;
+                if (pawn != null)
+                {
+                    // 如果Pawn死亡或不在地图上，强制结束工作会话
+                    if (pawn.Dead || !pawn.Spawned || pawn.Map == null)
+                    {
+                        WorkSessionAggregator.ForceEndSession(pawn);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 添加记忆到超短期记忆（ABM）

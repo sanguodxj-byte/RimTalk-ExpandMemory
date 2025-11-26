@@ -54,11 +54,20 @@ namespace RimTalk.MemoryPatch
         public bool enableConversationCache = true;   // 启用对话缓存
         public int conversationCacheSize = 100;       // 缓存大小（50-500）
         public int conversationCacheExpireDays = 7;   // 过期天数（1-30）
+        
+        // === 提示词缓存设置（新增）===
+        public bool enablePromptCache = true;         // 启用提示词缓存
+        public int promptCacheSize = 50;              // 缓存大小（20-200）
+        public int promptCacheExpireMinutes = 30;     // 过期分钟数（5-120）
 
         // === 动态注入设置 ===
         public bool useDynamicInjection = true;       // 使用动态注入（默认开启）
         public int maxInjectedMemories = 10;          // 最大注入记忆数量
         public int maxInjectedKnowledge = 5;          // 最大注入常识数量
+        
+        // ⭐ Token优化设置（新增）
+        public bool enableMemoryCompression = false;  // 启用记忆压缩（节省Token）
+        public bool enableKnowledgeCompression = false; // 启用常识压缩（节省Token）
         
         // 动态注入权重配置
         public float weightTimeDecay = 0.3f;          // 时间衰减权重
@@ -133,10 +142,20 @@ namespace RimTalk.MemoryPatch
         Scribe_Values.Look(ref conversationCacheSize, "cache_conversationCacheSize", 100);
         Scribe_Values.Look(ref conversationCacheExpireDays, "cache_conversationCacheExpireDays", 7);
         
+        // 提示词缓存设置（新增）
+        Scribe_Values.Look(ref enablePromptCache, "cache_enablePromptCache", true);
+        Scribe_Values.Look(ref promptCacheSize, "cache_promptCacheSize", 50);
+        Scribe_Values.Look(ref promptCacheExpireMinutes, "cache_promptCacheExpireMinutes", 30);
+        
         // 动态注入设置
         Scribe_Values.Look(ref useDynamicInjection, "dynamic_useDynamicInjection", true);
         Scribe_Values.Look(ref maxInjectedMemories, "dynamic_maxInjectedMemories", 10);
         Scribe_Values.Look(ref maxInjectedKnowledge, "dynamic_maxInjectedKnowledge", 5);
+        
+        // Token优化设置（新增）
+        Scribe_Values.Look(ref enableMemoryCompression, "dynamic_enableMemoryCompression", false);
+        Scribe_Values.Look(ref enableKnowledgeCompression, "dynamic_enableKnowledgeCompression", false);
+        
         Scribe_Values.Look(ref weightTimeDecay, "dynamic_weightTimeDecay", 0.3f);
         Scribe_Values.Look(ref weightImportance, "dynamic_weightImportance", 0.3f);
         Scribe_Values.Look(ref weightKeywordMatch, "dynamic_weightKeywordMatch", 0.4f);
@@ -308,6 +327,31 @@ namespace RimTalk.MemoryPatch
                 
                 listing.Label($"{"RimTalk_Settings_MaxInjectedKnowledge".Translate()}: {maxInjectedKnowledge}");
                 maxInjectedKnowledge = (int)listing.Slider(maxInjectedKnowledge, 1, 10);
+                
+                listing.Gap();
+                
+                // ⭐ Token优化选项（实验性功能）
+                GUI.color = new Color(1f, 1f, 0.8f);
+                listing.Label("⚠️ Token优化（实验性，可能影响质量）");
+                GUI.color = Color.white;
+                
+                listing.CheckboxLabeled("  启用记忆压缩（牺牲细节换取成本降低）", ref enableMemoryCompression);
+                if (enableMemoryCompression)
+                {
+                    GUI.color = new Color(1f, 0.7f, 0.7f);
+                    listing.Label("    ⚠️ 会合并/省略部分记忆内容");
+                    listing.Label("    💡 适用于：记忆数量多(>15条)且预算紧张时");
+                    GUI.color = Color.white;
+                }
+                
+                listing.CheckboxLabeled("  启用常识压缩（移除标签和格式）", ref enableKnowledgeCompression);
+                if (enableKnowledgeCompression)
+                {
+                    GUI.color = new Color(1f, 0.7f, 0.7f);
+                    listing.Label("    ⚠️ 会移除标签，内容更紧凑但可能降低AI理解");
+                    listing.Label("    💡 适用于：常识条目多(>8条)且对质量要求不高时");
+                    GUI.color = Color.white;
+                }
                 
                 listing.Gap();
                 listing.GapLine();

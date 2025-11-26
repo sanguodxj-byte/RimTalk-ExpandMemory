@@ -116,6 +116,7 @@ namespace RimTalk.Memory
                         // 只更新自动生成的内容
                         existingEntry.content = newContent;
                         existingEntry.importance = defaultImportance;
+                        existingEntry.targetPawnId = pawn.thingIDNumber; // ? 设置为专属
                         
                         if (Prefs.DevMode)
                         {
@@ -124,7 +125,7 @@ namespace RimTalk.Memory
                     }
                     else
                     {
-                        // 保留玩家的手动修改
+                        // 保护玩家的手动修改
                         if (Prefs.DevMode)
                         {
                             Log.Message($"[PawnStatus] Preserved user edits for {pawn.LabelShort}");
@@ -138,14 +139,15 @@ namespace RimTalk.Memory
                     {
                         importance = defaultImportance,
                         isEnabled = true,
-                        isUserEdited = false
+                        isUserEdited = false,
+                        targetPawnId = pawn.thingIDNumber // ? 设置为专属于该Pawn
                     };
                     
                     library.AddEntry(newEntry);
                     
                     if (Prefs.DevMode)
                     {
-                        Log.Message($"[PawnStatus] Created: {pawn.LabelShort} (importance: {defaultImportance:F2})");
+                        Log.Message($"[PawnStatus] Created: {pawn.LabelShort} (importance: {defaultImportance:F2}, targetPawnId: {pawn.thingIDNumber})");
                     }
                 }
             }

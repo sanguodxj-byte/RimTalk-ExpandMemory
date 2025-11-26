@@ -28,6 +28,8 @@ namespace RimTalk.Memory.UI
         private string editContent = "";
         private float editImportance = 0.5f;
         private string editKeywords = "";
+        // ? 新增：专属Pawn选择
+        private int editTargetPawnId = -1;  // -1表示全局
         
         // 导入文本
         private string importText = "";
@@ -600,26 +602,57 @@ namespace RimTalk.Memory.UI
             
             float y = 0f;
 
+            // 标签
             Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "RimTalk_Knowledge_Tag".Translate());
             editTag = Widgets.TextField(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), editTag);
             y += 30f;
 
+            // 重要性
             Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), string.Format("{0}: {1:F2}", "RimTalk_Knowledge_Importance".Translate(), editImportance));
             editImportance = Widgets.HorizontalSlider(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), editImportance, 0f, 1f);
             y += 35f;
 
+            // ? 新增：专属Pawn选择
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "专属角色");
+            Rect pawnButtonRect = new Rect(innerRect.x + 100f, y, 200f, 25f);
+            
+            string pawnLabel = "全局（所有人）";
+            if (editTargetPawnId != -1)
+            {
+                // 查找Pawn
+                Pawn targetPawn = FindPawnById(editTargetPawnId);
+                pawnLabel = targetPawn != null ? $"专属: {targetPawn.LabelShort}" : "全局（所有人）";
+            }
+            
+            if (Widgets.ButtonText(pawnButtonRect, pawnLabel))
+            {
+                ShowPawnSelectionMenu();
+            }
+            
+            // 提示信息
+            Rect hintRect = new Rect(innerRect.x + 310f, y + 3f, innerRect.width - 310f, 20f);
+            GUI.color = Color.gray;
+            Text.Font = GameFont.Tiny;
+            Widgets.Label(hintRect, "专属常识只会注入给指定角色");
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            y += 30f;
+
+            // 关键词
             Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "RimTalk_Knowledge_KeywordsHint".Translate());
             y += 25f;
             Rect keywordsRect = new Rect(innerRect.x, y, innerRect.width, 25f);
             editKeywords = Widgets.TextField(keywordsRect, editKeywords);
             y += 30f;
 
+            // 内容
             Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "RimTalk_Knowledge_Content".Translate());
             y += 25f;
             
             Rect contentRect = new Rect(innerRect.x, y, innerRect.width, innerRect.height - y - 50f);
             editContent = Widgets.TextArea(contentRect, editContent);
 
+            // 按钮
             Rect buttonRect = new Rect(innerRect.x, innerRect.yMax - 40f, 100f, 35f);
             
             if (Widgets.ButtonText(buttonRect, "RimTalk_Knowledge_Save".Translate()))
@@ -632,6 +665,63 @@ namespace RimTalk.Memory.UI
             {
                 editMode = false;
             }
+        }
+
+        /// <summary>
+        /// ? 新增：显示Pawn选择菜单
+        /// </summary>
+        private void ShowPawnSelectionMenu()
+        {
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            
+            // 全局选项
+            options.Add(new FloatMenuOption("全局（所有人）", delegate 
+            { 
+                editTargetPawnId = -1; 
+            }));
+            
+            // 分隔线
+            options.Add(new FloatMenuOption("—————————", null));
+            
+            // 所有殖民者
+            if (Current.Game != null)
+            {
+                foreach (var map in Find.Maps)
+                {
+                    foreach (var pawn in map.mapPawns.FreeColonists.OrderBy(p => p.LabelShort))
+                    {
+                        Pawn p = pawn; // 闭包捕获
+                        options.Add(new FloatMenuOption($"{p.LabelShort} (ID:{p.thingIDNumber})", delegate 
+                        { 
+                            editTargetPawnId = p.thingIDNumber; 
+                        }));
+                    }
+                }
+            }
+            
+            if (options.Count == 2) // 只有全局和分隔线
+            {
+                Messages.Message("当前没有殖民者", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+            
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+        
+        /// <summary>
+        /// ? 新增：根据ID查找Pawn
+        /// </summary>
+        private Pawn FindPawnById(int pawnId)
+        {
+            if (Current.Game == null || pawnId == -1) return null;
+            
+            foreach (var map in Find.Maps)
+            {
+                var pawn = map.mapPawns.AllPawns.FirstOrDefault(p => p.thingIDNumber == pawnId);
+                if (pawn != null) return pawn;
+            }
+            
+            return null;
         }
 
         private void CreateNewEntry()
@@ -651,6 +741,7 @@ namespace RimTalk.Memory.UI
             editContent = entry.content;
             editImportance = entry.importance;
             editKeywords = string.Join(", ", entry.keywords);
+            editTargetPawnId = entry.targetPawnId; // ? 加载专属Pawn ID
         }
 
         private void SaveEdit()
@@ -666,6 +757,7 @@ namespace RimTalk.Memory.UI
                 selectedEntry.tag = editTag;
                 selectedEntry.content = editContent;
                 selectedEntry.importance = editImportance;
+                selectedEntry.targetPawnId = editTargetPawnId; // ? 保存专属Pawn ID
                 
                 if (!string.IsNullOrWhiteSpace(editKeywords))
                 {
@@ -681,11 +773,16 @@ namespace RimTalk.Memory.UI
                 }
                 
                 selectedEntry.GetTags();
+                
+                // ? 标记为用户编辑
+                selectedEntry.isUserEdited = true;
             }
             else
             {
                 var newEntry = new CommonKnowledgeEntry(editTag, editContent);
                 newEntry.importance = editImportance;
+                newEntry.targetPawnId = editTargetPawnId; // ? 设置专属Pawn ID
+                newEntry.isUserEdited = true; // ? 标记为用户创建
                 
                 if (!string.IsNullOrWhiteSpace(editKeywords))
                 {

@@ -8,7 +8,8 @@
         <RootNamespace>RimTalk.MemoryPatch</RootNamespace>
         <AssemblyName>RimTalkMemoryPatch</AssemblyName>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <!-- 移除app.manifest引用 -->
+        <!-- <ApplicationManifest>app.manifest</ApplicationManifest> -->
 
         <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
 

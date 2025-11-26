@@ -14,6 +14,11 @@ namespace RimTalk.Memory.AI
     {
         private static bool isInitialized = false;
         private static string apiKey, apiUrl, model, provider;
+        
+        // ⭐ 修复1: 添加缓存大小限制，防止内存泄漏
+        private const int MAX_CACHE_SIZE = 100; // 最多缓存100个总结
+        private const int CACHE_CLEANUP_THRESHOLD = 120; // 达到120个时清理
+        
         private static readonly Dictionary<string, string> completedSummaries = new Dictionary<string, string>();
         private static readonly HashSet<string> pendingSummaries = new HashSet<string>();
         private static readonly Dictionary<string, List<Action<string>>> callbackMap = new Dictionary<string, List<Action<string>>>();
@@ -243,6 +248,22 @@ namespace RimTalk.Memory.AI
                     {
                         lock (completedSummaries)
                         {
+                            // ⭐ 修复1: 清理过大的缓存，防止内存泄漏
+                            if (completedSummaries.Count >= CACHE_CLEANUP_THRESHOLD)
+                            {
+                                // 移除最旧的50%条目（使用FIFO策略）
+                                var toRemove = completedSummaries.Keys.Take(MAX_CACHE_SIZE / 2).ToList();
+                                foreach (var key in toRemove)
+                                {
+                                    completedSummaries.Remove(key);
+                                }
+                                
+                                if (Prefs.DevMode)
+                                {
+                                    Log.Message($"[AI Summarizer] 🧹 Cleaned cache: {toRemove.Count} entries removed, {completedSummaries.Count} remaining");
+                                }
+                            }
+                            
                             completedSummaries[cacheKey] = result;
                         }
                         lock (callbackMap)

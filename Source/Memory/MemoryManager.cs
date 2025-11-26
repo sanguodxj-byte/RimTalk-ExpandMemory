@@ -52,6 +52,18 @@ namespace RimTalk.Memory
                 return conversationCache;
             }
         }
+        
+        // ⭐ 提示词缓存（新增）
+        private PromptCache promptCache;
+        public PromptCache PromptCache
+        {
+            get
+            {
+                if (promptCache == null)
+                    promptCache = new PromptCache();
+                return promptCache;
+            }
+        }
 
         /// <summary>
         /// 静态方法获取常识库
@@ -73,6 +85,17 @@ namespace RimTalk.Memory
             
             var manager = Find.World.GetComponent<MemoryManager>();
             return manager?.ConversationCache ?? new ConversationCache();
+        }
+        
+        /// <summary>
+        /// ⭐ 静态方法获取提示词缓存（新增）
+        /// </summary>
+        public static PromptCache GetPromptCache()
+        {
+            if (Current.Game == null) return new PromptCache();
+            
+            var manager = Find.World.GetComponent<MemoryManager>();
+            return manager?.PromptCache ?? new PromptCache();
         }
 
         public MemoryManager(World world) : base(world)
@@ -103,6 +126,9 @@ namespace RimTalk.Memory
                 if (RimTalkMemoryPatchMod.Settings.enableEventRecordKnowledge)
                 {
                     EventRecordKnowledgeGenerator.ScanRecentPlayLog();
+                    
+                    // ⭐ 新增：检查活跃袭击状态
+                    Patches.IncidentPatch.CheckRaidStatus();
                 }
                 
                 // 定期清理
@@ -478,6 +504,7 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref nextSummarizationTick, "nextSummarizationTick", 0);
             Scribe_Deep.Look(ref commonKnowledge, "commonKnowledge");
             Scribe_Deep.Look(ref conversationCache, "conversationCache");
+            Scribe_Deep.Look(ref promptCache, "promptCache"); // ⭐ 新增
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
@@ -485,6 +512,8 @@ namespace RimTalk.Memory
                     commonKnowledge = new CommonKnowledgeLibrary();
                 if (conversationCache == null)
                     conversationCache = new ConversationCache();
+                if (promptCache == null) // ⭐ 新增
+                    promptCache = new PromptCache();
                 
                 // ⭐ 重新初始化队列（不保存到存档）
                 if (summarizationQueue == null)

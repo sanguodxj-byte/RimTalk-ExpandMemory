@@ -275,12 +275,24 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 格式化记忆用于注入到System Rule
+        /// ⭐ v2.4.4: 增加Token压缩选项
         /// </summary>
         private static string FormatMemoriesForInjection(List<ScoredMemory> scoredMemories)
         {
             if (scoredMemories == null || scoredMemories.Count == 0)
                 return string.Empty;
 
+            // ⭐ 检查是否启用Token压缩
+            bool enableCompression = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableMemoryCompression ?? false;
+            
+            if (enableCompression)
+            {
+                // 使用压缩模式 - 节省Token
+                var memories = scoredMemories.Select(sm => sm.Memory).ToList();
+                return MemoryCompressor.CompressMemories(memories, 500); // 限制500 tokens
+            }
+
+            // 原始模式 - 完整显示
             var sb = new StringBuilder();
 
             // 按层级分组显示，但使用更简洁的格式

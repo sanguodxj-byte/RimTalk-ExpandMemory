@@ -61,6 +61,7 @@ namespace RimTalk.Memory.Patches
         /// Get conversation prompt enhanced with pawn's memories
         /// 支持动态注入和静态注入
         /// 返回包含system_rule和user_prompt的完整结构
+        /// ✅ v2.4.4: 增加智能缓存，避免重复计算记忆和常识注入
         /// </summary>
         public static string GetMemoryPrompt(Pawn pawn, string basePrompt)
         {
@@ -71,6 +72,17 @@ namespace RimTalk.Memory.Patches
             lastRimTalkPawn = pawn;
             lastRimTalkTick = Find.TickManager?.TicksGame ?? 0;
 
+            // ⭐ 新增：尝试从提示词缓存获取
+            var promptCache = MemoryManager.GetPromptCache();
+            var cachedEntry = promptCache.TryGet(pawn, basePrompt, out bool needsRegeneration);
+            
+            if (!needsRegeneration && cachedEntry != null)
+            {
+                // 缓存命中！直接返回
+                return cachedEntry.fullPrompt;
+            }
+
+            // 缓存未命中或失效，重新生成
             string memoryContext = "";
             string knowledgeContext = "";
             
@@ -143,7 +155,12 @@ namespace RimTalk.Memory.Patches
             sb.AppendLine("## User Prompt");
             sb.AppendLine(basePrompt);
 
-            return sb.ToString();
+            string fullPrompt = sb.ToString();
+            
+            // ⭐ 新增：缓存生成的提示词
+            promptCache.Add(pawn, basePrompt, memoryContext, knowledgeContext, fullPrompt);
+
+            return fullPrompt;
         }
 
         /// <summary>
