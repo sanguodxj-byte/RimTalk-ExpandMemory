@@ -537,18 +537,10 @@ namespace RimTalk.Memory
                 if (!string.IsNullOrEmpty(pawn.Name?.ToStringShort))
                 {
                     var name = pawn.Name.ToStringShort;
-                    keywords.Add(name);
-                    info.NameKeywords.Add(name);
+                    AddAndRecord(name, keywords, info.NameKeywords);
                 }
 
-                // 2. 年龄段
-                var ageLabel = GetAgeLabel(pawn);
-                if (!string.IsNullOrEmpty(ageLabel))
-                {
-                    keywords.Add(ageLabel);
-                    info.AgeKeywords.Add(ageLabel);
-                }
-                
+                // 2. 年龄段（合并逻辑，避免重复）
                 if (pawn.RaceProps != null && pawn.RaceProps.Humanlike)
                 {
                     float ageYears = pawn.ageTracker.AgeBiologicalYearsFloat;
@@ -583,15 +575,13 @@ namespace RimTalk.Memory
                 if (pawn.gender != null)
                 {
                     var genderLabel = pawn.gender.GetLabel();
-                    keywords.Add(genderLabel);
-                    info.GenderKeywords.Add(genderLabel);
+                    AddAndRecord(genderLabel, keywords, info.GenderKeywords);
                 }
 
                 // 4. 种族
                 if (pawn.def != null)
                 {
-                    keywords.Add(pawn.def.label);
-                    info.RaceKeywords.Add(pawn.def.label);
+                    AddAndRecord(pawn.def.label, keywords, info.RaceKeywords);
                 }
 
                 // 5. 特质
@@ -601,13 +591,12 @@ namespace RimTalk.Memory
                     {
                         if (trait?.def?.label != null)
                         {
-                            keywords.Add(trait.def.label);
-                            info.TraitKeywords.Add(trait.def.label);
+                            AddAndRecord(trait.def.label, keywords, info.TraitKeywords);
                         }
                     }
                 }
                 
-                // 6. 技能
+                // 6. 技能（修复重复添加"精通"的问题）
                 if (pawn.skills != null)
                 {
                     foreach (var skillRecord in pawn.skills.skills)
@@ -617,38 +606,34 @@ namespace RimTalk.Memory
                         
                         if (skillRecord.def?.label != null)
                         {
-                            keywords.Add(skillRecord.def.label);
-                            info.SkillKeywords.Add(skillRecord.def.label);
+                            AddAndRecord(skillRecord.def.label, keywords, info.SkillKeywords);
                             
                             // 添加技能+等级组合
                             int level = skillRecord.Level;
                             string skillWithLevel = $"{skillRecord.def.label}{level}级";
-                            keywords.Add(skillWithLevel);
-                            info.SkillKeywords.Add(skillWithLevel);
+                            AddAndRecord(skillWithLevel, keywords, info.SkillKeywords);
                             
                             // 添加等级数字
-                            keywords.Add($"{level}级");
-                            info.SkillLevelKeywords.Add($"{level}级");
-                        }
-                        
-                        int level2 = skillRecord.Level;
-                        if (level2 >= 15)
-                        {
-                            AddAndRecord("专家", keywords, info.SkillLevelKeywords);
-                            AddAndRecord("精通", keywords, info.SkillLevelKeywords);
-                        }
-                        else if (level2 >= 10)
-                        {
-                            AddAndRecord("熟练", keywords, info.SkillLevelKeywords);
-                            AddAndRecord("精通", keywords, info.SkillLevelKeywords);
-                        }
-                        else if (level2 >= 6)
-                        {
-                            AddAndRecord("良好", keywords, info.SkillLevelKeywords);
-                        }
-                        else if (level2 >= 3)
-                        {
-                            AddAndRecord("基础", keywords, info.SkillLevelKeywords);
+                            AddAndRecord($"{level}级", keywords, info.SkillLevelKeywords);
+                            
+                            // 添加技能水平描述词（修复重复问题）
+                            if (level >= 15)
+                            {
+                                AddAndRecord("专家", keywords, info.SkillLevelKeywords);
+                                AddAndRecord("精通", keywords, info.SkillLevelKeywords);
+                            }
+                            else if (level >= 10)
+                            {
+                                AddAndRecord("熟练", keywords, info.SkillLevelKeywords);
+                            }
+                            else if (level >= 6)
+                            {
+                                AddAndRecord("良好", keywords, info.SkillLevelKeywords);
+                            }
+                            else if (level >= 3)
+                            {
+                                AddAndRecord("基础", keywords, info.SkillLevelKeywords);
+                            }
                         }
                     }
                 }
@@ -683,8 +668,7 @@ namespace RimTalk.Memory
                         if (!string.IsNullOrEmpty(relatedPawn.Name?.ToStringShort))
                         {
                             var relatedName = relatedPawn.Name.ToStringShort;
-                            keywords.Add(relatedName);
-                            info.RelationshipKeywords.Add(relatedName);
+                            AddAndRecord(relatedName, keywords, info.RelationshipKeywords);
                         }
                         
                         var directRelations = pawn.relations.DirectRelations.Where(r => r.otherPawn == relatedPawn);
@@ -692,8 +676,7 @@ namespace RimTalk.Memory
                         {
                             if (relation.def?.label != null)
                             {
-                                keywords.Add(relation.def.label);
-                                info.RelationshipKeywords.Add(relation.def.label);
+                                AddAndRecord(relation.def.label, keywords, info.RelationshipKeywords);
                             }
                         }
                     }
