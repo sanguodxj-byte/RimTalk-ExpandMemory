@@ -105,12 +105,13 @@ namespace RimTalk.Memory.Patches
         /// <summary>
         /// Postfix for AIService.Chat (异步方法)
         /// ? v3.3.2: 优化为非阻塞处理，避免卡顿
+        /// ? v3.3.2: 修复参数名变化（talkRequest → request）
         /// </summary>
-        private static void ChatAsync_Postfix(object talkRequest, ref object __result)
+        private static void ChatAsync_Postfix(object request, ref object __result)
         {
             try
             {
-                if (__result == null || talkRequest == null)
+                if (__result == null || request == null)
                     return;
                 
                 // 获取Task类型
@@ -119,12 +120,12 @@ namespace RimTalk.Memory.Patches
                     return;
                 
                 // 获取Initiator (speaker)
-                var requestType = talkRequest.GetType();
+                var requestType = request.GetType();
                 var initiatorProp = requestType.GetProperty("Initiator");
                 if (initiatorProp == null)
                     return;
                 
-                Pawn speaker = initiatorProp.GetValue(talkRequest) as Pawn;
+                Pawn speaker = initiatorProp.GetValue(request) as Pawn;
                 if (speaker == null)
                     return;
                 
