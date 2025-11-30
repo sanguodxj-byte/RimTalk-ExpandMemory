@@ -72,6 +72,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 添加记忆到超短期记忆（ABM）
+        /// ⭐ v3.3.2.2: 集成异步向量化同步
         /// </summary>
         public void AddActiveMemory(string content, MemoryType type, float importance = 1f, string relatedPawn = null)
         {
@@ -91,6 +92,13 @@ namespace RimTalk.Memory
             
             ExtractKeywords(memory);
             activeMemories.Insert(0, memory);
+
+            // ⭐ 新增：异步向量化同步
+            var ownerPawn = parent as Pawn;
+            if (ownerPawn != null && RimTalkMemoryPatchMod.Settings.autoSyncToVectorDB)
+            {
+                VectorDB.AsyncVectorSyncManager.QueueMemorySync(memory, ownerPawn);
+            }
 
             // 超短期记忆满了，转移到短期
             if (activeMemories.Count > MAX_ACTIVE)

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite; // ? 替换为Microsoft.Data.Sqlite
 using Verse;
 
 namespace RimTalk.Memory.VectorDB
@@ -10,6 +10,7 @@ namespace RimTalk.Memory.VectorDB
     /// <summary>
     /// 轻量级向量数据库 - 基于SQLite
     /// v3.2.0 实验性功能
+    /// ? v3.3.2: 切换到Microsoft.Data.Sqlite（微软官方，无本地DLL依赖）
     /// 
     /// 功能:
     /// - 持久化存储向量（跨重启保留）
@@ -29,7 +30,7 @@ namespace RimTalk.Memory.VectorDB
     /// </summary>
     public class VectorMemoryDatabase : IDisposable
     {
-        private SQLiteConnection connection;
+        private SqliteConnection connection; // ? 改为SqliteConnection
         private string dbPath;
         private bool isInitialized = false;
         
@@ -53,15 +54,15 @@ namespace RimTalk.Memory.VectorDB
                     Directory.CreateDirectory(directory);
                 }
                 
-                // 连接数据库
-                connection = new SQLiteConnection($"Data Source={dbPath};Version=3;");
+                // ? Microsoft.Data.Sqlite连接字符串格式
+                connection = new SqliteConnection($"Data Source={dbPath}");
                 connection.Open();
                 
                 // 创建表结构
                 CreateTables();
                 
                 isInitialized = true;
-                Log.Message($"[VectorDB] Initialized at: {dbPath}");
+                Log.Message($"[VectorDB] Initialized with Microsoft.Data.Sqlite at: {dbPath}");
             }
             catch (Exception ex)
             {

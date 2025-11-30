@@ -58,7 +58,9 @@
         <PackageReference Include="Lib.Harmony.Ref" Version="2.*" ExcludeAssets="compile" />
         <!-- 使用稳定版 Roslyn 编译器，避免预览版 SDK 的崩溃 -->
         <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.11.0" PrivateAssets="All" />
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
+        <!-- ⭐ Microsoft.Data.Sqlite + 必需的依赖 -->
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
     </ItemGroup>
     

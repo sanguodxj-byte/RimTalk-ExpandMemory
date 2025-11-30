@@ -88,12 +88,13 @@ namespace RimTalk.Memory
                 int processedCount = 0;
                 int currentTick = Find.TickManager.TicksGame;
                 
-                // 只处理最近1小时的事件
-                int oneHourAgo = currentTick - GenDate.TicksPerHour;
+                // ? 修复：PlayLog.Age是事件发生时的tick（不是时间差）
+                // 应该比较：currentTick - entry.Age < GenDate.TicksPerHour
+                int oneHourAgoTick = currentTick - GenDate.TicksPerHour;
                 
                 var recentEntries = gameHistory.AllEntries
-                    .Where(e => e != null && e.Age > oneHourAgo)
-                    .OrderByDescending(e => e.Age)
+                    .Where(e => e != null && e.Age >= oneHourAgoTick) // 事件tick >= 1小时前的tick
+                    .OrderByDescending(e => e.Age) // 按时间倒序（最新的优先）
                     .Take(50);
                 
                 foreach (var logEntry in recentEntries)

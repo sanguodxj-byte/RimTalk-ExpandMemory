@@ -135,7 +135,7 @@ namespace RimTalk.Memory.AI
             if (string.IsNullOrEmpty(text))
                 return null;
             
-            // 生成缓存键
+            // 生产缓存键
             string cacheKey = GenerateCacheKey(text);
             
             // 检查缓存
@@ -541,6 +541,49 @@ namespace RimTalk.Memory.AI
                     IsInitialized = isInitialized
                 };
             }
+        }
+        
+        /// <summary>
+        /// 获取EmbeddingService实例（静态访问）
+        /// </summary>
+        public static EmbeddingServiceWrapper GetInstance()
+        {
+            // 返回包装器实例
+            return new EmbeddingServiceWrapper();
+        }
+        
+        /// <summary>
+        /// 同步版本的GetEmbedding（用于向量库注入）
+        /// </summary>
+        public static float[] GetEmbedding(string text)
+        {
+            try
+            {
+                var task = GetEmbeddingAsync(text);
+                task.Wait(5000); // 等待最多5秒
+                return task.Result;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[Embedding] Sync GetEmbedding failed: {ex.Message}");
+                return null;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// EmbeddingService包装器，用于实例模式访问
+    /// </summary>
+    public class EmbeddingServiceWrapper
+    {
+        public float[] GetEmbedding(string text)
+        {
+            return EmbeddingService.GetEmbedding(text);
+        }
+        
+        public async Task<float[]> GetEmbeddingAsync(string text)
+        {
+            return await EmbeddingService.GetEmbeddingAsync(text);
         }
     }
     

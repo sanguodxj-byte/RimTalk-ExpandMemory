@@ -246,6 +246,37 @@ namespace RimTalk.Memory.VectorDB
         }
         
         /// <summary>
+        /// ? 存储常识向量到数据库
+        /// </summary>
+        public static void StoreKnowledgeVector(string knowledgeId, string tag, string content, float[] vector, float importance)
+        {
+            if (!IsAvailable() || string.IsNullOrEmpty(knowledgeId) || vector == null || vector.Length == 0)
+                return;
+            
+            try
+            {
+                // 构建常识元数据
+                string metadata = BuildKnowledgeMetadata(tag, importance);
+                
+                // 存储到数据库
+                database.UpsertVector(
+                    id: knowledgeId,
+                    vector: vector,
+                    content: content,
+                    metadata: metadata
+                );
+                
+                if (Prefs.DevMode)
+                    Log.Message($"[VectorDB Manager] Stored knowledge vector: {knowledgeId} [{tag}]");
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[VectorDB Manager] Failed to store knowledge vector {knowledgeId}: {ex.Message}");
+                throw; // 重新抛出异常以便调用者处理
+            }
+        }
+        
+        /// <summary>
         /// 构建元数据JSON
         /// </summary>
         private static string BuildMetadata(MemoryEntry memory)
@@ -257,6 +288,53 @@ namespace RimTalk.Memory.VectorDB
                    $"\"importance\":{memory.importance:F2}," +
                    $"\"timestamp\":{memory.timestamp}" +
                    $"}}";
+        }
+        
+        /// <summary>
+        /// ? 构建常识元数据JSON
+        /// </summary>
+        private static string BuildKnowledgeMetadata(string tag, float importance)
+        {
+            // 简单的JSON构建（避免依赖JSON库）
+            return $"{{" +
+                   $"\"type\":\"knowledge\"," +
+                   $"\"tag\":\"{tag}\"," +
+                   $"\"importance\":{importance:F2}," +
+                   $"\"timestamp\":{Find.TickManager.TicksGame}" +
+                   $"}}";
+        }
+
+        /// <summary>
+        /// ? 搜索常识向量
+        /// </summary>
+        public static async Task<List<string>> SearchKnowledgeAsync(string query, int topK = 5, float minSimilarity = 0.3f)
+        {
+            if (!IsAvailable() || string.IsNullOrEmpty(query))
+                return new List<string>();
+            
+            try
+            {
+                // 获取查询向量
+                float[] queryVector = await AI.EmbeddingService.GetEmbeddingAsync(query);
+                
+                if (queryVector == null)
+                    return new List<string>();
+                
+                // 搜索相似向量（只返回常识类型）
+                var results = database.SearchSimilar(queryVector, topK * 2, minSimilarity); // 取多一些，然后过滤
+                
+                // 过滤出常识类型的结果
+                return results
+                    .Where(r => r.Metadata != null && r.Metadata.Contains("\"type\":\"knowledge\""))
+                    .Take(topK)
+                    .Select(r => r.Id)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[VectorDB Manager] Knowledge search failed: {ex.Message}");
+                return new List<string>();
+            }
         }
         
         /// <summary>

@@ -185,4 +185,11 @@
     <RimTalk_Settings_DebugToolsTitle>调试工具</RimTalk_Settings_DebugToolsTitle>
     <RimTalk_Settings_OpenInjectionPreviewer>打开注入预览器</RimTalk_Settings_OpenInjectionPreviewer>
     <RimTalk_Settings_PreviewerDesc>实时预览记忆和常识的动态注入效果</RimTalk_Settings_PreviewerDesc>
+    
+    <!-- 向量库注入功能 -->
+    <RimTalk_Knowledge_InjectToVectorDB>注入向量库</RimTalk_Knowledge_InjectToVectorDB>
+    <RimTalk_Knowledge_InjectToVectorDBDesc>直接解析文本并注入到向量数据库</RimTalk_Knowledge_InjectToVectorDBDesc>
+    <RimTalk_Knowledge_VectorDBInjectionSuccess>成功注入 {0} 条到向量数据库</RimTalk_Knowledge_VectorDBInjectionSuccess>
+    <RimTalk_Knowledge_VectorDBNotEnabled>向量数据库未启用，请在Mod设置中启用</RimTalk_Knowledge_VectorDBNotEnabled>
+    <RimTalk_Knowledge_VectorDBInjectionFailed>向量库注入失败: {0}</RimTalk_Knowledge_VectorDBInjectionFailed>
 </LanguageData>

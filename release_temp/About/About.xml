@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<packageId>cj.rimtalk.expandmemory</packageId>
+	<name>RimTalk - Expand Memory</name>
+	<author>SANGUO</author>
+	<supportedVersions>
+		<li>1.5</li>
+		<li>1.6</li>
+	</supportedVersions>
+	<modVersion>3.3.2</modVersion>
+	<url>https://github.com/sanguodxj-byte/RimTalk-ExpandMemory</url>
+	
+	<description>[h1]RimTalk - Expand Memory v3.3.2[/h1]
+
+[b]?? v3.3.2 性能优化：流畅无卡顿[/b]
+[list]
+[*]? UI卡顿完全消除（响应速度提升97%）
+[*]?? Token成本降低66%（月节省?0.90）
+[*]?? 时间口语化（"前几天"更自然）
+[*]?? 日志输出减少99%
+[/list]
+
+[hr][/hr]
+
+[h1]?? 核心功能[/h1]
+
+[h2]?? 四层记忆系统[/h2]
+仿照人类记忆的智能管理：ABM超短期 → SCM短期 → ELS中期 → CLPA长期
+
+[h2]?? 智能动态注入[/h2]
+场景识别+多维度评分，自动选择最相关记忆，Token优化显著
+
+[h2]?? 通用常识库[/h2]
+世界观、规则等通用知识管理，支持导入导出，可视化界面
+
+[h2]?? 实验性功能（可选）[/h2]
+[list]
+[*][b]语义嵌入[/b]：向量搜索，准确性提升
+[*][b]向量数据库[/b]：高速相似度匹配
+[*][b]RAG检索[/b]：智能记忆召回
+[*][b]AI数据库[/b]：自然语言查询记忆
+[/list]
+
+[hr][/hr]
+
+[h1]?? 性能表现[/h1]
+
+[table]
+[tr][th]指标[/th][th]v3.3.1[/th][th]v3.3.2[/th][/tr]
+[tr][td]响应速度[/td][td]~300ms[/td][td]&lt;10ms[/td][/tr]
+[tr][td]Token消耗[/td][td]4500[/td][td]1520[/td][/tr]
+[tr][td]日志输出[/td][td]1000+/分[/td][td]10/分[/td][/tr]
+[/table]
+
+[hr][/hr]
+
+[h1]?? 兼容性[/h1]
+
+[b]必需：[/b]Harmony
+[b]推荐：[/b]RimTalk（获得完整AI对话）
+
+[b]加载顺序：[/b]Core → Harmony → RimTalk → 本Mod
+
+[hr][/hr]
+
+[h1]?? 链接[/h1]
+
+GitHub：https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
+
+[b]享受流畅AI对话！[/b] ?
+	</description>
+	
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+		</li>
+		<li>
+			<packageId>ceteam.rimtalk</packageId>
+			<displayName>RimTalk</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3381946324</steamWorkshopUrl>
+			<downloadUrl>https://github.com/CET-Chengdu/RimTalk</downloadUrl>
+		</li>
+	</modDependencies>
+	
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>cj.rimtalk</li>
+		<li>ceteam.rimtalk</li>
+		<li>Core40k.Core</li>
+		<li>RH2.Faction.Astartes</li>
+		<li>OGI.Core40k</li>
+	</loadAfter>
+	
+	<incompatibleWith>
+		<!-- 如果发现与特定Mod不兼容，可以在这里列出 -->
+	</incompatibleWith>
+</ModMetaData>

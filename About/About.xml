@@ -7,67 +7,129 @@
 		<li>1.5</li>
 		<li>1.6</li>
 	</supportedVersions>
-	<modVersion>3.3.2</modVersion>
+	<modVersion>3.3.2.3</modVersion>
 	<url>https://github.com/sanguodxj-byte/RimTalk-ExpandMemory</url>
 	
-	<description>[h1]RimTalk - Expand Memory v3.3.2[/h1]
+	<description>[h1]RimTalk - Expand Memory v3.3.2.3[/h1]
 
-[b]?? v3.3.2 �����Ż��������޿���[/b]
+[b]🚀 四层记忆系统 + 智能注入 + 零卡顿优化[/b]
+
+为RimTalk AI对话提供强大的记忆与常识支持，让殖民者拥有真实的记忆和知识！
+
+[hr][/hr]
+
+[h1]✨ 核心功能[/h1]
+
+[b]🧠 四层记忆架构[/b]
+超短期(ABM 6条) → 短期(SCM 10-50条) → 中期(ELS 20-100条) → 长期(CLPA 无限)，模拟真实记忆衰减
+
+[b]🎯 智能动态注入[/b]
+时间衰减30% + 重要性30% + 关键词40%，自动选择最相关记忆注入对话，类似CharacterAI
+
+[b]📚 通用常识库[/b]
+规则、设定、世界观管理。格式：[标签|重要性]内容。支持导入导出、角色专属、可视化UI
+
+[b]⚡ 性能优化 v3.3.2.3[/b]
+• UI响应 &lt;10ms (97%↓)
+• Token成本 1520 (66%↓，从4500)
+• 日志输出 10/分 (99%↓，从1000+)
+• 零主线程阻塞（RAG立即降级策略）
+
+[b]🆕 更新内容[/b]
+• 🚀 手动注入常识集成异步向量化
+• 🔄 注入后自动后台升级为语义向量（如果启用）
+• 📊 智能用户提示（告知异步升级状态）
+
+[hr][/hr]
+
+[h1]🧪 实验性功能[/h1]
 [list]
-[*]? UI������ȫ��������Ӧ�ٶ�����97%��
-[*]?? Token�ɱ�����66%���½�ʡ?0.90��
-[*]?? ʱ����ﻯ��"ǰ����"����Ȼ��
-[*]?? ��־�������99%
+[*]语义嵌入 - AI理解语义相似度
+[*]向量数据库 - SQLite持久化向量
+[*]RAG检索 - 混合语义+关键词检索
+[*]AI数据库 - 自然语言查询记忆
 [/list]
 
 [hr][/hr]
 
-[h1]?? ���Ĺ���[/h1]
+[h1]🎯 使用方法[/h1]
 
-[h2]?? �Ĳ����ϵͳ[/h2]
-���������������ܹ�����ABM������ �� SCM���� �� ELS���� �� CLPA����
+[b]基础配置[/b]
+1. 安装 Harmony + RimTalk
+2. 启用本Mod
+3. Mod设置 → 打开常识库管理
+4. 导入示例：
+[code]
+[世界观|0.9]边缘世界，科技倒退
+[规则|0.8]回复80字内，口语化
+[危机|0.7]海盗定期袭击
+[/code]
 
-[h2]?? ���ܶ�̬ע��[/h2]
-����ʶ��+��ά�����֣��Զ�ѡ������ؼ��䣬Token�Ż�����
+[b]推荐配置[/b]
+• 动态注入：启用 ✅
+• 最大记忆：8-10条
+• 最大常识：3-5条
+• 记忆阈值：0.15
+• 常识阈值：0.10
 
-[h2]?? ͨ�ó�ʶ��[/h2]
-����ۡ������ͨ��֪ʶ������֧�ֵ��뵼�������ӻ�����
-
-[h2]?? ʵ���Թ��ܣ���ѡ��[/h2]
-[list]
-[*][b]����Ƕ��[/b]������������׼ȷ������
-[*][b]�������ݿ�[/b]���������ƶ�ƥ��
-[*][b]RAG����[/b]�����ܼ����ٻ�
-[*][b]AI���ݿ�[/b]����Ȼ���Բ�ѯ����
-[/list]
+[b]调试工具[/b]
+Mod设置 → 注入内容预览器 → 实时查看注入效果、评分明细、Token估算
 
 [hr][/hr]
 
-[h1]?? ���ܱ���[/h1]
-
+[h1]📊 性能对比[/h1]
 [table]
-[tr][th]ָ��[/th][th]v3.3.1[/th][th]v3.3.2[/th][/tr]
-[tr][td]��Ӧ�ٶ�[/td][td]~300ms[/td][td]&lt;10ms[/td][/tr]
-[tr][td]Token����[/td][td]4500[/td][td]1520[/td][/tr]
-[tr][td]��־���[/td][td]1000+/��[/td][td]10/��[/td][/tr]
+[tr][th]配置[/th][th]Token[/th][th]场景[/th][/tr]
+[tr][td]最小(1+1)[/td][td]40[/td][td]极简[/td][/tr]
+[tr][td]推荐(8+3)[/td][td]220[/td][td]标准[/td][/tr]
+[tr][td]最大(20+10)[/td][td]600[/td][td]深度[/td][/tr]
 [/table]
 
 [hr][/hr]
 
-[h1]?? ������[/h1]
-
-[b]���裺[/b]Harmony
-[b]�Ƽ���[/b]RimTalk���������AI�Ի���
-
-[b]����˳��[/b]Core �� Harmony �� RimTalk �� ��Mod
+[h1]🔧 兼容性[/h1]
+[b]必需：[/b]Harmony
+[b]推荐：[/b]RimTalk（获得AI对话功能）
+[b]加载顺序：[/b]Core → Harmony → RimTalk → 本Mod
 
 [hr][/hr]
 
-[h1]?? ����[/h1]
+[h1]📝 更新日志[/h1]
 
-GitHub��https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
+[b]v3.3.2.3 最新[/b]
+• 🚀 手动注入常识集成异步向量化
+• 🔄 注入后自动后台升级为语义向量（如果启用）
+• 📊 智能用户提示（告知异步升级状态）
+• 修复RAG主线程阻塞（500ms→0ms）
+• 采用立即降级+后台缓存策略
+• 减少95%日志输出
 
-[b]��������AI�Ի���[/b] ?
+[b]v3.3.2[/b]
+• UI性能优化97%
+• Token成本降66%
+• 时间模糊化显示
+
+[b]v2.4.3[/b]
+• 预览器"读取上次输入"
+• 双Pawn关键词提取
+
+[hr][/hr]
+
+[h1]🙏 鸣谢 Credits[/h1]
+
+[b]Juicy - RimTalk 原作者 Original Author[/b]
+RimTalk 是 RimWorld 最优秀的 AI 对话 Mod 之一，为殖民者赋予了真正的灵魂和个性。它的创新设计启发了我开发这个记忆系统扩展。
+RimTalk is one of the best AI conversation mods for RimWorld, giving colonists real soul and personality. Its innovative design inspired me to create this memory system extension.
+
+[b]GitHub Copilot (Claude Sonnet 4.5)[/b]
+AI 辅助让开发更高效（我没有编写任何代码
+AI assistance made development more efficient. (I didn't write any code
+
+[hr][/hr]
+
+GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
+
+[b]让你的殖民者拥有真实记忆！[/b] 🎮
 	</description>
 	
 	<modDependencies>
@@ -94,6 +156,5 @@ GitHub��https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
 	</loadAfter>
 	
 	<incompatibleWith>
-		<!-- ����������ض�Mod�����ݣ������������г� -->
 	</incompatibleWith>
 </ModMetaData>

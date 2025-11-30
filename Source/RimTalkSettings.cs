@@ -45,7 +45,7 @@ namespace RimTalk.MemoryPatch
         public bool enableConversationMemory = true;  // 对话记忆（RimTalk对话内容）
         
         // === Pawn状态常识自动生成 ===
-        public bool enablePawnStatusKnowledge = true;  // 自动生成新人/老人状态常识
+        public bool enablePawnStatusKnowledge = false;  // ⭐ 改为默认关闭
         
         // === 事件记录常识自动生成 ===
         public bool enableEventRecordKnowledge = false; // 自动生成事件记录常识（默认关闭）
@@ -151,7 +151,7 @@ namespace RimTalk.MemoryPatch
         Scribe_Values.Look(ref enableConversationMemory, "memoryPatch_enableConversationMemory", true);
         
         // Pawn状态常识
-        Scribe_Values.Look(ref enablePawnStatusKnowledge, "pawnStatus_enablePawnStatusKnowledge", true);
+        Scribe_Values.Look(ref enablePawnStatusKnowledge, "pawnStatus_enablePawnStatusKnowledge", false); // ⭐ 改为默认false
         
         // 事件记录常识
         Scribe_Values.Look(ref enableEventRecordKnowledge, "eventRecord_enableEventRecordKnowledge", false);

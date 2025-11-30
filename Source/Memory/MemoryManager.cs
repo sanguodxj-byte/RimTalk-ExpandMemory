@@ -146,6 +146,9 @@ namespace RimTalk.Memory
             // ⭐ 处理手动总结队列
             ProcessManualSummarizationQueue();
             
+            // ⭐ 新增：处理异步向量化同步队列
+            VectorDB.AsyncVectorSyncManager.ProcessSyncQueue();
+            
             // 每天 0 点触发总结
             CheckDailySummarization();
         }

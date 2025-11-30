@@ -26,7 +26,9 @@ namespace RimTalk.Memory.RAG
         // 统计
         private static int totalQueries = 0;
         private static int cacheHits = 0;
-        
+        private static int fallbackCount = 0; // ? 新增：降级次数统计
+        private static int backgroundCompletions = 0; // ? 新增：后台完成次数
+
         /// <summary>
         /// 检索（异步）
         /// </summary>
@@ -72,8 +74,8 @@ namespace RimTalk.Memory.RAG
         }
         
         /// <summary>
-        /// 检索（同步，带超时）
-        /// ? v3.3.2: 优化超时处理和降级策略
+        /// 检索（同步，立即降级策略）
+        /// ? v3.3.2.1: 完全移除主线程阻塞，改用立即降级+后台异步
         /// </summary>
         public static RAGResult Retrieve(
             string query,
@@ -82,37 +84,47 @@ namespace RimTalk.Memory.RAG
             RAGConfig config = null,
             int timeoutMs = 500)
         {
-            try
+            // ? 立即使用降级检索（关键词匹配），避免任何等待
+            // 同时在后台启动异步检索，结果将被缓存供下次使用
+            
+            // 检查缓存
+            string cacheKey = GenerateCacheKey(query, speaker, listener);
+            
+            if (TryGetCached(cacheKey, out RAGResult cached))
             {
-                var task = RetrieveAsync(query, speaker, listener, config);
-                
-                if (task.Wait(timeoutMs))
+                cacheHits++;
+                return cached;
+            }
+            
+            // ? 立即返回降级结果（0ms延迟）
+            var fallbackResult = FallbackRetrieve(query, speaker, listener, config);
+            fallbackCount++; // ? 统计降级次数
+            
+            // ? 后台启动完整异步检索，结果缓存后下次可用
+            Task.Run(async () =>
+            {
+                try
                 {
-                    return task.Result;
-                }
-                else
-                {
-                    // ? 减少超时警告频率
-                    if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
-                    {
-                        Log.Warning($"[RAG Manager] Timeout after {timeoutMs}ms, using fallback");
-                    }
+                    var fullResult = await RetrieveAsync(query, speaker, listener, config);
+                    CacheResult(cacheKey, fullResult);
+                    backgroundCompletions++; // ? 统计后台完成
                     
-                    return FallbackRetrieve(query, speaker, listener, config);
+                    if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
+                        Log.Message($"[RAG Manager] Background retrieval completed and cached");
                 }
-            }
-            catch (Exception ex)
-            {
-                if (Prefs.DevMode)
+                catch (Exception ex)
                 {
-                    Log.Error($"[RAG Manager] Sync retrieval failed: {ex.Message}");
+                    if (Prefs.DevMode)
+                        Log.Warning($"[RAG Manager] Background retrieval failed: {ex.Message}");
                 }
-                return FallbackRetrieve(query, speaker, listener, config);
-            }
+            });
+            
+            return fallbackResult;
         }
         
         /// <summary>
         /// 降级检索（仅关键词，无向量）
+        /// ? v3.3.2.1: 优化性能，减少日志输出
         /// </summary>
         private static RAGResult FallbackRetrieve(
             string query,
@@ -134,13 +146,15 @@ namespace RimTalk.Memory.RAG
                     HybridMatches = new List<RAGMatch>()
                 };
                 
-                // 仅使用关键词检索
+                // 仅使用关键词检索（快速路径）
                 var memoryComp = speaker?.TryGetComp<FourLayerMemoryComp>();
                 if (memoryComp != null)
                 {
                     var memories = new List<MemoryEntry>();
                     memories.AddRange(memoryComp.SituationalMemories);
-                    memories.AddRange(memoryComp.EventLogMemories);
+                    
+                    // ? 优化：仅检索最近的ELS记忆，避免全量扫描
+                    memories.AddRange(memoryComp.EventLogMemories.Take(20));
                     
                     var scored = AdvancedScoringSystem.ScoreMemories(
                         memories, query, speaker, listener
@@ -162,6 +176,11 @@ namespace RimTalk.Memory.RAG
                 result.RerankedMatches = result.HybridMatches;
                 result.TotalMatches = result.HybridMatches.Count;
                 
+                // ? 减少日志输出频率
+                if (Prefs.DevMode && UnityEngine.Random.value < 0.05f)
+                    Log.Message($"[RAG Manager] Fallback retrieval: {result.TotalMatches} matches");
+                
+                fallbackCount++; // ? 增加降级统计
                 return result;
             }
             catch (Exception ex)
@@ -256,6 +275,7 @@ namespace RimTalk.Memory.RAG
         
         /// <summary>
         /// 获取统计信息
+        /// ? v3.3.2.1: 添加降级和后台统计
         /// </summary>
         public static RAGStats GetStats()
         {
@@ -266,7 +286,9 @@ namespace RimTalk.Memory.RAG
                     TotalQueries = totalQueries,
                     CacheHits = cacheHits,
                     CacheSize = resultCache.Count,
-                    CacheHitRate = totalQueries > 0 ? (float)cacheHits / totalQueries : 0f
+                    CacheHitRate = totalQueries > 0 ? (float)cacheHits / totalQueries : 0f,
+                    FallbackCount = fallbackCount,
+                    BackgroundCompletions = backgroundCompletions
                 };
             }
         }
@@ -278,6 +300,8 @@ namespace RimTalk.Memory.RAG
         {
             totalQueries = 0;
             cacheHits = 0;
+            fallbackCount = 0;
+            backgroundCompletions = 0;
         }
     }
     
@@ -294,6 +318,7 @@ namespace RimTalk.Memory.RAG
     
     /// <summary>
     /// RAG统计信息
+    /// ? v3.3.2.1: 添加降级和后台统计
     /// </summary>
     public class RAGStats
     {
@@ -301,10 +326,13 @@ namespace RimTalk.Memory.RAG
         public int CacheHits;
         public int CacheSize;
         public float CacheHitRate;
+        public int FallbackCount; // ? 新增
+        public int BackgroundCompletions; // ? 新增
         
         public override string ToString()
         {
-            return $"Queries: {TotalQueries}, Cache: {CacheHits}/{TotalQueries} ({CacheHitRate:P0}), Size: {CacheSize}";
+            return $"Queries: {TotalQueries}, Cache: {CacheHits}/{TotalQueries} ({CacheHitRate:P0}), " +
+                   $"Fallback: {FallbackCount}, Background: {BackgroundCompletions}, Size: {CacheSize}";
         }
     }
     
