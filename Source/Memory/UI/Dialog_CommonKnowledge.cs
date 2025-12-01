@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +10,7 @@ using RimTalk.MemoryPatch;
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// ³£Ê¶¿â¹ÜÀí´°¿Ú
+    /// å¸¸è¯†åº“ç®¡ç†çª—å£
     /// </summary>
     public class Dialog_CommonKnowledge : Window
     {
@@ -20,17 +20,17 @@ namespace RimTalk.Memory.UI
         private CommonKnowledgeEntry selectedEntry = null;
         private bool editMode = false;
         
-        // ×Ô¶¯Éú³ÉÕÛµş×´Ì¬
+        // è‡ªåŠ¨ç”ŸæˆæŠ˜å çŠ¶æ€
         private bool expandAutoGenerate = false;
         
-        // ±à¼­×Ö¶Î
+        // ç¼–è¾‘å­—æ®µ
         private string editTag = "";
         private string editContent = "";
         private float editImportance = 0.5f;
         private string editKeywords = "";
         private int editTargetPawnId = -1;
         
-        // µ¼ÈëÎÄ±¾
+        // å¯¼å…¥æ–‡æœ¬
         private string importText = "";
 
         public override Vector2 InitialSize => new Vector2(900f, 700f);
@@ -48,31 +48,31 @@ namespace RimTalk.Memory.UI
         {
             float yPos = 0f;
 
-            // ¹¤¾ßÀ¸
+            // å·¥å…·æ 
             Rect toolbarRect = new Rect(0f, yPos, inRect.width, 40f);
             DrawToolbar(toolbarRect);
             yPos += 45f;
 
-            // ËÑË÷¿ò
+            // æœç´¢æ¡†
             Rect searchRect = new Rect(0f, yPos, 300f, 30f);
             searchFilter = Widgets.TextField(searchRect, searchFilter);
 
-            // Í³¼ÆĞÅÏ¢
+            // ç»Ÿè®¡ä¿¡æ¯
             Rect statsRect = new Rect(310f, yPos, 300f, 30f);
             int enabledCount = library.Entries.Count(e => e.isEnabled);
             Widgets.Label(statsRect, "RimTalk_Knowledge_TotalAndEnabled".Translate(library.Entries.Count, enabledCount));
             yPos += 35f;
 
-            // ×Ô¶¯Éú³É³£Ê¶ÕÛµşÇø
+            // è‡ªåŠ¨ç”Ÿæˆå¸¸è¯†æŠ˜å åŒº
             Rect autoGenRect = new Rect(0f, yPos, inRect.width, 35f);
             DrawAutoGenerateSection(autoGenRect);
-            yPos += expandAutoGenerate ? 170f : 40f; // ? ´Ó140fÔö¼Óµ½170f£¨130+35+5£©
+            yPos += expandAutoGenerate ? 170f : 40f; // ? ä»140få¢åŠ åˆ°170fï¼ˆ130+35+5ï¼‰
 
-            // ×ó²àÁĞ±í
+            // å·¦ä¾§åˆ—è¡¨
             Rect listRect = new Rect(0f, yPos, 450f, inRect.height - yPos - 50f);
             DrawEntryList(listRect);
 
-            // ÓÒ²àÏêÇé/±à¼­Çø
+            // å³ä¾§è¯¦æƒ…/ç¼–è¾‘åŒº
             Rect detailRect = new Rect(460f, yPos, inRect.width - 460f, inRect.height - yPos - 50f);
             if (editMode)
                 DrawEditPanel(detailRect);
@@ -86,28 +86,28 @@ namespace RimTalk.Memory.UI
             float spacing = 5f;
             float x = 0f;
 
-            // ĞÂ½¨°´Å¥
+            // æ–°å»ºæŒ‰é’®
             if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "RimTalk_Knowledge_New".Translate()))
             {
                 CreateNewEntry();
             }
             x += buttonWidth + spacing;
 
-            // µ¼Èë°´Å¥
+            // å¯¼å…¥æŒ‰é’®
             if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "RimTalk_Knowledge_Import".Translate()))
             {
                 ShowImportDialog();
             }
             x += buttonWidth + spacing;
 
-            // µ¼³ö°´Å¥
+            // å¯¼å‡ºæŒ‰é’®
             if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "RimTalk_Knowledge_Export".Translate()))
             {
                 ExportToFile();
             }
             x += buttonWidth + spacing;
 
-            // É¾³ı°´Å¥
+            // åˆ é™¤æŒ‰é’®
             if (selectedEntry != null)
             {
                 if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "RimTalk_Knowledge_Delete".Translate()))
@@ -117,32 +117,35 @@ namespace RimTalk.Memory.UI
                 x += buttonWidth + spacing;
             }
 
-            // Çå¿Õ°´Å¥
+            // æ¸…ç©ºæŒ‰é’®
             if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "RimTalk_Knowledge_ClearAll".Translate()))
             {
                 ClearAllEntries();
             }
             
-            // ? ×¢ÈëÏòÁ¿¿â°´Å¥ÒÆµ½×îÓÒ±ß
+            // ? v3.3.2.25: å‘é‡æ³¨å…¥æŒ‰é’®å·²ç¦ç”¨ï¼ˆVectorDBå·²ç§»é™¤ï¼‰
+            // ä¿ç•™UIæ¡†æ¶ï¼Œæœªæ¥å¯ä»¥é‡æ–°å¯ç”¨è¯­ä¹‰æœç´¢åŠŸèƒ½
+            /*
             float vectorButtonWidth = buttonWidth + 20f;
             float vectorButtonX = rect.width - vectorButtonWidth;
-            if (Widgets.ButtonText(new Rect(vectorButtonX, 0f, vectorButtonWidth, 35f), "×¢ÈëÏòÁ¿¿â"))
+            if (Widgets.ButtonText(new Rect(vectorButtonX, 0f, vectorButtonWidth, 35f), "æ³¨å…¥å‘é‡åº“"))
             {
                 ShowVectorDBInjectionDialog();
             }
+            */
         }
 
         private void DrawAutoGenerateSection(Rect rect)
         {
-            string sectionTitle = "×Ô¶¯Éú³É";
-            if (Widgets.ButtonText(new Rect(rect.x, rect.y, rect.width, 30f), expandAutoGenerate ? $"¨‹ {sectionTitle}" : $"? {sectionTitle}"))
+            string sectionTitle = "è‡ªåŠ¨ç”Ÿæˆ";
+            if (Widgets.ButtonText(new Rect(rect.x, rect.y, rect.width, 30f), expandAutoGenerate ? $"â–¼ {sectionTitle}" : $"? {sectionTitle}"))
             {
                 expandAutoGenerate = !expandAutoGenerate;
             }
 
             if (expandAutoGenerate)
             {
-                Rect contentRect = new Rect(rect.x + 10f, rect.y + 35f, rect.width - 20f, 130f); // ? ´Ó100Ôö¼Óµ½130
+                Rect contentRect = new Rect(rect.x + 10f, rect.y + 35f, rect.width - 20f, 130f); // ? ä»100å¢åŠ åˆ°130
                 GUI.Box(contentRect, "");
                 
                 Rect innerRect = contentRect.ContractedBy(5f);
@@ -151,51 +154,51 @@ namespace RimTalk.Memory.UI
                 
                 var settings = RimTalkMemoryPatchMod.Settings;
                 
-                // ? µÚÒ»ĞĞ£ºPawn×´Ì¬³£Ê¶
+                // ? ç¬¬ä¸€è¡Œï¼šPawnçŠ¶æ€å¸¸è¯†
                 Rect pawnStatusLineRect = new Rect(innerRect.x, y, innerRect.width, 30f);
                 
-                // ¸´Ñ¡¿ò
+                // å¤é€‰æ¡†
                 Rect pawnCheckboxRect = new Rect(pawnStatusLineRect.x, pawnStatusLineRect.y, pawnStatusLineRect.width - buttonWidth - 10f, 30f);
                 bool enablePawnStatus = settings.enablePawnStatusKnowledge;
-                Widgets.CheckboxLabeled(pawnCheckboxRect, "Éú³ÉPawn×´Ì¬³£Ê¶", ref enablePawnStatus);
+                Widgets.CheckboxLabeled(pawnCheckboxRect, "ç”ŸæˆPawnçŠ¶æ€å¸¸è¯†", ref enablePawnStatus);
                 settings.enablePawnStatusKnowledge = enablePawnStatus;
                 
-                // ? Á¢¼´Éú³É°´Å¥
+                // ? ç«‹å³ç”ŸæˆæŒ‰é’®
                 Rect pawnButtonRect = new Rect(pawnStatusLineRect.xMax - buttonWidth, pawnStatusLineRect.y, buttonWidth, 30f);
-                if (Widgets.ButtonText(pawnButtonRect, "Á¢¼´Éú³É"))
+                if (Widgets.ButtonText(pawnButtonRect, "ç«‹å³ç”Ÿæˆ"))
                 {
                     GeneratePawnStatusKnowledge();
                 }
                 
                 y += 35f;
                 
-                // ? µÚ¶şĞĞ£ºÊÂ¼ş¼ÇÂ¼³£Ê¶
+                // ? ç¬¬äºŒè¡Œï¼šäº‹ä»¶è®°å½•å¸¸è¯†
                 Rect eventLineRect = new Rect(innerRect.x, y, innerRect.width, 30f);
                 
-                // ¸´Ñ¡¿ò
+                // å¤é€‰æ¡†
                 Rect eventCheckboxRect = new Rect(eventLineRect.x, eventLineRect.y, eventLineRect.width - buttonWidth - 10f, 30f);
                 bool enableEventRecord = settings.enableEventRecordKnowledge;
-                Widgets.CheckboxLabeled(eventCheckboxRect, "Éú³ÉÊÂ¼ş¼ÇÂ¼³£Ê¶", ref enableEventRecord);
+                Widgets.CheckboxLabeled(eventCheckboxRect, "ç”Ÿæˆäº‹ä»¶è®°å½•å¸¸è¯†", ref enableEventRecord);
                 settings.enableEventRecordKnowledge = enableEventRecord;
                 
-                // ? Á¢¼´Éú³É°´Å¥
+                // ? ç«‹å³ç”ŸæˆæŒ‰é’®
                 Rect eventButtonRect = new Rect(eventLineRect.xMax - buttonWidth, eventLineRect.y, buttonWidth, 30f);
-                if (Widgets.ButtonText(eventButtonRect, "Á¢¼´Éú³É"))
+                if (Widgets.ButtonText(eventButtonRect, "ç«‹å³ç”Ÿæˆ"))
                 {
                     GenerateEventRecordKnowledge();
                 }
                 
                 y += 35f;
                 
-                // ? ÌáÊ¾ĞÅÏ¢
+                // ? æç¤ºä¿¡æ¯
                 GUI.color = Color.gray;
-                Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 20f), "ÌáÊ¾£ºÆôÓÃ×Ô¶¯Éú³Éºó£¬ÏµÍ³»á¶¨ÆÚ¸üĞÂ³£Ê¶¿â");
+                Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 20f), "æç¤ºï¼šå¯ç”¨è‡ªåŠ¨ç”Ÿæˆåï¼Œç³»ç»Ÿä¼šå®šæœŸæ›´æ–°å¸¸è¯†åº“");
                 GUI.color = Color.white;
             }
         }
         
         /// <summary>
-        /// Éú³ÉPawn×´Ì¬³£Ê¶
+        /// ç”ŸæˆPawnçŠ¶æ€å¸¸è¯†
         /// </summary>
         private void GeneratePawnStatusKnowledge()
         {
@@ -204,23 +207,23 @@ namespace RimTalk.Memory.UI
                 var settings = RimTalkMemoryPatchMod.Settings;
                 if (!settings.enablePawnStatusKnowledge)
                 {
-                    Messages.Message("Pawn×´Ì¬³£Ê¶Éú³ÉÎ´ÆôÓÃ£¬ÇëÔÚÉèÖÃÖĞÆôÓÃ", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message("PawnçŠ¶æ€å¸¸è¯†ç”Ÿæˆæœªå¯ç”¨ï¼Œè¯·åœ¨è®¾ç½®ä¸­å¯ç”¨", MessageTypeDefOf.RejectInput, false);
                     return;
                 }
                 
-                // »ñÈ¡ËùÓĞÖ³ÃñÕß
+                // è·å–æ‰€æœ‰æ®–æ°‘è€…
                 var colonists = Find.CurrentMap?.mapPawns?.FreeColonists;
                 if (colonists == null || colonists.Count() == 0)
                 {
-                    Messages.Message("µ±Ç°µØÍ¼Ã»ÓĞÖ³ÃñÕß", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message("å½“å‰åœ°å›¾æ²¡æœ‰æ®–æ°‘è€…", MessageTypeDefOf.RejectInput, false);
                     return;
                 }
                 
-                // »ñÈ¡MemoryManager£¨ÓÃÓÚ·ÃÎÊcolonistJoinTicks£©
+                // è·å–MemoryManagerï¼ˆç”¨äºè®¿é—®colonistJoinTicksï¼‰
                 var memoryManager = Find.World?.GetComponent<MemoryManager>();
                 if (memoryManager == null)
                 {
-                    Messages.Message("ÎŞ·¨»ñÈ¡MemoryManager", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message("æ— æ³•è·å–MemoryManager", MessageTypeDefOf.RejectInput, false);
                     return;
                 }
                 
@@ -232,7 +235,7 @@ namespace RimTalk.Memory.UI
                 {
                     try
                     {
-                        // Ê¹ÓÃPawnStatusKnowledgeGeneratorµÄÂß¼­
+                        // ä½¿ç”¨PawnStatusKnowledgeGeneratorçš„é€»è¾‘
                         PawnStatusKnowledgeGenerator.UpdatePawnStatusKnowledge(pawn, library, currentTick, colonistJoinTicks);
                         generated++;
                     }
@@ -242,18 +245,18 @@ namespace RimTalk.Memory.UI
                     }
                 }
                 
-                Messages.Message($"³É¹¦Îª {generated} ¸öÖ³ÃñÕßÉú³É×´Ì¬³£Ê¶", MessageTypeDefOf.PositiveEvent, false);
+                Messages.Message($"æˆåŠŸä¸º {generated} ä¸ªæ®–æ°‘è€…ç”ŸæˆçŠ¶æ€å¸¸è¯†", MessageTypeDefOf.PositiveEvent, false);
                 Log.Message($"[CommonKnowledge] Generated {generated} pawn status knowledge entries");
             }
             catch (Exception ex)
             {
                 Log.Error($"[CommonKnowledge] Pawn status generation failed: {ex.Message}");
-                Messages.Message($"Éú³ÉÊ§°Ü£º{ex.Message}", MessageTypeDefOf.RejectInput, false);
+                Messages.Message($"ç”Ÿæˆå¤±è´¥ï¼š{ex.Message}", MessageTypeDefOf.RejectInput, false);
             }
         }
         
         /// <summary>
-        /// Éú³ÉÊÂ¼ş¼ÇÂ¼³£Ê¶
+        /// ç”Ÿæˆäº‹ä»¶è®°å½•å¸¸è¯†
         /// </summary>
         private void GenerateEventRecordKnowledge()
         {
@@ -262,22 +265,22 @@ namespace RimTalk.Memory.UI
                 var settings = RimTalkMemoryPatchMod.Settings;
                 if (!settings.enableEventRecordKnowledge)
                 {
-                    Messages.Message("ÊÂ¼ş¼ÇÂ¼³£Ê¶Éú³ÉÎ´ÆôÓÃ£¬ÇëÔÚÉèÖÃÖĞÆôÓÃ", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message("äº‹ä»¶è®°å½•å¸¸è¯†ç”Ÿæˆæœªå¯ç”¨ï¼Œè¯·åœ¨è®¾ç½®ä¸­å¯ç”¨", MessageTypeDefOf.RejectInput, false);
                     return;
                 }
                 
-                // Ö±½Óµ÷ÓÃEventRecordKnowledgeGeneratorµÄÉ¨Ãè·½·¨
-                // Õâ½«×Ô¶¯´ÓPlayLogÌáÈ¡×î½üÊÂ¼ş²¢Éú³É³£Ê¶
+                // ç›´æ¥è°ƒç”¨EventRecordKnowledgeGeneratorçš„æ‰«ææ–¹æ³•
+                // è¿™å°†è‡ªåŠ¨ä»PlayLogæå–æœ€è¿‘äº‹ä»¶å¹¶ç”Ÿæˆå¸¸è¯†
                 EventRecordKnowledgeGenerator.ScanRecentPlayLog();
                 
-                // ÓÉÓÚScanRecentPlayLogÊÇ×Ô¶¯¹ÜÀíµÄ£¬ÎÒÃÇ¸øÓÃ»§Ò»¸öÌáÊ¾
-                Messages.Message("ÒÑ´¥·¢ÊÂ¼ş¼ÇÂ¼É¨Ãè£¬³£Ê¶½«×Ô¶¯Éú³Éµ½¿âÖĞ", MessageTypeDefOf.PositiveEvent, false);
+                // ç”±äºScanRecentPlayLogæ˜¯è‡ªåŠ¨ç®¡ç†çš„ï¼Œæˆ‘ä»¬ç»™ç”¨æˆ·ä¸€ä¸ªæç¤º
+                Messages.Message("å·²è§¦å‘äº‹ä»¶è®°å½•æ‰«æï¼Œå¸¸è¯†å°†è‡ªåŠ¨ç”Ÿæˆåˆ°åº“ä¸­", MessageTypeDefOf.PositiveEvent, false);
                 Log.Message($"[CommonKnowledge] Triggered event record knowledge scan");
             }
             catch (Exception ex)
             {
                 Log.Error($"[CommonKnowledge] Event record generation failed: {ex.Message}");
-                Messages.Message($"Éú³ÉÊ§°Ü£º{ex.Message}", MessageTypeDefOf.RejectInput, false);
+                Messages.Message($"ç”Ÿæˆå¤±è´¥ï¼š{ex.Message}", MessageTypeDefOf.RejectInput, false);
             }
         }
 
@@ -285,7 +288,7 @@ namespace RimTalk.Memory.UI
         {
             GUI.Box(rect, "");
             
-            var viewRect = new Rect(0f, 0f, rect.width - 16f, library.Entries.Count * 70f); // ? ´Ó50Ôö¼Óµ½70
+            var viewRect = new Rect(0f, 0f, rect.width - 16f, library.Entries.Count * 70f); // ? ä»50å¢åŠ åˆ°70
             Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
 
             float y = 0f;
@@ -297,7 +300,7 @@ namespace RimTalk.Memory.UI
 
             foreach (var entry in filteredEntries)
             {
-                Rect entryRect = new Rect(0f, y, viewRect.width, 65f); // ? ´Ó45Ôö¼Óµ½65
+                Rect entryRect = new Rect(0f, y, viewRect.width, 65f); // ? ä»45å¢åŠ åˆ°65
                 
                 if (selectedEntry == entry)
                 {
@@ -310,27 +313,27 @@ namespace RimTalk.Memory.UI
                     editMode = false;
                 }
 
-                // ÆôÓÃ/½ûÓÃ¸´Ñ¡¿ò
+                // å¯ç”¨/ç¦ç”¨å¤é€‰æ¡†
                 Rect checkboxRect = new Rect(entryRect.x + 5f, entryRect.y + 10f, 24f, 24f);
                 bool wasEnabled = entry.isEnabled;
                 Widgets.Checkbox(checkboxRect.position, ref entry.isEnabled);
                 
-                // ±êÇ©
+                // æ ‡ç­¾
                 Rect tagRect = new Rect(entryRect.x + 35f, entryRect.y + 5f, 100f, 20f);
                 Widgets.Label(tagRect, $"[{entry.tag}]");
                 
-                // ÖØÒªĞÔ
+                // é‡è¦æ€§
                 Rect importanceRect = new Rect(entryRect.x + 140f, entryRect.y + 5f, 60f, 20f);
                 Widgets.Label(importanceRect, entry.importance.ToString("F1"));
                 
-                // ÄÚÈİÔ¤ÀÀ£¨Á½ĞĞÏÔÊ¾£©
-                Rect contentRect = new Rect(entryRect.x + 35f, entryRect.y + 25f, entryRect.width - 40f, 35f); // ? ´Ó15Ôö¼Óµ½35£¬ÔÊĞíÁ½ĞĞ
+                // å†…å®¹é¢„è§ˆï¼ˆä¸¤è¡Œæ˜¾ç¤ºï¼‰
+                Rect contentRect = new Rect(entryRect.x + 35f, entryRect.y + 25f, entryRect.width - 40f, 35f); // ? ä»15å¢åŠ åˆ°35ï¼Œå…è®¸ä¸¤è¡Œ
                 Text.Font = GameFont.Tiny;
-                string preview = entry.content.Length > 80 ? entry.content.Substring(0, 80) + "..." : entry.content; // ? ´Ó50Ôö¼Óµ½80
+                string preview = entry.content.Length > 80 ? entry.content.Substring(0, 80) + "..." : entry.content; // ? ä»50å¢åŠ åˆ°80
                 Widgets.Label(contentRect, preview);
                 Text.Font = GameFont.Small;
 
-                y += 70f; // ? ´Ó50Ôö¼Óµ½70
+                y += 70f; // ? ä»50å¢åŠ åˆ°70
             }
 
             Widgets.EndScrollView();
@@ -343,34 +346,34 @@ namespace RimTalk.Memory.UI
             
             float y = innerRect.y;
             
-            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "±à¼­³£Ê¶");
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "ç¼–è¾‘å¸¸è¯†");
             y += 30f;
             
-            // ±êÇ©
-            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "±êÇ©:");
+            // æ ‡ç­¾
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "æ ‡ç­¾:");
             editTag = Widgets.TextField(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), editTag);
             y += 30f;
             
-            // ÖØÒªĞÔ
-            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "ÖØÒªĞÔ:");
+            // é‡è¦æ€§
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "é‡è¦æ€§:");
             editImportance = Widgets.HorizontalSlider(new Rect(innerRect.x + 100f, y, innerRect.width - 150f, 25f), editImportance, 0f, 1f);
             Widgets.Label(new Rect(innerRect.x + innerRect.width - 40f, y, 40f, 25f), editImportance.ToString("F1"));
             y += 30f;
             
-            // ÄÚÈİ
-            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "ÄÚÈİ:");
+            // å†…å®¹
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "å†…å®¹:");
             y += 30f;
             Rect contentRect = new Rect(innerRect.x, y, innerRect.width, 150f);
             editContent = Widgets.TextArea(contentRect, editContent);
             y += 160f;
             
-            // °´Å¥
-            if (Widgets.ButtonText(new Rect(innerRect.x, y, 100f, 30f), "±£´æ"))
+            // æŒ‰é’®
+            if (Widgets.ButtonText(new Rect(innerRect.x, y, 100f, 30f), "ä¿å­˜"))
             {
                 SaveEntry();
             }
             
-            if (Widgets.ButtonText(new Rect(innerRect.x + 110f, y, 100f, 30f), "È¡Ïû"))
+            if (Widgets.ButtonText(new Rect(innerRect.x + 110f, y, 100f, 30f), "å–æ¶ˆ"))
             {
                 editMode = false;
             }
@@ -382,36 +385,36 @@ namespace RimTalk.Memory.UI
             
             if (selectedEntry == null)
             {
-                Widgets.Label(rect.ContractedBy(10f), "Ñ¡ÔñÒ»¸ö³£Ê¶ÌõÄ¿ÒÔ²é¿´ÏêÇé");
+                Widgets.Label(rect.ContractedBy(10f), "é€‰æ‹©ä¸€ä¸ªå¸¸è¯†æ¡ç›®ä»¥æŸ¥çœ‹è¯¦æƒ…");
                 return;
             }
             
             Rect innerRect = rect.ContractedBy(10f);
             float y = innerRect.y;
             
-            // ±êÌâ
-            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), $"[{selectedEntry.tag}] ÏêÇé");
+            // æ ‡é¢˜
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), $"[{selectedEntry.tag}] è¯¦æƒ…");
             y += 35f;
             
-            // ÖØÒªĞÔ
-            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "ÖØÒªĞÔ:");
+            // é‡è¦æ€§
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "é‡è¦æ€§:");
             Widgets.Label(new Rect(innerRect.x + 100f, y, 100f, 25f), selectedEntry.importance.ToString("F1"));
             y += 30f;
             
-            // ÆôÓÃ×´Ì¬
-            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "×´Ì¬:");
-            Widgets.Label(new Rect(innerRect.x + 100f, y, 100f, 25f), selectedEntry.isEnabled ? "ÆôÓÃ" : "½ûÓÃ");
+            // å¯ç”¨çŠ¶æ€
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "çŠ¶æ€:");
+            Widgets.Label(new Rect(innerRect.x + 100f, y, 100f, 25f), selectedEntry.isEnabled ? "å¯ç”¨" : "ç¦ç”¨");
             y += 30f;
             
-            // ÄÚÈİ
-            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "ÄÚÈİ:");
+            // å†…å®¹
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "å†…å®¹:");
             y += 30f;
             Rect contentRect = new Rect(innerRect.x, y, innerRect.width, 150f);
             Widgets.Label(contentRect, selectedEntry.content);
             y += 160f;
             
-            // ±à¼­°´Å¥
-            if (Widgets.ButtonText(new Rect(innerRect.x, y, 100f, 30f), "±à¼­"))
+            // ç¼–è¾‘æŒ‰é’®
+            if (Widgets.ButtonText(new Rect(innerRect.x, y, 100f, 30f), "ç¼–è¾‘"))
             {
                 StartEdit();
             }
@@ -441,13 +444,13 @@ namespace RimTalk.Memory.UI
         {
             if (string.IsNullOrEmpty(editTag) || string.IsNullOrEmpty(editContent))
             {
-                Messages.Message("±êÇ©ºÍÄÚÈİ²»ÄÜÎª¿Õ", MessageTypeDefOf.RejectInput, false);
+                Messages.Message("æ ‡ç­¾å’Œå†…å®¹ä¸èƒ½ä¸ºç©º", MessageTypeDefOf.RejectInput, false);
                 return;
             }
 
             if (selectedEntry == null)
             {
-                // ĞÂ½¨
+                // æ–°å»º
                 var newEntry = new CommonKnowledgeEntry(editTag, editContent)
                 {
                     importance = editImportance
@@ -457,26 +460,26 @@ namespace RimTalk.Memory.UI
             }
             else
             {
-                // ±à¼­ÏÖÓĞ
+                // ç¼–è¾‘ç°æœ‰
                 selectedEntry.tag = editTag;
                 selectedEntry.content = editContent;
                 selectedEntry.importance = editImportance;
             }
 
             editMode = false;
-            Messages.Message("³£Ê¶ÒÑ±£´æ", MessageTypeDefOf.PositiveEvent, false);
+            Messages.Message("å¸¸è¯†å·²ä¿å­˜", MessageTypeDefOf.PositiveEvent, false);
         }
 
         private void ShowImportDialog()
         {
             Dialog_TextInput dialog = new Dialog_TextInput(
-                "µ¼Èë³£Ê¶",
-                "Ã¿ĞĞ¸ñÊ½£º[±êÇ©|ÖØÒªĞÔ]ÄÚÈİ\nÀıÈç£º[ÊÀ½ç¹Û|0.9]ÕâÊÇ±ßÔµÊÀ½ç",
+                "å¯¼å…¥å¸¸è¯†",
+                "æ¯è¡Œæ ¼å¼ï¼š[æ ‡ç­¾|é‡è¦æ€§]å†…å®¹\nä¾‹å¦‚ï¼š[ä¸–ç•Œè§‚|0.9]è¿™æ˜¯è¾¹ç¼˜ä¸–ç•Œ",
                 "",
                 delegate(string text)
                 {
                     int count = library.ImportFromText(text);
-                    Messages.Message($"ÒÑµ¼Èë {count} Ìõ³£Ê¶", MessageTypeDefOf.PositiveEvent, false);
+                    Messages.Message($"å·²å¯¼å…¥ {count} æ¡å¸¸è¯†", MessageTypeDefOf.PositiveEvent, false);
                 },
                 null,
                 true
@@ -489,7 +492,7 @@ namespace RimTalk.Memory.UI
         {
             string content = library.ExportToText();
             GUIUtility.systemCopyBuffer = content;
-            Messages.Message("³£Ê¶¿âÒÑ¸´ÖÆµ½¼ôÌù°å", MessageTypeDefOf.PositiveEvent, false);
+            Messages.Message("å¸¸è¯†åº“å·²å¤åˆ¶åˆ°å‰ªè´´æ¿", MessageTypeDefOf.PositiveEvent, false);
         }
 
         private void DeleteSelectedEntry()
@@ -498,453 +501,28 @@ namespace RimTalk.Memory.UI
             {
                 library.RemoveEntry(selectedEntry);
                 selectedEntry = null;
-                Messages.Message("³£Ê¶ÒÑÉ¾³ı", MessageTypeDefOf.PositiveEvent, false);
+                Messages.Message("å¸¸è¯†å·²åˆ é™¤", MessageTypeDefOf.PositiveEvent, false);
             }
         }
 
         private void ClearAllEntries()
         {
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                "È·¶¨ÒªÇå¿ÕËùÓĞ³£Ê¶Âğ£¿",
+                "ç¡®å®šè¦æ¸…ç©ºæ‰€æœ‰å¸¸è¯†å—ï¼Ÿ",
                 delegate
                 {
                     library.Clear();
                     selectedEntry = null;
-                    Messages.Message("³£Ê¶¿âÒÑÇå¿Õ", MessageTypeDefOf.PositiveEvent, false);
+                    Messages.Message("å¸¸è¯†åº“å·²æ¸…ç©º", MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
         }
 
-        // ? ÏòÁ¿¿âÏà¹Ø·½·¨
-
-        /// <summary>
-        /// ? ÏÔÊ¾ÏòÁ¿¿â×¢Èë¶Ô»°¿ò£¨Ö§³Ö´¿ÎÄ±¾Ä£Ê½£©
-        /// </summary>
-        private void ShowVectorDBInjectionDialog()
-        {
-            // ¼ì²éÏòÁ¿Êı¾İ¿âÊÇ·ñÆôÓÃ
-            var settings = RimTalkMemoryPatchMod.Settings;
-            if (!settings.enableVectorDatabase)
-            {
-                Messages.Message("ÏòÁ¿Êı¾İ¿âÎ´ÆôÓÃ£¬ÇëÔÚÉèÖÃÖĞÆôÓÃ", MessageTypeDefOf.RejectInput, false);
-                return;
-            }
-
-            // ? ´´½¨Ò»¸ö´øÎÄ¼şµ¼ÈëÑ¡ÏîµÄ¶Ô»°¿ò
-            Find.WindowStack.Add(new Dialog_VectorDBInjection(this));
-        }
-
-        /// <summary>
-        /// ? ½«ÎÄ±¾½âÎöºóÖ±½Ó×¢ÈëÏòÁ¿Êı¾İ¿â£¨Ö§³Ö´¿ÎÄ±¾Ä£Ê½£©
-        /// </summary>
-        private void InjectTextToVectorDB(string text)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(text))
-                {
-                    Messages.Message("ÊäÈëÄÚÈİÎª¿Õ", MessageTypeDefOf.RejectInput, false);
-                    return;
-                }
-
-                var settings = RimTalkMemoryPatchMod.Settings;
-                if (!settings.enableVectorDatabase)
-                {
-                    Messages.Message("ÏòÁ¿Êı¾İ¿âÎ´ÆôÓÃ", MessageTypeDefOf.RejectInput, false);
-                    return;
-                }
-
-                // ¼ì²éVectorDBÊÇ·ñ¿ÉÓÃ
-                if (!VectorDB.VectorDBManager.IsAvailable())
-                {
-                    // ³¢ÊÔ³õÊ¼»¯VectorDB
-                    VectorDB.VectorDBManager.Initialize(settings.useSharedVectorDB);
-                    
-                    if (!VectorDB.VectorDBManager.IsAvailable())
-                    {
-                        Messages.Message("VectorDB¹ÜÀíÆ÷³õÊ¼»¯Ê§°Ü", MessageTypeDefOf.RejectInput, false);
-                        return;
-                    }
-                }
-
-                // ? ÖÇÄÜ¼ì²âÊäÈëÄ£Ê½
-                int injectedCount = 0;
-                int failedCount = 0;
-                
-                if (IsFormattedText(text))
-                {
-                    // ¸ñÊ½Ä£Ê½£º[±êÇ©|ÖØÒªĞÔ]ÄÚÈİ
-                    ProcessFormattedText(text, ref injectedCount, ref failedCount);
-                }
-                else
-                {
-                    // ´¿ÎÄ±¾Ä£Ê½£º×Ô¶¯·Ö¶Î´¦Àí
-                    ProcessPlainText(text, ref injectedCount, ref failedCount);
-                }
-
-                // ÏÔÊ¾½á¹ûÏûÏ¢
-                if (injectedCount > 0)
-                {
-                    var vectorSettings = RimTalkMemoryPatchMod.Settings;
-                    
-                    string message = $"³É¹¦×¢Èë {injectedCount} Ìõµ½ÏòÁ¿Êı¾İ¿â";
-                    if (failedCount > 0)
-                    {
-                        message += $"£¨Ê§°Ü{failedCount}Ìõ£©";
-                    }
-                    Messages.Message(message, MessageTypeDefOf.PositiveEvent, false);
-                    
-                    // ? ÖÇÄÜÌáÊ¾ÓÃ»§ºóĞø´¦Àí·½Ê½
-                    if (vectorSettings.enableSemanticEmbedding && vectorSettings.autoSyncToVectorDB)
-                    {
-                        // ¼ÆËãÓĞ¶àÉÙÌõ·ûºÏÖØÒªĞÔãĞÖµ£¨»á±»Òì²½Éı¼¶£©
-                        int queuedCount = injectedCount; // ¼ò»¯¼ÙÉèÈ«²¿ÖØÒªĞÔ¡İ0.7
-                        Messages.Message(
-                            $"?? ÒÑÊ¹ÓÃ¿ìËÙ¹şÏ£ÏòÁ¿×¢Èë£¬{queuedCount}ÌõÕıÔÚºóÌ¨Òì²½Éı¼¶ÎªÓïÒåÏòÁ¿",
-                            MessageTypeDefOf.NeutralEvent,
-                            false
-                        );
-                    }
-                    else if (vectorSettings.enableSemanticEmbedding && !vectorSettings.autoSyncToVectorDB)
-                    {
-                        Messages.Message(
-                            "?? ÌáÊ¾£ºÒÑÊ¹ÓÃ¿ìËÙ¹şÏ£ÏòÁ¿¡£¿ÉÔÚÉèÖÃÖĞÆôÓÃ\"×Ô¶¯Í¬²½\"ÒÔÒì²½Éı¼¶ÎªÓïÒåÏòÁ¿",
-                            MessageTypeDefOf.NeutralEvent,
-                            false
-                        );
-                    }
-                    else
-                    {
-                        Messages.Message(
-                            "?? ÒÑÊ¹ÓÃ¹şÏ£ÏòÁ¿£¨±¾µØÄ£Ê½£¬ÎŞĞèAPI£©",
-                            MessageTypeDefOf.NeutralEvent,
-                            false
-                        );
-                    }
-                    
-                    Log.Message($"[VectorDB Injection] Successfully injected {injectedCount} entries, failed {failedCount}");
-                }
-                else if (failedCount > 0)
-                {
-                    Messages.Message($"×¢ÈëÊ§°Ü£º{failedCount}ÌõÎŞĞ§»ò´íÎó", MessageTypeDefOf.RejectInput, false);
-                }
-                else
-                {
-                    Messages.Message("Ã»ÓĞÓĞĞ§µÄÄÚÈİ±»×¢Èë", MessageTypeDefOf.NeutralEvent, false);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[VectorDB Injection] Error: {ex.Message}\n{ex.StackTrace}");
-                Messages.Message(
-                    $"ÏòÁ¿¿â×¢ÈëÊ§°Ü£º{ex.Message}",
-                    MessageTypeDefOf.RejectInput,
-                    false
-                );
-            }
-        }
-
-        /// <summary>
-        /// ? ¼ì²âÊÇ·ñÎª¸ñÊ½»¯ÎÄ±¾
-        /// v3.3.2.7: ĞŞ¸´ÅĞ¶ÏÂß¼­bug
-        /// </summary>
-        private bool IsFormattedText(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return false;
-            
-            var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            int formattedLines = 0;
-            int totalLines = 0;
-            
-            foreach (var line in lines)
-            {
-                string trimmed = line.Trim();
-                if (string.IsNullOrEmpty(trimmed))
-                    continue;
-                    
-                totalLines++;
-                
-                // ? ĞŞ¸´£ºÒÆ³ı´íÎóµÄ·ÖºÅ
-                if (trimmed.StartsWith("[") && trimmed.Contains("]"))
-                {
-                    formattedLines++;
-                }
-            }
-            
-            // Èç¹û³¬¹ı50%µÄĞĞÊÇ¸ñÊ½»¯µÄ£¬ÈÏÎªÊÇ¸ñÊ½Ä£Ê½
-            return totalLines > 0 && (float)formattedLines / totalLines > 0.5f;
-        }
-
-        /// <summary>
-        /// ? ´¦Àí¸ñÊ½»¯ÎÄ±¾£¨Ô­ÓĞÂß¼­£©
-        /// </summary>
-        private void ProcessFormattedText(string text, ref int injectedCount, ref int failedCount)
-        {
-            var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var line in lines)
-            {
-                string trimmedLine = line.Trim();
-                if (string.IsNullOrEmpty(trimmedLine))
-                    continue;
-
-                // ½âÎö¸ñÊ½: [±êÇ©|ÖØÒªĞÔ]ÄÚÈİ
-                var entry = ParseLineForVectorDB(trimmedLine);
-                if (entry != null)
-                {
-                    if (InjectSingleEntry(entry))
-                        injectedCount++;
-                    else
-                        failedCount++;
-                }
-                else
-                {
-                    Log.Warning($"[VectorDB Injection] Failed to parse formatted line: {trimmedLine}");
-                    failedCount++;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ? ½âÎö¸ñÊ½»¯ĞĞÎªÏòÁ¿¿âÌõÄ¿
-        /// v3.3.2.7: ÌáÉıÄ¬ÈÏÖØÒªĞÔµ½0.7
-        /// </summary>
-        private CommonKnowledgeEntry ParseLineForVectorDB(string line)
-        {
-            try
-            {
-                line = line.Trim();
-                if (string.IsNullOrEmpty(line))
-                    return null;
-
-                if (line.StartsWith("[") && line.Contains("]"))
-                {
-                    int endBracket = line.IndexOf(']');
-                    if (endBracket == -1)
-                        return null;
-
-                    string tagPart = line.Substring(1, endBracket - 1);
-                    string content = line.Substring(endBracket + 1).Trim();
-
-                    if (string.IsNullOrEmpty(content))
-                        return null;
-
-                    string tag;
-                    float importance = 0.7f; // ? ´Ó0.5ÌáÉıµ½0.7£¨ÊÖ¶¯×¢ÈëµÄ³£Ê¶¸üÖØÒª')
-
-                    if (tagPart.Contains("|"))
-                    {
-                        var parts = tagPart.Split('|');
-                        tag = parts[0].Trim();
-                        if (parts.Length > 1 && float.TryParse(parts[1].Trim(), out float imp))
-                        {
-                            importance = Mathf.Clamp(imp, 0f, 1f);
-                        }
-                    }
-                    else
-                    {
-                        tag = tagPart.Trim();
-                    }
-
-                    if (string.IsNullOrEmpty(tag))
-                        tag = "ÖªÊ¶";
-
-                    return new CommonKnowledgeEntry(tag, content)
-                    {
-                        importance = importance
-                    };
-                }
-                else
-                {
-                    // ÎŞ¸ñÊ½ÎÄ±¾£¬Ê¹ÓÃÄ¬ÈÏ±êÇ©ºÍÖØÒªĞÔ
-                    return new CommonKnowledgeEntry("ÖªÊ¶", line)
-                    {
-                        importance = 0.7f // ? ±£³Ö0.7
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[VectorDB Injection] Parse error: {ex.Message}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// ? ´¦Àí´¿ÎÄ±¾£¨ĞÂÔö£©
-        /// </summary>
-        private void ProcessPlainText(string text, ref int injectedCount, ref int failedCount)
-        {
-            // ÖÇÄÜ·Ö¶Î£º°´ĞĞ¡¢¾äºÅ¡¢»ò¹Ì¶¨³¤¶È·Ö¶Î
-            var segments = SmartSegmentText(text);
-            
-            int segmentIndex = 1;
-            foreach (var segment in segments)
-            {
-                if (string.IsNullOrWhiteSpace(segment))
-                    continue;
-                
-                try
-                {
-                    // ´´½¨¼ò»¯µÄÌõÄ¿
-                    var entry = new CommonKnowledgeEntry("ÖªÊ¶", segment.Trim())
-                    {
-                        importance = 0.7f // Ä¬ÈÏÖØÒªĞÔ
-                    };
-
-                    if (InjectSingleEntry(entry))
-                    {
-                        injectedCount++;
-                        
-                        if (Prefs.DevMode)
-                        {
-                            string preview = segment.Length > 30 ? segment.Substring(0, 30) + "..." : segment;
-                            Log.Message($"[VectorDB Injection] Plain text #{segmentIndex}: {preview}");
-                        }
-                    }
-                    else
-                    {
-                        failedCount++;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[VectorDB Injection] Failed to inject plain text segment: {ex.Message}");
-                    failedCount++;
-                }
-                
-                segmentIndex++;
-            }
-        }
-
-        /// <summary>
-        /// ? ÖÇÄÜÎÄ±¾·Ö¶Î
-        /// </summary>
-        private List<string> SmartSegmentText(string text)
-        {
-            var segments = new List<string>();
-            
-            // ·½·¨1£º°´ĞĞ·Ö¶Î£¨ÓÅÏÈ£©
-            var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            if (lines.Length > 1)
-            {
-                foreach (var line in lines)
-                {
-                    string trimmed = line.Trim();
-                    if (!string.IsNullOrEmpty(trimmed) && trimmed.Length > 5)
-                    {
-                        segments.Add(trimmed);
-                    }
-                }
-                
-                if (segments.Count > 0)
-                    return segments;
-            }
-            
-            // ·½·¨2£º°´¾äºÅ·Ö¶Î
-            var sentences = text.Split(new[] { '¡£', '.', '£¡', '!', '£¿', '?' }, 
-                StringSplitOptions.RemoveEmptyEntries);
-            if (sentences.Length > 1)
-            {
-                foreach (var sentence in sentences)
-                {
-                    string trimmed = sentence.Trim();
-                    if (!string.IsNullOrEmpty(trimmed) && trimmed.Length > 10)
-                    {
-                        segments.Add(trimmed);
-                    }
-                }
-                
-                if (segments.Count > 0)
-                    return segments;
-            }
-            
-            // ·½·¨3£º¹Ì¶¨³¤¶È·Ö¶Î£¨×îºó¶µµ×£©
-            const int segmentLength = 100;
-            if (text.Length > segmentLength)
-            {
-                for (int i = 0; i < text.Length; i += segmentLength)
-                {
-                    int length = Math.Min(segmentLength, text.Length - i);
-                    string segment = text.Substring(i, length).Trim();
-                    
-                    if (!string.IsNullOrEmpty(segment))
-                    {
-                        segments.Add(segment);
-                    }
-                }
-            }
-            else
-            {
-                // ÎÄ±¾Ì«¶Ì£¬Ö±½Ó×÷ÎªÒ»¶Î
-                segments.Add(text.Trim());
-            }
-            
-            return segments;
-        }
-
-        /// <summary>
-        /// ? ×¢Èëµ¥¸öÌõÄ¿£¨ÌáÈ¡¹«¹²Âß¼­£©
-        /// ? v3.3.2.3: ¼ò»¯ - Ê¹ÓÃKnowledgeVectorSyncManager
-        /// </summary>
-        private bool InjectSingleEntry(CommonKnowledgeEntry entry)
-        {
-            try
-            {
-                // ? Ö±½ÓÌí¼Óµ½³£Ê¶¿â£¬»á×Ô¶¯´¥·¢ÏòÁ¿»¯
-                library.AddEntry(entry);
-                
-                // KnowledgeVectorSyncManager»á×Ô¶¯´¦ÀíÏòÁ¿»¯
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[VectorDB Injection] Failed to inject entry: {ex.Message}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// ? Éú³É»ØÍËÏòÁ¿£¨¼òµ¥¹şÏ££©
-        /// </summary>
-        private float[] GenerateFallbackVector(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return new float[384]; // Ä¬ÈÏ384Î¬ÁãÏòÁ¿
-
-            // ¼òµ¥µÄ¹şÏ£ÏòÁ¿Éú³É
-            int hash = text.GetHashCode();
-            var random = new System.Random(hash);
-            float[] vector = new float[384];
-            
-            for (int i = 0; i < vector.Length; i++)
-            {
-                vector[i] = (float)(random.NextDouble() * 2.0 - 1.0); // -1µ½1Ö®¼ä
-            }
-            
-            // ¹éÒ»»¯
-            float magnitude = 0f;
-            for (int i = 0; i < vector.Length; i++)
-            {
-                magnitude += vector[i] * vector[i];
-            }
-            
-            magnitude = Mathf.Sqrt(magnitude);
-            if (magnitude > 0f)
-            {
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] /= magnitude;
-                }
-            }
-            
-            return vector;
-        }
+        // â­ v3.3.2.25: å‘é‡åº“ç›¸å…³æ–¹æ³•å·²ç§»é™¤ï¼ˆVectorDBå·²ç¦ç”¨ï¼‰
     }
     
     /// <summary>
-    /// ÏòÁ¿¿â×¢Èë¶Ô»°¿ò - Ö§³ÖÎÄ±¾ÊäÈëºÍÎÄ¼şµ¼Èë
+    /// å‘é‡åº“æ³¨å…¥å¯¹è¯æ¡† - æ”¯æŒæ–‡æœ¬è¾“å…¥å’Œæ–‡ä»¶å¯¼å…¥
     /// </summary>
     public class Dialog_VectorDBInjection : Window
     {
@@ -965,69 +543,69 @@ namespace RimTalk.Memory.UI
         public override void DoWindowContents(Rect inRect)
         {
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(0f, 0f, inRect.width, 35f), "×¢ÈëÏòÁ¿Êı¾İ¿â");
+            Widgets.Label(new Rect(0f, 0f, inRect.width, 35f), "æ³¨å…¥å‘é‡æ•°æ®åº“");
             Text.Font = GameFont.Small;
 
             float y = 40f;
             
-            // ËµÃ÷ÎÄ±¾
+            // è¯´æ˜æ–‡æœ¬
             GUI.color = new Color(0.8f, 0.9f, 1f);
-            string description = "Ö§³ÖÁ½ÖÖÄ£Ê½£º\n\n" +
-                "¡¾¸ñÊ½Ä£Ê½¡¿Ã¿ĞĞ¸ñÊ½£º[±êÇ©|ÖØÒªĞÔ]ÄÚÈİ\n" +
-                "¡¾´¿ÎÄ±¾Ä£Ê½¡¿Ö±½ÓÕ³ÌùÈÎÒâÎÄ±¾£¬×Ô¶¯·Ö¶Î´¦Àí\n\n" +
-                "Ê¾Àı¸ñÊ½Ä£Ê½£º\n[ÊÀ½ç¹Û|0.9]±ßÔµÊÀ½ç£¬¿Æ¼¼µ¹ÍË\n\n" +
-                "Ê¾Àı´¿ÎÄ±¾Ä£Ê½£º\nÕâÊÇ±ßÔµÊÀ½ç\n¿Æ¼¼ÒÑ¾­µ¹ÍË\nº£µÁ¾­³£Ï®»÷";
+            string description = "æ”¯æŒä¸¤ç§æ¨¡å¼ï¼š\n\n" +
+                "ã€æ ¼å¼æ¨¡å¼ã€‘æ¯è¡Œæ ¼å¼ï¼š[æ ‡ç­¾|é‡è¦æ€§]å†…å®¹\n" +
+                "ã€çº¯æ–‡æœ¬æ¨¡å¼ã€‘ç›´æ¥ç²˜è´´ä»»æ„æ–‡æœ¬ï¼Œè‡ªåŠ¨åˆ†æ®µå¤„ç†\n\n" +
+                "ç¤ºä¾‹æ ¼å¼æ¨¡å¼ï¼š\n[ä¸–ç•Œè§‚|0.9]è¾¹ç¼˜ä¸–ç•Œï¼Œç§‘æŠ€å€’é€€\n\n" +
+                "ç¤ºä¾‹çº¯æ–‡æœ¬æ¨¡å¼ï¼š\nè¿™æ˜¯è¾¹ç¼˜ä¸–ç•Œ\nç§‘æŠ€å·²ç»å€’é€€\næµ·ç›—ç»å¸¸è¢­å‡»";
             float descHeight = Text.CalcHeight(description, inRect.width);
             Widgets.Label(new Rect(0f, y, inRect.width, descHeight), description);
             GUI.color = Color.white;
             y += descHeight + 10f;
 
-            // ? ÎÄ¼şµ¼Èë°´Å¥
+            // ? æ–‡ä»¶å¯¼å…¥æŒ‰é’®
             Rect fileButtonRect = new Rect(0f, y, 150f, 35f);
-            if (Widgets.ButtonText(fileButtonRect, "?? ´ÓTXTÎÄ¼şµ¼Èë"))
+            if (Widgets.ButtonText(fileButtonRect, "?? ä»TXTæ–‡ä»¶å¯¼å…¥"))
             {
                 ImportFromFile();
             }
             
             Rect clearButtonRect = new Rect(160f, y, 100f, 35f);
-            if (Widgets.ButtonText(clearButtonRect, "Çå¿Õ"))
+            if (Widgets.ButtonText(clearButtonRect, "æ¸…ç©º"))
             {
                 inputText = "";
             }
             y += 40f;
 
-            // ÎÄ±¾ÊäÈëÇøÓò
+            // æ–‡æœ¬è¾“å…¥åŒºåŸŸ
             Rect textRect = new Rect(0f, y, inRect.width, inRect.height - y - 90f);
             Rect viewRect = new Rect(0f, 0f, textRect.width - 16f, Mathf.Max(Text.CalcHeight(inputText, textRect.width - 16f), textRect.height));
             Widgets.BeginScrollView(textRect, ref scrollPos, viewRect);
             inputText = Widgets.TextArea(viewRect, inputText);
             Widgets.EndScrollView();
 
-            // µ×²¿°´Å¥
+            // åº•éƒ¨æŒ‰é’®
             Rect confirmRect = new Rect(inRect.width - 220f, inRect.height - 40f, 100f, 35f);
-            if (Widgets.ButtonText(confirmRect, "×¢Èë"))
+            if (Widgets.ButtonText(confirmRect, "æ³¨å…¥"))
             {
                 InjectToVectorDB();
             }
 
             Rect cancelRect = new Rect(inRect.width - 110f, inRect.height - 40f, 100f, 35f);
-            if (Widgets.ButtonText(cancelRect, "È¡Ïû"))
+            if (Widgets.ButtonText(cancelRect, "å–æ¶ˆ"))
             {
                 Close();
             }
         }
 
         /// <summary>
-        /// ? ´ÓTXTÎÄ¼şµ¼Èë
+        /// ? ä»TXTæ–‡ä»¶å¯¼å…¥
         /// </summary>
         private void ImportFromFile()
         {
             try
             {
-                // RimWorld²»Ö§³Ö±ê×¼ÎÄ¼ş¶Ô»°¿ò£¬Ê¹ÓÃ¼òµ¥µÄÂ·¾¶ÊäÈë
+                // RimWorldä¸æ”¯æŒæ ‡å‡†æ–‡ä»¶å¯¹è¯æ¡†ï¼Œä½¿ç”¨ç®€å•çš„è·¯å¾„è¾“å…¥
                 Find.WindowStack.Add(new Dialog_TextInput(
-                    "ÊäÈëTXTÎÄ¼şÂ·¾¶",
-                    "ÇëÊäÈëÍêÕûµÄÎÄ¼şÂ·¾¶£¬ÀıÈç£º\nC:\\Users\\YourName\\Documents\\knowledge.txt\n\n»òÕß·ÅÔÚÓÎÏ·Ä¿Â¼ÏÂ£º\nMods\\YourMod\\knowledge.txt",
+                    "è¾“å…¥TXTæ–‡ä»¶è·¯å¾„",
+                    "è¯·è¾“å…¥å®Œæ•´çš„æ–‡ä»¶è·¯å¾„ï¼Œä¾‹å¦‚ï¼š\nC:\\Users\\YourName\\Documents\\knowledge.txt\n\næˆ–è€…æ”¾åœ¨æ¸¸æˆç›®å½•ä¸‹ï¼š\nMods\\YourMod\\knowledge.txt",
                     "",
                     delegate(string filePath)
                     {
@@ -1039,13 +617,13 @@ namespace RimTalk.Memory.UI
             }
             catch (Exception ex)
             {
-                Messages.Message($"ÎÄ¼şµ¼ÈëÊ§°Ü£º{ex.Message}", MessageTypeDefOf.RejectInput, false);
+                Messages.Message($"æ–‡ä»¶å¯¼å…¥å¤±è´¥ï¼š{ex.Message}", MessageTypeDefOf.RejectInput, false);
                 Log.Error($"[VectorDB] File import error: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// ¼ÓÔØÎÄ¼şÄÚÈİ
+        /// åŠ è½½æ–‡ä»¶å†…å®¹
         /// </summary>
         private void LoadFileContent(string filePath)
         {
@@ -1053,11 +631,11 @@ namespace RimTalk.Memory.UI
             {
                 if (string.IsNullOrEmpty(filePath))
                 {
-                    Messages.Message("ÎÄ¼şÂ·¾¶Îª¿Õ", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message("æ–‡ä»¶è·¯å¾„ä¸ºç©º", MessageTypeDefOf.RejectInput, false);
                     return;
                 }
 
-                // Ö§³ÖÏà¶ÔÂ·¾¶£¨Ïà¶ÔÓÚÓÎÏ·¸ùÄ¿Â¼£©
+                // æ”¯æŒç›¸å¯¹è·¯å¾„ï¼ˆç›¸å¯¹äºæ¸¸æˆæ ¹ç›®å½•ï¼‰
                 if (!System.IO.Path.IsPathRooted(filePath))
                 {
                     filePath = System.IO.Path.Combine(UnityEngine.Application.dataPath, "..", filePath);
@@ -1065,31 +643,31 @@ namespace RimTalk.Memory.UI
 
                 if (!System.IO.File.Exists(filePath))
                 {
-                    Messages.Message($"ÎÄ¼ş²»´æÔÚ£º{filePath}", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message($"æ–‡ä»¶ä¸å­˜åœ¨ï¼š{filePath}", MessageTypeDefOf.RejectInput, false);
                     return;
                 }
 
-                // ¶ÁÈ¡ÎÄ¼şÄÚÈİ
+                // è¯»å–æ–‡ä»¶å†…å®¹
                 inputText = System.IO.File.ReadAllText(filePath, System.Text.Encoding.UTF8);
-                Messages.Message($"³É¹¦¼ÓÔØÎÄ¼ş£º{System.IO.Path.GetFileName(filePath)}", MessageTypeDefOf.PositiveEvent, false);
+                Messages.Message($"æˆåŠŸåŠ è½½æ–‡ä»¶ï¼š{System.IO.Path.GetFileName(filePath)}", MessageTypeDefOf.PositiveEvent, false);
                 
                 Log.Message($"[VectorDB] Loaded {inputText.Length} characters from {filePath}");
             }
             catch (Exception ex)
             {
-                Messages.Message($"¶ÁÈ¡ÎÄ¼şÊ§°Ü£º{ex.Message}", MessageTypeDefOf.RejectInput, false);
+                Messages.Message($"è¯»å–æ–‡ä»¶å¤±è´¥ï¼š{ex.Message}", MessageTypeDefOf.RejectInput, false);
                 Log.Error($"[VectorDB] File read error: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// ×¢Èëµ½ÏòÁ¿Êı¾İ¿â
+        /// æ³¨å…¥åˆ°å‘é‡æ•°æ®åº“
         /// </summary>
         private void InjectToVectorDB()
         {
             if (parentDialog != null)
             {
-                // µ÷ÓÃ¸¸¶Ô»°¿òµÄ×¢Èë·½·¨
+                // è°ƒç”¨çˆ¶å¯¹è¯æ¡†çš„æ³¨å…¥æ–¹æ³•
                 try
                 {
                     var method = parentDialog.GetType().GetMethod("InjectTextToVectorDB", 
@@ -1102,12 +680,12 @@ namespace RimTalk.Memory.UI
                     }
                     else
                     {
-                        Messages.Message("ÎŞ·¨ÕÒµ½×¢Èë·½·¨", MessageTypeDefOf.RejectInput, false);
+                        Messages.Message("æ— æ³•æ‰¾åˆ°æ³¨å…¥æ–¹æ³•", MessageTypeDefOf.RejectInput, false);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Messages.Message($"×¢ÈëÊ§°Ü£º{ex.Message}", MessageTypeDefOf.RejectInput, false);
+                    Messages.Message($"æ³¨å…¥å¤±è´¥ï¼š{ex.Message}", MessageTypeDefOf.RejectInput, false);
                     Log.Error($"[VectorDB] Injection error: {ex.Message}");
                 }
             }
@@ -1115,7 +693,7 @@ namespace RimTalk.Memory.UI
     }
     
     /// <summary>
-    /// ¼òµ¥µÄÎÄ±¾ÊäÈë¶Ô»°¿ò
+    /// ç®€å•çš„æ–‡æœ¬è¾“å…¥å¯¹è¯æ¡†
     /// </summary>
     public class Dialog_TextInput : Window
     {
@@ -1168,14 +746,14 @@ namespace RimTalk.Memory.UI
             }
 
             Rect buttonRect = new Rect(inRect.width - 220f, inRect.height - 40f, 100f, 35f);
-            if (Widgets.ButtonText(buttonRect, "È·ÈÏ"))
+            if (Widgets.ButtonText(buttonRect, "ç¡®è®¤"))
             {
                 onAccept?.Invoke(text);
                 Close();
             }
 
             buttonRect.x += 110f;
-            if (Widgets.ButtonText(buttonRect, "È¡Ïû"))
+            if (Widgets.ButtonText(buttonRect, "å–æ¶ˆ"))
             {
                 onCancel?.Invoke();
                 Close();
@@ -1183,3 +761,4 @@ namespace RimTalk.Memory.UI
         }
     }
 }
+

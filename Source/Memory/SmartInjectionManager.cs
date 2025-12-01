@@ -7,14 +7,16 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// 智能注入管理器 v3.0
-    /// 整合高级评分系统，提供统一的注入接口
+    /// 智能注入管理器 v3.3.2.25
+    /// 直接使用CommonKnowledgeLibrary（关键词检索）
+    /// ? 完全移除RAG依赖
     /// </summary>
     public static class SmartInjectionManager
     {
+        private static int callCount = 0;
+        
         /// <summary>
-        /// 智能注入上下文 - v3.0增强版
-        /// 使用RAG检索系统（v3.3）
+        /// 智能注入上下文
         /// </summary>
         public static string InjectSmartContext(
             Pawn speaker,
@@ -23,517 +25,92 @@ namespace RimTalk.Memory
             int maxMemories = 10,
             int maxKnowledge = 5)
         {
-            if (speaker == null || string.IsNullOrEmpty(context))
-                return null;
-
-            try
-            {
-                // ? v3.3: 尝试使用RAG检索
-                if (RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableRAGRetrieval ?? false)
-                {
-                    return InjectWithRAG(speaker, listener, context, maxMemories, maxKnowledge);
-                }
-                
-                // 降级: 使用原有智能注入
-                return InjectWithLegacyMethod(speaker, listener, context, maxMemories, maxKnowledge);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[Smart Injection] Failed: {ex.Message}");
-                return null;
-            }
-        }
-        
-        /// <summary>
-        /// 使用RAG检索注入（v3.3新功能）
-        /// </summary>
-        private static string InjectWithRAG(
-            Pawn speaker,
-            Pawn listener,
-            string context,
-            int maxMemories,
-            int maxKnowledge)
-        {
-            try
-            {
-                var config = new RAG.RAGConfig
-                {
-                    TopK = maxMemories,
-                    MaxResults = maxMemories + maxKnowledge,
-                    UseSemanticScoring = AI.EmbeddingService.IsAvailable(),
-                    IncludeArchive = false
-                };
-                
-                // 异步检索（带超时）
-                var result = RAG.RAGManager.Retrieve(
-                    context,
-                    speaker,
-                    listener,
-                    config,
-                    timeoutMs: 300 // 300ms超时
-                );
-                
-                if (result != null && !string.IsNullOrEmpty(result.GeneratedContext))
-                {
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message($"[Smart Injection] RAG: {result.TotalMatches} matches, " +
-                                  $"{result.RerankedMatches.Count} selected");
-                    }
-                    
-                    return FormatRAGContext(result);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[Smart Injection] RAG failed, falling back: {ex.Message}");
-            }
-            
-            // RAG失败，降级
-            return InjectWithLegacyMethod(speaker, listener, context, maxMemories, maxKnowledge);
-        }
-        
-        /// <summary>
-        /// 格式化RAG上下文
-        /// ? v3.3.1: 添加AI数据库使用提示
-        /// </summary>
-        private static string FormatRAGContext(RAG.RAGResult result)
-        {
-            if (result == null || result.RerankedMatches.Count == 0)
-                return null;
-            
-            var sb = new System.Text.StringBuilder();
-            
-            // ? 添加数据库使用提示（如果启用）
-            if (RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableVectorDatabase ?? false)
-            {
-                sb.AppendLine();
-                sb.AppendLine("【AI数据库命令】");
-                sb.AppendLine("你可以使用以下命令查询记忆：");
-                sb.AppendLine("  [DB:查询内容] - 查询相关记忆");
-                sb.AppendLine("  [RECALL:事件] - 回忆特定事件");
-                sb.AppendLine("  [SEARCH:关键词] - 搜索记忆");
-                sb.AppendLine();
-            }
-            
-            // 记忆部分（使用传统格式）
-            var memories = result.RerankedMatches
-                .Where(m => m.Memory != null)
-                .Take(10)
-                .ToList();
-            
-            if (memories.Count > 0)
-            {
-                sb.AppendLine("## Recent Memories"); // 改为传统标题
-                int index = 1;
-                foreach (var match in memories)
-                {
-                    var m = match.Memory;
-                    string typeTag = m.type.ToString();
-                    string timeAgo = m.TimeAgoString;
-                    sb.AppendLine($"{index}. [{typeTag}] {m.content} ({timeAgo})"); // 添加编号
-                    index++;
-                }
-                sb.AppendLine();
-            }
-            
-            // 常识部分（使用传统格式）
-            var knowledge = result.RerankedMatches
-                .Where(m => m.Knowledge != null)
-                .Take(5)
-                .ToList();
-            
-            if (knowledge.Count > 0)
-            {
-                sb.AppendLine("## Knowledge Base"); // 改为传统标题
-                int index = 1;
-                foreach (var match in knowledge)
-                {
-                    var k = match.Knowledge;
-                    sb.AppendLine($"{index}. [{k.tag}] {k.content}"); // 添加编号
-                    index++;
-                }
-            }
-            
-            return sb.ToString();
-        }
-        
-        /// <summary>
-        /// 原有注入方法（降级使用）
-        /// </summary>
-        private static string InjectWithLegacyMethod(
-            Pawn speaker,
-            Pawn listener,
-            string context,
-            int maxMemories,
-            int maxKnowledge)
-        {
-            // 1. 获取记忆内容
-            string memories = InjectSmartMemories(speaker, context, maxMemories, listener);
-            
-            // 2. 获取常识内容
-            string knowledge = InjectSmartKnowledge(context, maxKnowledge, speaker, listener);
-
-            // 3. 零结果检查：如果都为空，直接返回空字符串（不注入任何内容）
-            if (string.IsNullOrEmpty(memories) && string.IsNullOrEmpty(knowledge))
-            {
-                Log.Message("[Smart Injection] No relevant content - skipping injection to save tokens");
-                return string.Empty;
-            }
-
-            // 4. 构建注入内容（仅包含有效部分）
-            var sb = new StringBuilder();
-            
-            if (!string.IsNullOrEmpty(memories))
-            {
-                sb.AppendLine("## Recent Memories");
-                sb.AppendLine(memories);
-                if (!string.IsNullOrEmpty(knowledge))
-                {
-                    sb.AppendLine(); // 只在有两部分时添加分隔
-                }
-            }
-
-            if (!string.IsNullOrEmpty(knowledge))
-            {
-                sb.AppendLine("## Knowledge Base");
-                sb.AppendLine(knowledge);
-            }
-
-            string result = sb.ToString();
-            
-            // 5. 记录注入统计（用于调试）
-            int memoryCount = string.IsNullOrEmpty(memories) ? 0 : memories.Split('\n').Length - 1;
-            int knowledgeCount = string.IsNullOrEmpty(knowledge) ? 0 : knowledge.Split('\n').Length - 1;
+            callCount++;
             
             if (Prefs.DevMode)
-                Log.Message($"[Smart Injection] Injected {memoryCount} memories, {knowledgeCount} knowledge");
-
-            return result;
-        }
-
-        /// <summary>
-        /// 智能注入记忆（带自适应阈值）
-        /// </summary>
-        public static string InjectSmartMemories(
-            Pawn pawn,
-            string context,
-            int maxCount = 8,
-            Pawn listener = null)
-        {
-            // 1. 验证输入
-            if (pawn == null)
             {
-                Log.Warning("[Smart Injection] Speaker is null, skipping memory injection");
-                return string.Empty;
+                Log.Message($"[SmartInjection] ?? Call #{callCount}: Speaker={speaker?.LabelShort ?? "null"}, Listener={listener?.LabelShort ?? "null"}");
+            }
+            
+            if (speaker == null || string.IsNullOrEmpty(context))
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Warning($"[SmartInjection] ? Null input");
+                }
+                return null;
             }
 
-            var memoryComp = pawn.TryGetComp<FourLayerMemoryComp>();
-            if (memoryComp == null)
+            try
             {
-                Log.Warning($"[Smart Injection] {pawn.LabelShort} has no memory component");
-                return string.Empty;
-            }
-
-            // 2. 收集所有记忆
-            var allMemories = new List<MemoryEntry>();
-            allMemories.AddRange(memoryComp.SituationalMemories);
-            allMemories.AddRange(memoryComp.EventLogMemories);
-
-            // 根据上下文判断是否需要归档记忆
-            if (ShouldIncludeArchive(context))
-            {
-                allMemories.AddRange(memoryComp.ArchiveMemories.Take(10));
-            }
-
-            // 3. 零记忆检查
-            if (allMemories.Count == 0)
-            {
-                Log.Message($"[Smart Injection] No memories available for {pawn.LabelShort}");
-                return string.Empty;
-            }
-
-            // 4. 使用高级评分系统
-            var scored = AdvancedScoringSystem.ScoreMemories(
-                allMemories,
-                context,
-                pawn,
-                listener);
-
-            // 4.1 记录评分到自适应阈值系统
-            AdaptiveThresholdManager.RecordScores(scored, null);
-
-            // 5. 获取自适应阈值（如果启用）
-            float threshold = GetAdaptiveMemoryThreshold();
-
-            var selected = scored
-                .Where(s => s.Score >= threshold)
-                .Take(maxCount)
-                .ToList();
-
-            // 6. 零结果检查：低于阈值的全部过滤
-            if (selected.Count == 0)
-            {
-                Log.Message($"[Smart Injection] All memories scored below threshold ({threshold:F2}) - no injection");
-                return string.Empty; // ? 返回空字符串，不注入任何内容
-            }
-
-            // 7. 格式化输出
-            return FormatMemories(selected);
-        }
-
-        /// <summary>
-        /// 智能注入常识（带自适应阈值）
-        /// </summary>
-        public static string InjectSmartKnowledge(
-            string context,
-            int maxCount = 5,
-            Pawn speaker = null,
-            Pawn listener = null)
-        {
-            // 1. 获取常识库
-            var library = MemoryManager.GetCommonKnowledge();
-            if (library == null || library.Entries.Count == 0)
-            {
-                Log.Message("[Smart Injection] No knowledge library available");
-                return string.Empty;
-            }
-
-            // 2. 过滤可用常识
-            var available = library.Entries
-                .Where(e => e.isEnabled)
-                .Where(e => e.targetPawnId == -1 || // 全局
-                           (speaker != null && e.targetPawnId == speaker.thingIDNumber))
-                .ToList();
-
-            // 3. 零常识检查
-            if (available.Count == 0)
-            {
-                Log.Message("[Smart Injection] No enabled knowledge entries");
-                return string.Empty;
-            }
-
-            // 4. 使用高级评分系统
-            var scored = AdvancedScoringSystem.ScoreKnowledge(
-                available,
-                context,
-                speaker,
-                listener);
-
-            // 4.1 记录评分到自适应阈值系统
-            AdaptiveThresholdManager.RecordScores(null, scored);
-
-            // 5. 获取自适应阈值（如果启用）
-            float threshold = GetAdaptiveKnowledgeThreshold();
-
-            var selected = scored
-                .Where(s => s.Score >= threshold)
-                .Take(maxCount)
-                .ToList();
-
-            // 6. 零结果检查：低于阈值的全部过滤
-            if (selected.Count == 0)
-            {
-                Log.Message($"[Smart Injection] All knowledge scored below threshold ({threshold:F2}) - no injection");
-                return string.Empty; // ? 返回空字符串，不注入任何内容
-            }
-
-            // 7. 格式化输出
-            return FormatKnowledge(selected);
-        }
-
-        #region 格式化输出
-
-        /// <summary>
-        /// 格式化记忆（生产模式：简洁输出）
-        /// </summary>
-        private static string FormatMemories(List<ScoredItem<MemoryEntry>> scored)
-        {
-            var sb = new StringBuilder();
-            int index = 1;
-
-            foreach (var item in scored)
-            {
-                var memory = item.Item;
-                string typeTag = GetMemoryTypeTag(memory.type);
-                string timeStr = memory.TimeAgoString;
-
-                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
+                var sb = new StringBuilder();
                 
-                // ? 移除调试输出（减少Token消耗）
-                // 如需调试，请使用 GetPreviewData() 方法
-                
-                index++;
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// 格式化常识（生产模式：简洁输出）
-        /// </summary>
-        private static string FormatKnowledge(List<ScoredItem<CommonKnowledgeEntry>> scored)
-        {
-            var sb = new StringBuilder();
-            int index = 1;
-
-            foreach (var item in scored)
-            {
-                var entry = item.Item;
-                sb.AppendLine($"{index}. [{entry.tag}] {entry.content}");
-                
-                // ? 移除调试输出（减少Token消耗）
-                
-                index++;
-            }
-
-            return sb.ToString();
-        }
-
-        private static string GetMemoryTypeTag(MemoryType type)
-        {
-            switch (type)
-            {
-                case MemoryType.Conversation:
-                    return "Conv";
-                case MemoryType.Action:
-                    return "Act";
-                case MemoryType.Event:
-                    return "Event";
-                case MemoryType.Emotion:
-                    return "Emot";
-                case MemoryType.Relationship:
-                    return "Rel";
-                default:
-                    return "Mem";
-            }
-        }
-
-        #endregion
-
-        #region 辅助方法
-
-        private static bool ShouldIncludeArchive(string context)
-        {
-            if (string.IsNullOrEmpty(context))
-                return false;
-
-            string[] archiveKeywords = { "过去", "以前", "曾经", "记得", "回忆", "历史", "当时", "那时候" };
-            
-            foreach (var keyword in archiveKeywords)
-            {
-                if (context.Contains(keyword))
-                    return true;
-            }
-
-            return false;
-        }
-
-        #endregion
-
-        #region 自适应阈值辅助方法
-
-        /// <summary>
-        /// 获取自适应记忆阈值
-        /// </summary>
-        private static float GetAdaptiveMemoryThreshold()
-        {
-            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
-            
-            // 检查是否启用自适应阈值
-            if (settings?.enableAdaptiveThreshold ?? false)
-            {
-                return AdaptiveThresholdManager.GetRecommendedMemoryThreshold();
-            }
-            
-            // 使用手动设置的阈值
-            return settings?.memoryScoreThreshold ?? 0.20f;
-        }
-
-        /// <summary>
-        /// 获取自适应常识阈值
-        /// </summary>
-        private static float GetAdaptiveKnowledgeThreshold()
-        {
-            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
-            
-            if (settings?.enableAdaptiveThreshold ?? false)
-            {
-                return AdaptiveThresholdManager.GetRecommendedKnowledgeThreshold();
-            }
-            
-            return settings?.knowledgeScoreThreshold ?? 0.15f;
-        }
-
-        #endregion
-
-        #region 预览和调试
-
-        /// <summary>
-        /// 获取详细评分信息（用于预览窗口）
-        /// </summary>
-        public static InjectionPreviewData GetPreviewData(
-            Pawn speaker,
-            Pawn listener,
-            string context)
-        {
-            var data = new InjectionPreviewData
-            {
-                Speaker = speaker?.LabelShort ?? "Unknown",
-                Listener = listener?.LabelShort ?? "None",
-                Context = context
-            };
-
-            // 记忆评分
-            if (speaker != null)
-            {
+                // 1. 注入记忆（使用DynamicMemoryInjection）
                 var memoryComp = speaker.TryGetComp<FourLayerMemoryComp>();
                 if (memoryComp != null)
                 {
-                    var allMemories = new List<MemoryEntry>();
-                    allMemories.AddRange(memoryComp.SituationalMemories);
-                    allMemories.AddRange(memoryComp.EventLogMemories);
-
-                    data.MemoryScores = AdvancedScoringSystem.ScoreMemories(
-                        allMemories,
-                        context,
-                        speaker,
-                        listener);
+                    string memoriesText = DynamicMemoryInjection.InjectMemoriesWithDetails(
+                        memoryComp, 
+                        context, 
+                        maxMemories, 
+                        out var memoryScores
+                    );
+                    
+                    if (!string.IsNullOrEmpty(memoriesText))
+                    {
+                        sb.AppendLine("## Character Memories");
+                        sb.AppendLine(memoriesText);
+                        
+                        if (Prefs.DevMode)
+                        {
+                            Log.Message($"[SmartInjection]   Injected {memoryScores.Count} memories");
+                        }
+                    }
                 }
+                
+                // 2. 注入常识（直接使用CommonKnowledgeLibrary）
+                var memoryManager = Find.World?.GetComponent<MemoryManager>();
+                if (memoryManager != null)
+                {
+                    string knowledgeText = memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
+                        context,
+                        maxKnowledge,
+                        out var knowledgeScores,
+                        speaker,
+                        listener
+                    );
+                    
+                    if (!string.IsNullOrEmpty(knowledgeText))
+                    {
+                        if (sb.Length > 0)
+                            sb.AppendLine();
+                        
+                        sb.AppendLine("## World Knowledge");
+                        sb.AppendLine(knowledgeText);
+                        
+                        if (Prefs.DevMode)
+                        {
+                            Log.Message($"[SmartInjection]   Injected {knowledgeScores.Count} knowledge entries");
+                        }
+                    }
+                }
+                
+                string result = sb.ToString();
+                
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[SmartInjection] ? Success: {result.Length} chars formatted");
+                }
+                
+                return string.IsNullOrEmpty(result) ? null : result;
             }
-
-            // 常识评分
-            var library = MemoryManager.GetCommonKnowledge();
-            if (library != null)
+            catch (Exception ex)
             {
-                var available = library.Entries
-                    .Where(e => e.isEnabled)
-                    .Where(e => e.targetPawnId == -1 || 
-                               (speaker != null && e.targetPawnId == speaker.thingIDNumber))
-                    .ToList();
-
-                data.KnowledgeScores = AdvancedScoringSystem.ScoreKnowledge(
-                    available,
-                    context,
-                    speaker,
-                    listener);
+                Log.Error($"[SmartInjection] ? Exception: {ex.Message}\n{ex.StackTrace}");
+                return null;
             }
-
-            return data;
         }
-
-        /// <summary>
-        /// 预览数据结构
-        /// </summary>
-        public class InjectionPreviewData
-        {
-            public string Speaker;
-            public string Listener;
-            public string Context;
-            public List<ScoredItem<MemoryEntry>> MemoryScores;
-            public List<ScoredItem<CommonKnowledgeEntry>> KnowledgeScores;
-        }
-
-        #endregion
+        
+        public static int GetCallCount() => callCount;
     }
 }

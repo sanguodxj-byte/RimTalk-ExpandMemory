@@ -231,8 +231,8 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 生成状态描述文本（优化为第三人称视角）
-        /// 其他Pawn看到这条常识时，会知道对方是新人
-        /// ? v2.4.6: 增加加入时间显示
+        /// 当其他Pawn提到此角色时，系统会自动注入此常识
+        /// ? v3.3.2.26: 添加完整种族信息（种族+亚种）
         /// </summary>
         private static string GenerateStatusContent(Pawn pawn, int daysInColony, int joinTick)
         {
@@ -243,27 +243,142 @@ namespace RimTalk.Memory
             Quadrum joinQuadrum = GenDate.Quadrum(joinTick, Find.WorldGrid.LongLatOf(Find.CurrentMap.Tile).x);
             int joinYear = GenDate.Year(joinTick, Find.WorldGrid.LongLatOf(Find.CurrentMap.Tile).x);
             
-            // 格式化日期：季节 X日, 5500年
+            // 格式化日期（例如：X月, 5500年）
             string joinDate = $"{joinQuadrum.Label()} {joinDay}日, {joinYear}年";
             
-            // 使用第三人称客观描述，适合全局常识库
-            // 任何Pawn看到这条信息时都能正确理解
+            // ? 提取完整种族信息（种族+亚种）
+            string raceInfo = GetCompleteRaceInfo(pawn);
+            
+            // 构建完整描述（包含种族+加入时间）
+            string baseDescription = "";
+            
             if (daysInColony == 0)
             {
-                return $"{name}是殖民地的新成员，今天({joinDate})刚加入，对殖民地的历史和成员关系还不熟悉";
+                baseDescription = $"{name}是殖民地的新成员，今天({joinDate})刚加入";
             }
             else if (daysInColony == 1)
             {
-                return $"{name}是殖民地的新成员，昨天({joinDate})加入，对殖民地的历史和成员关系还不熟悉";
+                baseDescription = $"{name}是殖民地的新成员，昨天({joinDate})加入";
             }
             else
             {
-                return $"{name}是殖民地的新成员，{daysInColony}天前({joinDate})加入，对殖民地的历史和成员关系还不熟悉";
+                baseDescription = $"{name}是殖民地的新成员，{daysInColony}天前({joinDate})加入";
+            }
+            
+            // ? 组合种族信息和加入信息
+            if (!string.IsNullOrEmpty(raceInfo))
+            {
+                return $"{baseDescription}。{raceInfo}对殖民地的历史和成员关系还不熟悉";
+            }
+            else
+            {
+                return $"{baseDescription}，对殖民地的历史和成员关系还不熟悉";
             }
         }
-
+        
         /// <summary>
-        /// ? 获取Pawn真实的加入殖民地时间
+        /// ? v3.3.2.26: 获取完整种族信息（种族+亚种）
+        /// 例如："人类-基准人"、"龙王种-索拉克亚种"、"美狐族-朱雀亚种"
+        /// </summary>
+        private static string GetCompleteRaceInfo(Pawn pawn)
+        {
+            if (pawn?.def == null)
+                return "";
+            
+            try
+            {
+                string pawnName = pawn.LabelShort;
+                
+                // 1. 获取主种族名称
+                string raceName = pawn.def.label ?? pawn.def.defName;
+                
+                // 2. 尝试获取亚种信息（从多个来源）
+                string xenotypeName = "";
+                
+                // 方法A：检查pawn.genes.Xenotype（适用于Biotech DLC）
+                if (pawn.genes != null && pawn.genes.Xenotype != null)
+                {
+                    xenotypeName = pawn.genes.Xenotype.label ?? pawn.genes.Xenotype.defName;
+                }
+                
+                // 方法B：检查pawn.story.xenotype（旧版API）
+                if (string.IsNullOrEmpty(xenotypeName) && pawn.story != null)
+                {
+                    var xenotypeField = pawn.story.GetType().GetField("xenotype");
+                    if (xenotypeField != null)
+                    {
+                        var xenotype = xenotypeField.GetValue(pawn.story);
+                        if (xenotype != null)
+                        {
+                            var labelProp = xenotype.GetType().GetProperty("label");
+                            if (labelProp != null)
+                            {
+                                xenotypeName = labelProp.GetValue(xenotype) as string;
+                            }
+                        }
+                    }
+                }
+                
+                // 方法C：检查CustomXenotype（自定义亚种）
+                if (string.IsNullOrEmpty(xenotypeName) && pawn.genes != null)
+                {
+                    var customXenotypeField = pawn.genes.GetType().GetField("xenotypeName");
+                    if (customXenotypeField != null)
+                    {
+                        xenotypeName = customXenotypeField.GetValue(pawn.genes) as string;
+                    }
+                }
+                
+                // 方法D：从def.description中提取（适用于Mod添加的种族）
+                if (string.IsNullOrEmpty(xenotypeName) && !string.IsNullOrEmpty(pawn.def.description))
+                {
+                    // 尝试从描述中提取关键词（例如"索拉克"、"朱雀"等）
+                    var descWords = pawn.def.description.Split(new[] { ' ', '，', '。', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var word in descWords)
+                    {
+                        // 检测常见亚种关键词
+                        if (word.Length >= 2 && word.Length <= 6 && 
+                            (word.Contains("亚种") || word.Contains("种") || word.Contains("族")))
+                        {
+                            xenotypeName = word;
+                            break;
+                        }
+                    }
+                }
+                
+                // 3. 构建完整种族描述
+                if (!string.IsNullOrEmpty(xenotypeName))
+                {
+                    // 避免重复（例如"人类-人类"）
+                    if (xenotypeName.Equals(raceName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return $"{pawnName}的种族是{raceName}";
+                    }
+                    else
+                    {
+                        return $"{pawnName}的种族是{raceName}-{xenotypeName}";
+                    }
+                }
+                else
+                {
+                    // 只有主种族
+                    return $"{pawnName}的种族是{raceName}";
+                }
+            }
+            catch (Exception ex)
+            {
+                // 容错：种族信息提取失败时返回基础信息
+                if (Prefs.DevMode)
+                {
+                    Log.Warning($"[PawnStatus] Failed to extract race info for {pawn.LabelShort}: {ex.Message}");
+                }
+                
+                return $"{pawn.LabelShort}的种族是{pawn.def?.label ?? "未知"}";
+            }
+        }
+        
+        /// <summary>
+        /// ? v3.3.2.26: 获取Pawn真实的加入殖民地时间
         /// </summary>
         private static int GetPawnRealJoinTick(Pawn pawn, int fallbackTick)
         {
@@ -272,12 +387,12 @@ namespace RimTalk.Memory
                 // 方法1：从records.colonistSince获取（最准确）
                 if (pawn.records != null)
                 {
-                    // colonistSince是殖民者加入的游戏tick
-                    // 但这个字段可能不存在或为0（非殖民者）
+                    // colonistSince是殖民者记录的游戏tick
+                    // （这个字段可能不存在或为0，对于非殖民者）
                     var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
                     if (recordDef != null)
                     {
-                        // 如果有这个record，说明是殖民者
+                        // 获取作为record的时长
                         // 计算加入时间 = 当前tick - 作为殖民者的时长
                         float timeAsColonist = pawn.records.GetValue(recordDef);
                         if (timeAsColonist > 0)
@@ -293,15 +408,15 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // 方法2：从spawned时间推断（不太准确，但总比用当前时间好）
+                // 方法2：从spawned时间推断（不太准确，但能作为兜底）
                 if (pawn.Spawned && pawn.Map != null)
                 {
-                    // 如果Pawn刚生成不久（<1小时），可能是刚加入的
-                    // 否则使用fallback
+                    // 如果Pawn刚刚被生成（<1小时），可能刚刚加入
+                    // 但这个逻辑不准确，所以使用fallback
                 }
                 
-                // 方法3：回退 - 使用当前时间
-                // 但至少在日志中标记为不准确
+                // 方法3：兜底 - 使用当前时间
+                // 这意味着会被标记为新加入
                 if (Prefs.DevMode)
                 {
                     Log.Warning($"[PawnStatus] Could not determine real join time for {pawn.LabelShort}, using current time as fallback");

@@ -154,9 +154,6 @@ namespace RimTalk.Memory
             // ⭐ 处理手动总结队列
             ProcessManualSummarizationQueue();
             
-            // ⭐ 新增：处理异步向量化同步队列
-            VectorDB.AsyncVectorSyncManager.ProcessSyncQueue();
-            
             // 每天 0 点触发总结
             CheckDailySummarization();
         }
@@ -321,7 +318,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ⭐ 处理手动总结队列（每个殖민者之间延迟1秒）
+        /// ⭐ 处理手动总结队列（每个殖民者之间延迟1秒）
         /// </summary>
         private void ProcessManualSummarizationQueue()
         {

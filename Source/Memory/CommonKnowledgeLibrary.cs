@@ -82,6 +82,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 计算与上下文的相关性分数（标签匹配 + 内容匹配）
+        /// ⭐ v3.3.2.25: 优化长关键词权重 + 精确匹配加成
         /// </summary>
         public float CalculateRelevanceScore(List<string> contextKeywords)
         {
@@ -116,8 +117,9 @@ namespace RimTalk.Memory
                 }
             }
 
-            // 2. 内容匹配（精确匹配）
-            int contentMatchCount = 0;
+            // 2. ⭐ 内容匹配（长关键词加权）
+            float contentMatchScore = 0f;
+            
             if (!string.IsNullOrEmpty(content))
             {
                 foreach (var keyword in contextKeywords)
@@ -125,25 +127,65 @@ namespace RimTalk.Memory
                     // 直接在内容中查找关键词
                     if (content.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        contentMatchCount++;
+                        // ⭐ 长关键词权重更高（识别"龙王种索拉克"等完整实体）
+                        if (keyword.Length >= 6)
+                            contentMatchScore += 0.40f;  // "龙王种索拉克" 超大加分
+                        else if (keyword.Length >= 5)
+                            contentMatchScore += 0.30f;  // "龙王种索" 大幅加分
+                        else if (keyword.Length >= 4)
+                            contentMatchScore += 0.20f;  // "龙王种" 中等加分
+                        else if (keyword.Length == 3)
+                            contentMatchScore += 0.12f;  // "龙王" 小幅加分
+                        else
+                            contentMatchScore += 0.05f;  // "种族" 基础加分
                     }
                 }
             }
+            
+            // 限制最高分
+            contentMatchScore = Math.Min(contentMatchScore, 1.5f);
 
-            // 计算匹配率和匹配分
-            float tagMatchRate = tags.Count > 0 ? (float)tagMatchCount / tags.Count : 0f;
-            float contentMatchScore = Math.Min(contentMatchCount * 0.05f, 0.5f); // 每个匹配+0.05，最高0.5
+            // 3. ⭐ 完全匹配加成（内容包含连续的长查询串）
+            float exactMatchBonus = 0f;
+            
+            if (!string.IsNullOrEmpty(content))
+            {
+                // 检查最长的关键词（通常是完整查询）
+                var longestKeywords = contextKeywords
+                    .Where(k => k.Length >= 3)
+                    .OrderByDescending(k => k.Length)
+                    .Take(5);
+                
+                foreach (var keyword in longestKeywords)
+                {
+                    if (content.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        if (keyword.Length >= 6)
+                            exactMatchBonus += 0.8f; // "龙王种索拉克" 超强加成
+                        else if (keyword.Length >= 5)
+                            exactMatchBonus += 0.5f; // "龙王种索" 强力加成
+                        else if (keyword.Length >= 4)
+                            exactMatchBonus += 0.3f; // "龙王种" 中等加成
+                    }
+                }
+            }
+            
+            exactMatchBonus = Math.Min(exactMatchBonus, 1.0f);
 
             // 综合评分
-            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight;
-            float contentPart = contentMatchScore * importance;
-            float totalScore = baseScore + tagPart + contentPart;
+            // ⭐ v3.3.2.25: contentPart和exactPart不受importance影响（避免被低重要性压制）
+            float tagMatchRate = tags.Count > 0 ? (float)tagMatchCount / tags.Count : 0f;
+            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight * 0.5f; // ⭐ 标签权重降低
+            float contentPart = contentMatchScore;  // ⭐ 不再乘importance
+            float exactPart = exactMatchBonus;      // ⭐ 不再乘importance
+            float totalScore = baseScore + tagPart + contentPart + exactPart;
 
             return totalScore;
         }
         
         /// <summary>
         /// 计算与上下文的相关性分数（带详细信息）- 用于调试
+        /// ⭐ v3.3.2.25: 同步优化长关键词权重 + 精确匹配加成
         /// </summary>
         public KnowledgeScoreDetail CalculateRelevanceScoreWithDetails(List<string> contextKeywords)
         {
@@ -195,8 +237,10 @@ namespace RimTalk.Memory
             detail.MatchedTags = matchedTags;
             detail.TagScore = tagMatchRate;
 
-            // 2. 内容匹配
+            // 2. ⭐ 内容匹配（长关键词加权）
             var matchedKeywords = new List<string>();
+            float contentMatchScore = 0f;
+            
             if (!string.IsNullOrEmpty(content))
             {
                 foreach (var keyword in contextKeywords)
@@ -204,21 +248,59 @@ namespace RimTalk.Memory
                     if (content.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         matchedKeywords.Add(keyword);
+                        
+                        // ⭐ 长关键词权重更高
+                        if (keyword.Length >= 6)
+                            contentMatchScore += 0.40f;
+                        else if (keyword.Length >= 5)
+                            contentMatchScore += 0.30f;
+                        else if (keyword.Length >= 4)
+                            contentMatchScore += 0.20f;
+                        else if (keyword.Length == 3)
+                            contentMatchScore += 0.12f;
+                        else
+                            contentMatchScore += 0.05f;
                     }
                 }
             }
-
-            float contentMatchScore = Math.Min(matchedKeywords.Count * 0.05f, 0.5f);
+            
+            contentMatchScore = Math.Min(contentMatchScore, 1.5f);
             detail.MatchedKeywords = matchedKeywords;
             detail.KeywordMatchCount = matchedKeywords.Count;
 
+            // 3. ⭐ 完全匹配加成
+            float exactMatchBonus = 0f;
+            if (!string.IsNullOrEmpty(content))
+            {
+                var longestKeywords = contextKeywords
+                    .Where(k => k.Length >= 3)
+                    .OrderByDescending(k => k.Length)
+                    .Take(5);
+                
+                foreach (var keyword in longestKeywords)
+                {
+                    if (content.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        if (keyword.Length >= 6)
+                            exactMatchBonus += 0.8f;
+                        else if (keyword.Length >= 5)
+                            exactMatchBonus += 0.5f;
+                        else if (keyword.Length >= 4)
+                            exactMatchBonus += 0.3f;
+                    }
+                }
+            }
+            
+            exactMatchBonus = Math.Min(exactMatchBonus, 1.0f);
+
             // 综合评分
-            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight;
-            float contentPart = contentMatchScore * importance;
-            float totalScore = baseScore + tagPart + contentPart;
+            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight * 0.5f; // ⭐ 标签权重降低
+            float contentPart = contentMatchScore;  // ⭐ 不再乘importance
+            float exactPart = exactMatchBonus;      // ⭐ 不再乘importance
+            float totalScore = baseScore + tagPart + contentPart + exactPart;
             
             detail.TotalScore = totalScore;
-            detail.JaccardScore = 0f; // 不再使用
+            detail.JaccardScore = exactMatchBonus;
             
             if (matchedTags.Count == 0 && matchedKeywords.Count == 0)
             {
@@ -226,11 +308,15 @@ namespace RimTalk.Memory
             }
             else if (matchedTags.Count == 0)
             {
-                detail.FailReason = $"仅内容匹配({matchedKeywords.Count}个关键词)";
+                detail.FailReason = $"仅内容匹配({matchedKeywords.Count}个关键词，长关键词加成)";
             }
             else if (matchedKeywords.Count == 0)
             {
                 detail.FailReason = $"仅标签匹配({matchedTags.Count}/{tags.Count})";
+            }
+            else
+            {
+                detail.FailReason = exactMatchBonus > 0 ? $"精确匹配加成{exactMatchBonus:F2}" : "";
             }
             
             return detail;
@@ -273,61 +359,49 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 添加常识
-        /// ⭐ v3.3.2.3: 触发向量化同步
+        /// ⭐ v3.3.2.25: 完全移除向量化代码
         /// </summary>
         public void AddEntry(string tag, string content)
         {
             var entry = new CommonKnowledgeEntry(tag, content);
             entries.Add(entry);
-            
-            // ⭐ 触发向量化同步
-            VectorDB.KnowledgeVectorSyncManager.SyncKnowledge(entry);
         }
 
         /// <summary>
         /// 添加常识
-        /// ⭐ v3.3.2.3: 触发向量化同步
+        /// ⭐ v3.3.2.25: 完全移除向量化代码
         /// </summary>
         public void AddEntry(CommonKnowledgeEntry entry)
         {
             if (entry != null && !entries.Contains(entry))
             {
                 entries.Add(entry);
-                
-                // ⭐ 触发向量化同步
-                VectorDB.KnowledgeVectorSyncManager.SyncKnowledge(entry);
             }
         }
 
         /// <summary>
         /// 移除常识
-        /// ⭐ v3.3.2.3: 移除向量
         /// </summary>
         public void RemoveEntry(CommonKnowledgeEntry entry)
         {
-            if (entry != null && entries.Remove(entry))
+            if (entry != null)
             {
-                // ⭐ 移除向量
-                VectorDB.KnowledgeVectorSyncManager.RemoveKnowledgeVector(entry.id);
+                entries.Remove(entry);
             }
         }
 
         /// <summary>
         /// 清空常识库
-        /// ⭐ v3.3.2.3: 清空向量
         /// </summary>
         public void Clear()
         {
             entries.Clear();
-            
-            // ⭐ 清空所有向量
-            VectorDB.KnowledgeVectorSyncManager.ClearAllKnowledgeVectors();
         }
 
         /// <summary>
         /// 从文本导入常识
         /// 格式: [标签]内容\n[标签]内容
-        /// ⭐ v3.3.2.3: 批量向量化
+        /// ⭐ v3.3.2.25: 完全移除向量化代码
         /// </summary>
         public int ImportFromText(string text, bool clearExisting = false)
         {
@@ -337,12 +411,10 @@ namespace RimTalk.Memory
             if (clearExisting)
             {
                 entries.Clear();
-                VectorDB.KnowledgeVectorSyncManager.ClearAllKnowledgeVectors();
             }
 
             int importCount = 0;
             var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            var newEntries = new List<CommonKnowledgeEntry>();
 
             foreach (var line in lines)
             {
@@ -355,20 +427,11 @@ namespace RimTalk.Memory
                 if (entry != null)
                 {
                     entries.Add(entry);
-                    newEntries.Add(entry);
                     importCount++;
                 }
             }
             
-            // ⭐ 批量向量化新导入的常识
-            if (newEntries.Count > 0)
-            {
-                Log.Message($"[Knowledge] 🔄 Queuing {newEntries.Count} knowledge entries for vectorization...");
-                foreach (var entry in newEntries)
-                {
-                    VectorDB.KnowledgeVectorSyncManager.SyncKnowledge(entry);
-                }
-            }
+            Log.Message($"[Knowledge] Imported {importCount} knowledge entries");
 
             return importCount;
         }
@@ -622,10 +685,47 @@ namespace RimTalk.Memory
                     AddAndRecord(genderLabel, keywords, info.GenderKeywords);
                 }
 
-                // 4. 种族
+                // 4. 种族（⭐ v3.3.2.26: 添加亚种关键词提取）
                 if (pawn.def != null)
                 {
+                    // 主种族
                     AddAndRecord(pawn.def.label, keywords, info.RaceKeywords);
+                    
+                    // ⭐ 亚种信息（Biotech DLC / Mod添加的种族）
+                    try
+                    {
+                        // 方法A：检查pawn.genes.Xenotype
+                        if (pawn.genes != null && pawn.genes.Xenotype != null)
+                        {
+                            string xenotypeName = pawn.genes.Xenotype.label ?? pawn.genes.Xenotype.defName;
+                            if (!string.IsNullOrEmpty(xenotypeName))
+                            {
+                                AddAndRecord(xenotypeName, keywords, info.RaceKeywords);
+                                
+                                // 添加组合关键词（例如："人类-基准人"、"龙王种-索拉克"）
+                                string combinedRace = $"{pawn.def.label}-{xenotypeName}";
+                                AddAndRecord(combinedRace, keywords, info.RaceKeywords);
+                            }
+                        }
+                        
+                        // 方法B：检查CustomXenotype（自定义亚种名）
+                        if (pawn.genes != null)
+                        {
+                            var customXenotypeField = pawn.genes.GetType().GetField("xenotypeName");
+                            if (customXenotypeField != null)
+                            {
+                                string customName = customXenotypeField.GetValue(pawn.genes) as string;
+                                if (!string.IsNullOrEmpty(customName))
+                                {
+                                    AddAndRecord(customName, keywords, info.RaceKeywords);
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // 兼容性：如果没有Biotech DLC或基因系统不可用，跳过
+                    }
                 }
 
                 // 5. 特质
@@ -797,17 +897,16 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// 提取上下文关键词（简单的中文分词）
-        /// v2.4.1优化：提升关键词限制到100，进一步减少Pawn关键词被挤掉的情况
-        /// ⭐ v2.4.4修复：截断长文本，防止性能问题
+        /// 提取上下文关键词（超级引擎版）
+        /// ⭐ v3.3.2.25: 使用SuperKeywordEngine替代滑动窗口分词
         /// </summary>
         private List<string> ExtractContextKeywords(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return new List<string>();
 
-            // ⭐ 修复2: 截断过长文本，防止O(n²)性能问题
-            const int MAX_TEXT_LENGTH = 500; // 最多处理500字符
+            // 截断过长文本，防止性能问题
+            const int MAX_TEXT_LENGTH = 500;
             if (text.Length > MAX_TEXT_LENGTH)
             {
                 text = text.Substring(0, MAX_TEXT_LENGTH);
@@ -818,27 +917,17 @@ namespace RimTalk.Memory
                 }
             }
 
-            var keywords = new HashSet<string>();
-
-            // 简单的中文关键词提取（2-4字词语）
-            for (int length = 2; length <= 4; length++)
+            // ⭐ 使用超级关键词引擎（TF-IDF + N-gram + 权重排序）
+            var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 100);
+            
+            if (Prefs.DevMode && weightedKeywords.Count > 0)
             {
-                for (int i = 0; i <= text.Length - length; i++)
-                {
-                    string word = text.Substring(i, length);
-                    
-                    // 过滤纯符号和空白
-                    if (word.Any(c => char.IsLetterOrDigit(c)))
-                    {
-                        keywords.Add(word);
-                    }
-                }
+                Log.Message($"[Knowledge] SuperKeywordEngine extracted {weightedKeywords.Count} keywords");
+                Log.Message($"[Knowledge] Top 5: {string.Join(", ", weightedKeywords.Take(5).Select(kw => $"{kw.Word}({kw.Weight:F2})"))}");
             }
-
-            // v2.4.0: 从20增加到50
-            // v2.4.1: 从50增加到100，性能影响可忽略（+0.5KB内存，+3ms@100条常识）
-            // 大幅提高Pawn关键词匹配准确性，尤其是复杂角色信息（技能、背景等）
-            return keywords.Take(100).ToList();
+            
+            // 返回关键词列表（已按权重排序，高权重在前）
+            return weightedKeywords.Select(kw => kw.Word).ToList();
         }
         
         /// <summary>

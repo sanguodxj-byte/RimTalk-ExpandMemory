@@ -39,6 +39,7 @@ namespace RimTalk.Memory.AI
         
         /// <summary>
         /// 初始化Embedding服务
+        /// ? v3.3.2.27: VectorDB已移除，始终返回未初始化状态
         /// </summary>
         public static void Initialize()
         {
@@ -46,82 +47,24 @@ namespace RimTalk.Memory.AI
             
             try
             {
-                var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
-                
-                // 检查是否启用Embedding
-                if (!settings.enableSemanticEmbedding)
-                {
-                    Log.Message("[Embedding] Semantic embedding disabled in settings");
-                    return;
-                }
-                
-                // ? 优化：优先使用RimTalk的AI配置
-                if (settings.useRimTalkAIConfig)
-                {
-                    // 尝试从RimTalk获取API配置
-                    Log.Message("[Embedding] Attempting to use RimTalk AI configuration...");
-                    // TODO: 实现RimTalk配置获取
-                    // 暂时回退到独立配置
-                }
-                
-                // 使用独立AI配置
-                apiKey = settings.independentApiKey?.Trim();
-                provider = settings.independentProvider;
-                
-                // ? 验证API Key
-                if (string.IsNullOrEmpty(apiKey))
-                {
-                    Log.Warning("[Embedding] ? API Key is not configured!");
-                    Log.Warning("[Embedding] Please configure API Key in Mod Settings:");
-                    Log.Warning("[Embedding]   Options → Mod Settings → RimTalk-Expand Memory");
-                    Log.Warning("[Embedding]   → AI配置 → 填写 API Key");
-                    return;
-                }
-                
-                // 根据提供商设置URL和维度
-                if (provider == "DeepSeek")
-                {
-                    apiUrl = "https://api.deepseek.com/v1/embeddings";
-                    embeddingDimension = 1024;
-                }
-                else if (provider == "Google")
-                {
-                    // Gemini使用不同的API
-                    apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={apiKey}";
-                    embeddingDimension = 768;
-                }
-                else if (provider == "OpenAI")
-                {
-                    apiUrl = "https://api.openai.com/v1/embeddings";
-                    embeddingDimension = 1536;
-                }
-                else
-                {
-                    Log.Warning($"[Embedding] Unsupported provider: {provider}");
-                    return;
-                }
-                
-                isInitialized = true;
-                Log.Message($"[Embedding] ? Initialized successfully!");
-                Log.Message($"[Embedding]   Provider: {provider}");
-                Log.Message($"[Embedding]   Dimension: {embeddingDimension}D");
-                Log.Message($"[Embedding]   API Key: {apiKey.Substring(0, Math.Min(10, apiKey.Length))}... (length: {apiKey.Length})");
+                // ? v3.3.2.27: enableSemanticEmbedding已移除，始终不初始化
+                Log.Message("[Embedding] v3.3.2.27: Semantic embedding功能已移除，使用SuperKeywordEngine替代");
+                return;
             }
             catch (Exception ex)
             {
                 Log.Error($"[Embedding] Init failed: {ex.Message}");
-                Log.Error($"[Embedding] Stack trace: {ex.StackTrace}");
                 isInitialized = false;
             }
         }
         
         /// <summary>
         /// 检查服务是否可用
+        /// ? v3.3.2.27: VectorDB已移除，始终返回false
         /// </summary>
         public static bool IsAvailable()
         {
-            if (!isInitialized) Initialize();
-            return isInitialized;
+            return false; // v3.3.2.27: 语义嵌入功能已移除
         }
         
         /// <summary>

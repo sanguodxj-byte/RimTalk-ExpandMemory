@@ -40,7 +40,8 @@ namespace RimTalk.Memory
             var topCandidates = quickScored.Take(keepCount).ToList();
             
             // 第2步：检查是否启用语义增强
-            bool useSemantics = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableSemanticEmbedding ?? false;
+            // ? v3.3.2.27: enableSemanticEmbedding已移除，始终使用关键词匹配
+            bool useSemantics = false;
             
             if (!useSemantics || !AI.EmbeddingService.IsAvailable())
             {
@@ -159,7 +160,8 @@ namespace RimTalk.Memory
             var topCandidates = quickScored.Take(keepCount).ToList();
             
             // 第2步：检查是否启用语义增强
-            bool useSemantics = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableSemanticEmbedding ?? false;
+            // ? v3.3.2.27: enableSemanticEmbedding已移除，始终使用关键词匹配
+            bool useSemantics = false;
             
             if (!useSemantics || !AI.EmbeddingService.IsAvailable())
             {
