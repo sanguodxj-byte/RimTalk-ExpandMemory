@@ -26,6 +26,10 @@ namespace RimTalk.Memory.UI
         
         private PawnMemoryComp currentMemoryComp = null; // 保存当前的记忆组件引用
 
+        // 顶部区域高度，包含殖民者选择 + 总结/归档按钮两行
+        private const float TopAreaHeight = 90f;
+        private const float TopAreaMargin = 10f;
+
         public override Vector2 RequestedTabSize
         {
             get { return new Vector2(1010f, 640f); }
@@ -33,13 +37,15 @@ namespace RimTalk.Memory.UI
 
         public override void DoWindowContents(Rect inRect)
         {
-            // Pawn selection
-            Rect pawnSelectRect = new Rect(0f, 0f, inRect.width, 50f);
+            // Pawn selection & top buttons
+            Rect pawnSelectRect = new Rect(0f, 0f, inRect.width, TopAreaHeight);
             DrawPawnSelection(pawnSelectRect);
+
+            float contentStartY = TopAreaHeight + TopAreaMargin;
 
             if (selectedPawn == null)
             {
-                Rect noPawnRect = new Rect(0f, 60f, inRect.width, 100f);
+                Rect noPawnRect = new Rect(0f, contentStartY, inRect.width, 100f);
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Text.Font = GameFont.Medium;
                 Widgets.Label(noPawnRect, "RimTalk_SelectColonist".Translate());
@@ -51,7 +57,7 @@ namespace RimTalk.Memory.UI
             var memoryComp = selectedPawn.TryGetComp<PawnMemoryComp>();
             if (memoryComp == null)
             {
-                Rect noMemoryRect = new Rect(0f, 60f, inRect.width, 100f);
+                Rect noMemoryRect = new Rect(0f, contentStartY, inRect.width, 100f);
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Widgets.Label(noMemoryRect, "RimTalk_NoMemoryComponent".Translate());
                 Text.Anchor = TextAnchor.UpperLeft;
@@ -59,7 +65,12 @@ namespace RimTalk.Memory.UI
             }
 
             currentMemoryComp = memoryComp; // 保存引用
-            Rect contentRect = new Rect(0f, 60f, inRect.width, inRect.height - 60f);
+            Rect contentRect = new Rect(
+                0f,
+                contentStartY,
+                inRect.width,
+                inRect.height - contentStartY
+            );
             DrawMemoryContent(contentRect, memoryComp);
         }
 
@@ -76,10 +87,10 @@ namespace RimTalk.Memory.UI
             }
 
             // Dropdown for colonist selection
-            Rect labelRect = new Rect(rect.x, rect.y, 150f, rect.height);
+            Rect labelRect = new Rect(rect.x, rect.y + 5f, 150f, 30f);
             Widgets.Label(labelRect, "RimTalk_SelectColonist".Translate() + ":");
 
-            Rect buttonRect = new Rect(rect.x + 160f, rect.y, 300f, 35f);
+            Rect buttonRect = new Rect(rect.x + 160f, rect.y + 5f, 300f, 30f);
             string buttonLabel = selectedPawn != null 
                 ? selectedPawn.LabelShort 
                 : (string)"RimTalk_ChooseColonist".Translate();
@@ -96,7 +107,7 @@ namespace RimTalk.Memory.UI
             }
 
             // ⭐ 新增：注入预览器按钮（右上角，紧凑版）
-            Rect previewButtonRect = new Rect(rect.xMax - 140f, rect.y, 60f, 35f);
+            Rect previewButtonRect = new Rect(rect.xMax - 140f, rect.y + 5f, 60f, 30f);
             if (Widgets.ButtonText(previewButtonRect, "RimTalk_UI_Preview".Translate()))
             {
                 Find.WindowStack.Add(new RimTalk.Memory.Debug.Dialog_InjectionPreview());
@@ -104,17 +115,20 @@ namespace RimTalk.Memory.UI
             TooltipHandler.TipRegion(previewButtonRect, "打开注入内容预览器\n实时查看将要注入给AI的记忆和常识");
             
             // ⭐ 新增：常识按钮（预览按钮左边）
-            Rect knowledgeButtonRect = new Rect(rect.xMax - 70f, rect.y, 60f, 35f);
+            Rect knowledgeButtonRect = new Rect(rect.xMax - 70f, rect.y + 5f, 60f, 30f);
             if (Widgets.ButtonText(knowledgeButtonRect, "RimTalk_UI_Knowledge".Translate()))
             {
                 OpenCommonKnowledgeDialog();
             }
             TooltipHandler.TipRegion(knowledgeButtonRect, "打开常识库管理\n查看和编辑常识条目");
             
-            // 立即总结按钮（SCM → ELS）
+            // 下面这一行按钮（总结/归档）放在第二行，避免和上面的控件挤在一起
             if (selectedPawn != null)
             {
-                Rect summarizeButtonRect = new Rect(rect.x + 470f, rect.y, 180f, 35f);
+                float secondRowY = rect.y + 40f;
+
+                // 立即总结按钮（SCM → ELS）
+                Rect summarizeButtonRect = new Rect(rect.x + 470f, secondRowY, 180f, 30f);
                 string summarizeLabel = "RimTalk_UI_ImmediateSummarize".Translate();
                 
                 var memoryComp = selectedPawn.TryGetComp<PawnMemoryComp>();
@@ -139,7 +153,7 @@ namespace RimTalk.Memory.UI
                 GUI.color = Color.white;
                 
                 // 总结所有人按钮
-                Rect summarizeAllButtonRect = new Rect(rect.x + 660f, rect.y, 180f, 35f);
+                Rect summarizeAllButtonRect = new Rect(rect.x + 660f, secondRowY, 180f, 30f);
                 if (Widgets.ButtonText(summarizeAllButtonRect, "RimTalk_UI_SummarizeAll".Translate()))
                 {
                     // ⭐ 使用队列系统（1秒延迟）
@@ -168,8 +182,10 @@ namespace RimTalk.Memory.UI
                     }
                 }
                 
-                // === CLPA 归档按钮（对齐） ===
-                Rect archiveButtonRect = new Rect(rect.x + 470f, rect.y + 40f, 180f, 35f);
+                // === CLPA 归档按钮（同一行，和总结按钮对齐） ===
+                float thirdRowY = rect.y + 40f; // 保持与上面的按钮在一行，避免跑出rect范围
+
+                Rect archiveButtonRect = new Rect(rect.x + 470f, thirdRowY + 35f, 180f, 30f);
                 string archiveLabel = "RimTalk_UI_ImmediateArchive".Translate();
                 
                 var archiveComp = selectedPawn.TryGetComp<PawnMemoryComp>();
@@ -181,7 +197,7 @@ namespace RimTalk.Memory.UI
                     archiveLabel = "RimTalk_UI_ImmediateArchiveNoMemory".Translate();
                 }
                 
-                if ( Widgets.ButtonText(archiveButtonRect, archiveLabel))
+                if (Widgets.ButtonText(archiveButtonRect, archiveLabel))
                 {
                     if (canArchive)
                     {
@@ -194,7 +210,7 @@ namespace RimTalk.Memory.UI
                 GUI.color = Color.white;
                 
                 // 归档所有人按钮（CLPA）
-                Rect archiveAllButtonRect = new Rect(rect.x + 660f, rect.y + 40f, 180f, 35f);
+                Rect archiveAllButtonRect = new Rect(rect.x + 660f, thirdRowY + 35f, 180f, 30f);
                 if (Widgets.ButtonText(archiveAllButtonRect, "RimTalk_UI_ArchiveAll".Translate()))
                 {
                     int count = 0;
