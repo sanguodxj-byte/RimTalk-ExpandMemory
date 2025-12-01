@@ -4,11 +4,13 @@ using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using RimTalk.MemoryPatch;
+using System; // ⭐ 添加System命名空间用于Exception
 
 namespace RimTalk.Memory.UI
 {
     /// <summary>
     /// Main tab window for viewing colonist memories - appears in bottom menu bar
+    /// ⭐ v3.3.2.3: 添加安全检查防止NullReference
     /// </summary>
     public class MainTabWindow_Memory : MainTabWindow
     {
@@ -368,13 +370,45 @@ namespace RimTalk.Memory.UI
             // 选项1：添加行动记忆
             options.Add(new FloatMenuOption($"添加行动记忆到 {layerName}", delegate
             {
-                Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp as FourLayerMemoryComp, targetLayer, MemoryType.Action));
+                try
+                {
+                    // ⭐ v3.3.2.3: 启用手动创建记忆功能
+                    if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
+                    {
+                        Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, fourLayerComp, targetLayer, MemoryType.Action));
+                    }
+                    else
+                    {
+                        Messages.Message("记忆组件不可用", MessageTypeDefOf.RejectInput, false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[RimTalk Memory] Failed to create memory: {ex.Message}");
+                    Messages.Message("创建记忆失败", MessageTypeDefOf.RejectInput, false);
+                }
             }));
             
             // 选项2：添加对话记忆
             options.Add(new FloatMenuOption($"添加对话记忆到 {layerName}", delegate
             {
-                Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp as FourLayerMemoryComp, targetLayer, MemoryType.Conversation));
+                try
+                {
+                    // ⭐ v3.3.2.3: 启用手动创建记忆功能
+                    if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
+                    {
+                        Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, fourLayerComp, targetLayer, MemoryType.Conversation));
+                    }
+                    else
+                    {
+                        Messages.Message("记忆组件不可用", MessageTypeDefOf.RejectInput, false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[RimTalk Memory] Failed to create memory: {ex.Message}");
+                    Messages.Message("创建记忆失败", MessageTypeDefOf.RejectInput, false);
+                }
             }));
             
             Find.WindowStack.Add(new FloatMenu(options));
@@ -616,7 +650,23 @@ namespace RimTalk.Memory.UI
             Rect editButtonRect = new Rect(buttonsStartX, buttonY, buttonWidth, 25f);
             if (Widgets.ButtonText(editButtonRect, "编辑"))
             {
-                Find.WindowStack.Add(new Dialog_EditMemory(memory, currentMemoryComp as FourLayerMemoryComp));
+                try
+                {
+                    // ⭐ 安全检查：确保组件存在
+                    if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
+                    {
+                        Find.WindowStack.Add(new Dialog_EditMemory(memory, fourLayerComp));
+                    }
+                    else
+                    {
+                        Messages.Message("记忆组件不可用", MessageTypeDefOf.RejectInput, false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[RimTalk Memory] Failed to open edit dialog: {ex.Message}");
+                    Messages.Message("打开编辑对话框失败", MessageTypeDefOf.RejectInput, false);
+                }
             }
             TooltipHandler.TipRegion(editButtonRect, "编辑此记忆的内容、标签和备注");
 

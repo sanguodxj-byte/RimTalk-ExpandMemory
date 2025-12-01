@@ -8,6 +8,7 @@ namespace RimTalk.Memory
     /// <summary>
     /// 自适应阈值管理器 - 根据评分分布动态调整阈值
     /// v3.0.0
+    /// ? v3.3.2.3: 添加日志降频，避免刷屏
     /// </summary>
     public static class AdaptiveThresholdManager
     {
@@ -15,6 +16,10 @@ namespace RimTalk.Memory
         private static List<float> memoryScoreHistory = new List<float>();
         private static List<float> knowledgeScoreHistory = new List<float>();
 
+        // ? 日志降频控制
+        private static int logCounter = 0;
+        private const int LOG_INTERVAL = 100; // 每100次计算才输出一次日志
+        
         // 配置参数
         private const int MAX_HISTORY_SIZE = 1000;  // 最大历史记录数
         private const int MIN_SAMPLES = 50;         // 最小样本数（用于统计）
@@ -112,6 +117,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 计算自适应阈值
+        /// ? v3.3.2.3: 降频日志输出
         /// </summary>
         private static float CalculateAdaptiveThreshold(List<float> scores, string type)
         {
@@ -137,9 +143,14 @@ namespace RimTalk.Memory
 
             float smoothedThreshold = SmoothAdjustment(currentThreshold, recommendedThreshold);
 
-            Log.Message($"[Adaptive Threshold] {type} - Current: {currentThreshold:F3}, " +
-                       $"Recommended: {recommendedThreshold:F3}, Smoothed: {smoothedThreshold:F3} " +
-                       $"(Mean: {stats.Mean:F3}, StdDev: {stats.StdDev:F3}, Samples: {scores.Count})");
+            // ? 降频日志输出（每100次才输出一次）
+            logCounter++;
+            if (Prefs.DevMode && logCounter % LOG_INTERVAL == 0)
+            {
+                Log.Message($"[Adaptive Threshold] {type} - Current: {currentThreshold:F3}, " +
+                           $"Recommended: {recommendedThreshold:F3}, Smoothed: {smoothedThreshold:F3} " +
+                           $"(Mean: {stats.Mean:F3}, StdDev: {stats.StdDev:F3}, Samples: {scores.Count})");
+            }
 
             return smoothedThreshold;
         }
@@ -189,6 +200,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 自动应用推荐阈值
+        /// ? v3.3.2.3: 只在DevMode输出日志
         /// </summary>
         public static void ApplyRecommendedThresholds()
         {
@@ -202,7 +214,11 @@ namespace RimTalk.Memory
             settings.memoryScoreThreshold = memoryThreshold;
             settings.knowledgeScoreThreshold = knowledgeThreshold;
 
-            Log.Message($"[Adaptive Threshold] Applied - Memory: {memoryThreshold:F3}, Knowledge: {knowledgeThreshold:F3}");
+            // ? 只在DevMode输出日志
+            if (Prefs.DevMode)
+            {
+                Log.Message($"[Adaptive Threshold] Applied - Memory: {memoryThreshold:F3}, Knowledge: {knowledgeThreshold:F3}");
+            }
         }
 
         /// <summary>
@@ -244,12 +260,18 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 重置历史记录
+        /// ? v3.3.2.3: 只在DevMode输出日志
         /// </summary>
         public static void ResetHistory()
         {
             memoryScoreHistory.Clear();
             knowledgeScoreHistory.Clear();
-            Log.Message("[Adaptive Threshold] History reset");
+            
+            // ? 只在DevMode输出日志
+            if (Prefs.DevMode)
+            {
+                Log.Message("[Adaptive Threshold] History reset");
+            }
         }
 
         /// <summary>

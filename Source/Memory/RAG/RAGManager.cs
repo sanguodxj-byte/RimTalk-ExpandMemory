@@ -125,6 +125,7 @@ namespace RimTalk.Memory.RAG
         /// <summary>
         /// 降级检索（仅关键词，无向量）
         /// ? v3.3.2.1: 优化性能，减少日志输出
+        /// ? v3.3.2.7: 添加轻量级常识库检索（避免UI阻塞）
         /// </summary>
         private static RAGResult FallbackRetrieve(
             string query,
@@ -146,7 +147,7 @@ namespace RimTalk.Memory.RAG
                     HybridMatches = new List<RAGMatch>()
                 };
                 
-                // 仅使用关键词检索（快速路径）
+                // 1. 检索记忆（快速路径）
                 var memoryComp = speaker?.TryGetComp<FourLayerMemoryComp>();
                 if (memoryComp != null)
                 {
@@ -173,12 +174,51 @@ namespace RimTalk.Memory.RAG
                     }
                 }
                 
+                // ? 2. 轻量级常识库检索（仅高重要性）
+                var memoryManager = Find.World?.GetComponent<MemoryManager>();
+                if (memoryManager != null)
+                {
+                    // ? 只检索重要性>=0.7的常识，大幅减少扫描量
+                    var highImportanceKnowledge = memoryManager.CommonKnowledge.Entries
+                        .Where(e => e.isEnabled && e.importance >= 0.7f)
+                        .Take(20) // 最多20条
+                        .ToList();
+                    
+                    if (highImportanceKnowledge.Count > 0)
+                    {
+                        var knowledgeScored = AdvancedScoringSystem.ScoreKnowledge(
+                            highImportanceKnowledge,
+                            query,
+                            speaker,
+                            listener
+                        );
+                        
+                        int maxKnowledge = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.maxInjectedKnowledge ?? 5;
+                        
+                        foreach (var item in knowledgeScored.Take(maxKnowledge))
+                        {
+                            result.HybridMatches.Add(new RAGMatch
+                            {
+                                Source = RAGMatchSource.Knowledge,
+                                Knowledge = item.Item,
+                                Score = item.Score,
+                                FinalScore = item.Score,
+                                MatchType = "Keyword-Fallback"
+                            });
+                        }
+                    }
+                }
+                
                 result.RerankedMatches = result.HybridMatches;
                 result.TotalMatches = result.HybridMatches.Count;
                 
                 // ? 减少日志输出频率
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.05f)
-                    Log.Message($"[RAG Manager] Fallback retrieval: {result.TotalMatches} matches");
+                {
+                    int memoryCount = result.HybridMatches.Count(m => m.Source == RAGMatchSource.Memory);
+                    int knowledgeCount = result.HybridMatches.Count(m => m.Source == RAGMatchSource.Knowledge);
+                    Log.Message($"[RAG Manager] Fallback: {memoryCount} memories, {knowledgeCount} knowledge (high-importance only)");
+                }
                 
                 fallbackCount++; // ? 增加降级统计
                 return result;

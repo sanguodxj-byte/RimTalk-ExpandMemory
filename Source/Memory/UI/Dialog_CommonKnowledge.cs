@@ -618,6 +618,7 @@ namespace RimTalk.Memory.UI
 
         /// <summary>
         /// ? 检测是否为格式化文本
+        /// v3.3.2.7: 修复判断逻辑bug
         /// </summary>
         private bool IsFormattedText(string text)
         {
@@ -636,8 +637,8 @@ namespace RimTalk.Memory.UI
                     
                 totalLines++;
                 
-                // 检查是否符合 [标签] 或 [标签|重要性] 格式
-                if (trimmed.StartsWith("[") && trimmed.Contains("]"));
+                // ? 修复：移除错误的分号
+                if (trimmed.StartsWith("[") && trimmed.Contains("]"))
                 {
                     formattedLines++;
                 }
@@ -679,6 +680,7 @@ namespace RimTalk.Memory.UI
 
         /// <summary>
         /// ? 解析格式化行为向量库条目
+        /// v3.3.2.7: 提升默认重要性到0.7
         /// </summary>
         private CommonKnowledgeEntry ParseLineForVectorDB(string line)
         {
@@ -701,7 +703,7 @@ namespace RimTalk.Memory.UI
                         return null;
 
                     string tag;
-                    float importance = 0.5f;
+                    float importance = 0.7f; // ? 从0.5提升到0.7（手动注入的常识更重要')
 
                     if (tagPart.Contains("|"))
                     {
@@ -727,10 +729,10 @@ namespace RimTalk.Memory.UI
                 }
                 else
                 {
-                    // 无格式文本，使用默认标签
+                    // 无格式文本，使用默认标签和重要性
                     return new CommonKnowledgeEntry("知识", line)
                     {
-                        importance = 0.5f
+                        importance = 0.7f // ? 保持0.7
                     };
                 }
             }
@@ -856,34 +858,16 @@ namespace RimTalk.Memory.UI
 
         /// <summary>
         /// ? 注入单个条目（提取公共逻辑）
-        /// ? v3.3.2.3: 集成异步向量化同步
+        /// ? v3.3.2.3: 简化 - 使用KnowledgeVectorSyncManager
         /// </summary>
         private bool InjectSingleEntry(CommonKnowledgeEntry entry)
         {
             try
             {
-                // ? 立即使用哈希向量注入（<1ms，不卡UI）
-                float[] vector = GenerateFallbackVector(entry.content);
-                VectorDB.VectorDBManager.StoreKnowledgeVector(
-                    entry.id,
-                    entry.tag,
-                    entry.content,
-                    vector,
-                    entry.importance
-                );
+                // ? 直接添加到常识库，会自动触发向量化
+                library.AddEntry(entry);
                 
-                // ? 如果启用了语义嵌入和自动同步，加入异步队列升级为语义向量
-                var settings = RimTalkMemoryPatchMod.Settings;
-                if (settings.enableSemanticEmbedding && settings.autoSyncToVectorDB && entry.importance >= 0.7f)
-                {
-                    VectorDB.AsyncVectorSyncManager.QueueKnowledgeSync(entry);
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message($"[VectorDB Injection] Queued for async semantic embedding: {entry.id}");
-                    }
-                }
-                
+                // KnowledgeVectorSyncManager会自动处理向量化
                 return true;
             }
             catch (Exception ex)

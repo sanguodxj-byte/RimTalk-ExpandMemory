@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Memory Management Main Tab -->
+  <MainButtonDef>
+    <defName>RimTalk_Memory</defName>
+    <label>Memory</label>
+    <description>View and manage colonist memories</description>
+    <!-- ? 添加完整的程序集限定符 -->
+    <tabWindowClass>RimTalk.Memory.UI.MainTabWindow_Memory, RimTalkMemoryPatch</tabWindowClass>
+    <order>35</order>
+    <!-- 移除iconPath（使用默认图标） -->
+    <!-- <iconPath>UI/Buttons/Memory</iconPath> -->
+    <!-- 使用有效的快捷键或不设置 -->
+    <!-- <defaultHotKey>Misc12</defaultHotKey> -->
+  </MainButtonDef>
+</Defs>

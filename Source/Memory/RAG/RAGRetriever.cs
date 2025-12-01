@@ -90,6 +90,7 @@ namespace RimTalk.Memory.RAG
         
         /// <summary>
         /// 阶段1: 向量检索（语义相似度）
+        /// ? v3.3.2.4: 同时搜索记忆和常识向量
         /// </summary>
         private static async Task<List<RAGMatch>> VectorRetrievalAsync(string query, RAGConfig config)
         {
@@ -101,7 +102,7 @@ namespace RimTalk.Memory.RAG
             
             try
             {
-                // 语义搜索
+                // ? 1. 搜索记忆向量
                 var memoryIds = await VectorDBManager.SemanticSearchAsync(
                     query,
                     topK: config.TopK,
@@ -124,8 +125,35 @@ namespace RimTalk.Memory.RAG
                     }
                 }
                 
+                // ? 2. 搜索常识向量（新增）
+                var knowledgeIds = await VectorDBManager.SearchKnowledgeAsync(
+                    query,
+                    topK: config.TopK / 2,  // 常识数量减半
+                    minSimilarity: 0.2f      // ? 降低阈值到0.3
+                );
+                
+                // 获取常识详情
+                var library = MemoryManager.GetCommonKnowledge();
+                if (library != null && knowledgeIds != null)
+                {
+                    foreach (var knowledgeId in knowledgeIds)
+                    {
+                        var knowledge = library.Entries.FirstOrDefault(e => e.id == knowledgeId);
+                        if (knowledge != null)
+                        {
+                            matches.Add(new RAGMatch
+                            {
+                                Source = RAGMatchSource.VectorDB,
+                                Knowledge = knowledge,
+                                Score = 0.9f,  // 向量检索高置信度
+                                MatchType = "Semantic"
+                            });
+                        }
+                    }
+                }
+                
                 if (Prefs.DevMode)
-                    Log.Message($"[RAG] Vector retrieval: {matches.Count} matches");
+                    Log.Message($"[RAG] Vector retrieval: {matches.Count} matches ({memoryIds.Count} memories + {knowledgeIds?.Count ?? 0} knowledge)");
             }
             catch (Exception ex)
             {

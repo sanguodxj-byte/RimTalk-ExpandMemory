@@ -60,6 +60,7 @@
         <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.11.0" PrivateAssets="All" />
         <!-- ⭐ Microsoft.Data.Sqlite + 必需的依赖 -->
         <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
     </ItemGroup>
@@ -105,6 +106,32 @@
       <Folder Include="Source\Memory\Debug\" />
       <Folder Include="Source\Memory\DevTools\" />
     </ItemGroup>
+
+    <!-- ⭐ 自动复制SQLite本地DLL到输出目录 -->
+    <Target Name="CopySQLiteNativeDlls" AfterTargets="Build">
+        <PropertyGroup>
+            <SQLiteRuntimesSource>$(USERPROFILE)\.nuget\packages\sqlitepclraw.lib.e_sqlite3\2.1.10\runtimes</SQLiteRuntimesSource>
+            <SQLiteRuntimesTarget>$(OutputPath)\runtimes</SQLiteRuntimesTarget>
+        </PropertyGroup>
+        
+        <!-- 创建runtimes目录 -->
+        <MakeDir Directories="$(SQLiteRuntimesTarget)\win-x64\native" />
+        <MakeDir Directories="$(SQLiteRuntimesTarget)\win-x86\native" />
+        <MakeDir Directories="$(SQLiteRuntimesTarget)\win-arm\native" />
+        
+        <!-- 复制本地DLL -->
+        <Copy SourceFiles="$(SQLiteRuntimesSource)\win-x64\native\e_sqlite3.dll"
+              DestinationFolder="$(SQLiteRuntimesTarget)\win-x64\native"
+              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="$(SQLiteRuntimesSource)\win-x86\native\e_sqlite3.dll"
+              DestinationFolder="$(SQLiteRuntimesTarget)\win-x86\native"
+              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="$(SQLiteRuntimesSource)\win-arm\native\e_sqlite3.dll"
+              DestinationFolder="$(SQLiteRuntimesTarget)\win-arm\native"
+              SkipUnchangedFiles="true" />
+              
+        <Message Text="SQLite native DLLs copied to $(SQLiteRuntimesTarget)" Importance="high" />
+    </Target>
 
     <!-- Deploy to RimWorld client -->
     <Target Name="DeployToModsFolder" AfterTargets="Build" Condition=" '$(BuildingWithScript)' != 'true' AND '$(RimWorldDir)' != '' ">

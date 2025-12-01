@@ -26,7 +26,7 @@ namespace RimTalk.Memory.VectorDB
         private const int MAX_QUEUE_SIZE = 100;           // 最大队列大小
         private const int BATCH_SIZE = 5;                 // 每批处理数量
         private const int SYNC_INTERVAL_TICKS = 150;      // 同步间隔（~2.5秒）
-        private const float IMPORTANCE_THRESHOLD = 0.7f;  // 重要性阈值
+        private const float IMPORTANCE_THRESHOLD = 0.3f;  // 重要性阈值
         
         /// <summary>
         /// 同步任务
@@ -95,52 +95,6 @@ namespace RimTalk.Memory.VectorDB
             if (Prefs.DevMode)
             {
                 Log.Message($"[AsyncVectorSync] Queued memory: {memory.content.Substring(0, Math.Min(40, memory.content.Length))}... (queue: {syncQueue.Count})");
-            }
-        }
-        
-        /// <summary>
-        /// 将常识加入同步队列
-        /// </summary>
-        public static void QueueKnowledgeSync(CommonKnowledgeEntry knowledge)
-        {
-            if (!ShouldSync()) return;
-            if (knowledge == null || string.IsNullOrEmpty(knowledge.content)) return;
-            
-            // 检查重要性阈值
-            if (knowledge.importance < IMPORTANCE_THRESHOLD)
-            {
-                return;
-            }
-            
-            // 检查是否已在队列中
-            if (processingIds.Contains(knowledge.id))
-            {
-                return;
-            }
-            
-            // 检查队列大小
-            if (syncQueue.Count >= MAX_QUEUE_SIZE)
-            {
-                var oldest = syncQueue.Dequeue();
-                processingIds.Remove(oldest.Id);
-            }
-            
-            var task = new SyncTask
-            {
-                Id = knowledge.id,
-                Content = knowledge.content,
-                Type = SyncType.Knowledge,
-                Importance = knowledge.importance,
-                QueuedTick = Find.TickManager.TicksGame,
-                Pawn = null
-            };
-            
-            syncQueue.Enqueue(task);
-            processingIds.Add(knowledge.id);
-            
-            if (Prefs.DevMode)
-            {
-                Log.Message($"[AsyncVectorSync] Queued knowledge: {knowledge.content.Substring(0, Math.Min(40, knowledge.content.Length))}... (queue: {syncQueue.Count})");
             }
         }
         
@@ -225,9 +179,20 @@ namespace RimTalk.Memory.VectorDB
         
         /// <summary>
         /// 异步处理单个同步任务
+        /// ? v3.3.2.3: 简化为只处理记忆，常识由KnowledgeVectorSyncManager处理
         /// </summary>
         private static async Task ProcessSingleTaskAsync(SyncTask task)
         {
+            // 只处理记忆类型
+            if (task.Type != SyncType.Memory)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Warning($"[AsyncVectorSync] Knowledge sync should use KnowledgeVectorSyncManager instead");
+                }
+                return;
+            }
+            
             var settings = RimTalkMemoryPatchMod.Settings;
             
             // 获取向量
@@ -254,29 +219,8 @@ namespace RimTalk.Memory.VectorDB
                 vector = GenerateFallbackVector(task.Content);
             }
             
-            // 存储到向量数据库
-            if (task.Type == SyncType.Memory)
-            {
-                // 记忆类型：使用StoreKnowledgeVector方法（重用现有方法）
-                VectorDBManager.StoreKnowledgeVector(
-                    task.Id,
-                    $"memory_{task.Pawn?.LabelShort ?? "unknown"}", // 标签包含Pawn信息
-                    task.Content,
-                    vector,
-                    task.Importance
-                );
-            }
-            else
-            {
-                // 常识类型
-                VectorDBManager.StoreKnowledgeVector(
-                    task.Id,
-                    "knowledge", // 标签
-                    task.Content,
-                    vector,
-                    task.Importance
-                );
-            }
+            // 存储记忆向量（使用简化的2参数版本）
+            VectorDBManager.StoreKnowledgeVector(task.Id, vector);
         }
         
         /// <summary>

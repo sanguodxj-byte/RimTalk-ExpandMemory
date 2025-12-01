@@ -10,9 +10,17 @@ namespace RimTalk.Memory
     /// <summary>
     /// WorldComponent to manage global memory decay and daily summarization
     /// 支持四层记忆系统 (FMS)
+    /// ⭐ v3.3.2.3: 添加向后兼容性支持
     /// </summary>
     public class MemoryManager : WorldComponent
     {
+        // ⭐ 静态构造函数确保类型正确注册
+        static MemoryManager()
+        {
+            // RimWorld会自动发现和注册WorldComponent子类
+            // 这个静态构造函数确保类型在使用前被初始化
+        }
+        
         private int lastDecayTick = 0;
         private const int DecayInterval = 2500; // Every in-game hour
         
@@ -313,7 +321,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ⭐ 处理手动总结队列（每个殖民者之间延迟1秒）
+        /// ⭐ 处理手动总结队列（每个殖민者之间延迟1秒）
         /// </summary>
         private void ProcessManualSummarizationQueue()
         {
@@ -523,6 +531,11 @@ namespace RimTalk.Memory
         public override void ExposeData()
         {
             base.ExposeData();
+            
+            // ⭐ 添加版本标记用于兼容性检查
+            int saveVersion = 0;
+            Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
+            
             Scribe_Values.Look(ref lastDecayTick, "lastDecayTick", 0);
             Scribe_Values.Look(ref lastSummarizationDay, "lastSummarizationDay", -1);
             Scribe_Values.Look(ref lastArchiveDay, "lastArchiveDay", -1);
@@ -534,20 +547,50 @@ namespace RimTalk.Memory
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                // ⭐ 确保所有组件都已初始化
                 if (commonKnowledge == null)
+                {
                     commonKnowledge = new CommonKnowledgeLibrary();
+                    Log.Warning("[RimTalk Memory] commonKnowledge was null, initialized new instance");
+                }
                 if (conversationCache == null)
+                {
                     conversationCache = new ConversationCache();
+                    Log.Warning("[RimTalk Memory] conversationCache was null, initialized new instance");
+                }
                 if (promptCache == null)
+                {
                     promptCache = new PromptCache();
+                    Log.Warning("[RimTalk Memory] promptCache was null, initialized new instance");
+                }
                 if (colonistJoinTicks == null) // ⭐ 新增
+                {
                     colonistJoinTicks = new Dictionary<int, int>();
+                    Log.Warning("[RimTalk Memory] colonistJoinTicks was null, initialized new instance");
+                }
                 
                 // ⭐ 重新初始化队列（不保存到存档）
                 if (summarizationQueue == null)
                     summarizationQueue = new Queue<Pawn>();
                 if (manualSummarizationQueue == null)
                     manualSummarizationQueue = new Queue<Pawn>();
+                
+                // ⭐ 版本升级逻辑
+                if (saveVersion < 1)
+                {
+                    Log.Message("[RimTalk Memory] Upgrading save data from v0 to v1");
+                    // 这里可以添加数据迁移代码
+                    saveVersion = 1;
+                }
+                
+                Log.Message($"[RimTalk Memory] MemoryManager loaded successfully (save version: {saveVersion})");
+            }
+            
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                // ⭐ 保存当前版本号
+                saveVersion = 1;
+                Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
             }
         }
     }

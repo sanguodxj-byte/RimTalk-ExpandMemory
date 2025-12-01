@@ -64,48 +64,72 @@ namespace RimTalk.Memory.AI
             }
         }
 
+        /// <summary>
+        /// ⭐ 修复：添加强制重新初始化方法
+        /// </summary>
+        public static void ForceReinitialize()
+        {
+            isInitialized = false;
+            Initialize();
+        }
+        
         public static void Initialize()
         {
-            if (isInitialized) return;
+            // ⭐ 修复：移除isInitialized检查，允许重新初始化
+            // if (isInitialized) return; // <-- 删除这行
+            
             try
             {
                 var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
                 
-                // 优先使用独立配置
-                if (!settings.useRimTalkAIConfig || !TryLoadFromRimTalk())
+                // ⭐ 修复：严格按照用户设置决定是否跟随RimTalk
+                if (settings.useRimTalkAIConfig)
                 {
-                    apiKey = settings.independentApiKey;
-                    apiUrl = settings.independentApiUrl;
-                    model = settings.independentModel;
-                    provider = settings.independentProvider;
-                    
-                    // 如果 URL 为空，根据提供商设置默认值
-                    if (string.IsNullOrEmpty(apiUrl))
+                    // 用户选择跟随RimTalk，尝试加载
+                    if (TryLoadFromRimTalk())
                     {
-                        if (provider == "OpenAI")
-                        {
-                            apiUrl = "https://api.openai.com/v1/chat/completions";
-                        }
-                        else if (provider == "DeepSeek")
-                        {
-                            apiUrl = "https://api.deepseek.com/v1/chat/completions";
-                        }
-                        else if (provider == "Google")
-                        {
-                            apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/MODEL_PLACEHOLDER:generateContent?key=API_KEY_PLACEHOLDER";
-                        }
-                    }
-                    
-                    // 验证配置
-                    if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiUrl))
-                    {
-                        Log.Warning("[AI] Configuration incomplete, using rule-based summary");
+                        // 成功从RimTalk加载
+                        Log.Message($"[AI] Loaded from RimTalk ({provider}/{model})");
+                        isInitialized = true;
                         return;
                     }
-                    
-                    Log.Message($"[AI] Initialized ({provider}/{model})");
-                    isInitialized = true;
+                    // 如果RimTalk未配置，继续使用独立配置（fallback）
+                    Log.Warning("[AI] RimTalk not configured, using independent config as fallback");
                 }
+                
+                // 使用独立配置（用户主动选择 或 RimTalk未配置）
+                apiKey = settings.independentApiKey;
+                apiUrl = settings.independentApiUrl;
+                model = settings.independentModel;
+                provider = settings.independentProvider;
+                
+                // 如果 URL 为空，根据提供商设置默认值
+                if (string.IsNullOrEmpty(apiUrl))
+                {
+                    if (provider == "OpenAI")
+                    {
+                        apiUrl = "https://api.openai.com/v1/chat/completions";
+                    }
+                    else if (provider == "DeepSeek")
+                    {
+                        apiUrl = "https://api.deepseek.com/v1/chat/completions";
+                    }
+                    else if (provider == "Google")
+                    {
+                        apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/MODEL_PLACEHOLDER:generateContent?key=API_KEY_PLACEHOLDER";
+                    }
+                }
+                
+                // 验证配置
+                if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiUrl))
+                {
+                    Log.Warning("[AI] Configuration incomplete, using rule-based summary");
+                    isInitialized = false; // ⭐ 标记为未初始化，允许下次重试
+                    return;
+                }
+                
+                Log.Message($"[AI] Initialized with independent config ({provider}/{model})");
+                isInitialized = true;
             }
             catch (Exception ex)
             {

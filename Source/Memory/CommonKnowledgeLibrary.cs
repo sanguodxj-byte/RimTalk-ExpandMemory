@@ -273,43 +273,61 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 添加常识
+        /// ⭐ v3.3.2.3: 触发向量化同步
         /// </summary>
         public void AddEntry(string tag, string content)
         {
             var entry = new CommonKnowledgeEntry(tag, content);
             entries.Add(entry);
+            
+            // ⭐ 触发向量化同步
+            VectorDB.KnowledgeVectorSyncManager.SyncKnowledge(entry);
         }
 
         /// <summary>
         /// 添加常识
+        /// ⭐ v3.3.2.3: 触发向量化同步
         /// </summary>
         public void AddEntry(CommonKnowledgeEntry entry)
         {
             if (entry != null && !entries.Contains(entry))
             {
                 entries.Add(entry);
+                
+                // ⭐ 触发向量化同步
+                VectorDB.KnowledgeVectorSyncManager.SyncKnowledge(entry);
             }
         }
 
         /// <summary>
         /// 移除常识
+        /// ⭐ v3.3.2.3: 移除向量
         /// </summary>
         public void RemoveEntry(CommonKnowledgeEntry entry)
         {
-            entries.Remove(entry);
+            if (entry != null && entries.Remove(entry))
+            {
+                // ⭐ 移除向量
+                VectorDB.KnowledgeVectorSyncManager.RemoveKnowledgeVector(entry.id);
+            }
         }
 
         /// <summary>
         /// 清空常识库
+        /// ⭐ v3.3.2.3: 清空向量
         /// </summary>
         public void Clear()
         {
             entries.Clear();
+            
+            // ⭐ 清空所有向量
+            VectorDB.KnowledgeVectorSyncManager.ClearAllKnowledgeVectors();
         }
 
         /// <summary>
         /// 从文本导入常识
         /// 格式: [标签]内容\n[标签]内容
+        /// ⭐ v3.3.2.3: 批量向量化
         /// </summary>
         public int ImportFromText(string text, bool clearExisting = false)
         {
@@ -317,10 +335,14 @@ namespace RimTalk.Memory
                 return 0;
 
             if (clearExisting)
+            {
                 entries.Clear();
+                VectorDB.KnowledgeVectorSyncManager.ClearAllKnowledgeVectors();
+            }
 
             int importCount = 0;
             var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var newEntries = new List<CommonKnowledgeEntry>();
 
             foreach (var line in lines)
             {
@@ -333,7 +355,18 @@ namespace RimTalk.Memory
                 if (entry != null)
                 {
                     entries.Add(entry);
+                    newEntries.Add(entry);
                     importCount++;
+                }
+            }
+            
+            // ⭐ 批量向量化新导入的常识
+            if (newEntries.Count > 0)
+            {
+                Log.Message($"[Knowledge] 🔄 Queuing {newEntries.Count} knowledge entries for vectorization...");
+                foreach (var entry in newEntries)
+                {
+                    VectorDB.KnowledgeVectorSyncManager.SyncKnowledge(entry);
                 }
             }
 

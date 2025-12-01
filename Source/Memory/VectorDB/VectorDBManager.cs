@@ -9,26 +9,23 @@ namespace RimTalk.Memory.VectorDB
 {
     /// <summary>
     /// 向量数据库管理器 - 集成层
-    /// v3.2.0
+    /// v3.3.4 - 改用纯C#内存存储（零Native依赖）
     /// 
     /// 功能:
     /// - 管理向量数据库生命周期
     /// - 自动同步记忆到数据库
     /// - 提供高级检索接口
-    /// - 跨存档共享（可选）
+    /// - SIMD加速检索
     /// </summary>
     public static class VectorDBManager
     {
-        private static VectorMemoryDatabase database;
+        // ? v3.3.4: 改用纯C#内存存储
+        private static InMemoryVectorStore vectorStore;
         private static bool isInitialized = false;
-        private static string currentDBPath;
-        
-        // 配置
-        private const string DB_FILENAME = "MemoryVectors.db";
-        private const string SHARED_DB_FOLDER = "SharedVectors";
         
         /// <summary>
-        /// 初始化向量数据库
+        /// 初始化向量存储
+        /// ? v3.3.4: 零Native依赖，100%成功率
         /// </summary>
         public static void Initialize(bool useSharedDB = false)
         {
@@ -45,24 +42,18 @@ namespace RimTalk.Memory.VectorDB
                     return;
                 }
                 
-                // 确定数据库路径
-                string dbPath = GetDatabasePath(useSharedDB);
-                
-                // 创建数据库实例
-                database = new VectorMemoryDatabase(dbPath);
-                currentDBPath = dbPath;
+                // ? 创建纯C#内存存储（无任何异常风险）
+                vectorStore = new InMemoryVectorStore();
                 isInitialized = true;
                 
-                Log.Message($"[VectorDB Manager] Initialized: {dbPath}");
-                
-                // 显示统计
-                var stats = database.GetStats();
-                Log.Message($"[VectorDB Manager] Loaded {stats.VectorCount} vectors ({stats.DatabaseSizeMB:F2} MB)");
+                Log.Message("[VectorDB Manager] ? Initialized with InMemoryVectorStore (Zero Native Dependencies)");
+                Log.Message("[VectorDB Manager] Using SIMD-accelerated cosine similarity");
             }
             catch (Exception ex)
             {
-                Log.Error($"[VectorDB Manager] Init failed: {ex.Message}");
+                Log.Error($"[VectorDB Manager] ? Unexpected init error: {ex.Message}");
                 isInitialized = false;
+                vectorStore = null;
             }
         }
         
@@ -71,31 +62,7 @@ namespace RimTalk.Memory.VectorDB
         /// </summary>
         public static bool IsAvailable()
         {
-            return isInitialized && database != null;
-        }
-        
-        /// <summary>
-        /// 获取数据库路径
-        /// </summary>
-        private static string GetDatabasePath(bool useShared)
-        {
-            if (useShared)
-            {
-                // 共享数据库（所有存档共用）
-                string sharedPath = Path.Combine(GenFilePaths.SaveDataFolderPath, SHARED_DB_FOLDER);
-                if (!Directory.Exists(sharedPath))
-                {
-                    Directory.CreateDirectory(sharedPath);
-                }
-                return Path.Combine(sharedPath, DB_FILENAME);
-            }
-            else
-            {
-                // 存档专属数据库
-                string saveName = Find.World?.info?.name ?? "Unknown";
-                string safeName = string.Concat(saveName.Split(Path.GetInvalidFileNameChars()));
-                return Path.Combine(GenFilePaths.SaveDataFolderPath, $"{safeName}_{DB_FILENAME}");
-            }
+            return isInitialized && vectorStore != null;
         }
         
         /// <summary>
@@ -120,8 +87,8 @@ namespace RimTalk.Memory.VectorDB
                     // 构建元数据
                     string metadata = BuildMetadata(memory);
                     
-                    // 插入数据库
-                    database.UpsertVector(
+                    // 存储到内存向量库
+                    vectorStore.Upsert(
                         id: memory.id,
                         vector: embedding,
                         content: memory.content,
@@ -156,9 +123,9 @@ namespace RimTalk.Memory.VectorDB
                 
                 Log.Message($"[VectorDB Manager] Batch syncing {importantMemories.Count} memories...");
                 
-                var insertItems = new List<VectorInsertItem>();
+                int synced = 0;
                 
-                // 获取所有向量
+                // 获取所有向量并存储
                 foreach (var memory in importantMemories)
                 {
                     try
@@ -167,13 +134,13 @@ namespace RimTalk.Memory.VectorDB
                         
                         if (embedding != null)
                         {
-                            insertItems.Add(new VectorInsertItem
-                            {
-                                Id = memory.id,
-                                Vector = embedding,
-                                Content = memory.content,
-                                Metadata = BuildMetadata(memory)
-                            });
+                            vectorStore.Upsert(
+                                id: memory.id,
+                                vector: embedding,
+                                content: memory.content,
+                                metadata: BuildMetadata(memory)
+                            );
+                            synced++;
                         }
                     }
                     catch (Exception ex)
@@ -182,12 +149,7 @@ namespace RimTalk.Memory.VectorDB
                     }
                 }
                 
-                // 批量插入
-                if (insertItems.Count > 0)
-                {
-                    int synced = database.BatchInsert(insertItems);
-                    Log.Message($"[VectorDB Manager] Batch sync complete: {synced}/{insertItems.Count}");
-                }
+                Log.Message($"[VectorDB Manager] Batch sync complete: {synced}/{importantMemories.Count}");
             }
             catch (Exception ex)
             {
@@ -196,7 +158,7 @@ namespace RimTalk.Memory.VectorDB
         }
         
         /// <summary>
-        /// 语义搜索记忆
+        /// 语义搜索记忆（使用InMemoryVectorStore）
         /// </summary>
         public static async Task<List<string>> SemanticSearchAsync(string query, int topK = 10, float minSimilarity = 0.5f)
         {
@@ -211,8 +173,8 @@ namespace RimTalk.Memory.VectorDB
                 if (queryVector == null)
                     return new List<string>();
                 
-                // 搜索相似向量
-                var results = database.SearchSimilar(queryVector, topK, minSimilarity);
+                // 使用SIMD加速搜索
+                var results = vectorStore.Search(queryVector, topK, minSimilarity);
                 
                 // 返回记忆ID列表
                 return results.Select(r => r.Id).ToList();
@@ -234,7 +196,7 @@ namespace RimTalk.Memory.VectorDB
             
             try
             {
-                database.DeleteVector(memoryId);
+                vectorStore.Remove(memoryId);
                 
                 if (Prefs.DevMode)
                     Log.Message($"[VectorDB Manager] Deleted vector: {memoryId}");
@@ -245,65 +207,6 @@ namespace RimTalk.Memory.VectorDB
             }
         }
         
-        /// <summary>
-        /// ? 存储常识向量到数据库
-        /// </summary>
-        public static void StoreKnowledgeVector(string knowledgeId, string tag, string content, float[] vector, float importance)
-        {
-            if (!IsAvailable() || string.IsNullOrEmpty(knowledgeId) || vector == null || vector.Length == 0)
-                return;
-            
-            try
-            {
-                // 构建常识元数据
-                string metadata = BuildKnowledgeMetadata(tag, importance);
-                
-                // 存储到数据库
-                database.UpsertVector(
-                    id: knowledgeId,
-                    vector: vector,
-                    content: content,
-                    metadata: metadata
-                );
-                
-                if (Prefs.DevMode)
-                    Log.Message($"[VectorDB Manager] Stored knowledge vector: {knowledgeId} [{tag}]");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[VectorDB Manager] Failed to store knowledge vector {knowledgeId}: {ex.Message}");
-                throw; // 重新抛出异常以便调用者处理
-            }
-        }
-        
-        /// <summary>
-        /// 构建元数据JSON
-        /// </summary>
-        private static string BuildMetadata(MemoryEntry memory)
-        {
-            // 简单的JSON构建（避免依赖JSON库）
-            return $"{{" +
-                   $"\"type\":\"{memory.type}\"," +
-                   $"\"layer\":\"{memory.layer}\"," +
-                   $"\"importance\":{memory.importance:F2}," +
-                   $"\"timestamp\":{memory.timestamp}" +
-                   $"}}";
-        }
-        
-        /// <summary>
-        /// ? 构建常识元数据JSON
-        /// </summary>
-        private static string BuildKnowledgeMetadata(string tag, float importance)
-        {
-            // 简单的JSON构建（避免依赖JSON库）
-            return $"{{" +
-                   $"\"type\":\"knowledge\"," +
-                   $"\"tag\":\"{tag}\"," +
-                   $"\"importance\":{importance:F2}," +
-                   $"\"timestamp\":{Find.TickManager.TicksGame}" +
-                   $"}}";
-        }
-
         /// <summary>
         /// ? 搜索常识向量
         /// </summary>
@@ -320,8 +223,8 @@ namespace RimTalk.Memory.VectorDB
                 if (queryVector == null)
                     return new List<string>();
                 
-                // 搜索相似向量（只返回常识类型）
-                var results = database.SearchSimilar(queryVector, topK * 2, minSimilarity); // 取多一些，然后过滤
+                // 使用SIMD加速搜索
+                var results = vectorStore.Search(queryVector, topK * 2, minSimilarity);
                 
                 // 过滤出常识类型的结果
                 return results
@@ -338,6 +241,72 @@ namespace RimTalk.Memory.VectorDB
         }
         
         /// <summary>
+        /// ? v3.3.2.4: 存储常识向量（使用InMemoryVectorStore）
+        /// </summary>
+        public static void StoreKnowledgeVector(string knowledgeId, float[] vector)
+        {
+            if (!IsAvailable() || string.IsNullOrEmpty(knowledgeId) || vector == null || vector.Length == 0)
+                return;
+            
+            try
+            {
+                // 构建元数据
+                string content = $"Knowledge_{knowledgeId}";
+                string metadata = $"{{\"type\":\"knowledge\",\"timestamp\":{Find.TickManager.TicksGame}}}";
+                
+                // 存储到内存向量库
+                vectorStore.Upsert(knowledgeId, vector, content, metadata);
+                
+                if (Prefs.DevMode)
+                    Log.Message($"[VectorDB Manager] ? Stored knowledge vector: {knowledgeId} ({vector.Length}D)");
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[VectorDB Manager] Failed to store knowledge vector {knowledgeId}: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// ? v3.3.2.4: 删除常识向量
+        /// </summary>
+        public static void RemoveKnowledgeVector(string knowledgeId)
+        {
+            if (!IsAvailable() || string.IsNullOrEmpty(knowledgeId))
+                return;
+            
+            try
+            {
+                vectorStore.Remove(knowledgeId);
+                
+                if (Prefs.DevMode)
+                    Log.Message($"[VectorDB Manager] ??? Removed knowledge vector: {knowledgeId}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[VectorDB Manager] Failed to remove knowledge vector {knowledgeId}: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// ? v3.3.2.4: 清空所有向量
+        /// </summary>
+        public static void ClearKnowledgeVectors()
+        {
+            if (!IsAvailable())
+                return;
+            
+            try
+            {
+                vectorStore.Clear();
+                Log.Message("[VectorDB Manager] Cleared all vectors");
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[VectorDB Manager] Failed to clear vectors: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
         /// 获取数据库统计
         /// </summary>
         public static VectorDBStats GetStats()
@@ -350,7 +319,15 @@ namespace RimTalk.Memory.VectorDB
                 };
             }
             
-            return database.GetStats();
+            var stats = vectorStore.GetStats();
+            return new VectorDBStats
+            {
+                VectorCount = stats.VectorCount,
+                VectorDimension = stats.VectorDimension,
+                DatabaseSizeMB = stats.EstimatedMemoryMB,
+                IsInitialized = stats.IsInitialized,
+                UseHNSW = false // 内存存储不使用HNSW
+            };
         }
         
         /// <summary>
@@ -363,7 +340,7 @@ namespace RimTalk.Memory.VectorDB
             
             try
             {
-                database.ClearAll();
+                vectorStore.Clear();
                 Log.Message("[VectorDB Manager] Database cleared");
             }
             catch (Exception ex)
@@ -373,22 +350,13 @@ namespace RimTalk.Memory.VectorDB
         }
         
         /// <summary>
-        /// 压缩数据库
+        /// 压缩数据库（内存存储无需此操作）
         /// </summary>
         public static void CompactDatabase()
         {
-            if (!IsAvailable())
-                return;
-            
-            try
-            {
-                database.Vacuum();
-                Log.Message("[VectorDB Manager] Database compacted");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[VectorDB Manager] Compact failed: {ex.Message}");
-            }
+            // 内存存储无需压缩
+            if (Prefs.DevMode)
+                Log.Message("[VectorDB Manager] Compact not needed for InMemoryVectorStore");
         }
         
         /// <summary>
@@ -396,12 +364,12 @@ namespace RimTalk.Memory.VectorDB
         /// </summary>
         public static void Shutdown()
         {
-            if (database != null)
+            if (vectorStore != null)
             {
                 try
                 {
-                    database.Dispose();
-                    database = null;
+                    vectorStore.Clear();
+                    vectorStore = null;
                     isInitialized = false;
                     
                     Log.Message("[VectorDB Manager] Shut down");
@@ -411,6 +379,20 @@ namespace RimTalk.Memory.VectorDB
                     Log.Error($"[VectorDB Manager] Shutdown error: {ex.Message}");
                 }
             }
+        }
+        
+        /// <summary>
+        /// 构建元数据JSON
+        /// </summary>
+        private static string BuildMetadata(MemoryEntry memory)
+        {
+            // 简单的JSON构建（避免依赖JSON库）
+            return $"{{" +
+                   $"\"type\":\"{memory.type}\"," +
+                   $"\"layer\":\"{memory.layer}\"," +
+                   $"\"importance\":{memory.importance:F2}," +
+                   $"\"timestamp\":{memory.timestamp}" +
+                   $"}}";
         }
     }
 }

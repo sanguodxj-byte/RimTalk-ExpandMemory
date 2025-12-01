@@ -11,6 +11,10 @@ namespace RimTalk.MemoryPatch
         public RimTalkMemoryPatchMod(ModContentPack content) : base(content)
         {
             Settings = GetSettings<RimTalkMemoryPatchSettings>();
+            
+            // ⭐ v3.3.2.5: 强制预注册关键类型，确保旧存档兼容性
+            Memory.BackCompatibilityFix.ForceInitialize();
+            
             var harmony = new Harmony("cj.rimtalk.expandmemory");
             harmony.PatchAll();
             Log.Message("[RimTalk-Expand Memory] Loaded successfully");

@@ -623,7 +623,16 @@ namespace RimTalk.MemoryPatch
         /// </summary>
         private void DrawAIConfigSettings(Listing_Standard listing)
         {
+            bool previousUseRimTalk = useRimTalkAIConfig;
+            string previousProvider = independentProvider;
+            
             listing.CheckboxLabeled("RimTalk_Settings_PreferRimTalkAI".Translate(), ref useRimTalkAIConfig);
+            
+            // ⭐ 检测设置变更，触发重新初始化
+            if (previousUseRimTalk != useRimTalkAIConfig)
+            {
+                RimTalk.Memory.AI.IndependentAISummarizer.ForceReinitialize();
+            }
             
             // ⭐ 优化提示，说明跟随逻辑
             GUI.color = new Color(0.8f, 0.9f, 1f);
@@ -696,10 +705,24 @@ namespace RimTalk.MemoryPatch
                 independentModel = "gemini-pro";
             }
             
+            // ⭐ 检测Provider变更
+            if (previousProvider != independentProvider)
+            {
+                RimTalk.Memory.AI.IndependentAISummarizer.ForceReinitialize();
+            }
+            
             listing.Gap();
+            
+            string previousApiKey = independentApiKey;
             
             listing.Label("RimTalk_Settings_APIKey".Translate());
             independentApiKey = listing.TextEntry(independentApiKey);
+            
+            // ⭐ API Key变更时重新初始化
+            if (previousApiKey != independentApiKey)
+            {
+                RimTalk.Memory.AI.IndependentAISummarizer.ForceReinitialize();
+            }
             
             // ⭐ 添加API Key格式验证提示
             if (!string.IsNullOrEmpty(independentApiKey))
