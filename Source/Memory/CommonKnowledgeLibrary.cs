@@ -899,6 +899,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 提取上下文关键词（超级引擎版）
         /// ⭐ v3.3.2.25: 使用SuperKeywordEngine替代滑动窗口分词
+        /// ⭐ v3.3.2.28: 强制输出日志用于诊断常识匹配问题
         /// </summary>
         private List<string> ExtractContextKeywords(string text)
         {
@@ -911,19 +912,22 @@ namespace RimTalk.Memory
             {
                 text = text.Substring(0, MAX_TEXT_LENGTH);
                 
-                if (Prefs.DevMode)
-                {
-                    Log.Message($"[Knowledge] Context text truncated to {MAX_TEXT_LENGTH} chars for performance");
-                }
+                Log.Message($"[Knowledge] Context text truncated to {MAX_TEXT_LENGTH} chars for performance");
             }
 
             // ⭐ 使用超级关键词引擎（TF-IDF + N-gram + 权重排序）
             var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 100);
             
-            if (Prefs.DevMode && weightedKeywords.Count > 0)
+            // ⭐ v3.3.2.28: 强制输出日志（移除DevMode检查）
+            if (weightedKeywords.Count > 0)
             {
-                Log.Message($"[Knowledge] SuperKeywordEngine extracted {weightedKeywords.Count} keywords");
-                Log.Message($"[Knowledge] Top 5: {string.Join(", ", weightedKeywords.Take(5).Select(kw => $"{kw.Word}({kw.Weight:F2})"))}");
+                Log.Message($"[Knowledge] SuperKeywordEngine extracted {weightedKeywords.Count} keywords from context");
+                Log.Message($"[Knowledge] Context: \"{text.Substring(0, Math.Min(100, text.Length))}...\"");
+                Log.Message($"[Knowledge] Top 10 keywords: {string.Join(", ", weightedKeywords.Take(10).Select(kw => $"{kw.Word}({kw.Weight:F2})"))}");
+            }
+            else
+            {
+                Log.Warning($"[Knowledge] ⚠️ SuperKeywordEngine extracted 0 keywords from context: \"{text}\"");
             }
             
             // 返回关键词列表（已按权重排序，高权重在前）

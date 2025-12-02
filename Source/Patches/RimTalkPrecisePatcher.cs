@@ -171,6 +171,7 @@ namespace RimTalk.Memory.Patches
         /// <summary>
         /// Postfix for BuildContext - 在构建上下文后添加记忆
         /// ⭐ v3.0: 使用智能注入管理器（高级评分系统）
+        /// ⭐ v3.3.2.28: 添加强制日志，诊断常识注入问题
         /// </summary>
         private static void BuildContext_Postfix(ref string __result, List<Pawn> pawns)
         {
@@ -197,15 +198,27 @@ namespace RimTalk.Memory.Patches
                 // ⭐ v3.0: 主动记忆召回（实验性功能）
                 string proactiveRecall = ProactiveMemoryRecall.TryRecallMemory(mainPawn, __result, targetPawn);
                 
+                // ⭐ v3.3.2.28: 强制日志 - 确认注入内容
+                if (!string.IsNullOrEmpty(injectedContext))
+                {
+                    Log.Message($"[BuildContext] ✅ Injected context for {mainPawn.LabelShort}:");
+                    Log.Message($"[BuildContext] Original length: {__result.Length} chars");
+                    Log.Message($"[BuildContext] Injected length: {injectedContext.Length} chars");
+                    Log.Message($"[BuildContext] Injected content preview: {injectedContext.Substring(0, Math.Min(200, injectedContext.Length))}...");
+                }
+                else
+                {
+                    Log.Warning($"[BuildContext] ⚠️ No content injected for {mainPawn.LabelShort}");
+                }
+                
                 // 合并注入内容
                 if (!string.IsNullOrEmpty(injectedContext))
                 {
                     __result = __result + "\n\n" + injectedContext;
                     
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message($"[Smart Injection] Injected context for {mainPawn.LabelShort}");
-                    }
+                    // ⭐ v3.3.2.28: 确认最终结果
+                    Log.Message($"[BuildContext] Final __result length: {__result.Length} chars");
+                    Log.Message($"[BuildContext] Final content contains knowledge: {__result.Contains("World Knowledge")}");
                 }
                 
                 // 如果触发主动召回，追加到末尾
@@ -223,6 +236,7 @@ namespace RimTalk.Memory.Patches
         /// <summary>
         /// Postfix for DecoratePrompt - 在装饰提示词后添加记忆
         /// ⭐ v3.0: 使用智能注入管理器（高级评分系统）
+        /// ⭐ v3.3.2.28: 添强化日志，诊断常识注入问题
         /// </summary>
         private static void DecoratePrompt_Postfix(object talkRequest, List<Pawn> pawns)
         {
@@ -261,6 +275,19 @@ namespace RimTalk.Memory.Patches
                 // ⭐ v3.0: 主动记忆召回（实验性功能）
                 string proactiveRecall = ProactiveMemoryRecall.TryRecallMemory(mainPawn, currentPrompt, targetPawn);
                 
+                // ⭐ v3.3.2.28: 强制日志 - 确认注入内容
+                if (!string.IsNullOrEmpty(injectedContext))
+                {
+                    Log.Message($"[DecoratePrompt] ✅ Enhanced prompt for {mainPawn.LabelShort}");
+                    Log.Message($"[DecoratePrompt] Original length: {currentPrompt.Length} chars");
+                    Log.Message($"[DecoratePrompt] Injected length: {injectedContext.Length} chars");
+                    Log.Message($"[DecoratePrompt] Injected content preview: {injectedContext.Substring(0, Math.Min(200, injectedContext.Length))}...");
+                }
+                else
+                {
+                    Log.Warning($"[DecoratePrompt] ⚠️ No content injected for {mainPawn.LabelShort}");
+                }
+                
                 // 合并注入内容
                 string enhancedPrompt = currentPrompt;
                 
@@ -279,10 +306,12 @@ namespace RimTalk.Memory.Patches
                 {
                     promptProperty.SetValue(talkRequest, enhancedPrompt);
                     
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message($"[Smart Injection] Enhanced prompt for {mainPawn.LabelShort}");
-                    }
+                    // ⭐ v3.3.2.28: 确认最终提示词
+                    Log.Message($"[DecoratePrompt] Final prompt length: {enhancedPrompt.Length} chars");
+                    Log.Message($"[DecoratePrompt] Final prompt contains knowledge: {enhancedPrompt.Contains("World Knowledge")}");
+                    
+                    // ⭐ v3.3.2.28: 输出完整的最终提示词（前500字符）
+                    Log.Message($"[DecoratePrompt] Final prompt preview:\n{enhancedPrompt.Substring(0, Math.Min(500, enhancedPrompt.Length))}...");
                 }
             }
             catch (Exception ex)

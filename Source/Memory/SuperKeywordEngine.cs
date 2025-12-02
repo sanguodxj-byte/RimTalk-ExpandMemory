@@ -40,7 +40,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 超级关键词提取（优化版）
-        /// ? v3.3.2.27: 过滤3字母以下的无意义词汇，上限提升到100
+        /// ? v3.3.2.28: 修复英文单词被切割的问题，使用智能分词
         /// </summary>
         public static List<WeightedKeyword> ExtractKeywords(string text, int maxKeywords = 100)
         {
@@ -54,38 +54,11 @@ namespace RimTalk.Memory
 
             var keywordScores = new Dictionary<string, KeywordScore>();
 
-            // 1. 多长度分词（2-6字，精确模式）
-            for (int length = 2; length <= 6; length++)
-            {
-                for (int i = 0; i <= text.Length - length; i++)
-                {
-                    string word = text.Substring(i, length);
-                    
-                    // 过滤纯符号和空白
-                    if (!word.Any(c => char.IsLetterOrDigit(c)))
-                        continue;
-                    
-                    // ? v3.3.2.27: 过滤3字母以下的纯英文无意义词汇
-                    if (IsLowQualityKeyword(word))
-                        continue;
-                    
-                    // 停用词过滤
-                    if (StopWords.Contains(word))
-                        continue;
+            // ? v3.3.2.28: 先提取英文单词（完整单词，不切割）
+            ExtractEnglishWords(text, keywordScores);
 
-                    if (!keywordScores.ContainsKey(word))
-                    {
-                        keywordScores[word] = new KeywordScore
-                        {
-                            Word = word,
-                            Length = length,
-                            FirstPosition = i
-                        };
-                    }
-                    
-                    keywordScores[word].Frequency++;
-                }
-            }
+            // ? v3.3.2.28: 再提取中文词组（2-6字滑动窗口）
+            ExtractChineseWords(text, keywordScores);
 
             // 2. 计算TF-IDF权重
             int totalWords = keywordScores.Values.Sum(s => s.Frequency);
@@ -123,46 +96,91 @@ namespace RimTalk.Memory
                 .Select(s => new WeightedKeyword { Word = s.Word, Weight = s.Weight })
                 .ToList();
         }
-        
+
         /// <summary>
-        /// ? v3.3.2.27: 检测低质量关键词（3字母以下的纯英文/无意义词汇）
+        /// ? v3.3.2.28: 提取英文单词（完整单词，不切割）
         /// </summary>
-        private static bool IsLowQualityKeyword(string word)
+        private static void ExtractEnglishWords(string text, Dictionary<string, KeywordScore> keywordScores)
         {
-            if (string.IsNullOrEmpty(word))
-                return true;
+            // 使用正则表达式提取完整的英文单词（2个字母以上）
+            var matches = System.Text.RegularExpressions.Regex.Matches(text, @"\b[a-zA-Z]{2,}\b");
             
-            // 规则1：纯数字（1-2位）过滤
-            if (word.Length <= 2 && word.All(char.IsDigit))
-                return true;
-            
-            // 规则2：3字母以下的纯英文单词过滤（例如："the", "is", "of", "to", "and"等）
-            if (word.Length <= 3 && word.All(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
+            foreach (System.Text.RegularExpressions.Match match in matches)
             {
-                // 例外：保留常见的重要英文缩写
-                var importantAbbreviations = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                string word = match.Value;
+                int position = match.Index;
+                
+                // 过滤低质量关键词
+                if (IsLowQualityKeyword(word))
+                    continue;
+                
+                // 停用词过滤
+                if (StopWords.Contains(word.ToLower()))
+                    continue;
+
+                if (!keywordScores.ContainsKey(word))
                 {
-                    "AI", "HP", "DPS", "XP", "UI", "API", "CPU", "GPU", "RAM", "SSD"
-                };
+                    keywordScores[word] = new KeywordScore
+                    {
+                        Word = word,
+                        Length = word.Length,
+                        FirstPosition = position
+                    };
+                }
                 
-                if (!importantAbbreviations.Contains(word))
-                    return true;
+                keywordScores[word].Frequency++;
             }
-            
-            // 规则3：2字符的无意义组合过滤（例如："1a", "x2", "3b"）
-            if (word.Length == 2)
+        }
+
+        /// <summary>
+        /// ? v3.3.2.28: 提取中文词组（2-6字滑动窗口）
+        /// </summary>
+        private static void ExtractChineseWords(string text, Dictionary<string, KeywordScore> keywordScores)
+        {
+            // 只对中文字符使用滑动窗口
+            for (int length = 2; length <= 6; length++)
             {
-                bool hasDigit = word.Any(char.IsDigit);
-                bool hasLetter = word.Any(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
-                
-                // 数字+字母的2字符组合通常无意义
-                if (hasDigit && hasLetter)
+                for (int i = 0; i <= text.Length - length; i++)
+                {
+                    string word = text.Substring(i, length);
+                    
+                    // 只提取包含中文字符的词组
+                    if (!ContainsChinese(word))
+                        continue;
+                    
+                    // 停用词过滤
+                    if (StopWords.Contains(word))
+                        continue;
+
+                    if (!keywordScores.ContainsKey(word))
+                    {
+                        keywordScores[word] = new KeywordScore
+                        {
+                            Word = word,
+                            Length = length,
+                            FirstPosition = i
+                        };
+                    }
+                    
+                    keywordScores[word].Frequency++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// ? v3.3.2.28: 检查字符串是否包含中文字符
+        /// </summary>
+        private static bool ContainsChinese(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+            
+            foreach (char c in text)
+            {
+                // 中文字符Unicode范围：\u4e00-\u9fa5
+                if (c >= 0x4e00 && c <= 0x9fa5)
                     return true;
             }
-            
-            // 规则4：纯符号（不应该出现，但做兜底检查）
-            if (word.All(c => !char.IsLetterOrDigit(c)))
-                return true;
             
             return false;
         }
@@ -243,6 +261,63 @@ namespace RimTalk.Memory
             }
 
             return d[n, m];
+        }
+
+        /// <summary>
+        /// ? v3.3.2.28: 检测低质量关键词（增强版，过滤英文碎片和后缀）
+        /// </summary>
+        private static bool IsLowQualityKeyword(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return true;
+            
+            // 规则1：纯数字（1-2位）过滤
+            if (word.Length <= 2 && word.All(char.IsDigit))
+                return true;
+            
+            // 规则2：3字母以下的纯英文单词过滤（例如："the", "is", "of", "to", "and"等）
+            if (word.Length <= 3 && word.All(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
+            {
+                // 例外：保留常见的重要英文缩写
+                var importantAbbreviations = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "AI", "HP", "DPS", "XP", "UI", "API", "CPU", "GPU", "RAM", "SSD"
+                };
+                
+                if (!importantAbbreviations.Contains(word))
+                    return true;
+            }
+            
+            // ? v3.3.2.28: 规则3：过滤常见的无意义英文后缀/前缀
+            var meaninglessSuffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "tion", "ment", "ing", "ed", "er", "ly", "ness", "ity", "able", "ible",
+                "al", "ful", "less", "ous", "ive", "ant", "ent", "ism", "ist", "ship"
+            };
+            
+            if (word.Length <= 4 && meaninglessSuffixes.Contains(word))
+                return true;
+            
+            // 规则4：2字符的无意义组合过滤（例如："1a", "x2", "3b"）
+            if (word.Length == 2)
+            {
+                bool hasDigit = word.Any(char.IsDigit);
+                bool hasLetter = word.Any(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+                
+                // 数字+字母的2字符组合通常无意义
+                if (hasDigit && hasLetter)
+                    return true;
+            }
+            
+            // 规则5：纯符号（不应该出现，但做兜底检查）
+            if (word.All(c => !char.IsLetterOrDigit(c)))
+                return true;
+            
+            // ? v3.3.2.28: 规则6：过滤包含空格的单字符（例如：" c", " r"）
+            if (word.Trim().Length == 1)
+                return true;
+            
+            return false;
         }
     }
 
