@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Verse;
+using RimWorld; // ⭐ v3.3.3: 添加RimWorld命名空间（用于GenDate）
 
 namespace RimTalk.Memory
 {
@@ -22,6 +23,10 @@ namespace RimTalk.Memory
         // ⭐ 新增：目标Pawn限制（用于角色专属常识）
         public int targetPawnId = -1;  // -1表示全局，否则只对特定Pawn有效
         
+        // ⭐ v3.3.3: 新增创建时间戳和原始事件文本（用于动态更新时间前缀）
+        public int creationTick = -1;       // -1表示永久，>=0表示创建时的游戏tick
+        public string originalEventText = "";  // 保存不带时间前缀的原始事件文本
+        
         private List<string> cachedTags; // 缓存分割后的标签列表
 
         public CommonKnowledgeEntry()
@@ -31,6 +36,8 @@ namespace RimTalk.Memory
             isEnabled = true;
             importance = 0.5f;
             targetPawnId = -1; // 默认全局
+            creationTick = -1; // 默认永久
+            originalEventText = "";
         }
 
         public CommonKnowledgeEntry(string tag, string content) : this()
@@ -47,14 +54,112 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref importance, "importance", 0.5f);
             Scribe_Values.Look(ref isEnabled, "isEnabled", true);
             Scribe_Values.Look(ref isUserEdited, "isUserEdited", false);
-            Scribe_Values.Look(ref targetPawnId, "targetPawnId", -1); // ⭐ 新增序列化
+            Scribe_Values.Look(ref targetPawnId, "targetPawnId", -1); // ⭐ 序列化专属Pawn ID
+            Scribe_Values.Look(ref creationTick, "creationTick", -1); // ⭐ v3.3.3: 序列化创建时间
+            Scribe_Values.Look(ref originalEventText, "originalEventText", ""); // ⭐ v3.3.3: 序列化原始事件文本
             Scribe_Collections.Look(ref keywords, "keywords", LookMode.Value);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (keywords == null) keywords = new List<string>();
                 cachedTags = null; // 清除缓存，强制重新解析
+                
+                // ⭐ v3.3.3: 兼容旧存档 - 如果没有originalEventText，从content中提取
+                if (string.IsNullOrEmpty(originalEventText) && !string.IsNullOrEmpty(content))
+                {
+                    // 尝试移除时间前缀（"今天"、"3天前"等）
+                    originalEventText = RemoveTimePrefix(content);
+                }
             }
+        }
+        
+        /// <summary>
+        /// ⭐ v3.3.3: 移除时间前缀，提取原始事件文本
+        /// </summary>
+        private static string RemoveTimePrefix(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            
+            // 移除常见的时间前缀
+            string[] timePrefixes = { "今天", "1天前", "2天前", "3天前", "4天前", "5天前", "6天前", 
+                                     "约3天前", "约4天前", "约5天前", "约6天前", "约7天前" };
+            
+            foreach (var prefix in timePrefixes)
+            {
+                if (text.StartsWith(prefix))
+                {
+                    return text.Substring(prefix.Length);
+                }
+            }
+            
+            return text;
+        }
+        
+        /// <summary>
+        /// ⭐ v3.3.3: 更新事件常识的时间前缀
+        /// </summary>
+        public void UpdateEventTimePrefix(int currentTick)
+        {
+            // 只更新带时间戳的事件常识
+            if (creationTick < 0 || string.IsNullOrEmpty(originalEventText))
+                return;
+            
+            // 如果被用户编辑过，不自动更新（保护用户修改）
+            if (isUserEdited)
+                return;
+            
+            // 计算时间差
+            int ticksElapsed = currentTick - creationTick;
+            int daysElapsed = ticksElapsed / GenDate.TicksPerDay;
+            
+            // 生成新的时间前缀
+            string timePrefix = "";
+            if (daysElapsed < 1)
+            {
+                timePrefix = "今天";
+            }
+            else if (daysElapsed == 1)
+            {
+                timePrefix = "1天前";
+            }
+            else if (daysElapsed == 2)
+            {
+                timePrefix = "2天前";
+            }
+            else if (daysElapsed < 7)
+            {
+                timePrefix = $"约{daysElapsed}天前";
+            }
+            else
+            {
+                // 超过7天，不再更新时间（保持"约7天前"）
+                timePrefix = "约7天前";
+            }
+            
+            // 更新content
+            content = timePrefix + originalEventText;
+        }
+
+        /// <summary>
+        /// ⭐ v3.3.3: 检查常识是否已过期（超过7天）
+        /// </summary>
+        public bool IsExpired()
+        {
+            // 如果没有创建时间戳，表示永久有效
+            if (creationTick < 0)
+                return false;
+            
+            // 如果被用户编辑过，不会过期（保护用户修改）
+            if (isUserEdited)
+                return false;
+            
+            // 检查是否超过7天
+            int currentTick = Find.TickManager?.TicksGame ?? 0;
+            int ticksElapsed = currentTick - creationTick;
+            int daysElapsed = ticksElapsed / GenDate.TicksPerDay;
+            
+            return daysElapsed >= 7;
         }
 
         /// <summary>

@@ -85,6 +85,9 @@ namespace RimTalk.Memory
                 if (library == null)
                     return;
                 
+                // ? v3.3.3: 先更新已有事件常识的时间前缀
+                UpdateEventKnowledgeTimePrefix(library);
+                
                 int processedCount = 0;
                 int currentTick = Find.TickManager.TicksGame;
                 
@@ -133,12 +136,17 @@ namespace RimTalk.Memory
                                 // 计算重要性
                                 float importance = CalculateImportance(eventText);
                                 
-                                // ? 创建全局常识（targetPawnId保持默认-1）
+                                // ? v3.3.3: 提取原始事件文本（移除时间前缀）
+                                string originalText = ExtractOriginalEventText(eventText);
+                                
+                                // ? v3.3.3: 创建事件常识，保存创建时间和原始文本
                                 var entry = new CommonKnowledgeEntry("事件,历史", eventText)
                                 {
                                     importance = importance,
                                     isEnabled = true,
-                                    isUserEdited = false
+                                    isUserEdited = false,
+                                    creationTick = currentTick,           // ? 设置创建时间戳
+                                    originalEventText = originalText      // ? 保存原始文本
                                     // targetPawnId = -1 (默认全局)
                                 };
                                 
@@ -148,7 +156,7 @@ namespace RimTalk.Memory
                                 // ? v3.3.2: 减少日志量 - 仅DevMode且10%概率
                                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                                 {
-                                    Log.Message($"[EventRecord] Created global event knowledge: {eventText.Substring(0, Math.Min(50, eventText.Length))}...");
+                                    Log.Message($"[EventRecord] Created event knowledge: {eventText.Substring(0, Math.Min(50, eventText.Length))}...");
                                 }
                             }
                         }
@@ -350,7 +358,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// 清理过期记录（维护性能）
+        /// 用于清理记录和维护性能
         /// </summary>
         public static void CleanupProcessedRecords()
         {
@@ -363,6 +371,67 @@ namespace RimTalk.Memory
                     processedLogIDs.Remove(id);
                 }
             }
+        }
+        
+        /// <summary>
+        /// ? v3.3.3: 更新事件常识的时间前缀（动态更新"今天" → "3天前"）
+        /// </summary>
+        private static void UpdateEventKnowledgeTimePrefix(CommonKnowledgeLibrary library)
+        {
+            if (library == null)
+                return;
+            
+            try
+            {
+                int currentTick = Find.TickManager.TicksGame;
+                int updatedCount = 0;
+                
+                // 查找所有事件常识
+                var eventEntries = library.Entries
+                    .Where(e => e.tag != null && (e.tag.Contains("事件") || e.tag.Contains("历史")))
+                    .Where(e => e.creationTick >= 0) // 只更新有时间戳的
+                    .ToList();
+                
+                foreach (var entry in eventEntries)
+                {
+                    // 更新时间前缀
+                    entry.UpdateEventTimePrefix(currentTick);
+                    updatedCount++;
+                }
+                
+                // ? 日志：记录更新操作（仅DevMode且低频率）
+                if (updatedCount > 0 && Prefs.DevMode && UnityEngine.Random.value < 0.05f)
+                {
+                    Log.Message($"[EventRecord] Updated time prefix for {updatedCount} event knowledge entries");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[EventRecord] Error updating event time prefix: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// ? v3.3.3: 从带时间前缀的事件文本中提取原始文本
+        /// </summary>
+        private static string ExtractOriginalEventText(string eventText)
+        {
+            if (string.IsNullOrEmpty(eventText))
+                return eventText;
+            
+            // 移除常见的时间前缀
+            string[] timePrefixes = { "今天", "1天前", "2天前", "3天前", "4天前", "5天前", "6天前",
+                                     "约3天前", "约4天前", "约5天前", "约6天前", "约7天前" };
+            
+            foreach (var prefix in timePrefixes)
+            {
+                if (eventText.StartsWith(prefix))
+                {
+                    return eventText.Substring(prefix.Length);
+                }
+            }
+            
+            return eventText;
         }
     }
 }

@@ -1,0 +1,141 @@
+[1mdiff --git a/Source/Memory/CommonKnowledgeLibrary.cs b/Source/Memory/CommonKnowledgeLibrary.cs[m
+[1mindex 8ad6551..95429e8 100644[m
+[1m--- a/Source/Memory/CommonKnowledgeLibrary.cs[m
+[1m+++ b/Source/Memory/CommonKnowledgeLibrary.cs[m
+[36m@@ -22,6 +22,9 @@[m [mnamespace RimTalk.Memory[m
+         // â­ æ–°å¢ï¼šç›®æ ‡Pawné™åˆ¶ï¼ˆç”¨äºè§’è‰²ä¸“å±å¸¸è¯†ï¼‰[m
+         public int targetPawnId = -1;  // -1è¡¨ç¤ºå…¨å±€ï¼Œå¦åˆ™åªå¯¹ç‰¹å®šPawnæœ‰æ•ˆ[m
+         [m
+[32m+[m[32m        // â­ v3.3.3: æ–°å¢åˆ›å»ºæ—¶é—´æˆ³ï¼ˆç”¨äºäº‹ä»¶å¸¸è¯†è¿‡æœŸæ£€æŸ¥ï¼‰[m
+[32m+[m[32m        public int creationTick = -1;  // -1è¡¨ç¤ºæ°¸ä¹…ï¼Œ>=0è¡¨ç¤ºåˆ›å»ºæ—¶çš„æ¸¸æˆtick[m
+[32m+[m[41m        [m
+         private List<string> cachedTags; // ç¼“å­˜åˆ†å‰²åçš„æ ‡ç­¾åˆ—è¡¨[m
+ [m
+         public CommonKnowledgeEntry()[m
+[36m@@ -31,6 +34,7 @@[m [mnamespace RimTalk.Memory[m
+             isEnabled = true;[m
+             importance = 0.5f;[m
+             targetPawnId = -1; // é»˜è®¤å…¨å±€[m
+[32m+[m[32m            creationTick = -1; // é»˜è®¤æ°¸ä¹…[m
+         }[m
+ [m
+         public CommonKnowledgeEntry(string tag, string content) : this()[m
+[36m@@ -47,7 +51,8 @@[m [mnamespace RimTalk.Memory[m
+             Scribe_Values.Look(ref importance, "importance", 0.5f);[m
+             Scribe_Values.Look(ref isEnabled, "isEnabled", true);[m
+             Scribe_Values.Look(ref isUserEdited, "isUserEdited", false);[m
+[31m-            Scribe_Values.Look(ref targetPawnId, "targetPawnId", -1); // â­ æ–°å¢åºåˆ—åŒ–[m
+[32m+[m[32m            Scribe_Values.Look(ref targetPawnId, "targetPawnId", -1); // â­ åºåˆ—åŒ–ä¸“å±Pawn ID[m
+[32m+[m[32m            Scribe_Values.Look(ref creationTick, "creationTick", -1); // â­ v3.3.3: åºåˆ—åŒ–åˆ›å»ºæ—¶é—´[m
+             Scribe_Collections.Look(ref keywords, "keywords", LookMode.Value);[m
+ [m
+             if (Scribe.mode == LoadSaveMode.PostLoadInit)[m
+[36m@@ -56,6 +61,27 @@[m [mnamespace RimTalk.Memory[m
+                 cachedTags = null; // æ¸…é™¤ç¼“å­˜ï¼Œå¼ºåˆ¶é‡æ–°è§£æ[m
+             }[m
+         }[m
+[32m+[m[41m        [m
+[32m+[m[32m        /// <summary>[m
+[32m+[m[32m        /// â­ v3.3.3: æ£€æŸ¥å¸¸è¯†æ˜¯å¦å·²è¿‡æœŸï¼ˆè¶…è¿‡7å¤©ï¼‰[m
+[32m+[m[32m        /// </summary>[m
+[32m+[m[32m        public bool IsExpired()[m
+[32m+[m[32m        {[m
+[32m+[m[32m            // å¦‚æœæ²¡æœ‰åˆ›å»ºæ—¶é—´æˆ³ï¼Œè¡¨ç¤ºæ°¸ä¹…æœ‰æ•ˆ[m
+[32m+[m[32m            if (creationTick < 0)[m
+[32m+[m[32m                return false;[m
+[32m+[m[41m            [m
+[32m+[m[32m            // å¦‚æœè¢«ç”¨æˆ·ç¼–è¾‘è¿‡ï¼Œä¸ä¼šè¿‡æœŸï¼ˆä¿æŠ¤ç”¨æˆ·ä¿®æ”¹ï¼‰[m
+[32m+[m[32m            if (isUserEdited)[m
+[32m+[m[32m                return false;[m
+[32m+[m[41m            [m
+[32m+[m[32m            // æ£€æŸ¥æ˜¯å¦è¶…è¿‡7å¤©[m
+[32m+[m[32m            int currentTick = Find.TickManager?.TicksGame ?? 0;[m
+[32m+[m[32m            int ticksElapsed = currentTick - creationTick;[m
+[32m+[m[32m            int daysElapsed = ticksElapsed / GenDate.TicksPerDay;[m
+[32m+[m[41m            [m
+[32m+[m[32m            return daysElapsed >= 7;[m
+[32m+[m[32m        }[m
+ [m
+         /// <summary>[m
+         /// è·å–æ ‡ç­¾åˆ—è¡¨ï¼ˆæ”¯æŒé€—å·åˆ†éš”ï¼‰[m
+[1mdiff --git a/Source/Memory/EventRecordKnowledgeGenerator.cs b/Source/Memory/EventRecordKnowledgeGenerator.cs[m
+[1mindex 5dd952c..71743f8 100644[m
+[1m--- a/Source/Memory/EventRecordKnowledgeGenerator.cs[m
+[1m+++ b/Source/Memory/EventRecordKnowledgeGenerator.cs[m
+[36m@@ -85,6 +85,9 @@[m [mnamespace RimTalk.Memory[m
+                 if (library == null)[m
+                     return;[m
+                 [m
+[32m+[m[32m                // ? v3.3.3: ÏÈÇåÀí¹ıÆÚµÄÊÂ¼ş³£Ê¶£¨³¬¹ı7Ìì£©[m
+[32m+[m[32m                CleanupExpiredEventKnowledge(library);[m
+[32m+[m[41m                [m
+                 int processedCount = 0;[m
+                 int currentTick = Find.TickManager.TicksGame;[m
+                 [m
+[36m@@ -133,12 +136,13 @@[m [mnamespace RimTalk.Memory[m
+                                 // ¼ÆËãÖØÒªĞÔ[m
+                                 float importance = CalculateImportance(eventText);[m
+                                 [m
+[31m-                                // ? ´´½¨È«¾Ö³£Ê¶£¨targetPawnId±£³ÖÄ¬ÈÏ-1£©[m
+[32m+[m[32m                                // ? v3.3.3: ´´½¨ÊÂ¼ş³£Ê¶£¬ÉèÖÃ´´½¨Ê±¼ä´Á£¨ÓÃÓÚ¹ıÆÚ¼ì²é£©[m
+                                 var entry = new CommonKnowledgeEntry("ÊÂ¼ş,ÀúÊ·", eventText)[m
+                                 {[m
+                                     importance = importance,[m
+                                     isEnabled = true,[m
+[31m-                                    isUserEdited = false[m
+[32m+[m[32m                                    isUserEdited = false,[m
+[32m+[m[32m                                    creationTick = currentTick  // ? ÉèÖÃ´´½¨Ê±¼ä´Á[m
+                                     // targetPawnId = -1 (Ä¬ÈÏÈ«¾Ö)[m
+                                 };[m
+                                 [m
+[36m@@ -350,7 +354,7 @@[m [mnamespace RimTalk.Memory[m
+         }[m
+         [m
+         /// <summary>[m
+[31m-        /// ÇåÀí¹ıÆÚ¼ÇÂ¼£¨Î¬»¤ĞÔÄÜ£©[m
+[32m+[m[32m        /// ÓÃÓÚÇåÀí¼ÇÂ¼ºÍÎ¬»¤ĞÔÄÜ[m
+         /// </summary>[m
+         public static void CleanupProcessedRecords()[m
+         {[m
+[36m@@ -364,5 +368,41 @@[m [mnamespace RimTalk.Memory[m
+                 }[m
+             }[m
+         }[m
+[32m+[m[41m        [m
+[32m+[m[32m        /// <summary>[m
+[32m+[m[32m        /// ? v3.3.3: ÇåÀí¹ıÆÚµÄÊÂ¼ş³£Ê¶£¨³¬¹ı7Ìì£©[m
+[32m+[m[32m        /// </summary>[m
+[32m+[m[32m        private static void CleanupExpiredEventKnowledge(CommonKnowledgeLibrary library)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            if (library == null)[m
+[32m+[m[32m                return;[m
+[32m+[m[41m            [m
+[32m+[m[32m            try[m
+[32m+[m[32m            {[m
+[32m+[m[32m                // ²éÕÒ¹ıÆÚµÄÊÂ¼ş³£Ê¶[m
+[32m+[m[32m                var expiredEntries = library.Entries[m
+[32m+[m[32m                    .Where(e => e.tag != null && (e.tag.Contains("ÊÂ¼ş") || e.tag.Contains("ÀúÊ·")))[m
+[32m+[m[32m                    .Where(e => e.IsExpired())[m
+[32m+[m[32m                    .ToList();[m
+[32m+[m[41m                [m
+[32m+[m[32m                if (expiredEntries.Count > 0)[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    foreach (var entry in expiredEntries)[m
+[32m+[m[32m                    {[m
+[32m+[m[32m                        library.RemoveEntry(entry);[m
+[32m+[m[32m                    }[m
+[32m+[m[41m                    [m
+[32m+[m[32m                    // ? ÈÕÖ¾£º¼ÇÂ¼ÇåÀí²Ù×÷[m
+[32m+[m[32m                    if (Prefs.DevMode)[m
+[32m+[m[32m                    {[m
+[32m+[m[32m                        Log.Message($"[EventRecord] Cleaned up {expiredEntries.Count} expired event knowledge entries (>7 days old)");[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m[32m            }[m
+[32m+[m[32m            catch (Exception ex)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                Log.Error($"[EventRecord] Error cleaning up expired knowledge: {ex.Message}");[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+     }[m
+ }[m
