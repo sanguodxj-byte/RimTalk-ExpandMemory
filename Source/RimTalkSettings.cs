@@ -765,6 +765,42 @@ namespace RimTalk.MemoryPatch
             listing.Label($"  DeepSeek: deepseek-chat, deepseek-coder");
             listing.Label($"  Google: gemini-pro, gemini-1.5-flash");
             GUI.color = Color.white;
+            
+            listing.Gap();
+            listing.GapLine();
+            
+            // ⭐ v3.3.3: 清除API配置按钮
+            GUI.color = new Color(1f, 0.7f, 0.7f);
+            Rect clearButtonRect = listing.GetRect(35f);
+            if (Widgets.ButtonText(clearButtonRect, "🗑️ 清除API配置和缓存"))
+            {
+                Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                    "确定要清除所有API配置和缓存吗？\n\n这将：\n• 清空独立API Key、URL、Model\n• 清除所有AI总结缓存\n• 重置AI服务状态\n\n需要重新配置API才能使用AI总结功能。",
+                    delegate
+                    {
+                        // 清除设置
+                        independentApiKey = "";
+                        independentApiUrl = "";
+                        independentModel = "gpt-3.5-turbo";
+                        independentProvider = "OpenAI";
+                        
+                        // 清除AI服务的配置和缓存
+                        RimTalk.Memory.AI.IndependentAISummarizer.ClearAllConfiguration();
+                        
+                        Messages.Message("✅ API配置和缓存已清除", MessageTypeDefOf.PositiveEvent, false);
+                        Log.Message("[Settings] User cleared API configuration and cache");
+                    },
+                    false,
+                    "清除配置"
+                ));
+            }
+            GUI.color = Color.white;
+            
+            GUI.color = Color.gray;
+            Text.Font = GameFont.Tiny;
+            listing.Label("  ⚠️ 清除后需要重新输入API Key才能使用AI总结功能");
+            Text.Font = GameFont.Small;
+            GUI.color = Color.white;
         }
 
         /// <summary>

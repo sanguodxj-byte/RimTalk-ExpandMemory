@@ -73,6 +73,42 @@ namespace RimTalk.Memory.AI
             Initialize();
         }
         
+        /// <summary>
+        /// ⭐ v3.3.3: 清除所有API配置和缓存
+        /// </summary>
+        public static void ClearAllConfiguration()
+        {
+            // 清除静态变量
+            apiKey = "";
+            apiUrl = "";
+            model = "";
+            provider = "";
+            isInitialized = false;
+            
+            // 清除所有缓存
+            lock (completedSummaries)
+            {
+                completedSummaries.Clear();
+            }
+            
+            lock (pendingSummaries)
+            {
+                pendingSummaries.Clear();
+            }
+            
+            lock (callbackMap)
+            {
+                callbackMap.Clear();
+            }
+            
+            lock (mainThreadActions)
+            {
+                mainThreadActions.Clear();
+            }
+            
+            Log.Message("[AI] 🧹 All API configuration and cache cleared");
+        }
+        
         public static void Initialize()
         {
             // ⭐ 修复：移除isInitialized检查，允许重新初始化
