@@ -142,27 +142,6 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ⭐ v3.3.3: 检查常识是否已过期（超过7天）
-        /// </summary>
-        public bool IsExpired()
-        {
-            // 如果没有创建时间戳，表示永久有效
-            if (creationTick < 0)
-                return false;
-            
-            // 如果被用户编辑过，不会过期（保护用户修改）
-            if (isUserEdited)
-                return false;
-            
-            // 检查是否超过7天
-            int currentTick = Find.TickManager?.TicksGame ?? 0;
-            int ticksElapsed = currentTick - creationTick;
-            int daysElapsed = ticksElapsed / GenDate.TicksPerDay;
-            
-            return daysElapsed >= 7;
-        }
-
-        /// <summary>
         /// 获取标签列表（支持逗号分隔）
         /// </summary>
         public List<string> GetTags()

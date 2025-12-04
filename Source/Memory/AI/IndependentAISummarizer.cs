@@ -88,13 +88,22 @@ namespace RimTalk.Memory.AI
                     // 用户选择跟随RimTalk，尝试加载
                     if (TryLoadFromRimTalk())
                     {
-                        // 成功从RimTalk加载
-                        Log.Message($"[AI] Loaded from RimTalk ({provider}/{model})");
-                        isInitialized = true;
-                        return;
+                        // 成功从RimTalk加载，验证配置
+                        if (ValidateConfiguration())
+                        {
+                            Log.Message($"[AI] ✅ Loaded from RimTalk ({provider}/{model})");
+                            isInitialized = true;
+                            return;
+                        }
+                        else
+                        {
+                            Log.Warning("[AI] ⚠️ RimTalk config invalid, using independent config");
+                        }
                     }
-                    // 如果RimTalk未配置，继续使用独立配置（fallback）
-                    Log.Warning("[AI] RimTalk not configured, using independent config as fallback");
+                    else
+                    {
+                        Log.Warning("[AI] ⚠️ RimTalk not configured, using independent config as fallback");
+                    }
                 }
                 
                 // 使用独立配置（用户主动选择 或 RimTalk未配置）
@@ -120,24 +129,86 @@ namespace RimTalk.Memory.AI
                     }
                 }
                 
-                // 验证配置
-                if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiUrl))
+                // ⭐ 详细验证配置
+                if (!ValidateConfiguration())
                 {
-                    Log.Warning("[AI] Configuration incomplete, using rule-based summary");
-                    isInitialized = false; // ⭐ 标记为未初始化，允许下次重试
+                    isInitialized = false;
                     return;
                 }
                 
-                Log.Message($"[AI] Initialized with independent config ({provider}/{model})");
+                Log.Message($"[AI] ✅ Initialized with independent config ({provider}/{model})");
+                Log.Message($"[AI]    API Key: {SanitizeApiKey(apiKey)}");
+                Log.Message($"[AI]    API URL: {apiUrl}");
                 isInitialized = true;
             }
             catch (Exception ex)
             {
-                Log.Error($"[AI] Init failed: {ex.Message}");
+                Log.Error($"[AI] ❌ Init failed: {ex.Message}");
                 isInitialized = false;
             }
         }
-
+        
+        /// <summary>
+        /// ⭐ v3.3.3: 验证API配置
+        /// </summary>
+        private static bool ValidateConfiguration()
+        {
+            // 检查API Key
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                Log.Error("[AI] ❌ API Key is empty!");
+                Log.Error("[AI]    Please configure in: Options → Mod Settings → RimTalk-Expand Memory → AI配置");
+                return false;
+            }
+            
+            // 检查API Key长度
+            if (apiKey.Length < 20)
+            {
+                Log.Error($"[AI] ❌ API Key too short (length: {apiKey.Length})!");
+                Log.Error("[AI]    Valid API Keys are usually 30+ characters");
+                Log.Error($"[AI]    Your key: {SanitizeApiKey(apiKey)}");
+                return false;
+            }
+            
+            // 检查API Key格式（OpenAI/DeepSeek应该以sk-开头）
+            if ((provider == "OpenAI" || provider == "DeepSeek") && !apiKey.StartsWith("sk-"))
+            {
+                Log.Warning($"[AI] ⚠️ API Key doesn't start with 'sk-' for {provider}");
+                Log.Warning($"[AI]    Your key: {SanitizeApiKey(apiKey)}");
+                Log.Warning("[AI]    This might be incorrect. Check your API Key!");
+            }
+            
+            // 检查API URL
+            if (string.IsNullOrEmpty(apiUrl))
+            {
+                Log.Error("[AI] ❌ API URL is empty!");
+                return false;
+            }
+            
+            // 检查Model
+            if (string.IsNullOrEmpty(model))
+            {
+                Log.Warning("[AI] ⚠️ Model name is empty, using default");
+                model = "gpt-3.5-turbo";
+            }
+            
+            return true;
+        }
+        
+        /// <summary>
+        /// ⭐ v3.3.3: 安全显示API Key（只显示前后缀）
+        /// </summary>
+        private static string SanitizeApiKey(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return "(empty)";
+            
+            if (key.Length <= 10)
+                return key.Substring(0, Math.Min(3, key.Length)) + "...";
+            
+            return $"{key.Substring(0, 7)}...{key.Substring(key.Length - 4)} (length: {key.Length})";
+        }
+        
         /// <summary>
         /// 尝试从 RimTalk 加载配置（兼容模式）
         /// </summary>
@@ -428,15 +499,21 @@ namespace RimTalk.Memory.AI
                     else
                     {
                         Log.Message($"[AI Summarizer] Calling API: {actualUrl.Substring(0, Math.Min(60, actualUrl.Length))}...");
+                        Log.Message($"[AI Summarizer]   Provider: {provider}");
+                        Log.Message($"[AI Summarizer]   Model: {model}");
+                        Log.Message($"[AI Summarizer]   API Key: {SanitizeApiKey(apiKey)}");
                     }
 
                     var request = (HttpWebRequest)WebRequest.Create(actualUrl);
                     request.Method = "POST";
                     request.ContentType = "application/json";
+                    
+                    // ⭐ v3.3.3: Google API不使用Bearer token（Key在URL中）
                     if (provider != "Google")
                     {
                         request.Headers["Authorization"] = $"Bearer {apiKey}";
                     }
+                    
                     request.Timeout = 30000;
 
                     string json = BuildJsonRequest(prompt);
@@ -466,6 +543,7 @@ namespace RimTalk.Memory.AI
                 {
                     bool shouldRetry = false;
                     string errorDetail = "";
+                    HttpStatusCode statusCode = 0; // ⭐ v3.3.3: 保存状态码到外部变量
                     
                     if (ex.Response != null)
                     {
@@ -473,7 +551,30 @@ namespace RimTalk.Memory.AI
                         using (var streamReader = new System.IO.StreamReader(errorResponse.GetResponseStream()))
                         {
                             string errorText = streamReader.ReadToEnd();
-                            errorDetail = errorText.Substring(0, Math.Min(200, errorText.Length));
+                            statusCode = errorResponse.StatusCode; // ⭐ 保存状态码
+                            
+                            // ⭐ v3.3.3: 根据错误类型显示完整或截断的错误信息
+                            if (errorResponse.StatusCode == HttpStatusCode.Unauthorized || // 401
+                                errorResponse.StatusCode == HttpStatusCode.Forbidden)      // 403
+                            {
+                                // 认证错误：显示完整错误信息（帮助调试）
+                                errorDetail = errorText;
+                                Log.Error($"[AI Summarizer] ❌ Authentication Error ({errorResponse.StatusCode}):");
+                                Log.Error($"[AI Summarizer]    API Key: {SanitizeApiKey(apiKey)}");
+                                Log.Error($"[AI Summarizer]    Provider: {provider}");
+                                Log.Error($"[AI Summarizer]    Response: {errorText}");
+                                Log.Error("[AI Summarizer] ");
+                                Log.Error("[AI Summarizer] 💡 Possible solutions:");
+                                Log.Error("[AI Summarizer]    1. Check if API Key is correct");
+                                Log.Error("[AI Summarizer]    2. Verify Provider selection matches your key");
+                                Log.Error("[AI Summarizer]    3. Check if API Key has sufficient credits");
+                                Log.Error("[AI Summarizer]    4. Try regenerating your API Key");
+                            }
+                            else
+                            {
+                                // 其他错误：截断显示
+                                errorDetail = errorText.Substring(0, Math.Min(200, errorText.Length));
+                            }
                             
                             // 判断是否应该重试
                             if (errorResponse.StatusCode == HttpStatusCode.ServiceUnavailable || // 503
@@ -485,7 +586,11 @@ namespace RimTalk.Memory.AI
                                 shouldRetry = true;
                             }
                             
-                            Log.Warning($"[AI Summarizer] ⚠️ API Error (attempt {attempt}/{MAX_RETRIES}): {errorResponse.StatusCode} - {errorDetail}");
+                            if (errorResponse.StatusCode != HttpStatusCode.Unauthorized && 
+                                errorResponse.StatusCode != HttpStatusCode.Forbidden)
+                            {
+                                Log.Warning($"[AI Summarizer] ⚠️ API Error (attempt {attempt}/{MAX_RETRIES}): {errorResponse.StatusCode} - {errorDetail}");
+                            }
                         }
                     }
                     else
@@ -498,7 +603,12 @@ namespace RimTalk.Memory.AI
                     // 如果是最后一次尝试或不应该重试，则失败
                     if (attempt >= MAX_RETRIES || !shouldRetry)
                     {
-                        Log.Error($"[AI Summarizer] ❌ Failed after {attempt} attempts. Last error: {errorDetail}");
+                        // ⭐ v3.3.3: 使用保存的状态码判断
+                        if (statusCode != HttpStatusCode.Unauthorized && 
+                            statusCode != HttpStatusCode.Forbidden)
+                        {
+                            Log.Error($"[AI Summarizer] ❌ Failed after {attempt} attempts. Last error: {errorDetail}");
+                        }
                         return null;
                     }
                     
@@ -508,6 +618,7 @@ namespace RimTalk.Memory.AI
                 catch (Exception ex)
                 {
                     Log.Error($"[AI Summarizer] ❌ Unexpected error: {ex.GetType().Name} - {ex.Message}");
+                    Log.Error($"[AI Summarizer]    Stack trace: {ex.StackTrace}");
                     return null;
                 }
             }
