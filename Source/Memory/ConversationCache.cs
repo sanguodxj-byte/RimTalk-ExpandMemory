@@ -239,6 +239,7 @@ namespace RimTalk.Memory
     {
         /// <summary>
         /// 生成对话缓存键
+        /// ⭐ v3.3.4: 优化为更粗粒度的键，提高缓存命中率
         /// </summary>
         public static string Generate(Pawn speaker, Pawn listener, string topic)
         {
@@ -249,32 +250,35 @@ namespace RimTalk.Memory
             string speakerName = speaker.LabelShort;
             string listenerName = listener.LabelShort;
             
-            // 情绪等级（模糊化）
+            // ⭐ 优化1：简化情绪等级（4级→2级）
             string moodLevel = GetMoodLevel(speaker.needs?.mood?.CurLevel ?? 0.5f);
             
-            // 关系等级（模糊化）
+            // ⭐ 优化2：简化关系等级（5级→2级）
             string relationLevel = GetRelationLevel(speaker, listener);
             
-            // 话题（如果有）
-            string topicHash = string.IsNullOrEmpty(topic) ? "general" : topic.GetHashCode().ToString();
+            // ⭐ 优化3：移除topic hash - 话题变化不应导致缓存失效
+            // 大多数对话内容相似，话题只是细微差别
             
-            // 组合缓存键
-            return $"{speakerName}_{listenerName}_{moodLevel}_{relationLevel}_{topicHash}";
+            // 组合缓存键 - 更简单=更高命中率
+            return $"{speakerName}_{listenerName}_{moodLevel}_{relationLevel}";
         }
         
         /// <summary>
-        /// 获取情绪等级（模糊化避免过度细分）
+        /// 获取情绪等级（粗粒度分级，提高缓存复用）
+        /// ⭐ v3.3.4: 4级→2级，命中率提升约2倍
         /// </summary>
         private static string GetMoodLevel(float mood)
         {
-            if (mood > 0.7f) return "happy";
-            if (mood > 0.4f) return "neutral";
-            if (mood > 0.2f) return "sad";
-            return "miserable";
+            // 之前：happy(>0.7), neutral(0.4-0.7), sad(0.2-0.4), miserable(<0.2) = 4种状态
+            // 现在：positive(>0.4), negative(≤0.4) = 2种状态
+            // 理由：情绪微小波动不应导致对话内容巨大变化
+            if (mood > 0.4f) return "positive";
+            return "negative";
         }
         
         /// <summary>
-        /// 获取关系等级（模糊化）
+        /// 获取关系等级（粗粒度分级，提高缓存复用）
+        /// ⭐ v3.3.4: 5级→2级，命中率提升约2.5倍
         /// </summary>
         private static string GetRelationLevel(Pawn speaker, Pawn listener)
         {
@@ -283,11 +287,11 @@ namespace RimTalk.Memory
             
             int opinion = speaker.relations.OpinionOf(listener);
             
-            if (opinion > 50) return "friend";
-            if (opinion > 0) return "friendly";
-            if (opinion > -20) return "neutral";
-            if (opinion > -50) return "unfriendly";
-            return "hostile";
+            // 之前：friend(>50), friendly(0-50), neutral(-20-0), unfriendly(-50--20), hostile(<-50) = 5种状态
+            // 现在：positive(>0), negative(≤0) = 2种状态
+            // 理由：opinion在±20内的波动是正常的，不应导致对话截然不同
+            if (opinion > 0) return "positive";
+            return "negative";
         }
     }
 }

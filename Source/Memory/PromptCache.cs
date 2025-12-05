@@ -47,14 +47,25 @@ namespace RimTalk.Memory
             
             /// <summary>
             /// 检查缓存是否仍然有效
+            /// ? v3.3.4: 放宽失效条件，提高缓存命中率
             /// </summary>
             public bool IsValid(int currentMemoryCount, int currentKnowledgeCount, int currentTick, int expireTicks)
             {
-                // 记忆或常识变化，缓存失效
-                if (pawnMemoryCount != currentMemoryCount || knowledgeCount != currentKnowledgeCount)
+                // ? 优化1：放宽记忆变化阈值（±5条内不失效）
+                // 原因：增加1-2条记忆不应导致整个提示词失效
+                // 记忆注入是动态选择的，微小变化影响很小
+                int memoryDiff = Math.Abs(pawnMemoryCount - currentMemoryCount);
+                if (memoryDiff > 5)
                     return false;
                 
-                // 超时失效
+                // ? 优化2：放宽常识变化阈值（±10条内不失效）
+                // 原因：常识库变化更不应导致缓存失效
+                // 常识库是全局共享的，单个常识变化影响极小
+                int knowledgeDiff = Math.Abs(knowledgeCount - currentKnowledgeCount);
+                if (knowledgeDiff > 10)
+                    return false;
+                
+                // 时间失效检查
                 if (currentTick - timestamp > expireTicks)
                     return false;
                 

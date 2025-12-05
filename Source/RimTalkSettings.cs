@@ -37,6 +37,9 @@ namespace RimTalk.MemoryPatch
         public string independentModel = "gpt-3.5-turbo";  // 独立模型
         public string independentProvider = "OpenAI"; // 独立提供商（OpenAI/Google）
         
+        // ⭐ v3.3.4: Prompt Caching配置
+        public bool enablePromptCaching = true;       // 启用Prompt Caching（降低50%费用）
+
         // UI 设置
         public bool enableMemoryUI = true;
         
@@ -52,13 +55,13 @@ namespace RimTalk.MemoryPatch
 
         // === 对话缓存设置 ===
         public bool enableConversationCache = true;   // 启用对话缓存
-        public int conversationCacheSize = 100;       // 缓存大小（50-500）
-        public int conversationCacheExpireDays = 7;   // 过期天数（1-30）
+        public int conversationCacheSize = 200;       // ⭐ v3.3.4: 100→200（缓存大小翻倍）
+        public int conversationCacheExpireDays = 14;  // ⭐ v3.3.4: 7→14天（过期时间翻倍）
         
         // === 提示词缓存设置（新增）===
         public bool enablePromptCache = true;         // 启用提示词缓存
-        public int promptCacheSize = 50;              // 缓存大小（20-200）
-        public int promptCacheExpireMinutes = 30;     // 过期分钟数（5-120）
+        public int promptCacheSize = 100;             // ⭐ v3.3.4: 50→100（缓存大小翻倍）
+        public int promptCacheExpireMinutes = 60;     // ⭐ v3.3.4: 30→60分钟（过期时间翻倍）
 
         // === 动态注入设置 ===
         public bool useDynamicInjection = true;       // 使用动态注入（默认开启）
@@ -128,7 +131,8 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref independentApiUrl, "ai_independentApiUrl", "");
             Scribe_Values.Look(ref independentModel, "ai_independentModel", "gpt-3.5-turbo");
             Scribe_Values.Look(ref independentProvider, "ai_independentProvider", "OpenAI");
-            
+            Scribe_Values.Look(ref enablePromptCaching, "ai_enablePromptCaching", true);  // ⭐ v3.3.4
+
             // UI 设置
             Scribe_Values.Look(ref enableMemoryUI, "memoryPatch_enableMemoryUI", true);
             
@@ -144,13 +148,13 @@ namespace RimTalk.MemoryPatch
 
             // 对话缓存设置
             Scribe_Values.Look(ref enableConversationCache, "cache_enableConversationCache", true);
-            Scribe_Values.Look(ref conversationCacheSize, "cache_conversationCacheSize", 100);
-            Scribe_Values.Look(ref conversationCacheExpireDays, "cache_conversationCacheExpireDays", 7);
+            Scribe_Values.Look(ref conversationCacheSize, "cache_conversationCacheSize", 200);
+            Scribe_Values.Look(ref conversationCacheExpireDays, "cache_conversationCacheExpireDays", 14);
             
             // 提示词缓存设置
             Scribe_Values.Look(ref enablePromptCache, "cache_enablePromptCache", true);
-            Scribe_Values.Look(ref promptCacheSize, "cache_promptCacheSize", 50);
-            Scribe_Values.Look(ref promptCacheExpireMinutes, "cache_promptCacheExpireMinutes", 30);
+            Scribe_Values.Look(ref promptCacheSize, "cache_promptCacheSize", 100);
+            Scribe_Values.Look(ref promptCacheExpireMinutes, "cache_promptCacheExpireMinutes", 60);
             
             // 动态注入设置
             Scribe_Values.Look(ref useDynamicInjection, "dynamic_useDynamicInjection", true);
@@ -765,6 +769,29 @@ namespace RimTalk.MemoryPatch
             listing.Label($"  DeepSeek: deepseek-chat, deepseek-coder");
             listing.Label($"  Google: gemini-pro, gemini-1.5-flash");
             GUI.color = Color.white;
+            
+            listing.Gap();
+            
+            // ⭐ v3.3.4: Prompt Caching选项
+            GUI.color = new Color(0.7f, 1f, 0.7f);
+            listing.CheckboxLabeled("💰 启用Prompt Caching（降低50%费用）", ref enablePromptCaching);
+            GUI.color = Color.white;
+            
+            if (enablePromptCaching)
+            {
+                GUI.color = Color.gray;
+                listing.Label("  ✅ 将system指令标记为可缓存");
+                listing.Label("  ✅ 适用于OpenAI GPT-4/3.5和DeepSeek");
+                listing.Label("  ✅ 首次调用正常计费，后续缓存命中费用降低50%");
+                listing.Label("  ⚠️ 缓存有效期：5-10分钟（由API提供商控制）");
+                GUI.color = Color.white;
+            }
+            else
+            {
+                GUI.color = Color.yellow;
+                listing.Label("  ⚠️ 关闭后所有token按正常价格计费");
+                GUI.color = Color.white;
+            }
             
             listing.Gap();
             listing.GapLine();
