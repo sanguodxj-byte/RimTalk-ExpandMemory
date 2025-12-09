@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Verse;
 using RimWorld;
 using RimWorld.Planet;
@@ -459,6 +460,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 检查并触发CLPA归档（按天数间隔）
+        /// ⭐ v3.3.2.33: 重构 - 实现真正的 ELS → CLPA 自动归档
         /// </summary>
         /// <param name="currentDay">当前游戏中的天数</param>
         private void CheckArchiveInterval(int currentDay)
@@ -470,61 +472,238 @@ namespace RimTalk.Memory
             int intervalDays = RimTalkMemoryPatchMod.Settings.archiveIntervalDays;
             
             // 检查是否到达归档间隔
-            if (currentDay != lastArchiveDay && currentDay % intervalDays == 0)
+            if (lastArchiveDay == -1)
             {
-                Log.Message($"[RimTalk Memory] 📚 Day {currentDay}: Triggering CLPA archive (every {intervalDays} days)");
-                
-                int totalArchived = 0;
-                
-                // 检查每个殖民者的CLPA记忆
-                foreach (var map in Find.Maps)
+                // 首次初始化，记录当前天数
+                lastArchiveDay = currentDay;
+                return;
+            }
+            
+            int daysSinceLastArchive = currentDay - lastArchiveDay;
+            
+            // 如果距离上次归档还没到间隔天数，直接返回
+            if (daysSinceLastArchive < intervalDays)
+                return;
+            
+            // 到达归档时间
+            Log.Message($"[RimTalk Memory] 📚 Day {currentDay}: Triggering CLPA archive (every {intervalDays} days)");
+            
+            int totalArchivedPawns = 0;
+            int totalArchivedEntries = 0;
+            
+            // 遍历所有殖民者，执行 ELS → CLPA 归档
+            foreach (var map in Find.Maps)
+            {
+                foreach (var pawn in map.mapPawns.AllPawnsSpawned)
                 {
-                    foreach (var pawn in map.mapPawns.AllPawnsSpawned)
+                    if (!pawn.IsColonist)
+                        continue;
+                    
+                    var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
+                    if (fourLayerComp == null)
+                        continue;
+                    
+                    // 检查是否有 ELS 记忆需要归档
+                    if (fourLayerComp.EventLogMemories.Count == 0)
+                        continue;
+                    
+                    // ⭐ 步骤1：将 ELS 记忆按类型分组并总结归档
+                    var byType = fourLayerComp.EventLogMemories.GroupBy(m => m.type);
+                    
+                    int archivedCount = 0;
+                    foreach (var typeGroup in byType)
                     {
-                        if (pawn.IsColonist)
+                        var memories = typeGroup.ToList();
+                        
+                        // 创建归档摘要（简单版本）
+                        string archiveSummary = CreateArchiveSummary(memories, typeGroup.Key);
+                        
+                        var archiveEntry = new MemoryEntry(
+                            content: archiveSummary,
+                            type: typeGroup.Key,
+                            layer: MemoryLayer.Archive,
+                            importance: memories.Average(m => m.importance) + 0.3f // CLPA 记忆重要性更高
+                        );
+                        
+                        // 合并关键词和标签
+                        archiveEntry.keywords.AddRange(memories.SelectMany(m => m.keywords).Distinct());
+                        archiveEntry.tags.AddRange(memories.SelectMany(m => m.tags).Distinct());
+                        archiveEntry.AddTag("自动归档");
+                        archiveEntry.AddTag($"源自{memories.Count}条ELS");
+                        
+                        // ⭐ 如果启用 AI 总结，异步更新归档内容
+                        if (RimTalkMemoryPatchMod.Settings.useAISummarization && AI.IndependentAISummarizer.IsAvailable())
                         {
-                            var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
-                            if (fourLayerComp != null)
+                            string cacheKey = AI.IndependentAISummarizer.ComputeCacheKey(pawn, memories);
+                            
+                            AI.IndependentAISummarizer.RegisterCallback(cacheKey, (aiSummary) =>
                             {
-                                // 检查CLPA容量，超过上限则清理
-                                int maxArchive = RimTalkMemoryPatchMod.Settings.maxArchiveMemories;
-                                if (fourLayerComp.ArchiveMemories.Count > maxArchive)
+                                if (!string.IsNullOrEmpty(aiSummary))
                                 {
-                                    // 移除最旧的低重要性记忆
-                                    var toRemove = fourLayerComp.ArchiveMemories
-                                        .OrderBy(m => m.importance)
-                                        .ThenBy(m => m.timestamp)
-                                        .Take(fourLayerComp.ArchiveMemories.Count - maxArchive)
-                                        .ToList();
-                                    
-                                    foreach (var memory in toRemove)
-                                    {
-                                        fourLayerComp.ArchiveMemories.Remove(memory);
-                                    }
-                                    
-                                    if (toRemove.Count > 0)
-                                    {
-                                        totalArchived++;
-                                        if (Prefs.DevMode)
-                                        {
-                                            Log.Message($"[RimTalk Memory] Cleaned {toRemove.Count} old CLPA memories for {pawn.LabelShort}");
-                                        }
-                                    }
+                                    archiveEntry.content = aiSummary;
+                                    archiveEntry.RemoveTag("简单归档");
+                                    archiveEntry.AddTag("AI归档");
+                                    archiveEntry.notes = "AI 深度归档已完成。";
                                 }
-                            }
+                            });
+                            
+                            AI.IndependentAISummarizer.SummarizeMemories(pawn, memories, "deep_archive");
+                            
+                            archiveEntry.AddTag("简单归档");
+                            archiveEntry.AddTag("待AI更新");
+                            archiveEntry.notes = "AI 深度归档正在后台处理中...";
+                        }
+                        
+                        // 添加到 CLPA
+                        fourLayerComp.ArchiveMemories.Insert(0, archiveEntry);
+                        archivedCount++;
+                    }
+                    
+                    if (archivedCount > 0)
+                    {
+                        totalArchivedPawns++;
+                        totalArchivedEntries += archivedCount;
+                        
+                        // ⭐ 清空 ELS（已归档）
+                        fourLayerComp.EventLogMemories.Clear();
+                        
+                        if (Prefs.DevMode)
+                        {
+                            Log.Message($"[RimTalk Memory] Archived {archivedCount} ELS entries for {pawn.LabelShort}");
+                        }
+                    }
+                    
+                    // ⭐ 步骤2：清理超过上限的旧 CLPA 记忆
+                    int maxArchive = RimTalkMemoryPatchMod.Settings.maxArchiveMemories;
+                    if (fourLayerComp.ArchiveMemories.Count > maxArchive)
+                    {
+                        // 移除最旧的低重要性记忆
+                        var toRemove = fourLayerComp.ArchiveMemories
+                            .OrderBy(m => m.importance)
+                            .ThenBy(m => m.timestamp)
+                            .Take(fourLayerComp.ArchiveMemories.Count - maxArchive)
+                            .ToList();
+                        
+                        foreach (var memory in toRemove)
+                        {
+                            fourLayerComp.ArchiveMemories.Remove(memory);
+                        }
+                        
+                        if (Prefs.DevMode && toRemove.Count > 0)
+                        {
+                            Log.Message($"[RimTalk Memory] Cleaned {toRemove.Count} old CLPA memories for {pawn.LabelShort}");
                         }
                     }
                 }
+            }
+            
+            // 更新最后归档日期
+            lastArchiveDay = currentDay;
+            
+            // 输出总结日志
+            if (totalArchivedPawns > 0)
+            {
+                Log.Message($"[RimTalk Memory] ✅ CLPA auto-archive complete: {totalArchivedPawns} colonists, {totalArchivedEntries} entries archived");
                 
-                if (totalArchived > 0)
-                {
-                    Log.Message($"[RimTalk Memory] ✅ CLPA archive cleanup complete for {totalArchived} colonists");
-                }
-                
-                lastArchiveDay = currentDay;
+                // 可选：给用户一个通知
+                Messages.Message(
+                    $"CLPA自动归档完成：{totalArchivedPawns}名殖民者，{totalArchivedEntries}条记忆已归档",
+                    MessageTypeDefOf.NeutralEvent,
+                    false
+                );
+            }
+            else
+            {
+                Log.Message($"[RimTalk Memory] ✅ CLPA auto-archive check complete: no memories to archive");
             }
         }
-
+        
+        /// <summary>
+        /// 创建归档摘要（简单版本）
+        /// </summary>
+        private string CreateArchiveSummary(List<MemoryEntry> memories, MemoryType type)
+        {
+            if (memories == null || memories.Count == 0)
+                return null;
+            
+            var summary = new StringBuilder();
+            
+            // 归档摘要格式：更详细，因为是长期保存
+            if (type == MemoryType.Conversation)
+            {
+                // 对话归档：按对话对象分组
+                var byPerson = memories
+                    .Where(m => !string.IsNullOrEmpty(m.relatedPawnName))
+                    .GroupBy(m => m.relatedPawnName)
+                    .OrderByDescending(g => g.Count());
+                
+                summary.Append($"对话归档（{memories.Count}条）：");
+                int shown = 0;
+                foreach (var group in byPerson.Take(10))
+                {
+                    if (shown > 0) summary.Append("；");
+                    summary.Append($"与{group.Key}对话×{group.Count()}");
+                    shown++;
+                }
+            }
+            else if (type == MemoryType.Action)
+            {
+                // 行动归档：按行动类型分组
+                summary.Append($"行动归档（{memories.Count}条）：");
+                
+                var grouped = memories
+                    .Select(m => m.content.Length > 20 ? m.content.Substring(0, 20) : m.content)
+                    .GroupBy(a => a)
+                    .OrderByDescending(g => g.Count());
+                
+                int shown = 0;
+                foreach (var group in grouped.Take(5))
+                {
+                    if (shown > 0) summary.Append("；");
+                    if (group.Count() > 1)
+                    {
+                        summary.Append($"{group.Key}×{group.Count()}");
+                    }
+                    else
+                    {
+                        summary.Append(group.Key);
+                    }
+                    shown++;
+                }
+            }
+            else
+            {
+                // 其他类型归档：保留更多细节
+                summary.Append($"{type}归档（{memories.Count}条）：");
+                
+                var grouped = memories
+                    .GroupBy(m => m.content.Length > 30 ? m.content.Substring(0, 30) : m.content)
+                    .OrderByDescending(g => g.Count());
+                
+                int shown = 0;
+                foreach (var group in grouped.Take(8))
+                {
+                    if (shown > 0) summary.Append("；");
+                    
+                    string content = group.First().content;
+                    if (content.Length > 60)
+                        content = content.Substring(0, 60) + "...";
+                    
+                    if (group.Count() > 1)
+                    {
+                        summary.Append($"{content}×{group.Count()}");
+                    }
+                    else
+                    {
+                        summary.Append(content);
+                    }
+                    shown++;
+                }
+            }
+            
+            return summary.ToString();
+        }
+        
         public override void ExposeData()
         {
             base.ExposeData();
