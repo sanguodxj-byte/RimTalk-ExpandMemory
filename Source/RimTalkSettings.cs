@@ -3,12 +3,47 @@ using Verse;
 using RimWorld;
 using RimTalk.Memory;
 using RimTalk.Memory.UI;
+using System.Collections.Generic; // ? 添加
 
 namespace RimTalk.MemoryPatch
 {
     public class RimTalkMemoryPatchSettings : ModSettings
     {
-        // 四层记忆容量设置
+        // ? 新增：提示词规范化规则
+        /// <summary>
+        /// 替换规则定义
+        /// </summary>
+        public class ReplacementRule : IExposable
+        {
+            public string pattern = "";
+            public string replacement = "";
+            public bool isEnabled = true;
+            
+            public ReplacementRule() { }
+            
+            public ReplacementRule(string pattern, string replacement, bool isEnabled = true)
+            {
+                this.pattern = pattern;
+                this.replacement = replacement;
+                this.isEnabled = isEnabled;
+            }
+            
+            public void ExposeData()
+            {
+                Scribe_Values.Look(ref pattern, "pattern", "");
+                Scribe_Values.Look(ref replacement, "replacement", "");
+                Scribe_Values.Look(ref isEnabled, "isEnabled", true);
+            }
+        }
+        
+        // ? 提示词规范化规则列表
+        public List<ReplacementRule> normalizationRules = new List<ReplacementRule>
+        {
+            new ReplacementRule(@"\(Player\)", "Master", true),
+            new ReplacementRule(@"\(玩家\)", "主人", true)
+        };
+        
+        // 四层记忆容量配置
         public int maxActiveMemories = 6;
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
@@ -103,6 +138,19 @@ namespace RimTalk.MemoryPatch
         {
             base.ExposeData();
             
+            // ? 序列化提示词规范化规则
+            Scribe_Collections.Look(ref normalizationRules, "normalizationRules", LookMode.Deep);
+            
+            // ? 兼容性：如果加载后为 null，初始化默认规则
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && normalizationRules == null)
+            {
+                normalizationRules = new List<ReplacementRule>
+                {
+                    new ReplacementRule(@"\(Player\)", "Master", true),
+                    new ReplacementRule(@"\(玩家\)", "主人", true)
+                };
+            }
+            
             Scribe_Values.Look(ref maxActiveMemories, "fourLayer_maxActiveMemories", 6);
             Scribe_Values.Look(ref maxSituationalMemories, "fourLayer_maxSituationalMemories", 20);
             Scribe_Values.Look(ref maxEventLogMemories, "fourLayer_maxEventLogMemories", 50);
@@ -164,9 +212,25 @@ namespace RimTalk.MemoryPatch
         {
             Listing_Standard listingStandard = new Listing_Standard();
             
-            Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2200f);
+            Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2400f); // ? 增加高度以容纳新内容
             Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
             listingStandard.Begin(viewRect);
+
+            // ? 新增：提示词规范化设置
+            Text.Font = GameFont.Medium;
+            listingStandard.Label("提示词规范化");
+            Text.Font = GameFont.Small;
+            
+            GUI.color = Color.gray;
+            listingStandard.Label("自定义替换规则，在发送给 AI 前自动处理提示词");
+            GUI.color = Color.white;
+            
+            listingStandard.Gap(6f);
+            
+            DrawPromptNormalizationSettings(listingStandard);
+            
+            listingStandard.Gap();
+            listingStandard.GapLine();
 
             // 常识库管理
             Text.Font = GameFont.Medium;
@@ -190,8 +254,8 @@ namespace RimTalk.MemoryPatch
 
             // 动态注入设置
             DrawCollapsibleSection(listingStandard, "动态注入设置", ref expandDynamicInjection, () => DrawDynamicInjectionSettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "记忆容量设置", ref expandMemoryCapacity, () => DrawMemoryCapacitySettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "记忆衰减设置", ref expandDecayRates, () => DrawDecaySettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "记忆容量配置", ref expandMemoryCapacity, () => DrawMemoryCapacitySettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "记忆衰减配置", ref expandDecayRates, () => DrawDecaySettings(listingStandard));
             DrawCollapsibleSection(listingStandard, "记忆总结设置", ref expandSummarization, () => DrawSummarizationSettings(listingStandard));
 
             if (useAISummarization)
@@ -210,17 +274,20 @@ namespace RimTalk.MemoryPatch
             GUI.color = Color.white;
             
             Rect previewButtonRect = listingStandard.GetRect(35f);
-            if (Widgets.ButtonText(previewButtonRect, "打开注入预览器"))
+            if (Widgets.ButtonText(previewButtonRect, "注入预览器"))
             {
                 Find.WindowStack.Add(new RimTalk.Memory.Debug.Dialog_InjectionPreview());
             }
             
             GUI.color = Color.gray;
-            listingStandard.Label("实时预览记忆/常识注入结果");
+            listingStandard.Label("实时预览记忆/常识注入效果");
             GUI.color = Color.white;
 
             listingStandard.End();
             Widgets.EndScrollView();
+            
+            // ? v3.3.2.37: 在设置窗口每帧更新时更新规则（用户修改后立即生效）
+            PromptNormalizer.UpdateRules(normalizationRules);
         }
 
         private void DrawCollapsibleSection(Listing_Standard listing, string title, ref bool expanded, System.Action drawContent)
@@ -581,11 +648,98 @@ namespace RimTalk.MemoryPatch
             var memoryManager = Find.World.GetComponent<MemoryManager>();
             if (memoryManager == null)
             {
-                Messages.Message("无法找到记忆管理器", MessageTypeDefOf.RejectInput);
+                Messages.Message("无法找到内存管理器", MessageTypeDefOf.RejectInput);
                 return;
             }
 
             Find.WindowStack.Add(new Dialog_CommonKnowledge(memoryManager.CommonKnowledge));
+        }
+        
+        /// <summary>
+        /// ? 绘制提示词规范化设置 UI
+        /// </summary>
+        private void DrawPromptNormalizationSettings(Listing_Standard listing)
+        {
+            // 背景框
+            Rect sectionRect = listing.GetRect(300f); // 预估高度
+            Widgets.DrawBoxSolid(sectionRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
+            
+            Listing_Standard inner = new Listing_Standard();
+            inner.Begin(sectionRect.ContractedBy(10f));
+            
+            // 标题
+            Text.Font = GameFont.Small;
+            GUI.color = new Color(1f, 0.9f, 0.7f);
+            inner.Label("替换规则列表");
+            GUI.color = Color.white;
+            
+            inner.Gap(5f);
+            
+            // 规则列表（最多显示 10 条）
+            if (normalizationRules == null)
+            {
+                normalizationRules = new List<ReplacementRule>();
+            }
+            
+            // 绘制每条规则
+            for (int i = 0; i < normalizationRules.Count; i++)
+            {
+                var rule = normalizationRules[i];
+                
+                Rect ruleRect = inner.GetRect(30f);
+                
+                // 启用复选框
+                Rect checkboxRect = new Rect(ruleRect.x, ruleRect.y, 24f, 24f);
+                Widgets.Checkbox(checkboxRect.position, ref rule.isEnabled);
+                
+                // 模式输入框
+                Rect patternRect = new Rect(ruleRect.x + 30f, ruleRect.y, 200f, 25f);
+                rule.pattern = Widgets.TextField(patternRect, rule.pattern ?? "");
+                
+                // 箭头
+                Rect arrowRect = new Rect(ruleRect.x + 235f, ruleRect.y, 30f, 25f);
+                Widgets.Label(arrowRect, " → ");
+                
+                // 替换输入框
+                Rect replacementRect = new Rect(ruleRect.x + 270f, ruleRect.y, 150f, 25f);
+                rule.replacement = Widgets.TextField(replacementRect, rule.replacement ?? "");
+                
+                // 删除按钮
+                Rect deleteRect = new Rect(ruleRect.x + 430f, ruleRect.y, 30f, 25f);
+                GUI.color = new Color(1f, 0.3f, 0.3f);
+                if (Widgets.ButtonText(deleteRect, "?"))
+                {
+                    normalizationRules.RemoveAt(i);
+                    i--; // 调整索引
+                }
+                GUI.color = Color.white;
+                
+                inner.Gap(3f);
+            }
+            
+            // 添加新规则按钮
+            Rect addButtonRect = inner.GetRect(30f);
+            if (Widgets.ButtonText(addButtonRect, "+ 添加新规则"))
+            {
+                normalizationRules.Add(new ReplacementRule("", "", true));
+            }
+            
+            inner.Gap(5f);
+            
+            // 统计信息
+            int enabledCount = normalizationRules.Count(r => r.isEnabled);
+            GUI.color = Color.gray;
+            inner.Label($"已启用: {enabledCount} / {normalizationRules.Count} 条规则");
+            GUI.color = Color.white;
+            
+            // 示例提示
+            inner.Gap(3f);
+            GUI.color = new Color(0.7f, 0.9f, 1f);
+            inner.Label("?? 示例：模式 \\(Player\\) → 替换 Master");
+            inner.Label("   支持正则表达式（忽略大小写）");
+            GUI.color = Color.white;
+            
+            inner.End();
         }
     }
 }

@@ -97,6 +97,21 @@ namespace RimTalk.Memory
                 
                 string result = sb.ToString();
                 
+                // ? v3.3.2.37: 应用提示词规范化规则
+                if (!string.IsNullOrEmpty(result))
+                {
+                    string normalizedResult = PromptNormalizer.Normalize(result);
+                    
+                    if (Prefs.DevMode && normalizedResult != result)
+                    {
+                        Log.Message($"[SmartInjection] ? Applied prompt normalization rules");
+                        Log.Message($"[SmartInjection]   Original: {result.Substring(0, Math.Min(100, result.Length))}...");
+                        Log.Message($"[SmartInjection]   Normalized: {normalizedResult.Substring(0, Math.Min(100, normalizedResult.Length))}...");
+                    }
+                    
+                    result = normalizedResult;
+                }
+                
                 if (Prefs.DevMode)
                 {
                     Log.Message($"[SmartInjection] ? Success: {result.Length} chars formatted");
