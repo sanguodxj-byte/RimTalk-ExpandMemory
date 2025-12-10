@@ -168,8 +168,9 @@ namespace RimTalk.Memory
         /// 计算与上下文的相关性分数（标签匹配 + 内容匹配）
         /// ⭐ v3.3.2.25: 优化长关键词权重 + 精确匹配加成
         /// ⭐ v3.3.2.31: 提高名字关键词的匹配分数
+        /// ⭐ v3.3.2.38: 接受角色名字列表参数，改进名字识别
         /// </summary>
-        public float CalculateRelevanceScore(List<string> contextKeywords)
+        public float CalculateRelevanceScore(List<string> contextKeywords, HashSet<string> pawnNames = null)
         {
             if (!isEnabled)
                 return 0f;
@@ -213,32 +214,24 @@ namespace RimTalk.Memory
                     // 直接在内容中查找关键词
                     if (content.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        // ⭐ v3.3.2.31: 检测是否是名字（2-6字符，且包含在标签中）
+                        // ⭐ v3.3.2.38: 改进名字检测 - 直接检查是否在角色名字列表中
                         bool isNameKeyword = false;
-                        if (keyword.Length >= 2 && keyword.Length <= 6)
+                        if (keyword.Length >= 2 && keyword.Length <= 6 && pawnNames != null)
                         {
-                            // 简单启发式：如果标签包含这个关键词，很可能是名字
-                            foreach (var tag in tags)
-                            {
-                                if (tag.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                                {
-                                    isNameKeyword = true;
-                                    break;
-                                }
-                            }
+                            isNameKeyword = pawnNames.Contains(keyword);
                         }
                         
                         // 基础长关键词权重
                         if (keyword.Length >= 6)
-                            contentMatchScore += 0.40f;  // "龙王种索拉克" 超大加分
+                            contentMatchScore += 0.40f;
                         else if (keyword.Length >= 5)
-                            contentMatchScore += 0.30f;  // "龙王种索拉克" 超大加分
+                            contentMatchScore += 0.30f;
                         else if (keyword.Length >= 4)
-                            contentMatchScore += 0.20f;  // "龙王种索拉克" 超大加分
+                            contentMatchScore += 0.20f;
                         else if (keyword.Length == 3)
-                            contentMatchScore += 0.12f;  // "龙王" 小幅加分
+                            contentMatchScore += 0.12f;
                         else
-                            contentMatchScore += 0.05f;  // "种族" 基础加分
+                            contentMatchScore += 0.05f;
                         
                         // ⭐ v3.3.2.31: 名字额外加成（0.3分）
                         if (isNameKeyword)
@@ -281,13 +274,11 @@ namespace RimTalk.Memory
             exactMatchBonus = Math.Min(exactMatchBonus, 1.0f);
 
             // 综合评分
-            // ⭐ v3.3.2.25: contentPart和exactPart不受importance影响（避免被低重要性压制）
-            // ⭐ v3.3.2.31: 添加namePart（名字加成）
             float tagMatchRate = tags.Count > 0 ? (float)tagMatchCount / tags.Count : 0f;
-            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight * 0.5f; // ⭐ 标签权重降低
-            float contentPart = contentMatchScore;  // ⭐ 不再乘importance
-            float exactPart = exactMatchBonus;      // ⭐ 不再乘importance
-            float namePart = nameMatchBonus;        // ⭐ v3.3.2.31: 名字加成
+            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight * 0.5f;
+            float contentPart = contentMatchScore;
+            float exactPart = exactMatchBonus;
+            float namePart = nameMatchBonus;
             float totalScore = baseScore + tagPart + contentPart + exactPart + namePart;
 
             return totalScore;
@@ -297,8 +288,9 @@ namespace RimTalk.Memory
         /// 计算与上下文的相关性分数（带详细信息）- 用于调试
         /// ⭐ v3.3.2.25: 同步优化长关键词权重 + 精确匹配加成
         /// ⭐ v3.3.2.31: 提高名字关键词的匹配分数
+        /// ⭐ v3.3.2.38: 接受角色名字列表参数，改进名字识别
         /// </summary>
-        public KnowledgeScoreDetail CalculateRelevanceScoreWithDetails(List<string> contextKeywords)
+        public KnowledgeScoreDetail CalculateRelevanceScoreWithDetails(List<string> contextKeywords, HashSet<string> pawnNames = null)
         {
             var detail = new KnowledgeScoreDetail
             {
@@ -350,8 +342,9 @@ namespace RimTalk.Memory
 
             // 2. ⭐ 内容匹配（长关键词加权 + 名字特殊加成）
             var matchedKeywords = new List<string>();
+            var matchedNameKeywords = new List<string>(); // ⭐ v3.3.2.38: 记录名字关键词
             float contentMatchScore = 0f;
-            float nameMatchBonus = 0f; // ⭐ v3.3.2.31: 名字匹配额外加成
+            float nameMatchBonus = 0f;
             
             if (!string.IsNullOrEmpty(content))
             {
@@ -361,18 +354,14 @@ namespace RimTalk.Memory
                     {
                         matchedKeywords.Add(keyword);
                         
-                        // ⭐ v3.3.2.31: 检测是否是名字（2-6字符，且包含在标签中）
+                        // ⭐ v3.3.2.38: 改进名字检测 - 直接检查是否在角色名字列表中
                         bool isNameKeyword = false;
-                        if (keyword.Length >= 2 && keyword.Length <= 6)
+                        if (keyword.Length >= 2 && keyword.Length <= 6 && pawnNames != null)
                         {
-                            // 简单启发式：如果标签包含这个关键词，很可能是名字
-                            foreach (var tag in tags)
+                            isNameKeyword = pawnNames.Contains(keyword);
+                            if (isNameKeyword)
                             {
-                                if (tag.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                                {
-                                    isNameKeyword = true;
-                                    break;
-                                }
+                                matchedNameKeywords.Add(keyword);
                             }
                         }
                         
@@ -398,7 +387,7 @@ namespace RimTalk.Memory
             }
             
             contentMatchScore = Math.Min(contentMatchScore, 1.5f);
-            nameMatchBonus = Math.Min(nameMatchBonus, 0.6f); // 最多2个名字 * 0.3
+            nameMatchBonus = Math.Min(nameMatchBonus, 0.6f);
 
             // 3. ⭐ 完全匹配加成
             float exactMatchBonus = 0f;
@@ -426,10 +415,10 @@ namespace RimTalk.Memory
             exactMatchBonus = Math.Min(exactMatchBonus, 1.0f);
 
             // 综合评分
-            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight * 0.5f; // ⭐ 标签权重降低
-            float contentPart = contentMatchScore;  // ⭐ 不再乘importance
-            float exactPart = exactMatchBonus;      // ⭐ 不再乘importance
-            float namePart = nameMatchBonus;        // ⭐ v3.3.2.31: 名字加成
+            float tagPart = tagMatchRate * importance * KnowledgeWeights.TagWeight * 0.5f;
+            float contentPart = contentMatchScore;
+            float exactPart = exactMatchBonus;
+            float namePart = nameMatchBonus;
             float totalScore = baseScore + tagPart + contentPart + exactPart + namePart;
             
             detail.TotalScore = totalScore;
@@ -443,7 +432,8 @@ namespace RimTalk.Memory
             }
             else if (matchedTags.Count == 0)
             {
-                string nameInfo = nameMatchBonus > 0 ? $"+名字加成{nameMatchBonus:F2}" : "";
+                // ⭐ v3.3.2.38: 详细显示名字匹配信息
+                string nameInfo = nameMatchBonus > 0 ? $"+名字加成{nameMatchBonus:F2}({string.Join(",", matchedNameKeywords)})" : "";
                 detail.FailReason = $"仅内容匹配({matchedKeywords.Count}个关键词，长关键词加成{nameInfo})";
             }
             else if (matchedKeywords.Count == 0)
@@ -452,7 +442,7 @@ namespace RimTalk.Memory
             }
             else
             {
-                string nameInfo = nameMatchBonus > 0 ? $"+名字{nameMatchBonus:F2}" : "";
+                string nameInfo = nameMatchBonus > 0 ? $"+名字{nameMatchBonus:F2}({string.Join(",", matchedNameKeywords)})" : "";
                 detail.FailReason = exactMatchBonus > 0 ? $"精确匹配加成{exactMatchBonus:F2}{nameInfo}" : nameInfo;
             }
             
@@ -579,15 +569,33 @@ namespace RimTalk.Memory
         /// 1. [标签|重要性]内容  -> 新格式，带重要性
         /// 2. [标签]内容          -> 旧格式，默认重要性0.5
         /// 3. 纯文本              -> 默认标签"通用"，重要性0.5
+        /// ⭐ v3.3.2.38: 增强容错性，支持 [标签} 格式（右括号写错）
         /// </summary>
         private CommonKnowledgeEntry ParseLine(string line)
         {
             if (string.IsNullOrEmpty(line))
                 return null;
 
-            // 查找 [标签]
+            // ⭐ v3.3.2.38: 查找 [ 和第一个 ] 或 }（容错右括号）
             int tagStart = line.IndexOf('[');
-            int tagEnd = line.IndexOf(']');
+            int tagEnd = -1;
+            
+            if (tagStart >= 0)
+            {
+                // 优先查找 ]
+                tagEnd = line.IndexOf(']', tagStart + 1);
+                
+                // 如果没有找到 ]，尝试查找 }（容错）
+                if (tagEnd == -1)
+                {
+                    int braceEnd = line.IndexOf('}', tagStart + 1);
+                    if (braceEnd > tagStart)
+                    {
+                        tagEnd = braceEnd;
+                        Log.Warning($"[CommonKnowledge] 检测到错误的标签格式（使用了花括号）: {line.Substring(0, Math.Min(50, line.Length))}");
+                    }
+                }
+            }
 
             if (tagStart == -1 || tagEnd == -1 || tagEnd <= tagStart)
             {
@@ -694,20 +702,42 @@ namespace RimTalk.Memory
             
             int totalPawnKeywords = 0;
             
+            // ⭐ v3.3.2.38: 收集角色名字列表（用于名字识别）
+            var pawnNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            
             // 添加当前角色关键词
             if (currentPawn != null)
             {
                 int beforeCount = contextKeywords.Count;
                 keywordInfo.PawnInfo = ExtractPawnKeywordsWithDetails(contextKeywords, currentPawn);
                 totalPawnKeywords += contextKeywords.Count - beforeCount;
+                
+                // 收集当前角色名字
+                if (!string.IsNullOrEmpty(currentPawn.Name?.ToStringShort))
+                {
+                    pawnNames.Add(currentPawn.Name.ToStringShort);
+                }
             }
             
-            // 添加目标角色关键词（如果存在）
+            // ⭐ 添加目标角色关键词（如果存在）
             if (targetPawn != null && targetPawn != currentPawn)
             {
                 int beforeCount = contextKeywords.Count;
-                ExtractPawnKeywordsWithDetails(contextKeywords, targetPawn);
+                var targetPawnInfo = ExtractPawnKeywordsWithDetails(contextKeywords, targetPawn);
                 totalPawnKeywords += contextKeywords.Count - beforeCount;
+                
+                // 收集目标角色名字
+                if (!string.IsNullOrEmpty(targetPawn.Name?.ToStringShort))
+                {
+                    pawnNames.Add(targetPawn.Name.ToStringShort);
+                }
+                
+                // ⭐ v3.3.2.38: 记录目标角色关键词提取结果（用于调试）
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[Knowledge] Target pawn '{targetPawn.LabelShort}' added {contextKeywords.Count - beforeCount} keywords");
+                    Log.Message($"[Knowledge] Target keywords: {string.Join(", ", targetPawnInfo.NameKeywords.Concat(targetPawnInfo.RaceKeywords).Take(5))}");
+                }
             }
             
             keywordInfo.TotalKeywords = contextKeywords.Count;
@@ -723,10 +753,9 @@ namespace RimTalk.Memory
                            (currentPawn != null && e.targetPawnId == currentPawn.thingIDNumber)) // 或专属于当前Pawn
                 .ToList();
 
-            // 计算每个常识的相关性分数（包括详细信息）
-            // ⭐ v3.3.2.30: 优化 tie-breaker - 使用匹配关键词数量而不是 ID
+            // ⭐ v3.3.2.38: 计算每个常识的相关性分数时传递角色名字列表
             allScores = filteredEntries
-                .Select(e => e.CalculateRelevanceScoreWithDetails(contextKeywords))
+                .Select(e => e.CalculateRelevanceScoreWithDetails(contextKeywords, pawnNames))
                 .OrderByDescending(se => se.TotalScore)
                 .ThenByDescending(se => se.KeywordMatchCount) // ⭐ 优先按匹配数量（高到低）
                 .ThenBy(se => se.Entry.id, StringComparer.Ordinal) // ⭐ 最后按 ID（稳定排序）
