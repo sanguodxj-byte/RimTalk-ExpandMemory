@@ -11,10 +11,12 @@
         <!-- 移除app.manifest引用 -->
         <!-- <ApplicationManifest>app.manifest</ApplicationManifest> -->
 
-        <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
+        <!-- ⭐ 设置默认 RimWorld 目录 -->
+        <RimWorldDir Condition=" '$(RimWorldDir)' == '' AND '$(RIMWORLD_DIR)' != '' ">$(RIMWORLD_DIR)</RimWorldDir>
+        <RimWorldDir Condition=" '$(RimWorldDir)' == '' AND '$(RIMWORLD_DIR)' == '' ">D:\steam\steamapps\common\RimWorld</RimWorldDir>
 
         <OutputPath>$(GameVersion)/Assemblies</OutputPath>
-        <ModFolderName>RimTalk-MemoryPatch</ModFolderName>
+        <ModFolderName>RimTalk-ExpandMemory</ModFolderName>
         <LangVersion>7.3</LangVersion>
         <EnableBubbles>true</EnableBubbles>
         

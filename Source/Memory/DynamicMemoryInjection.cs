@@ -246,9 +246,9 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 提取上下文关键词（核心 + 模糊双重策略）
-        /// ⭐ v3.3.2.29: 升级为"核心 + 模糊"策略，与常识库保持一致
-        /// - 核心策略：按长度降序排序，取前10个（优先详细概念）
-        /// - 模糊策略：从剩余池中随机选10个（增加多样性）
+        /// ⭐ v3.3.2.34: 修复非确定性行为 - 使用完全确定性排序
+        /// - 核心策略：按长度降序 + 字母顺序升序，取前10个（优先详细概念）
+        /// - 模糊策略：从剩余池按字母顺序选10个（确定性选择）
         /// - 最终返回最多20个关键词
         /// </summary>
         private static List<string> ExtractKeywords(string text)
@@ -271,32 +271,25 @@ namespace RimTalk.Memory
                 return new List<string>();
             }
             
-            // ⭐ 策略1：核心词 - 按长度降序排序，取前10个（优先详细概念）
+            // ⭐ v3.3.2.34: 策略1：核心词 - 按长度降序 + 字母顺序升序，取前10个
             var sortedByLength = weightedKeywords
                 .OrderByDescending(kw => kw.Word.Length)
+                .ThenBy(kw => kw.Word, StringComparer.Ordinal) // ⭐ 确定性 tie-breaker
                 .ToList();
             
             var coreKeywords = sortedByLength.Take(10).ToList();
             
-            // ⭐ 策略2：模糊词 - 从剩余池随机选10个（增加多样性）
+            // ⭐ v3.3.2.34: 策略2：模糊词 - 从剩余池按字母顺序选10个（确定性）
             var remainingPool = sortedByLength.Skip(10).ToList();
             var fuzzyKeywords = new List<WeightedKeyword>();
             
             if (remainingPool.Count > 0)
             {
-                // 使用当前tick作为随机种子（保证同一tick内结果一致）
-                var random = new System.Random(Find.TickManager.TicksGame);
-                
-                // Fisher-Yates 洗牌算法
-                for (int i = remainingPool.Count - 1; i > 0; i--)
-                {
-                    int j = random.Next(i + 1);
-                    var temp = remainingPool[i];
-                    remainingPool[i] = remainingPool[j];
-                    remainingPool[j] = temp;
-                }
-                
-                fuzzyKeywords = remainingPool.Take(10).ToList();
+                // ⭐ 按字母顺序排序（确定性），然后取前10个
+                fuzzyKeywords = remainingPool
+                    .OrderBy(kw => kw.Word, StringComparer.Ordinal)
+                    .Take(10)
+                    .ToList();
             }
             
             // ⭐ 策略3：合并核心词 + 模糊词（最多20个）
@@ -308,8 +301,8 @@ namespace RimTalk.Memory
             if (Prefs.DevMode)
             {
                 Log.Message($"[Memory] ExtractKeywords: {finalKeywords.Count} keywords total");
-                Log.Message($"[Memory] - Core: {coreKeywords.Count} (by length descending)");
-                Log.Message($"[Memory] - Fuzzy: {fuzzyKeywords.Count} (random from {remainingPool.Count} pool)");
+                Log.Message($"[Memory] - Core: {coreKeywords.Count} (by length desc + alpha asc)");
+                Log.Message($"[Memory] - Fuzzy: {fuzzyKeywords.Count} (alphabetical from {remainingPool.Count} pool)");
             }
             
             return finalKeywords;

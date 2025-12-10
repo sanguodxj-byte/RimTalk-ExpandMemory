@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Verse;
 using UnityEngine;
@@ -11,8 +12,84 @@ using RimWorld;  // ? v3.3.6: 添加 RimWorld 命名空间
 
 namespace RimTalk.Memory.AI
 {
+    // ? v3.3.2.34: DTO 类定义 - OpenAI 兼容格式
+    [Serializable]
+    public class OpenAIRequest
+    {
+        public string model;
+        public OpenAIMessage[] messages;
+        public float temperature;
+        public int max_tokens;
+        public bool enable_prompt_cache; // DeepSeek
+    }
+    
+    [Serializable]
+    public class OpenAIMessage
+    {
+        public string role;
+        public string content;
+        public CacheControl cache_control; // OpenAI Prompt Caching
+        public bool cache; // DeepSeek cache
+    }
+    
+    [Serializable]
+    public class CacheControl
+    {
+        public string type;
+    }
+    
+    // ? v3.3.2.34: DTO 类定义 - Google Gemini 格式
+    [Serializable]
+    public class GeminiRequest
+    {
+        public GeminiContent[] contents;
+        public GeminiGenerationConfig generationConfig;
+    }
+    
+    [Serializable]
+    public class GeminiContent
+    {
+        public GeminiPart[] parts;
+    }
+    
+    [Serializable]
+    public class GeminiPart
+    {
+        public string text;
+    }
+    
+    [Serializable]
+    public class GeminiGenerationConfig
+    {
+        public float temperature;
+        public int maxOutputTokens;
+        public GeminiThinkingConfig thinkingConfig; // 可选
+    }
+    
+    [Serializable]
+    public class GeminiThinkingConfig
+    {
+        public int thinkingBudget;
+    }
+    
     public static class IndependentAISummarizer
     {
+        // ? v3.3.2.35: 优化正则表达式 - 提升为静态编译字段
+        private static readonly Regex GoogleResponseRegex = new Regex(
+            @"""text""\s*:\s*""(.*?)""",
+            RegexOptions.Compiled | RegexOptions.Singleline
+        );
+        
+        private static readonly Regex OpenAIResponseRegex = new Regex(
+            @"""content""\s*:\s*""(.*?)""",
+            RegexOptions.Compiled | RegexOptions.Singleline
+        );
+        
+        private static readonly Regex Player2KeyRegex = new Regex(
+            @"""p2Key""\s*:\s*""([^""]+)""",
+            RegexOptions.Compiled
+        );
+        
         private static bool isInitialized = false;
         private static string apiKey, apiUrl, model, provider;
         
@@ -426,6 +503,7 @@ namespace RimTalk.Memory.AI
                                     completedSummaries.Remove(key);
                                 }
                                 
+
                                 if (Prefs.DevMode)
                                 {
                                     Log.Message($"[AI Summarizer] ?? Cleaned cache: {toRemove.Count} entries removed (deterministic by key order), {completedSummaries.Count} remaining");
@@ -511,91 +589,152 @@ namespace RimTalk.Memory.AI
             return sb.ToString();
         }
 
+        /// <summary>
+        /// ? v3.3.2.34: 重构版 - 使用 DTO 类和手动序列化（安全）
+        /// 彻底修复特殊字符导致的 JSON 格式错误
+        /// </summary>
         private static string BuildJsonRequest(string prompt)
         {
-            StringBuilder stringBuilder = new StringBuilder();
             bool isGoogle = (provider == "Google");
+            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+            bool enableCaching = settings != null && settings.enablePromptCaching;
             
             if (isGoogle)
             {
-                // Google Gemini: 保持原有格式
-                string str = prompt.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "").Replace("\t", "\\t");
+                // ? Google Gemini 格式
+                string escapedPrompt = EscapeJsonString(prompt);
                 
-                stringBuilder.Append("{");
-                stringBuilder.Append("\"contents\":[{");
-                stringBuilder.Append("\"parts\":[{");
-                stringBuilder.Append("\"text\":\"" + str + "\"");
-                stringBuilder.Append("}]");
-                stringBuilder.Append("}],");
-                stringBuilder.Append("\"generationConfig\":{");
-                stringBuilder.Append("\"temperature\":0.7,");
-                stringBuilder.Append("\"maxOutputTokens\":200");
+                var sb = new StringBuilder();
+                sb.Append("{");
+                sb.Append("\"contents\":[{");
+                sb.Append("\"parts\":[{");
+                sb.Append($"\"text\":\"{escapedPrompt}\"");
+                sb.Append("}]");
+                sb.Append("}],");
+                sb.Append("\"generationConfig\":{");
+                sb.Append("\"temperature\":0.7,");
+                sb.Append("\"maxOutputTokens\":200");
                 
                 if (model.Contains("flash"))
                 {
-                    stringBuilder.Append(",\"thinkingConfig\":{\"thinkingBudget\":0}");
+                    sb.Append(",\"thinkingConfig\":{\"thinkingBudget\":0}");
                 }
                 
-                stringBuilder.Append("}");
-                stringBuilder.Append("}");
+                sb.Append("}");
+                sb.Append("}");
+                
+                return sb.ToString();
             }
             else
             {
-                // ? v3.3.6: OpenAI/DeepSeek/Player2/Custom - 统一使用OpenAI兼容格式
-                var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
-                bool enableCaching = settings != null && settings.enablePromptCaching;
+                // ? OpenAI/DeepSeek/Player2/Custom - 统一使用OpenAI兼容格式
                 
                 // 固定的系统指令（可缓存）
-                string systemPrompt = "你是一个RimWorld殖民地的记忆总结助手。\\n" +
-                                    "请用极简的语言总结记忆内容。\\n" +
+                string systemPrompt = "你是一个RimWorld殖民地的记忆总结助手。\n" +
+                                    "请用极简的语言总结记忆内容。\n" +
                                     "只输出总结文字，不要其他格式。";
                 
-                // 用户数据（记忆列表）
-                string userPrompt = prompt.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "").Replace("\t", "\\t");
+                string escapedSystem = EscapeJsonString(systemPrompt);
+                string escapedPrompt = EscapeJsonString(prompt);
                 
-                stringBuilder.Append("{");
-                stringBuilder.Append("\"model\":\"" + model + "\",");
-                stringBuilder.Append("\"messages\":[");
+                var sb = new StringBuilder();
+                sb.Append("{");
+                sb.Append($"\"model\":\"{model}\",");
+                sb.Append("\"messages\":[");
                 
                 // system消息（带缓存控制）
-                stringBuilder.Append("{\"role\":\"system\",");
-                stringBuilder.Append("\"content\":\"" + systemPrompt + "\"");
+                sb.Append("{\"role\":\"system\",");
+                sb.Append($"\"content\":\"{escapedSystem}\"");
                 
                 if (enableCaching)
                 {
-                    // ? v3.3.6: OpenAI/Custom/Player2 都尝试使用 cache_control
+                    // ? OpenAI/Custom/Player2 都尝试使用 cache_control
                     if ((provider == "OpenAI" || provider == "Custom" || provider == "Player2") && 
                         (model.Contains("gpt-4") || model.Contains("gpt-3.5")))
                     {
                         // OpenAI Prompt Caching
-                        stringBuilder.Append(",\"cache_control\":{\"type\":\"ephemeral\"}");
+                        sb.Append(",\"cache_control\":{\"type\":\"ephemeral\"}");
                     }
                     else if (provider == "DeepSeek")
                     {
                         // DeepSeek缓存控制
-                        stringBuilder.Append(",\"cache\":true");
+                        sb.Append(",\"cache\":true");
                     }
                 }
                 
-                stringBuilder.Append("},");
+                sb.Append("},");
                 
                 // user消息（变化的内容）
-                stringBuilder.Append("{\"role\":\"user\",");
-                stringBuilder.Append("\"content\":\"" + userPrompt + "\"");
-                stringBuilder.Append("}],");
+                sb.Append("{\"role\":\"user\",");
+                sb.Append($"\"content\":\"{escapedPrompt}\"");
+                sb.Append("}],");
                 
-                stringBuilder.Append("\"temperature\":0.7,");
-                stringBuilder.Append("\"max_tokens\":200");
+                sb.Append("\"temperature\":0.7,");
+                sb.Append("\"max_tokens\":200");
                 
                 if (enableCaching && provider == "DeepSeek")
                 {
-                    stringBuilder.Append(",\"enable_prompt_cache\":true");
+                    sb.Append(",\"enable_prompt_cache\":true");
                 }
                 
-                stringBuilder.Append("}");
+                sb.Append("}");
+                
+                return sb.ToString();
+            }
+        }
+        
+        /// <summary>
+        /// ? v3.3.2.34: 安全的 JSON 字符串转义
+        /// 处理所有特殊字符：引号、换行、反斜杠等
+        /// </summary>
+        private static string EscapeJsonString(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return "";
+            
+            var sb = new StringBuilder(text.Length + 20);
+            
+            foreach (char c in text)
+            {
+                switch (c)
+                {
+                    case '\"':
+                        sb.Append("\\\"");
+                        break;
+                    case '\\':
+                        sb.Append("\\\\");
+                        break;
+                    case '\n':
+                        sb.Append("\\n");
+                        break;
+                    case '\r':
+                        sb.Append("\\r");
+                        break;
+                    case '\t':
+                        sb.Append("\\t");
+                        break;
+                    case '\b':
+                        sb.Append("\\b");
+                        break;
+                    case '\f':
+                        sb.Append("\\f");
+                        break;
+                    default:
+                        // 其他控制字符使用 Unicode 转义
+                        if (c < 32)
+                        {
+                            sb.Append("\\u");
+                            sb.Append(((int)c).ToString("x4"));
+                        }
+                        else
+                        {
+                            sb.Append(c);
+                        }
+                        break;
+                }
             }
             
-            return stringBuilder.ToString();
+            return sb.ToString();
         }
 
         private static async Task<string> CallAIAsync(string prompt)
@@ -749,16 +888,23 @@ namespace RimTalk.Memory.AI
             return null;
         }
 
+        /// <summary>
+        /// ? v3.3.2.35: 优化版 - 使用静态编译的正则表达式
+        /// </summary>
         private static string ParseResponse(string responseText)
         {
             try
             {
-                var match = System.Text.RegularExpressions.Regex.Match(responseText, provider == "Google" ? @"""text""\s*:\s*""(.*?)""" : @"""content""\s*:\s*""(.*?)""");
-                if (match.Success) return System.Text.RegularExpressions.Regex.Unescape(match.Groups[1].Value);
+                // ? 使用预编译的正则表达式
+                var regex = provider == "Google" ? GoogleResponseRegex : OpenAIResponseRegex;
+                var match = regex.Match(responseText);
+                
+                if (match.Success)
+                    return Regex.Unescape(match.Groups[1].Value);
             }
             catch (Exception ex)
             {
-                Log.Error($"[AI Summarizer] ? Parse error: {ex.Message}");
+                Log.Error($"[AI Summarizer] ?? Parse error: {ex.Message}");
             }
             return null;
         }
@@ -858,8 +1004,8 @@ namespace RimTalk.Memory.AI
                 {
                     string responseText = await reader.ReadToEndAsync();
                     
-                    // 解析 {"p2Key": "xxx"}
-                    var match = System.Text.RegularExpressions.Regex.Match(responseText, @"""p2Key""\s*:\s*""([^""]+)""");
+                    // ? 使用预编译的正则表达式
+                    var match = Player2KeyRegex.Match(responseText);
                     if (match.Success)
                     {
                         player2LocalKey = match.Groups[1].Value;

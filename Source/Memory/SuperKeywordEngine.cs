@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Verse;
 
 namespace RimTalk.Memory
@@ -21,6 +22,12 @@ namespace RimTalk.Memory
     /// </summary>
     public static class SuperKeywordEngine
     {
+        // ? v3.3.2.35: 优化正则表达式 - 提升为静态编译字段
+        private static readonly Regex EnglishWordRegex = new Regex(
+            @"\b[a-zA-Z]{2,}\b",
+            RegexOptions.Compiled
+        );
+        
         // 中文停用词表（高频但无意义的词）
         private static readonly HashSet<string> StopWords = new HashSet<string>
         {
@@ -100,14 +107,14 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ? v3.3.2.28: 提取英文单词（完整单词，不切割）
+        /// ? v3.3.2.35: 优化版 - 使用静态编译的正则表达式
         /// </summary>
         private static void ExtractEnglishWords(string text, Dictionary<string, KeywordScore> keywordScores)
         {
-            // 使用正则表达式提取完整的英文单词（2个字母以上）
-            var matches = System.Text.RegularExpressions.Regex.Matches(text, @"\b[a-zA-Z]{2,}\b");
+            // ? 使用预编译的正则表达式提取完整的英文单词（2个字母以上）
+            var matches = EnglishWordRegex.Matches(text);
             
-            foreach (System.Text.RegularExpressions.Match match in matches)
+            foreach (Match match in matches)
             {
                 string word = match.Value;
                 int position = match.Index;
