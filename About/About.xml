@@ -7,12 +7,12 @@
 		<li>1.5</li>
 		<li>1.6</li>
 	</supportedVersions>
-	<modVersion>3.3.8</modVersion>
+	<modVersion>3.3.2.38</modVersion>
 	<url>https://github.com/sanguodxj-byte/RimTalk-ExpandMemory</url>
 	
-	<description>[h1]RimTalk - Expand Memory v3.3.8[/h1]
+	<description>[h1]RimTalk - Expand Memory v3.3.2.38[/h1]
 
-[b]🚀 四层记忆系统 + 智能注入 + AI多平台支持 + TTS语音播放[/b]
+[b]🚀 四层记忆系统 + 智能注入 + 提示词规范化 + AI多平台支持[/b]
 
 为RimTalk AI对话提供强大的记忆与常识支持，让殖民者拥有真实的记忆和知识！
 
@@ -21,35 +21,43 @@
 [h1]✨ 核心功能[/h1]
 
 [b]🧠 四层记忆架构[/b]
-超短期(ABM 6条) → 短期(SCM 10-50条) → 中期(ELS 20-100条) → 长期(CLPA 无限)，模拟真实记忆衰减
+超短期(ABM 6条) → 短期(SCM 10-50条) → 中期(ELS 20-100条) → 长期(CLPA 无限)，模拟真实的记忆衰减
 
 [b]🎯 智能动态注入[/b]
-时间衰减30% + 重要性30% + 关键词40%，自动选择最相关记忆注入对话，类似CharacterAI
+• 时间衰减30% + 重要性30% + 关键词40%
+• 自动选择最相关记忆注入对话
+• 名字识别加成：+0.3分（v3.3.2.38优化）
+• 支持双角色关键词提取（当前角色 + 交互对象）
+• O(1) LRU缓存优化
+
+[b]✨ 提示词规范化 (v3.3.2.37新增)[/b]
+• 用户自定义文本替换规则
+• 支持正则表达式（忽略大小写）
+• 预编译优化 + 20ms超时保护
+• 实时生效，无需重启
+• 示例：将 \(Player\) 替换为 Master
 
 [b]📚 通用常识库[/b]
-规则、设定、世界观管理。格式：[标签|重要性]内容。支持导入导出、角色专属、可视化UI
+• 格式：[标签|重要性]内容
+• 支持导入导出、角色专属、可视化UI
+• 标签解析容错：[Noble] 和 [Noble} 都能识别（v3.3.2.38）
+• 名字匹配智能识别：直接检测角色名字，+0.3加成
 
 [b]⚡ SuperKeywordEngine[/b]
 • 智能分词：中文2-6字词组 + 完整英文单词
-• TF-IDF权重：长词优先，位置权重，自动排序
-• 关键词上限：100个
-• 准确率：95%
-• 响应时间：&lt;3ms
+• TF-IDF权重：长词优先，位置权重
+• 完全确定性排序：相同输入总是相同输出（v3.3.2.34修复）
+• 关键词上限：100个，响应时间 &lt;3ms
 
-[b]🤖 AI 多平台支持 (v3.3.8新增)[/b]
-• OpenAI GPT系列
-• DeepSeek 中文优化
-• Player2 游戏优化
-• Google Gemini
-• Custom 自定义端点
+[b]🤖 AI 多平台支持[/b]
+• OpenAI GPT、DeepSeek、Player2、Google Gemini、Custom
 • Prompt Caching 节省50%费用
+• 独立配置，不依赖RimTalk设置
 
-[b]🔊 TTS 语音播放 (v3.3.7新增)[/b]
+[b]🔊 TTS 语音播放 (v3.3.7)[/b]
 • Azure Speech Service
 • 中英文语音选择（4种）
 • 自动播放 AI 对话
-• Unity AudioSource播放
-• 语速、音量调节
 
 [hr][/hr]
 
@@ -63,24 +71,22 @@
 [code]
 [世界观|0.9]边缘世界，科技倒退
 [规则|0.8]回复80字内，口语化
-[危机|0.7]海盗定期袭击
+[Noble|0.5]Noble是殖民地领袖，擅长社交
 [/code]
 
-[b]AI 配置（v3.3.8）[/b]
+[b]提示词规范化（v3.3.2.37）[/b]
+1. Mod设置 → 顶部"提示词规范化"
+2. 点击"+ 添加新规则"
+3. 输入模式（正则表达式）：\(Player\)
+4. 输入替换内容：Master
+5. 勾选"启用"
+6. 自动生效，无需重启
+
+[b]AI 配置[/b]
 1. Mod设置 → 展开"AI 配置"
 2. 选择提供商（OpenAI/DeepSeek/Player2/Google/Custom）
 3. 输入 API Key
 4. 点击"验证配置"
-5. 启用 Prompt Caching（可选，节省费用）
-
-[b]TTS 配置（v3.3.7）[/b]
-1. Mod设置 → 展开"TTS 语音服务"
-2. 启用 TTS
-3. 输入 Azure Speech Key 和 Region
-4. 选择语音（晓晓/云希/Jenny/Guy）
-5. 调整语速和音量
-6. 启用"自动播放 AI 对话"（可选）
-7. 点击"测试语音"
 
 [b]推荐配置[/b]
 • 动态注入：启用 ✅
@@ -90,17 +96,20 @@
 • 常识阈值：0.10
 
 [b]调试工具[/b]
-Mod设置 → 注入内容预览器 → 实时查看注入效果、评分明细、Token估算
+Mod设置 → 注入预览器 → 实时查看注入效果、评分明细、名字匹配加成
 
 [hr][/hr]
 
-[h1]📊 性能对比[/h1]
-[table]
-[tr][th]配置[/th][th]Token[/th][th]场景[/th][/tr]
-[tr][td]最小(1+1)[/td][td]40[/td][td]极简[/td][/tr]
-[tr][td]推荐(8+3)[/td][td]220[/td][td]标准[/td][/tr]
-[tr][td]最大(20+10)[/td][td]600[/td][td]深度[/td][/tr]
-[/table]
+[h1]📊 性能优化（v3.3.2.34-v3.3.2.36）[/h1]
+[b]修复非确定性行为：[/b]
+• 关键词提取：完全确定性排序（长度降序 + 字母顺序）
+• JSON解析：静态编译正则，10-20倍性能提升
+• 纯数字检查：字符循环替代正则，100倍提升
+• 对话缓存：O(1) LRU链表优化
+
+[b]修复控制台崩溃：[/b]
+• 移除 System.ValueTuple.dll（与.NET 4.7.2冲突）
+• 清理多余依赖文件
 
 [hr][/hr]
 
@@ -115,31 +124,42 @@ Mod设置 → 注入内容预览器 → 实时查看注入效果、评分明细�
 
 [h1]📝 更新日志[/h1]
 
-[b]v3.3.8 最新 🎉[/b]
-• 🤖 [b]AI 多平台支持[/b]
-  - 支持 OpenAI、DeepSeek、Player2、Google、Custom
-  - 提供商一键切换
-  - 配置验证功能
-  - Prompt Caching 优化
-• 🎨 [b]设置界面优化[/b]
-  - 彩色提供商按钮
-  - 实时配置说明
-  - 详细的帮助提示
+[b]v3.3.2.38 最新 🎉[/b]
+• 🎯 [b]名字识别优化[/b]
+  - 改进名字检测算法：直接检查角色名字列表
+  - 支持双角色名字识别（当前角色 + 交互对象）
+  - 名字匹配加成 +0.3 分
+  - 详细调试日志：显示匹配的名字和加成详情
+• 🛡️ [b]标签解析容错[/b]
+  - 支持识别 [Noble} 格式（右括号写错为花括号）
+  - 自动警告并修正格式错误
+  - 提高常识库导入成功率
 
-[b]v3.3.7[/b]
-• 🔊 [b]TTS 语音播放功能[/b]
-  - Azure Speech Service 集成
-  - 中英文语音（晓晓/云希/Jenny/Guy）
-  - 自动播放 AI 对话
-  - Unity AudioSource 播放器
-  - 语速、音量调节
-• 🐛 修复 User-Agent 导致的崩溃
-• 🐛 移除 200 字符文本长度限制
+[b]v3.3.2.37[/b]
+• ✨ [b]提示词规范化系统[/b]
+  - 用户自定义替换规则
+  - 支持正则表达式（预编译 + 超时保护）
+  - 实时生效，无需重启
+  - 完整的UI界面
+
+[b]v3.3.2.36[/b]
+• 🐛 [b]修复控制台崩溃[/b]
+  - 移除 System.ValueTuple 依赖
+  - 清理游戏目录中的冲突 DLL
+
+[b]v3.3.2.34-v3.3.2.35[/b]
+• 🚀 [b]性能优化大礼包[/b]
+  - 关键词提取完全确定性
+  - JSON解析 10-20倍提升
+  - 纯数字检查 100倍提升
+  - O(1) LRU缓存优化
+
+[b]v3.3.2.31[/b]
+• 🎯 名字关键词匹配加成（初版）
 
 [b]v3.3.2.28[/b]
 • 🚀 SuperKeywordEngine 重大优化
 • ❌ 移除 VectorDB/语义嵌入/RAG
-• ✅ 设置界面 UI 清理
 
 [hr][/hr]
 
@@ -150,8 +170,8 @@ RimTalk 是 RimWorld 最优秀的 AI 对话 Mod 之一，为殖民者赋予了�
 RimTalk is one of the best AI conversation mods for RimWorld, giving colonists real soul and personality. Its innovative design inspired me to create this memory system extension.
 
 [b]GitHub Copilot (Claude Sonnet 4.5)[/b]
-AI 辅助让开发更高效（我没有编写任何代码
-AI assistance made development more efficient. (I didn't write any code
+AI 辅助让开发更高效（我没有编写任何代码）
+AI assistance made development more efficient. (I didn't write any code)
 
 [hr][/hr]
 
@@ -184,4 +204,4 @@ GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
 	
 	<incompatibleWith>
 	</incompatibleWith>
-</ModMetaData></ModMetaData>
+</ModMetaData>

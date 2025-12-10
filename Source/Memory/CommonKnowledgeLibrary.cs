@@ -743,6 +743,24 @@ namespace RimTalk.Memory
             keywordInfo.TotalKeywords = contextKeywords.Count;
             keywordInfo.PawnKeywordsCount = totalPawnKeywords;
 
+            // ⭐ v3.3.2.38: 调试日志 - 显示收集到的角色名字
+            if (Prefs.DevMode && pawnNames.Count > 0)
+            {
+                Log.Message($"[Knowledge] Collected pawn names for matching: {string.Join(", ", pawnNames)}");
+                Log.Message($"[Knowledge] Total contextKeywords: {contextKeywords.Count}");
+                
+                // 显示关键词中包含的名字
+                var nameKeywordsInContext = contextKeywords.Where(k => pawnNames.Contains(k)).ToList();
+                if (nameKeywordsInContext.Count > 0)
+                {
+                    Log.Message($"[Knowledge] Name keywords in context: {string.Join(", ", nameKeywordsInContext)}");
+                }
+                else
+                {
+                    Log.Warning($"[Knowledge] ⚠️ No name keywords found in context!");
+                }
+            }
+
             // 获取阈值设置
             float threshold = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.knowledgeScoreThreshold ?? 0.1f;
 
