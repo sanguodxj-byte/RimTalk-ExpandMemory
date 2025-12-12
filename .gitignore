@@ -1,5 +1,4 @@
-
-/.config
+/config
 /*.sln 
 /obj
 .idea
@@ -12,6 +11,10 @@ Folder.DotSettings.user
 Directory.Build.props
 *.sh
 auto_push_github.ps1
+
+# ? 本地配置文件（包含用户特定路径，不应提交）
+.rimworld.config
+deploy.ps1
 
 ## Interaction bubble library
 Libs/Bubbles.dll

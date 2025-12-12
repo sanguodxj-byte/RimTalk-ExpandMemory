@@ -1,45 +1,71 @@
 # RimTalk-ExpandMemory Mod 部署指南
 
-## ?? 快速部署
+## ?? 快速开始
 
-### 方法1：使用自动部署脚本（推荐）
+### 第一次使用？请先配置路径
+
+**步骤1：创建配置文件**
 
 ```powershell
-# 直接运行部署脚本
+# 复制示例配置文件
+Copy-Item .rimworld.config.example .rimworld.config
+Copy-Item deploy.ps1.example deploy.ps1
+```
+
+**步骤2：编辑配置文件**
+
+打开 `.rimworld.config`，将 `YOUR_RIMWORLD_PATH_HERE` 替换为您的 RimWorld 路径。
+
+常见路径示例：
+- **Steam (Windows)**：`C:\Program Files (x86)\Steam\steamapps\common\RimWorld`
+- **Steam (自定义)**：`D:\steam\steamapps\common\RimWorld`
+- **GOG**：`C:\GOG Games\RimWorld`
+- **Linux**：`~/.steam/steam/steamapps/common/RimWorld`
+- **macOS**：`~/Library/Application Support/Steam/steamapps/common/RimWorld`
+
+**步骤3：（可选）设置环境变量**
+
+```powershell
+# Windows
+setx RIMWORLD_DIR "您的RimWorld路径"
+
+# Linux/macOS（添加到 ~/.bashrc 或 ~/.zshrc）
+export RIMWORLD_DIR="您的RimWorld路径"
+```
+
+### 快速部署
+
+配置完成后，每次部署只需：
+
+```powershell
 .\deploy.ps1
 ```
 
-### 方法2：Visual Studio 自动部署
+---
 
-构建项目后会自动部署到 RimWorld Mod 目录（需要设置环境变量）。
+## ?? 配置方式对比
+
+| 方式 | 优点 | 缺点 | 推荐度 |
+|------|------|------|--------|
+| **配置文件** `.rimworld.config` | ? 项目级配置<br>? 不影响其他项目<br>? 不上传到 Git | 需要每个项目配置 | ????? |
+| **环境变量** `RIMWORLD_DIR` | ? 全局生效<br>? Visual Studio 自动部署 | 需要重启 VS | ???? |
+| **命令行参数** `-RimWorldDir` | ? 灵活临时使用 | 每次都要输入 | ??? |
 
 ---
 
-## ?? 配置 RimWorld 路径
+## ?? 安全提示
 
-### 永久配置（推荐）
-
-**已为您配置好的路径：**
-```
-D:\steam\steamapps\common\RimWorld
-```
-
-环境变量已设置为 `RIMWORLD_DIR`，重启 Visual Studio 后自动生效。
-
-### 修改路径（如需更换）
-
-1. **修改环境变量：**
-   ```powershell
-   setx RIMWORLD_DIR "新的RimWorld路径"
-   ```
-
-2. **修改配置文件：**
-   编辑 `.rimworld.config` 文件，更新 `RIMWORLD_DIR` 的值。
-
-3. **手动指定路径：**
-   ```powershell
-   .\deploy.ps1 -RimWorldDir "新的RimWorld路径"
-   ```
+> **?? 重要：本地配置文件已添加到 `.gitignore`**
+>
+> - `.rimworld.config` - 您的本地路径配置
+> - `deploy.ps1` - 您的自定义部署脚本
+>
+> 这些文件**不会**被提交到 Git 仓库，保护您的隐私。
+>
+> 其他用户需要：
+> 1. 复制 `.rimworld.config.example` → `.rimworld.config`
+> 2. 复制 `deploy.ps1.example` → `deploy.ps1`
+> 3. 填入自己的路径
 
 ---
 
@@ -47,7 +73,7 @@ D:\steam\steamapps\common\RimWorld
 
 部署后的目录结构：
 ```
-D:\steam\steamapps\common\RimWorld\Mods\RimTalk-MemoryPatch\
+<RimWorld路径>\Mods\RimTalk-MemoryPatch\
 ├── About\              # Mod 信息和预览图
 ├── Defs\               # 游戏定义文件
 ├── Languages\          # 多语言翻译
@@ -55,16 +81,6 @@ D:\steam\steamapps\common\RimWorld\Mods\RimTalk-MemoryPatch\
 └── 1.6\                # 游戏版本专属文件
     └── Assemblies\     # 编译后的 DLL
 ```
-
----
-
-## ?? 启用 Mod
-
-1. 启动 RimWorld
-2. 主菜单 → **Mods**
-3. 找到 `RimTalk-MemoryPatch`
-4. 勾选启用
-5. 重启游戏
 
 ---
 
@@ -86,60 +102,82 @@ dotnet build
 
 ### 3. 部署到游戏
 
-**自动部署（推荐）：**
-- 构建项目后自动部署（需环境变量）
-
-**手动部署：**
 ```powershell
 .\deploy.ps1
 ```
 
+**或者使用自定义路径：**
+```powershell
+.\deploy.ps1 -RimWorldDir "C:\Games\RimWorld"
+```
+
 ### 4. 测试
 
-- 启动 RimWorld
-- 启用 Mod
-- 测试功能
+1. 启动 RimWorld
+2. 主菜单 → **Mods**
+3. 启用 `RimTalk-MemoryPatch`
+4. 重启游戏
 
 ---
 
 ## ?? 配置文件说明
 
-### `.rimworld.config`
-
-存储 RimWorld 路径和部署配置的本地文件。
+### `.rimworld.config`（本地配置，不提交）
 
 ```ini
+# 您的 RimWorld 路径（根据实际情况修改）
 RIMWORLD_DIR=D:\steam\steamapps\common\RimWorld
+
+# Mod 名称（通常不需要修改）
 MOD_FOLDER_NAME=RimTalk-MemoryPatch
+
+# 游戏版本（通常不需要修改）
 GAME_VERSION=1.6
 ```
 
-### `deploy.ps1`
+### `.rimworld.config.example`（示例模板，会提交）
 
-PowerShell 部署脚本，支持自定义参数：
+其他用户的参考模板，包含常见路径示例。
 
-```powershell
-# 使用默认配置
-.\deploy.ps1
+### `deploy.ps1`（本地脚本，不提交）
 
-# 自定义路径
-.\deploy.ps1 -RimWorldDir "C:\Games\RimWorld"
+您的自定义部署脚本，可根据需要修改。
 
-# 自定义 Mod 名称和版本
-.\deploy.ps1 -ModName "MyMod" -GameVersion "1.5"
-```
+### `deploy.ps1.example`（示例模板，会提交）
+
+其他用户的参考模板，支持多种配置方式。
 
 ---
 
 ## ? 常见问题
 
+### Q: 为什么找不到 .rimworld.config 文件？
+
+**A:** 这是正常的！首次使用需要您创建：
+
+```powershell
+Copy-Item .rimworld.config.example .rimworld.config
+```
+
+然后编辑 `.rimworld.config` 填入您的路径。
+
+### Q: 我的配置会被推送到 GitHub 吗？
+
+**A:** 不会！`.rimworld.config` 和 `deploy.ps1` 已添加到 `.gitignore`，您的本地路径是安全的。
+
 ### Q: 环境变量未生效？
 
-**A:** 设置环境变量后需要**重启 Visual Studio**。
+**A:** 设置环境变量后需要**重启 Visual Studio** 或**重新打开 PowerShell**。
 
 ### Q: 部署失败，提示权限不足？
 
-**A:** 以**管理员身份**运行 PowerShell 或 Visual Studio。
+**A:** 以**管理员身份**运行 PowerShell：
+
+```powershell
+# 右键点击 PowerShell 图标 → 以管理员身份运行
+cd "您的项目路径"
+.\deploy.ps1
+```
 
 ### Q: robocopy 返回错误码？
 
@@ -151,42 +189,17 @@ PowerShell 部署脚本，支持自定义参数：
 echo $env:RIMWORLD_DIR
 ```
 
+### Q: macOS/Linux 如何部署？
+
+**A:** 使用示例脚本的 rsync 部分（已包含在 `deploy.ps1.example` 中）。
+
 ---
 
-## ?? GitHub Copilot 提示词（让 AI 记住路径）
+## ?? GitHub Copilot 配置
 
-您可以在与 Copilot 对话时使用以下提示词：
+项目已包含 `.github/copilot-instructions.md`，GitHub Copilot 会自动读取并记住常用路径和配置。
 
-```
-# 工作区配置提示词
-
-我的 RimWorld 安装路径是：
-D:\steam\steamapps\common\RimWorld
-
-Mod 文件夹路径是：
-D:\steam\steamapps\common\RimWorld\Mods
-
-当前项目 Mod 名称是：
-RimTalk-MemoryPatch
-
-请在后续所有涉及路径的操作中使用这些配置。
-```
-
-或者创建 `.github/copilot-instructions.md` 文件（如果使用 GitHub Copilot Workspace）：
-
-```markdown
-# Copilot 工作区指令
-
-## RimWorld 配置
-- 安装路径：`D:\steam\steamapps\common\RimWorld`
-- Mod 文件夹：`D:\steam\steamapps\common\RimWorld\Mods`
-- 当前 Mod：`RimTalk-MemoryPatch`
-
-## 部署流程
-1. 构建项目：`dotnet build`
-2. 运行部署：`.\deploy.ps1`
-3. 启动游戏测试
-```
+**但请注意：** Copilot 指令文件中不应包含您的个人路径，它只包含通用的项目结构说明。
 
 ---
 
@@ -200,16 +213,17 @@ RimTalk-MemoryPatch
 
 ## ? 检查清单
 
-部署前确认：
-- [x] 环境变量已设置（`RIMWORLD_DIR`）
-- [x] 项目已构建成功
-- [x] `.rimworld.config` 配置正确
-- [x] `deploy.ps1` 脚本可执行
+**首次配置：**
+- [ ] 复制 `.rimworld.config.example` → `.rimworld.config`
+- [ ] 复制 `deploy.ps1.example` → `deploy.ps1`
+- [ ] 编辑 `.rimworld.config` 填入您的 RimWorld 路径
+- [ ] （可选）设置环境变量 `RIMWORLD_DIR`
 
-部署后确认：
-- [x] Mod 文件夹存在：`D:\steam\steamapps\common\RimWorld\Mods\RimTalk-MemoryPatch`
-- [x] DLL 文件存在：`1.6\Assemblies\RimTalkMemoryPatch.dll`
-- [x] RimWorld 中能看到 Mod
+**每次部署：**
+- [ ] 构建项目（`dotnet build` 或 `Ctrl+Shift+B`）
+- [ ] 运行部署脚本（`.\deploy.ps1`）
+- [ ] 检查 Mod 文件夹是否存在
+- [ ] 启动 RimWorld 并启用 Mod
 
 ---
 
