@@ -606,7 +606,7 @@ namespace RimTalk.Memory.Debug
                     // 当前角色信息
                     preview.AppendLine($"【当前角色】: {selectedPawn.LabelShort}");
                     
-                    // 目标角色信息 ⭐ 新增
+                    // 目标角色信息
                     if (targetPawn != null)
                     {
                         preview.AppendLine($"【目标角色】: {targetPawn.LabelShort}");
@@ -617,100 +617,128 @@ namespace RimTalk.Memory.Debug
                     preview.AppendLine($"总关键词: {keywordInfo.TotalKeywords} 个");
                     preview.AppendLine();
                     
+                    // ⭐ 新增：显示具体的上下文关键词列表
+                    if (keywordInfo.ContextKeywords.Count > 0)
+                    {
+                        preview.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━══");
+                        preview.AppendLine("📝 【上下文关键词列表】");
+                        preview.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━══");
+                        preview.AppendLine();
+                        
+                        // 按长度分组显示
+                        var grouped = keywordInfo.ContextKeywords
+                            .GroupBy(kw => kw.Length)
+                            .OrderByDescending(g => g.Key);
+                        
+                        foreach (var group in grouped)
+                        {
+                            preview.AppendLine($"【{group.Key}字关键词】 ({group.Count()}个):");
+                            var keywords = group.OrderBy(kw => kw).Take(20).ToList(); // 每组最多显示20个
+                            preview.AppendLine("  " + string.Join(", ", keywords));
+                            if (group.Count() > 20)
+                            {
+                                preview.AppendLine($"  ... 还有 {group.Count() - 20} 个");
+                            }
+                            preview.AppendLine();
+                        }
+                    }
+                    
                     // 显示PawnInfo（仅显示当前角色的详细信息）
                     if (keywordInfo.PawnInfo != null)
                     {
                         var pawnInfo = keywordInfo.PawnInfo;
+                        preview.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━══");
                         preview.AppendLine($"【{pawnInfo.PawnName} 的关键词分类】");
+                        preview.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━══");
                         preview.AppendLine();
                         
                         if (pawnInfo.NameKeywords.Count > 0)
                         {
                             preview.AppendLine($"👤 名字关键词 ({pawnInfo.NameKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.NameKeywords));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.NameKeywords));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.AgeKeywords.Count > 0)
                         {
                             preview.AppendLine($"🎂 年龄关键词 ({pawnInfo.AgeKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.AgeKeywords));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.AgeKeywords));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.GenderKeywords.Count > 0)
                         {
                             preview.AppendLine($"⚥ 性别关键词 ({pawnInfo.GenderKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.GenderKeywords));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.GenderKeywords));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.RaceKeywords.Count > 0)
                         {
                             preview.AppendLine($"🧬 种族关键词 ({pawnInfo.RaceKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.RaceKeywords));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.RaceKeywords));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.TraitKeywords.Count > 0)
                         {
                             preview.AppendLine($"🎭 特质关键词 ({pawnInfo.TraitKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.TraitKeywords.Take(10)));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.TraitKeywords.Take(10)));
                             if (pawnInfo.TraitKeywords.Count > 10)
-                                preview.AppendLine($"... 还有 {pawnInfo.TraitKeywords.Count - 10} 个");
+                                preview.AppendLine($"   ... 还有 {pawnInfo.TraitKeywords.Count - 10} 个");
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.SkillKeywords.Count > 0)
                         {
                             preview.AppendLine($"🛠️ 技能关键词 ({pawnInfo.SkillKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.SkillKeywords));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.SkillKeywords));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.SkillLevelKeywords.Count > 0)
                         {
                             preview.AppendLine($"⭐ 技能等级关键词 ({pawnInfo.SkillLevelKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.SkillLevelKeywords.Distinct()));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.SkillLevelKeywords.Distinct()));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.HealthKeywords.Count > 0)
                         {
                             preview.AppendLine($"💚 健康状况关键词 ({pawnInfo.HealthKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.HealthKeywords.Distinct()));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.HealthKeywords.Distinct()));
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.RelationshipKeywords.Count > 0)
                         {
                             preview.AppendLine($"👥 关系网络关键词 ({pawnInfo.RelationshipKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.RelationshipKeywords.Take(10)));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.RelationshipKeywords.Take(10)));
                             if (pawnInfo.RelationshipKeywords.Count > 10)
-                                preview.AppendLine($"... 还有 {pawnInfo.RelationshipKeywords.Count - 10} 个");
+                                preview.AppendLine($"   ... 还有 {pawnInfo.RelationshipKeywords.Count - 10} 个");
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.BackstoryKeywords.Count > 0)
                         {
                             preview.AppendLine($"📖 背景故事关键词 ({pawnInfo.BackstoryKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.BackstoryKeywords.Take(15)));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.BackstoryKeywords.Take(15)));
                             if (pawnInfo.BackstoryKeywords.Count > 15)
-                                preview.AppendLine($"... 还有 {pawnInfo.BackstoryKeywords.Count - 15} 个");
+                                preview.AppendLine($"   ... 还有 {pawnInfo.BackstoryKeywords.Count - 15} 个");
                             preview.AppendLine();
                         }
                         
                         if (pawnInfo.ChildhoodKeywords.Count > 0)
                         {
                             preview.AppendLine($"🎈 童年背景关键词 ({pawnInfo.ChildhoodKeywords.Count}个)");
-                            preview.AppendLine(string.Join(", ", pawnInfo.ChildhoodKeywords.Take(15)));
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.ChildhoodKeywords.Take(15)));
                             if (pawnInfo.ChildhoodKeywords.Count > 15)
-                                preview.AppendLine($"... 还有 {pawnInfo.ChildhoodKeywords.Count - 15} 个");
+                                preview.AppendLine($"   ... 还有 {pawnInfo.ChildhoodKeywords.Count - 15} 个");
                             preview.AppendLine();
                         }
                     }
                     
-                    // 如果有目标角色，显示提示信息 ⭐
+                    // 如果有目标角色，显示提示信息
                     if (targetPawn != null)
                     {
                         preview.AppendLine($"💡 【提示】");
