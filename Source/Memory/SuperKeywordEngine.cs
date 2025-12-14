@@ -22,9 +22,11 @@ namespace RimTalk.Memory
     /// </summary>
     public static class SuperKeywordEngine
     {
-        // ? v3.3.2.35: 优化正则表达式 - 提升为静态编译字段
+        // ? v3.3.15: 优化正则表达式 - 支持字母数字混合单词（必须以字母开头）
+        // 匹配：M16, AK47, T5, V2（字母开头 + 至少1个字母或数字）
+        // 不匹配：123, 2b（数字开头）
         private static readonly Regex EnglishWordRegex = new Regex(
-            @"\b[a-zA-Z]{2,}\b",
+            @"\b[a-zA-Z][a-zA-Z0-9]{1,}\b",
             RegexOptions.Compiled
         );
         
