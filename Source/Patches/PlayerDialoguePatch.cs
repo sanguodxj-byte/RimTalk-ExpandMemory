@@ -123,14 +123,61 @@ namespace RimTalk.Memory.Patches
                 if (targetPawn == null)
                     return;
                 
-                // 获取 Prompt (玩家输入的内容)
-                var promptProperty = talkRequestType.GetProperty("Prompt");
-                if (promptProperty == null)
-                    return;
+                // ? 尝试获取原始玩家输入（优先顺序）
+                string playerInput = null;
                 
-                string playerInput = promptProperty.GetValue(talkRequest) as string;
+                // 方法1: 尝试获取 UserPrompt（原始用户输入）
+                var userPromptProperty = talkRequestType.GetProperty("UserPrompt");
+                if (userPromptProperty != null)
+                {
+                    playerInput = userPromptProperty.GetValue(talkRequest) as string;
+                    if (Prefs.DevMode && !string.IsNullOrEmpty(playerInput))
+                    {
+                        Log.Message($"[Player Dialogue] Found UserPrompt: {playerInput.Substring(0, Math.Min(30, playerInput.Length))}...");
+                    }
+                }
+                
+                // 方法2: 如果UserPrompt不存在，尝试 OriginalPrompt
                 if (string.IsNullOrEmpty(playerInput))
+                {
+                    var originalPromptProperty = talkRequestType.GetProperty("OriginalPrompt");
+                    if (originalPromptProperty != null)
+                    {
+                        playerInput = originalPromptProperty.GetValue(talkRequest) as string;
+                        if (Prefs.DevMode && !string.IsNullOrEmpty(playerInput))
+                        {
+                            Log.Message($"[Player Dialogue] Found OriginalPrompt: {playerInput.Substring(0, Math.Min(30, playerInput.Length))}...");
+                        }
+                    }
+                }
+                
+                // 方法3: 如果以上都不存在，使用 Prompt 但尝试清理
+                if (string.IsNullOrEmpty(playerInput))
+                {
+                    var promptProperty = talkRequestType.GetProperty("Prompt");
+                    if (promptProperty != null)
+                    {
+                        string fullPrompt = promptProperty.GetValue(talkRequest) as string;
+                        if (!string.IsNullOrEmpty(fullPrompt))
+                        {
+                            // ? 尝试从完整prompt中提取原始用户输入
+                            playerInput = ExtractUserInputFromPrompt(fullPrompt);
+                            if (Prefs.DevMode)
+                            {
+                                Log.Message($"[Player Dialogue] Extracted from Prompt: {playerInput?.Substring(0, Math.Min(30, playerInput?.Length ?? 0))}...");
+                            }
+                        }
+                    }
+                }
+                
+                if (string.IsNullOrEmpty(playerInput))
+                {
+                    if (Prefs.DevMode)
+                    {
+                        Log.Warning("[Player Dialogue] Failed to extract player input - all methods returned empty");
+                    }
                     return;
+                }
                 
                 // 清理旧缓存
                 if (Find.TickManager != null && Find.TickManager.TicksGame - lastCleanupTick > CleanupInterval)
@@ -161,6 +208,62 @@ namespace RimTalk.Memory.Patches
             {
                 Log.Warning($"[Player Dialogue Patch] Error in GenerateTalk_Postfix: {ex.Message}");
             }
+        }
+        
+        /// <summary>
+        /// ? 从完整的prompt中提取原始用户输入
+        /// RimTalk的prompt格式通常是：[系统指令]\n\n[记忆]\n\n[常识]\n\n用户: {原始输入}
+        /// </summary>
+        private static string ExtractUserInputFromPrompt(string fullPrompt)
+        {
+            if (string.IsNullOrEmpty(fullPrompt))
+                return null;
+            
+            // 尝试查找 "用户:" 或 "User:" 后的内容
+            string[] userMarkers = { "用户:", "User:", "玩家:", "Player:" };
+            
+            foreach (var marker in userMarkers)
+            {
+                int markerIndex = fullPrompt.LastIndexOf(marker);
+                if (markerIndex >= 0)
+                {
+                    // 提取标记后的内容
+                    string afterMarker = fullPrompt.Substring(markerIndex + marker.Length).Trim();
+                    
+                    // 如果后面还有其他标记（如"助手:"），只取到该标记之前
+                    string[] endMarkers = { "\n助手:", "\nAssistant:", "\n角色:", "\nCharacter:" };
+                    foreach (var endMarker in endMarkers)
+                    {
+                        int endIndex = afterMarker.IndexOf(endMarker);
+                        if (endIndex > 0)
+                        {
+                            afterMarker = afterMarker.Substring(0, endIndex).Trim();
+                            break;
+                        }
+                    }
+                    
+                    return afterMarker;
+                }
+            }
+            
+            // 如果找不到标记，尝试提取最后一段非空文本（假设是用户输入）
+            var lines = fullPrompt.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length > 0)
+            {
+                // 获取最后一行
+                string lastLine = lines[lines.Length - 1].Trim();
+                
+                // 如果最后一行不是系统指令（通常包含特定关键词），则认为是用户输入
+                if (!lastLine.Contains("记忆") && !lastLine.Contains("常识") && 
+                    !lastLine.Contains("Memory") && !lastLine.Contains("Knowledge") &&
+                    !lastLine.Contains("系统") && !lastLine.Contains("System"))
+                {
+                    return lastLine;
+                }
+            }
+            
+            // 如果都失败了，返回null
+            return null;
         }
         
         /// <summary>
