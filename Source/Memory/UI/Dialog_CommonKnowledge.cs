@@ -223,24 +223,15 @@ namespace RimTalk.Memory.UI
                     return;
                 }
                 
-                // 获取MemoryManager（用于访问colonistJoinTicks）
-                var memoryManager = Find.World?.GetComponent<MemoryManager>();
-                if (memoryManager == null)
-                {
-                    Messages.Message("无法获取MemoryManager", MessageTypeDefOf.RejectInput, false);
-                    return;
-                }
-                
                 int currentTick = Find.TickManager.TicksGame;
-                var colonistJoinTicks = memoryManager.ColonistJoinTicks;
                 
                 int generated = 0;
                 foreach (var pawn in colonists)
                 {
                     try
                     {
-                        // 使用PawnStatusKnowledgeGenerator的逻辑
-                        PawnStatusKnowledgeGenerator.UpdatePawnStatusKnowledge(pawn, library, currentTick, colonistJoinTicks);
+                        // ⭐ v3.3.17: 移除colonistJoinTicks参数，直接使用RimWorld记录
+                        PawnStatusKnowledgeGenerator.UpdatePawnStatusKnowledge(pawn, library, currentTick);
                         generated++;
                     }
                     catch (Exception ex)

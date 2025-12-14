@@ -38,10 +38,6 @@ namespace RimTalk.Memory
         private int nextManualSummarizationTick = 0;
         private const int MANUAL_SUMMARIZATION_DELAY_TICKS = 60; // 1秒 = 60 ticks
 
-        // ⭐ v2.4.4: 殖民者加入时间记录（修复时间反转BUG）
-        private Dictionary<int, int> colonistJoinTicks = new Dictionary<int, int>();
-        public Dictionary<int, int> ColonistJoinTicks => colonistJoinTicks;
-
         // 全局常识库
         private CommonKnowledgeLibrary commonKnowledge;
         public CommonKnowledgeLibrary CommonKnowledge
@@ -716,7 +712,7 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref lastSummarizationDay, "lastSummarizationDay", -1);
             Scribe_Values.Look(ref lastArchiveDay, "lastArchiveDay", -1);
             Scribe_Values.Look(ref nextSummarizationTick, "nextSummarizationTick", 0);
-            Scribe_Collections.Look(ref colonistJoinTicks, "colonistJoinTicks", LookMode.Value, LookMode.Value); // ⭐ 新增序列化
+            // ⭐ v3.3.17: 移除colonistJoinTicks序列化 - 不再需要缓存
             Scribe_Deep.Look(ref commonKnowledge, "commonKnowledge");
             Scribe_Deep.Look(ref conversationCache, "conversationCache");
             Scribe_Deep.Look(ref promptCache, "promptCache");
@@ -739,11 +735,7 @@ namespace RimTalk.Memory
                     promptCache = new PromptCache();
                     Log.Warning("[RimTalk Memory] promptCache was null, initialized new instance");
                 }
-                if (colonistJoinTicks == null) // ⭐ 新增
-                {
-                    colonistJoinTicks = new Dictionary<int, int>();
-                    Log.Warning("[RimTalk Memory] colonistJoinTicks was null, initialized new instance");
-                }
+                // ⭐ v3.3.17: 移除colonistJoinTicks初始化 - 不再需要
                 
                 // ⭐ 重新初始化队列（不保存到存档）
                 if (summarizationQueue == null)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 using RimWorld;
-using RimWorld.Planet; // ? 新增：用于检测商队和运输舱
+using RimWorld.Planet;
 using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory
@@ -12,25 +12,24 @@ namespace RimTalk.Memory
     /// 自动生成Pawn状态常识（殖民者标识）
     /// 每24小时更新一次，不会覆盖用户手动修改
     /// 
-    /// ? v3.3.2.32 重构版：
-    /// - 修复休眠舱/远行/空投舱导致的重置Bug
-    /// - 允许永久记录（移除7天限制）
-    /// - 7天后改为"资深成员"描述
-    /// - 覆盖所有地图+商队+运输舱中的小人
+    /// ? v3.3.17: 重构版 - 移除缓存，直接使用RimWorld原生记录
+    /// - 修复"今天加入"bug
+    /// - 完全依赖pawn.records.TimeAsColonistOrColonyAnimal
+    /// - 简化代码逻辑，消除同步问题
     /// </summary>
     public static class PawnStatusKnowledgeGenerator
     {
-        // 记录每个Pawn上次更新时间
+        // 记录每个Pawn上次更新时间（仅用于控制更新频率）
         private static Dictionary<int, int> lastUpdateTicks = new Dictionary<int, int>();
         private const int UPDATE_INTERVAL_TICKS = 60000; // 24小时 = 60000 ticks
         
-        // ? NEW_COLONIST_THRESHOLD_DAYS 改为描述切换阈值（不再删除记录）
+        // 描述切换阈值（不再删除记录）
         private const int NEW_COLONIST_THRESHOLD_DAYS = 7;
         
         /// <summary>
         /// 更新所有殖民者的状态常识（每小时检查一次）
         /// 只更新距离上次更新>=24小时的Pawn
-        /// ? v3.3.2.32: 覆盖所有地图+商队中的小人
+        /// ? v3.3.17: 简化逻辑，移除colonistJoinTicks传递
         /// </summary>
         public static void UpdateAllColonistStatus()
         {
@@ -43,13 +42,7 @@ namespace RimTalk.Memory
             int currentTick = Find.TickManager.TicksGame;
             int updatedCount = 0;
             
-            // 获取MemoryManager（用于访问colonistJoinTicks字典）
-            var memoryManager = Find.World?.GetComponent<MemoryManager>();
-            if (memoryManager == null) return;
-            
-            var colonistJoinTicks = memoryManager.ColonistJoinTicks;
-            
-            // ? v3.3.2.32: 遍历所有可能的位置获取殖民者
+            // 收集所有殖民者（所有地图 + 商队）
             var allColonists = new List<Pawn>();
             
             // 1. 所有地图上的殖民者
@@ -82,20 +75,6 @@ namespace RimTalk.Memory
                 {
                     int pawnID = pawn.thingIDNumber;
                     
-                    // 记录加入时间（如果尚未记录）
-                    if (!colonistJoinTicks.ContainsKey(pawnID))
-                    {
-                        // 尝试从Pawn的records中获取真实的加入时间
-                        int realJoinTick = GetPawnRealJoinTick(pawn, currentTick);
-                        colonistJoinTicks[pawnID] = realJoinTick;
-                        
-                        if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
-                        {
-                            int daysAgo = (currentTick - realJoinTick) / GenDate.TicksPerDay;
-                            Log.Message($"[PawnStatus] First detection: {pawn.LabelShort}, joined {daysAgo} days ago (tick: {realJoinTick})");
-                        }
-                    }
-                    
                     // 检查是否需要更新（24小时间隔）
                     if (!lastUpdateTicks.TryGetValue(pawnID, out int lastUpdate))
                     {
@@ -106,7 +85,7 @@ namespace RimTalk.Memory
                     
                     if (ticksSinceUpdate >= UPDATE_INTERVAL_TICKS)
                     {
-                        UpdatePawnStatusKnowledge(pawn, library, currentTick, colonistJoinTicks);
+                        UpdatePawnStatusKnowledge(pawn, library, currentTick);
                         lastUpdateTicks[pawnID] = currentTick;
                         updatedCount++;
                     }
@@ -129,11 +108,11 @@ namespace RimTalk.Memory
         /// <summary>
         /// 为单个Pawn更新状态常识
         /// 不会覆盖用户手动修改（标记为"用户编辑"等）
-        /// ? v3.3.2.32: 永久记录，7天后描述切换为"资深成员"
+        /// ? v3.3.17: 完全依赖RimWorld原生记录，每次实时计算
         /// </summary>
-        public static void UpdatePawnStatusKnowledge(Pawn pawn, CommonKnowledgeLibrary library, int currentTick, Dictionary<int, int> colonistJoinTicks)
+        public static void UpdatePawnStatusKnowledge(Pawn pawn, CommonKnowledgeLibrary library, int currentTick)
         {
-            if (pawn == null || library == null || colonistJoinTicks == null) return;
+            if (pawn == null || library == null) return;
 
             try
             {
@@ -143,65 +122,19 @@ namespace RimTalk.Memory
                     float ageYears = pawn.ageTracker.AgeBiologicalYearsFloat;
                     if (ageYears < 3f)
                     {
-                        CleanupPawnStatusKnowledge(pawn);
+                        CleanupPawnStatusKnowledge(pawn, library);
                         return;
                     }
                 }
                 
-                // 计算殖民者加入当前时间 - 防止时间倒流
-                int pawnID = pawn.thingIDNumber;
+                // ? v3.3.17: 直接从RimWorld记录计算加入时间（每次实时计算）
+                int joinTick = CalculateJoinTick(pawn, currentTick);
+                int daysInColony = CalculateDaysInColony(joinTick, currentTick);
                 
-                if (!colonistJoinTicks.TryGetValue(pawnID, out int joinTick))
+                // 开发模式日志
+                if (Prefs.DevMode && UnityEngine.Random.value < 0.05f)
                 {
-                    // 如果上一步应该发生的UpdateAllColonistStatus已经确认记录了
-                    joinTick = currentTick;
-                    colonistJoinTicks[pawnID] = joinTick;
-                    
-                    if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
-                    {
-                        Log.Warning($"[PawnStatus] No join record for {pawn.LabelShort}, using current time");
-                    }
-                }
-
-                // ? 自动修正逻辑：检查缓存的加入时间是否与Records严重不符
-                // 修复之前因为Bug导致的老殖民者被识别为新人的问题
-                if (pawn.records != null)
-                {
-                    var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
-                    if (recordDef != null)
-                    {
-                        float timeAsColonist = pawn.records.GetValue(recordDef);
-                        // 如果记录显示已加入超过1天
-                        if (timeAsColonist > 60000f) 
-                        {
-                            int calculatedJoinTick = currentTick - (int)timeAsColonist;
-                            // 允许少许误差，如果计算值为负，说明是初始殖民者，设为0
-                            if (calculatedJoinTick < 0) calculatedJoinTick = 0;
-                            
-                            // 如果当前记录的joinTick与计算值相差超过1天（60000 ticks）
-                            // 说明缓存的数据是错误的（可能是之前的fallback导致的）
-                            if (Math.Abs(joinTick - calculatedJoinTick) > 60000)
-                            {
-                                if (Prefs.DevMode)
-                                {
-                                    Log.Message($"[PawnStatus] Correcting join time for {pawn.LabelShort}: Cached={joinTick}, Real={calculatedJoinTick} (TimeAsColonist={timeAsColonist})");
-                                }
-                                joinTick = calculatedJoinTick;
-                                colonistJoinTicks[pawnID] = joinTick;
-                            }
-                        }
-                    }
-                }
-                
-                int ticksInColony = currentTick - joinTick;
-                int daysInColony = ticksInColony / GenDate.TicksPerDay;
-                
-                // 防止负数（如果加入时间错误）
-                if (daysInColony < 0)
-                {
-                    Log.Error($"[PawnStatus] Negative days for {pawn.LabelShort}: {daysInColony}, resetting join time");
-                    colonistJoinTicks[pawnID] = currentTick;
-                    daysInColony = 0;
+                    Log.Message($"[PawnStatus] {pawn.LabelShort}: joinTick={joinTick}, currentTick={currentTick}, daysInColony={daysInColony}");
                 }
 
                 // 使用唯一标签
@@ -213,14 +146,13 @@ namespace RimTalk.Memory
                     (e.tag.Contains(pawn.LabelShort) && e.tag.Contains("殖民者状态"))
                 );
 
-                // ? v3.3.2.32: 逻辑优化 - 自动删除旧记录
+                // 生成新内容
                 string newContent = GenerateStatusContent(pawn, daysInColony, joinTick);
                 float defaultImportance = 0.5f;
 
                 if (existingEntry != null)
                 {
-                    // 检查是否为自动生成的内容（没有被用户编辑）
-                    // ? v3.3.3: 只要 isUserEdited 为 true，绝对不覆盖
+                    // 检查是否为用户编辑（绝对不覆盖）
                     if (existingEntry.isUserEdited)
                     {
                         return;
@@ -246,7 +178,6 @@ namespace RimTalk.Memory
                             Log.Message($"[PawnStatus] Updated: {pawn.LabelShort} (days: {daysInColony}) -> {newContent}");
                         }
                     }
-                    // 如果内容看起来不像自动生成的（用户可能手动改了但没触发isUserEdited），也不覆盖
                 }
                 else
                 {
@@ -272,22 +203,83 @@ namespace RimTalk.Memory
                 Log.Error($"[PawnStatus] Failed to update status for {pawn?.LabelShort ?? "Unknown"}: {ex.Message}");
             }
         }
+        
+        /// <summary>
+        /// ? v3.3.17: 计算Pawn的加入时间（直接使用RimWorld原生记录）
+        /// </summary>
+        private static int CalculateJoinTick(Pawn pawn, int currentTick)
+        {
+            try
+            {
+                if (pawn.records == null)
+                    return currentTick; // 无记录系统，视为刚加入
+                
+                var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
+                if (recordDef == null)
+                {
+                    if (Prefs.DevMode)
+                        Log.Warning($"[PawnStatus] RecordDef 'TimeAsColonistOrColonyAnimal' not found");
+                    return currentTick;
+                }
+                
+                // 获取作为殖民者的时长（单位：ticks）
+                float timeAsColonist = pawn.records.GetValue(recordDef);
+                
+                if (timeAsColonist <= 0)
+                {
+                    // 新加入的殖民者（记录为0）
+                    return currentTick;
+                }
+                
+                // 计算加入时间 = 当前时间 - 作为殖民者的时长
+                int joinTick = currentTick - (int)timeAsColonist;
+                
+                // 安全检查：加入时间不能早于游戏开始（初始殖民者）
+                if (joinTick < 0)
+                {
+                    joinTick = 0; // 游戏开始时就存在
+                }
+                
+                return joinTick;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[PawnStatus] Error calculating join tick for {pawn?.LabelShort}: {ex.Message}");
+                return currentTick; // 出错时视为刚加入
+            }
+        }
+        
+        /// <summary>
+        /// ? v3.3.17: 计算殖民地天数
+        /// </summary>
+        private static int CalculateDaysInColony(int joinTick, int currentTick)
+        {
+            int ticksInColony = currentTick - joinTick;
+            int daysInColony = ticksInColony / GenDate.TicksPerDay;
+            
+            // 防止负数
+            if (daysInColony < 0)
+            {
+                Log.Warning($"[PawnStatus] Negative days detected: {daysInColony}, resetting to 0");
+                daysInColony = 0;
+            }
+            
+            return daysInColony;
+        }
 
         /// <summary>
         /// 生成状态描述文本（优化为自然人称视角）
-        /// 当Pawn首次被发现角色时，系统会自动注入其常识
-        /// ? v3.3.2.32: 7天后改为"资深成员"描述，让AI知道他们是老手
+        /// ? v3.3.17: 使用实时计算的joinTick
         /// </summary>
         private static string GenerateStatusContent(Pawn pawn, int daysInColony, int joinTick)
         {
             string name = pawn.LabelShort;
             
             // 计算加入日期（游戏内日期）
-            // 获取经度偏移（优先使用Pawn所在地图，否则使用任意玩家基地，最后使用0）
             int tile = pawn.Map?.Tile ?? (Find.AnyPlayerHomeMap?.Tile ?? 0);
             float longitude = Find.WorldGrid.LongLatOf(tile).x;
 
-            // ? 修复：确保使用 DayOfQuadrum (0-14) 并 +1
+            // 使用 DayOfQuadrum (0-14) 并 +1
             int joinDay = GenDate.DayOfQuadrum(joinTick, longitude) + 1;
             Quadrum joinQuadrum = GenDate.Quadrum(joinTick, longitude);
             int joinYear = GenDate.Year(joinTick, longitude);
@@ -295,18 +287,10 @@ namespace RimTalk.Memory
             // 格式化日期（例如：冬季 5日, 5500年）
             string joinDate = $"{joinQuadrum.Label()} {joinDay}日, {joinYear}年";
             
-            // ? 开发日志：输出实际计算的值用于调试
-            if (Prefs.DevMode && UnityEngine.Random.value < 0.05f)
-            {
-                int currentTick = Find.TickManager.TicksGame;
-                Log.Message($"[PawnStatus] {name} 日期计算: joinTick={joinTick}, currentTick={currentTick}, " +
-                           $"daysInColony={daysInColony}, date={joinDate}");
-            }
-            
             // 获取完整种族信息（种族+亚种）
             string raceInfo = GetCompleteRaceInfo(pawn);
             
-            // ? v3.3.3: 根据天数生成不同描述
+            // 根据天数生成不同描述
             string baseDescription = "";
             
             if (daysInColony < 7)
@@ -351,7 +335,6 @@ namespace RimTalk.Memory
         
         /// <summary>
         /// 获取完整种族信息（种族+亚种）
-        /// 例如："人类-基准人"、"灵能者-宿主灵能者"、"龙王种-斯拉库鲁"
         /// </summary>
         private static string GetCompleteRaceInfo(Pawn pawn)
         {
@@ -402,23 +385,6 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // 方法D：从def.description提取（适用于Mod添加的种族）
-                if (string.IsNullOrEmpty(xenotypeName) && !string.IsNullOrEmpty(pawn.def.description))
-                {
-                    // 尝试从描述中提取关键词（例如"灵能者"、"斯拉"等）
-                    var descWords = pawn.def.description.Split(new[] { ' ', '，', '。', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var word in descWords)
-                    {
-                        // 检测常见种族关键词
-                        if (word.Length >= 2 && word.Length <= 6 && 
-                            (word.Contains("灵能") || word.Contains("种") || word.Contains("型")))
-                        {
-                            xenotypeName = word;
-                            break;
-                        }
-                    }
-                }
-                
                 // 3. 组合种族和亚种描述
                 if (!string.IsNullOrEmpty(xenotypeName))
                 {
@@ -451,96 +417,6 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// 获取Pawn真实的加入殖民地时间
-        /// </summary>
-        private static int GetPawnRealJoinTick(Pawn pawn, int fallbackTick)
-        {
-            try
-            {
-                // 方法1：从records.TimeAsColonistOrColonyAnimal获取（最准确）
-                if (pawn.records != null)
-                {
-                    var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
-                    if (recordDef != null)
-                    {
-                        // 获取作为殖民者的时长（单位：ticks）
-                        float timeAsColonist = pawn.records.GetValue(recordDef);
-                        
-                        // ? 开发日志：输出原始数据
-                        if (Prefs.DevMode)
-                        {
-                            int daysAsColonist = (int)(timeAsColonist / GenDate.TicksPerDay);
-                            Log.Message($"[PawnStatus] {pawn.LabelShort} TimeAsColonist 记录: {timeAsColonist} ticks ({daysAsColonist} 天)");
-                        }
-                        
-                        if (timeAsColonist > 0)
-                        {
-                            // 加入时间 = 当前tick - 作为殖民者的时长
-                            int joinTick = fallbackTick - (int)timeAsColonist;
-                            
-                            // ? 开发日志：输出计算结果
-                            if (Prefs.DevMode)
-                            {
-                                int daysAgo = (fallbackTick - joinTick) / GenDate.TicksPerDay;
-                                Log.Message($"[PawnStatus] {pawn.LabelShort} 计算的加入时间: joinTick={joinTick}, " +
-                                           $"当前tick={fallbackTick}, 天数={daysAgo}");
-                            }
-                            
-                            // 安全检查：加入时间不能早于游戏开始
-                            if (joinTick >= 0 && joinTick <= fallbackTick)
-                            {
-                                return joinTick;
-                            }
-                            // ? 修复：如果计算出的加入时间早于游戏开始（例如初始殖民者或记录误差），修正为0
-                            else if (joinTick < 0)
-                            {
-                                if (Prefs.DevMode)
-                                {
-                                    Log.Message($"[PawnStatus] {pawn.LabelShort} 加入时间<0，修正为游戏开始(0)");
-                                }
-                                return 0;
-                            }
-                        }
-                        else
-                        {
-                            // TimeAsColonist = 0，说明是刚加入的新人
-                            if (Prefs.DevMode)
-                            {
-                                Log.Message($"[PawnStatus] {pawn.LabelShort} TimeAsColonist=0，使用当前时间");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (Prefs.DevMode)
-                        {
-                            Log.Warning($"[PawnStatus] {pawn.LabelShort} 找不到 TimeAsColonistOrColonyAnimal 记录定义");
-                        }
-                    }
-                }
-                
-                // 方法2：从spawned时间推断（不太准确，但聊胜于无）
-                if (pawn.Spawned && pawn.Map != null)
-                {
-                    // 如果Pawn刚被生成（<1小时），可能刚刚加入
-                    // 但这个逻辑不准确，所以使用fallback
-                }
-                
-                // 方法3：后备 - 使用当前时间
-                // 这意味着会被标记为新加入
-                if (Prefs.DevMode)
-                    Log.Warning($"[PawnStatus] {pawn.LabelShort} 无法确定真实加入时间，使用当前时间(fallback)");
-                
-                return fallbackTick;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[PawnStatus] 获取 {pawn?.LabelShort} 加入时间时出错: {ex.Message}\n{ex.StackTrace}");
-                return fallbackTick;
-            }
-        }
-        
-        /// <summary>
         /// 检查内容是否为自动生成的（没有被用户编辑）
         /// </summary>
         private static bool IsAutoGeneratedContent(string content)
@@ -560,12 +436,9 @@ namespace RimTalk.Memory
         /// <summary>
         /// 清除已不存在的状态常识（Pawn离开或死亡）
         /// </summary>
-        public static void CleanupPawnStatusKnowledge(Pawn pawn)
+        public static void CleanupPawnStatusKnowledge(Pawn pawn, CommonKnowledgeLibrary library)
         {
-            if (pawn == null) return;
-
-            var library = MemoryManager.GetCommonKnowledge();
-            if (library == null) return;
+            if (pawn == null || library == null) return;
 
             var entry = library.Entries.FirstOrDefault(e => 
                 e.tag.Contains(pawn.LabelShort) && 
@@ -587,16 +460,12 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.2.32: 清理更新记录（修复重置Bug）
-        /// 
-        /// 关键修复：不要因为"找不到小人"就删除记录！
-        /// 
-        /// 只有当小人确实死亡 (pawn.Dead) 或不再属于玩家派系 (pawn.Faction != Faction.OfPlayer) 时，
-        /// 才删除记录。这样可以完美解决休眠舱、远行、空投舱导致的重置问题。
+        /// ? v3.3.17: 简化清理逻辑 - 只清理lastUpdateTicks
+        /// 不再需要管理colonistJoinTicks
         /// </summary>
         public static void CleanupUpdateRecords()
         {
-            // ? 步骤1：收集所有存活的殖民者ID
+            // 收集所有存活的殖民者ID
             var allLivingColonists = new List<Pawn>();
             
             // 所有地图上的殖民者
@@ -625,57 +494,42 @@ namespace RimTalk.Memory
             
             var allColonistIDs = new HashSet<int>(allLivingColonists.Select(p => p.thingIDNumber));
             
-            // ? 步骤2：检查所有 Pawn（包括死亡的）来确定哪些应该删除
-            var memoryManager = Find.World?.GetComponent<MemoryManager>();
-            if (memoryManager == null) return;
+            // 清理不存在的Pawn的更新记录
+            var toRemove = new List<int>();
             
-            var colonistJoinTicks = memoryManager.ColonistJoinTicks;
-            
-            // 遍历所有记录的 PawnID，检查它们是否还应该保留
-            var toRemoveFromUpdate = new List<int>();
-            var toRemoveFromJoin = new List<int>();
-            
-            foreach (var pawnID in colonistJoinTicks.Keys.ToList())
+            foreach (var pawnID in lastUpdateTicks.Keys.ToList())
             {
-                // 如果在存活列表中，跳过（保留记录）
+                // 如果在存活列表中，跳过
                 if (allColonistIDs.Contains(pawnID))
                     continue;
                 
-                // 尝试查找这个 Pawn（可能死亡、被捕获、或在其他地方）
+                // 尝试查找这个Pawn
                 Pawn pawn = null;
                 
-                // 检查所有地图中的所有 Pawn（包括死亡的）
+                // 检查所有地图中的所有Pawn（包括死亡的）
                 foreach (var map in Find.Maps)
                 {
                     pawn = map.mapPawns.AllPawns.FirstOrDefault(p => p.thingIDNumber == pawnID);
                     if (pawn != null) break;
                 }
                 
-                // 检查世界 Pawns
+                // 检查世界Pawns
                 if (pawn == null && Find.WorldPawns != null)
                 {
                     pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == pawnID);
                 }
                 
-                // ? 步骤3：决定是否删除记录
+                // 决定是否删除记录
                 bool shouldRemove = false;
                 
                 if (pawn == null)
                 {
-                    // 找不到 Pawn - 可能已经完全消失（极少见）
-                    // 但不要急着删除！可能只是在特殊状态（如运输舱中）
-                    // 保守策略：只删除记录超过30天的"幽灵"记录
-                    int daysSinceJoin = (Find.TickManager.TicksGame - colonistJoinTicks[pawnID]) / GenDate.TicksPerDay;
-                    if (daysSinceJoin > 30)
-                    {
-                        shouldRemove = true;
-                        if (Prefs.DevMode)
-                            Log.Message($"[PawnStatus] Removing ghost record (ID:{pawnID}, >30 days)");
-                    }
+                    // 找不到Pawn - 可能已经完全消失
+                    shouldRemove = true;
                 }
                 else
                 {
-                    // 找到 Pawn - 检查是否真的应该删除
+                    // 找到Pawn - 检查是否真的应该删除
                     if (pawn.Dead)
                     {
                         shouldRemove = true;
@@ -686,33 +540,26 @@ namespace RimTalk.Memory
                     {
                         shouldRemove = true;
                         if (Prefs.DevMode)
-                            Log.Message($"[PawnStatus] Removing non-player pawn: {pawn.LabelShort} (faction: {pawn.Faction?.Name ?? "none"})");
+                            Log.Message($"[PawnStatus] Removing non-player pawn: {pawn.LabelShort}");
                     }
-                    // 否则保留记录（即使在休眠舱、远行、空投舱中）
                 }
                 
                 if (shouldRemove)
                 {
-                    toRemoveFromUpdate.Add(pawnID);
-                    toRemoveFromJoin.Add(pawnID);
+                    toRemove.Add(pawnID);
                 }
             }
             
-            // ? 步骤4：执行删除
-            foreach (var id in toRemoveFromUpdate)
+            // 执行删除
+            foreach (var id in toRemove)
             {
                 lastUpdateTicks.Remove(id);
             }
             
-            foreach (var id in toRemoveFromJoin)
-            {
-                colonistJoinTicks.Remove(id);
-            }
-            
             // 日志输出
-            if ((toRemoveFromUpdate.Count > 0 || toRemoveFromJoin.Count > 0) && Prefs.DevMode)
+            if (toRemove.Count > 0 && Prefs.DevMode)
             {
-                Log.Message($"[PawnStatus] Cleaned up {toRemoveFromUpdate.Count} update records, {toRemoveFromJoin.Count} join records");
+                Log.Message($"[PawnStatus] Cleaned up {toRemove.Count} update records");
             }
         }
     }
