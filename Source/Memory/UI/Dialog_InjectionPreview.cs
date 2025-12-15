@@ -171,12 +171,10 @@ namespace RimTalk.Memory.Debug
             var colonists = Find.CurrentMap.mapPawns.FreeColonists.ToList();
             if (colonists.Count > 0)
             {
-                options.Add(new FloatMenuOption("━━━ 殖民者 ━━━", null) { Disabled = true });
-                
                 foreach (var pawn in colonists.OrderBy(p => p.LabelShort))
                 {
                     Pawn localPawn = pawn;
-                    string optionLabel = BuildPawnOptionLabel(pawn, isPrimary);
+                    string optionLabel = "[殖民者] " + BuildPawnOptionLabel(pawn, isPrimary);
                     
                     options.Add(new FloatMenuOption(optionLabel, delegate
                     {
@@ -189,12 +187,16 @@ namespace RimTalk.Memory.Debug
             var prisoners = Find.CurrentMap.mapPawns.PrisonersOfColony.ToList();
             if (prisoners.Count > 0)
             {
-                options.Add(new FloatMenuOption("━━━ 囚犯 ━━━", null) { Disabled = true });
+                // 添加空白分隔
+                if (options.Count > 0)
+                {
+                    options.Add(new FloatMenuOption(" ", null) { Disabled = true });
+                }
                 
                 foreach (var pawn in prisoners.OrderBy(p => p.LabelShort))
                 {
                     Pawn localPawn = pawn;
-                    string optionLabel = BuildPawnOptionLabel(pawn, isPrimary) + " 🔒";
+                    string optionLabel = "[囚犯] " + BuildPawnOptionLabel(pawn, isPrimary);
                     
                     options.Add(new FloatMenuOption(optionLabel, delegate
                     {
@@ -205,7 +207,8 @@ namespace RimTalk.Memory.Debug
             
             // 3. 访客和盟友
             var guests = Find.CurrentMap.mapPawns.AllPawnsSpawned
-                .Where(p => p.RaceProps.Humanlike && 
+                .Where(p => p.RaceProps != null && 
+                           p.RaceProps.Humanlike && 
                            !p.IsColonist && 
                            !p.IsPrisonerOfColony && 
                            !p.HostileTo(Faction.OfPlayer))
@@ -213,12 +216,16 @@ namespace RimTalk.Memory.Debug
                 
             if (guests.Count > 0)
             {
-                options.Add(new FloatMenuOption("━━━ 访客/盟友 ━━━", null) { Disabled = true });
+                // 添加空白分隔
+                if (options.Count > 0)
+                {
+                    options.Add(new FloatMenuOption(" ", null) { Disabled = true });
+                }
                 
                 foreach (var pawn in guests.OrderBy(p => p.LabelShort))
                 {
                     Pawn localPawn = pawn;
-                    string optionLabel = BuildPawnOptionLabel(pawn, isPrimary) + " 👤";
+                    string optionLabel = "[访客] " + BuildPawnOptionLabel(pawn, isPrimary);
                     
                     options.Add(new FloatMenuOption(optionLabel, delegate
                     {
@@ -229,19 +236,24 @@ namespace RimTalk.Memory.Debug
             
             // 4. 敌人
             var enemies = Find.CurrentMap.mapPawns.AllPawnsSpawned
-                .Where(p => p.RaceProps.Humanlike && 
+                .Where(p => p.RaceProps != null && 
+                           p.RaceProps.Humanlike && 
                            p.HostileTo(Faction.OfPlayer))
                 .Take(50) // 限制敌人列表最多50个
                 .ToList();
                 
             if (enemies.Count > 0)
             {
-                options.Add(new FloatMenuOption("━━━ 敌人 ━━━", null) { Disabled = true });
+                // 添加空白分隔
+                if (options.Count > 0)
+                {
+                    options.Add(new FloatMenuOption(" ", null) { Disabled = true });
+                }
                 
                 foreach (var pawn in enemies.OrderBy(p => p.LabelShort))
                 {
                     Pawn localPawn = pawn;
-                    string optionLabel = BuildPawnOptionLabel(pawn, isPrimary) + " ⚔️";
+                    string optionLabel = "[敌人] " + BuildPawnOptionLabel(pawn, isPrimary);
                     
                     options.Add(new FloatMenuOption(optionLabel, delegate
                     {
