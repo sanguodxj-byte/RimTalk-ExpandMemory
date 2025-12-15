@@ -64,127 +64,11 @@ namespace RimTalk.Memory
                 if (keywords == null) keywords = new List<string>();
                 cachedTags = null; // 清除缓存，强制重新解析
                 
-                // ⭐ 迁移旧版事件条目：检查是否是带时间前缀的事件常识
-                if (creationTick < 0 && !string.IsNullOrEmpty(content) && !string.IsNullOrEmpty(tag))
-                {
-                    // 检查标签是否包含"事件"或"历史"
-                    if (tag.Contains("事件") || tag.Contains("历史"))
-                    {
-                        // 尝试从content中提取时间前缀并回填creationTick
-                        MigrateLegacyEventEntry();
-                    }
-                }
-                
                 // ⭐ v3.3.3: 兼容旧存档 - 如果没有originalEventText，从content中提取
                 if (string.IsNullOrEmpty(originalEventText) && !string.IsNullOrEmpty(content))
                 {
                     // 尝试移除时间前缀（"今天"、"3天前"等）
                     originalEventText = RemoveTimePrefix(content);
-                }
-            }
-        }
-        
-        /// <summary>
-        /// ⭐ 迁移旧版事件条目：从时间前缀推断creationTick
-        /// </summary>
-        private void MigrateLegacyEventEntry()
-        {
-            if (string.IsNullOrEmpty(content))
-                return;
-            
-            int currentTick = Find.TickManager?.TicksGame ?? 0;
-            if (currentTick <= 0)
-                return;
-            
-            // 尝试识别时间前缀并计算creationTick
-            int daysAgo = -1;
-            string prefix = "";
-            
-            // 检查各种时间前缀
-            if (content.StartsWith("今天"))
-            {
-                daysAgo = 0;
-                prefix = "今天";
-            }
-            else if (content.StartsWith("1天前"))
-            {
-                daysAgo = 1;
-                prefix = "1天前";
-            }
-            else if (content.StartsWith("2天前"))
-            {
-                daysAgo = 2;
-                prefix = "2天前";
-            }
-            else if (content.StartsWith("3天前"))
-            {
-                daysAgo = 3;
-                prefix = "3天前";
-            }
-            else if (content.StartsWith("4天前"))
-            {
-                daysAgo = 4;
-                prefix = "4天前";
-            }
-            else if (content.StartsWith("5天前"))
-            {
-                daysAgo = 5;
-                prefix = "5天前";
-            }
-            else if (content.StartsWith("6天前"))
-            {
-                daysAgo = 6;
-                prefix = "6天前";
-            }
-            else if (content.StartsWith("约3天前"))
-            {
-                daysAgo = 3;
-                prefix = "约3天前";
-            }
-            else if (content.StartsWith("约4天前"))
-            {
-                daysAgo = 4;
-                prefix = "约4天前";
-            }
-            else if (content.StartsWith("约5天前"))
-            {
-                daysAgo = 5;
-                prefix = "约5天前";
-            }
-            else if (content.StartsWith("约6天前"))
-            {
-                daysAgo = 6;
-                prefix = "约6天前";
-            }
-            else if (content.StartsWith("约7天前"))
-            {
-                daysAgo = 7;
-                prefix = "约7天前";
-            }
-            
-            // 如果识别到时间前缀
-            if (daysAgo >= 0 && !string.IsNullOrEmpty(prefix))
-            {
-                // 回填creationTick
-                creationTick = currentTick - (daysAgo * GenDate.TicksPerDay);
-                
-                // 提取originalEventText（移除时间前缀）
-                originalEventText = content.Substring(prefix.Length);
-                
-                if (Prefs.DevMode)
-                {
-                    Log.Message($"[Knowledge Migration] Migrated legacy event: '{prefix}' -> creationTick={creationTick}, originalText='{originalEventText.Substring(0, Math.Min(30, originalEventText.Length))}...'");
-                }
-            }
-            else
-            {
-                // 没有识别到时间前缀，使用默认值（当前时间）
-                creationTick = currentTick;
-                originalEventText = content;
-                
-                if (Prefs.DevMode)
-                {
-                    Log.Message($"[Knowledge Migration] No time prefix found, using current time for: '{content.Substring(0, Math.Min(30, content.Length))}...'");
                 }
             }
         }
@@ -614,171 +498,6 @@ namespace RimTalk.Memory
         private List<CommonKnowledgeEntry> entries = new List<CommonKnowledgeEntry>();
 
         public List<CommonKnowledgeEntry> Entries => entries;
-        
-        // ⭐ 新增：公共 API - 供其他 Mod 批量导入常识
-        /// <summary>
-        /// 批量导入常识（供其他 Mod 调用）
-        /// </summary>
-        /// <param name="knowledgeText">常识文本，格式：[标签|重要性]内容\n[标签|重要性]内容</param>
-        /// <param name="sourceModName">来源 Mod 名称（用于标记）</param>
-        /// <param name="overwriteExisting">是否覆盖已存在的相同标签常识</param>
-        /// <returns>成功导入的常识数量</returns>
-        public static int ImportFromExternalMod(string knowledgeText, string sourceModName = "ExternalMod", bool overwriteExisting = false)
-        {
-            if (string.IsNullOrEmpty(knowledgeText))
-            {
-                Log.Warning($"[CommonKnowledge API] Empty knowledge text from {sourceModName}");
-                return 0;
-            }
-            
-            var library = MemoryManager.GetCommonKnowledge();
-            if (library == null)
-            {
-                Log.Error($"[CommonKnowledge API] Failed to get CommonKnowledge library");
-                return 0;
-            }
-            
-            try
-            {
-                int importedCount = 0;
-                var lines = knowledgeText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-                
-                foreach (var line in lines)
-                {
-                    string trimmedLine = line.Trim();
-                    if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith("//") || trimmedLine.StartsWith("#"))
-                        continue; // 跳过空行和注释
-                    
-                    var entry = library.ParseLine(trimmedLine);
-                    if (entry == null)
-                        continue;
-                    
-                    // ⭐ 添加来源标记（追加到tag字符串）
-                    if (!entry.tag.Contains($"来自:{sourceModName}"))
-                    {
-                        entry.tag += $",来自:{sourceModName},自动导入";
-                    }
-                    
-                    // 检查是否已存在相同标签的常识
-                    bool exists = library.Entries.Any(e => e.tag == entry.tag && e.content == entry.content);
-                    
-                    if (exists && !overwriteExisting)
-                    {
-                        if (Prefs.DevMode)
-                        {
-                            Log.Message($"[CommonKnowledge API] Skipped duplicate: [{entry.tag}] {entry.content.Substring(0, Math.Min(30, entry.content.Length))}...");
-                        }
-                        continue;
-                    }
-                    
-                    if (exists && overwriteExisting)
-                    {
-                        // 移除旧条目
-                        var oldEntry = library.Entries.FirstOrDefault(e => e.tag == entry.tag && e.content == entry.content);
-                        if (oldEntry != null)
-                        {
-                            library.Entries.Remove(oldEntry);
-                        }
-                    }
-                    
-                    library.Entries.Add(entry);
-                    importedCount++;
-                }
-                
-                Log.Message($"[CommonKnowledge API] {sourceModName} imported {importedCount} knowledge entries");
-                return importedCount;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[CommonKnowledge API] Failed to import from {sourceModName}: {ex.Message}");
-                return 0;
-            }
-        }
-        
-        // ⭐ 新增：公共 API - 添加单条常识
-        /// <summary>
-        /// 添加单条常识（供其他 Mod 调用）
-        /// </summary>
-        public static bool AddKnowledgeEntry(string tag, string content, float importance = 0.5f, string sourceModName = "ExternalMod")
-        {
-            if (string.IsNullOrEmpty(tag) || string.IsNullOrEmpty(content))
-            {
-                Log.Warning($"[CommonKnowledge API] Empty tag or content from {sourceModName}");
-                return false;
-            }
-            
-            var library = MemoryManager.GetCommonKnowledge();
-            if (library == null)
-            {
-                Log.Error($"[CommonKnowledge API] Failed to get CommonKnowledge library");
-                return false;
-            }
-            
-            try
-            {
-                // ⭐ 限制重要性范围 [0, 1]
-                importance = Math.Max(0f, Math.Min(1f, importance));
-                
-                var entry = new CommonKnowledgeEntry(tag, content)
-                {
-                    importance = importance
-                };
-                
-                // ⭐ 添加来源标记（追加到tag字符串）
-                if (!entry.tag.Contains($"来自:{sourceModName}"))
-                {
-                    entry.tag += $",来自:{sourceModName},自动导入";
-                }
-                
-                library.Entries.Add(entry);
-                
-                if (Prefs.DevMode)
-                {
-                    Log.Message($"[CommonKnowledge API] Added: [{tag}|{importance:F2}] {content.Substring(0, Math.Min(30, content.Length))}...");
-                }
-                
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[CommonKnowledge API] Failed to add entry from {sourceModName}: {ex.Message}");
-                return false;
-            }
-        }
-        
-        // ⭐ 新增：公共 API - 移除来自特定 Mod 的所有常识
-        /// <summary>
-        /// 移除来自特定 Mod 的所有常识
-        /// </summary>
-        public static int RemoveKnowledgeBySource(string sourceModName)
-        {
-            var library = MemoryManager.GetCommonKnowledge();
-            if (library == null)
-                return 0;
-            
-            try
-            {
-                string sourceTag = $"来自:{sourceModName}";
-                
-                // ⭐ 使用 GetTags() 方法获取标签列表进行检查
-                var toRemove = library.Entries
-                    .Where(e => e.GetTags().Any(t => t == sourceTag))
-                    .ToList();
-                
-                foreach (var entry in toRemove)
-                {
-                    library.Entries.Remove(entry);
-                }
-                
-                Log.Message($"[CommonKnowledge API] Removed {toRemove.Count} entries from {sourceModName}");
-                return toRemove.Count;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[CommonKnowledge API] Failed to remove entries from {sourceModName}: {ex.Message}");
-                return 0;
-            }
-        }
 
         public void ExposeData()
         {
@@ -864,7 +583,8 @@ namespace RimTalk.Memory
                 }
             }
             
-            Log.Message($"[Knowledge] Imported {importCount} knowledge entries");
+            // ⭐ 移除日志输出
+            // Log.Message($"[Knowledge] Imported {importCount} knowledge entries");
 
             return importCount;
         }
@@ -1037,35 +757,10 @@ namespace RimTalk.Memory
                 {
                     pawnNames.Add(targetPawn.Name.ToStringShort);
                 }
-                
-                // ⭐ v3.3.2.38: 记录目标角色关键词提取结果（用于调试）
-                if (Prefs.DevMode)
-                {
-                    Log.Message($"[Knowledge] Target pawn '{targetPawn.LabelShort}' added {contextKeywords.Count - beforeCount} keywords");
-                    Log.Message($"[Knowledge] Target keywords: {string.Join(", ", targetPawnInfo.NameKeywords.Concat(targetPawnInfo.RaceKeywords).Take(5))}");
-                }
             }
             
             keywordInfo.TotalKeywords = contextKeywords.Count;
             keywordInfo.PawnKeywordsCount = totalPawnKeywords;
-
-            // ⭐ v3.3.2.38: 调试日志 - 显示收集到的角色名字
-            if (Prefs.DevMode && pawnNames.Count > 0)
-            {
-                Log.Message($"[Knowledge] Collected pawn names for matching: {string.Join(", ", pawnNames)}");
-                Log.Message($"[Knowledge] Total contextKeywords: {contextKeywords.Count}");
-                
-                // 显示关键词中包含的名字
-                var nameKeywordsInContext = contextKeywords.Where(k => pawnNames.Contains(k)).ToList();
-                if (nameKeywordsInContext.Count > 0)
-                {
-                    Log.Message($"[Knowledge] Name keywords in context: {string.Join(", ", nameKeywordsInContext)}");
-                }
-                else
-                {
-                    Log.Warning($"[Knowledge] ⚠️ No name keywords found in context!");
-                }
-            }
 
             // 获取阈值设置
             float threshold = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.knowledgeScoreThreshold ?? 0.1f;
@@ -1086,7 +781,7 @@ namespace RimTalk.Memory
                 .ToList();
             
             // ⭐ v3.3.2.29: 过滤并获取前N条（已排序，无需再次排序）
-            var scoredEntries = allScores
+            var scopedEntries = allScores
                 .Where(se => se.TotalScore >= threshold)
                 .Take(maxEntries)
                 .Select(detail => new KnowledgeScore
@@ -1096,10 +791,10 @@ namespace RimTalk.Memory
                 })
                 .ToList();
 
-            scores = scoredEntries;
+            scores = scopedEntries;
 
             // 如果没有常识达到阈值，返回null
-            if (scoredEntries.Count == 0)
+            if (scopedEntries.Count == 0)
             {
                 return null;
             }
@@ -1108,7 +803,7 @@ namespace RimTalk.Memory
             var sb = new StringBuilder();
 
             int index = 1;
-            foreach (var scored in scoredEntries)
+            foreach (var scored in scopedEntries)
             {
                 var entry = scored.Entry;
                 sb.AppendLine($"{index}. [{entry.tag}] {entry.content}");
@@ -1467,9 +1162,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 提取上下文关键词（核心 + 模糊双重策略）
         /// ⭐ v3.3.2.34: 修复非确定性行为 - 使用完全确定性排序
-        /// - 核心策略：按长度降序 + 字母顺序升序，取前10个（优先详细概念）
-        /// - 模糊策略：从剩余池按字母顺序选10个（确定性选择）
-        /// - 最终返回最多20个关键词
+        /// ⭐ v3.3.20: 优化数量和质量 - 增加到50个，过滤格式词
         /// </summary>
         private List<string> ExtractContextKeywords(string text)
         {
@@ -1477,54 +1170,63 @@ namespace RimTalk.Memory
                 return new List<string>();
 
             // 截断过长文本，防止性能问题
-            const int MAX_TEXT_LENGTH = 500;
+            const int MAX_TEXT_LENGTH = 800; // ⭐ 增加上限 500→800
             if (text.Length > MAX_TEXT_LENGTH)
             {
                 text = text.Substring(0, MAX_TEXT_LENGTH);
-                Log.Message($"[Knowledge] Context text truncated to {MAX_TEXT_LENGTH} chars for performance");
             }
 
-            // 使用超级关键词引擎获取候选词
-            var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 100);
+            // ⭐ 格式词黑名单（过滤无意义的格式符号和常见词）
+            var stopWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "的", "了", "是", "在", "有", "和", "就", "不", "人", "都", "一", "我", "他", "她", "它", "们",
+                "你", "我们", "他们", "这", "那", "什么", "怎么", "为什么", "吗", "呢", "啊", "吧",
+                "...", "---", "===", "***", "###", "```", "===", "---",
+                "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+                "have", "has", "had", "do", "does", "did", "will", "would", "can", "could"
+            };
+
+            // 使用超级关键词引擎获取候选词（增加上限）
+            var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 200); // ⭐ 增加 100→200
+            
+            // ⭐ 过滤格式词和无效词
+            weightedKeywords = weightedKeywords
+                .Where(kw => !stopWords.Contains(kw.Word))  // 过滤黑名单
+                .Where(kw => kw.Word.Length >= 2)           // 至少2个字符
+                .Where(kw => !string.IsNullOrWhiteSpace(kw.Word))
+                .Where(kw => kw.Word.Any(c => char.IsLetterOrDigit(c))) // 至少包含一个字母或数字
+                .ToList();
             
             if (weightedKeywords.Count == 0)
             {
-                Log.Warning($"[Knowledge] ⚠️ SuperKeywordEngine extracted 0 keywords from context: \"{text}\"");
+                // ⭐ 移除警告日志
                 return new List<string>();
             }
             
-            // ⭐ v3.3.2.34: 策略1：核心词 - 按长度降序 + 字母顺序升序，取前10个
+            // ⭐ 策略1：核心词 - 按长度降序 + 字母顺序升序，取前25个（增加）
             var sortedByLength = weightedKeywords
                 .OrderByDescending(kw => kw.Word.Length)
-                .ThenBy(kw => kw.Word, StringComparer.Ordinal) // ⭐ 确定性 tie-breaker
+                .ThenBy(kw => kw.Word, StringComparer.Ordinal)
                 .ToList();
             
-            var coreKeywords = sortedByLength.Take(10).ToList();
+            var coreKeywords = sortedByLength.Take(25).ToList(); // ⭐ 增加 10→25
             
-            // ⭐ v3.3.2.34: 策略2：模糊词 - 从剩余池按字母顺序选10个（确定性）
-            var remainingPool = sortedByLength.Skip(10).ToList();
+            // ⭐ 策略2：模糊词 - 从剩余池按字母顺序选25个（增加）
+            var remainingPool = sortedByLength.Skip(25).ToList();
             var fuzzyKeywords = new List<WeightedKeyword>();
             
             if (remainingPool.Count > 0)
             {
-                // ⭐ 按字母顺序排序（确定性），然后取前10个
                 fuzzyKeywords = remainingPool
                     .OrderBy(kw => kw.Word, StringComparer.Ordinal)
-                    .Take(10)
+                    .Take(25) // ⭐ 增加 10→25
                     .ToList();
             }
             
-            // ⭐ 策略3：合并核心词 + 模糊词（最多20个）
+            // ⭐ 策略3：合并核心词 + 模糊词（最多50个）
             var finalKeywords = new List<string>();
             finalKeywords.AddRange(coreKeywords.Select(kw => kw.Word));
             finalKeywords.AddRange(fuzzyKeywords.Select(kw => kw.Word));
-            
-            // 诊断日志输出
-            Log.Message($"[Knowledge] ExtractContextKeywords: {finalKeywords.Count} keywords total");
-            Log.Message($"[Knowledge] - Core: {coreKeywords.Count} (by length desc + alpha asc)");
-            Log.Message($"[Knowledge] - Fuzzy: {fuzzyKeywords.Count} (alphabetical from {remainingPool.Count} pool)");
-            Log.Message($"[Knowledge] Context: \"{text.Substring(0, Math.Min(100, text.Length))}...\"");
-            Log.Message($"[Knowledge] Top 10 final: {string.Join(", ", finalKeywords.Take(10))}");
             
             return finalKeywords;
         }

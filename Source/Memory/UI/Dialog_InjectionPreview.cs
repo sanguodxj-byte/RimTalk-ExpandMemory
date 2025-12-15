@@ -39,9 +39,6 @@ namespace RimTalk.Memory.Debug
 
         public override void DoWindowContents(Rect inRect)
         {
-            // ⭐ 每次绘制窗口时检查Pawn有效性
-            CleanupInvalidPawns();
-            
             float yPos = 0f;
 
             // 标题
@@ -61,7 +58,7 @@ namespace RimTalk.Memory.Debug
                 Text.Anchor = TextAnchor.MiddleCenter;
                 GUI.color = Color.gray;
                 Widgets.Label(new Rect(0f, inRect.height / 2 - 20f, inRect.width, 40f), 
-                    "没有可用的Pawn\n\n请进入游戏并加载存档");
+                    "没有可用的殖民者\n\n请进入游戏并加载存档");
                 GUI.color = Color.white;
                 Text.Anchor = TextAnchor.UpperLeft;
                 return;
@@ -150,114 +147,79 @@ namespace RimTalk.Memory.Debug
 
         /// <summary>
         /// 显示Pawn选择菜单（支持主要角色和目标角色）
-        /// ⭐ 支持所有Pawn类型：殖民者、囚犯、访客、敌人
+        /// ⭐ 修改：支持所有类人生物，不仅限于殖民者
         /// </summary>
         private void ShowPawnSelectionMenu(bool isPrimary)
         {
             List<FloatMenuOption> options = new List<FloatMenuOption>();
             
-            if (Find.CurrentMap == null)
+            if (Find.CurrentMap != null)
             {
-                Messages.Message("当前没有地图", MessageTypeDefOf.RejectInput, false);
-                return;
-            }
-            
-            // ⭐ 清理已删除或不在地图上的Pawn
-            CleanupInvalidPawns();
-            
-            // ===== 分类添加选项 =====
-            
-            // 1. 殖民者
-            var colonists = Find.CurrentMap.mapPawns.FreeColonists.ToList();
-            if (colonists.Count > 0)
-            {
-                foreach (var pawn in colonists.OrderBy(p => p.LabelShort))
+                // ⭐ 获取所有类人生物，而不只是殖民者
+                var allHumanlikes = Find.CurrentMap.mapPawns.AllPawnsSpawned
+                    .Where(p => p.RaceProps.Humanlike)
+                    .OrderBy(p =>
+                    {
+                        // 排序优先级：1=殖民者，2=囚犯，3=奴隶，4=访客，5=其他
+                        if (p.IsColonist) return 1;
+                        if (p.IsPrisoner) return 2;
+                        if (p.IsSlaveOfColony) return 3;
+                        if (p.HostFaction == Faction.OfPlayer) return 4;
+                        return 5;
+                    })
+                    .ThenBy(p => p.LabelShort);
+                
+                foreach (var pawn in allHumanlikes)
                 {
                     Pawn localPawn = pawn;
-                    string optionLabel = "[殖民者] " + BuildPawnOptionLabel(pawn, isPrimary);
+                    
+                    // 构建选项标签，显示身份
+                    string optionLabel = pawn.LabelShort;
+                    
+                    // 添加身份标识
+                    if (pawn.IsColonist)
+                    {
+                        optionLabel += " (殖民者)";
+                    }
+                    else if (pawn.IsPrisoner)
+                    {
+                        optionLabel += " (囚犯)";
+                    }
+                    else if (pawn.IsSlaveOfColony)
+                    {
+                        optionLabel += " (奴隶)";
+                    }
+                    else if (pawn.HostFaction == Faction.OfPlayer)
+                    {
+                        optionLabel += " (访客)";
+                    }
+                    else if (pawn.Faction != null && pawn.Faction != Faction.OfPlayer)
+                    {
+                        optionLabel += $" ({pawn.Faction.Name})";
+                    }
+                    
+                    // 如果是选择目标角色，且与当前角色相同，添加提示
+                    if (!isPrimary && selectedPawn != null && pawn == selectedPawn)
+                    {
+                        optionLabel += " (与当前角色相同)";
+                    }
                     
                     options.Add(new FloatMenuOption(optionLabel, delegate
                     {
-                        SelectPawn(localPawn, isPrimary);
-                    }));
-                }
-            }
-            
-            // 2. 囚犯
-            var prisoners = Find.CurrentMap.mapPawns.PrisonersOfColony.ToList();
-            if (prisoners.Count > 0)
-            {
-                // 添加空白分隔
-                if (options.Count > 0)
-                {
-                    options.Add(new FloatMenuOption(" ", null) { Disabled = true });
-                }
-                
-                foreach (var pawn in prisoners.OrderBy(p => p.LabelShort))
-                {
-                    Pawn localPawn = pawn;
-                    string optionLabel = "[囚犯] " + BuildPawnOptionLabel(pawn, isPrimary);
-                    
-                    options.Add(new FloatMenuOption(optionLabel, delegate
-                    {
-                        SelectPawn(localPawn, isPrimary);
-                    }));
-                }
-            }
-            
-            // 3. 访客和盟友
-            var guests = Find.CurrentMap.mapPawns.AllPawnsSpawned
-                .Where(p => p.RaceProps != null && 
-                           p.RaceProps.Humanlike && 
-                           !p.IsColonist && 
-                           !p.IsPrisonerOfColony && 
-                           !p.HostileTo(Faction.OfPlayer))
-                .ToList();
-                
-            if (guests.Count > 0)
-            {
-                // 添加空白分隔
-                if (options.Count > 0)
-                {
-                    options.Add(new FloatMenuOption(" ", null) { Disabled = true });
-                }
-                
-                foreach (var pawn in guests.OrderBy(p => p.LabelShort))
-                {
-                    Pawn localPawn = pawn;
-                    string optionLabel = "[访客] " + BuildPawnOptionLabel(pawn, isPrimary);
-                    
-                    options.Add(new FloatMenuOption(optionLabel, delegate
-                    {
-                        SelectPawn(localPawn, isPrimary);
-                    }));
-                }
-            }
-            
-            // 4. 敌人
-            var enemies = Find.CurrentMap.mapPawns.AllPawnsSpawned
-                .Where(p => p.RaceProps != null && 
-                           p.RaceProps.Humanlike && 
-                           p.HostileTo(Faction.OfPlayer))
-                .Take(50) // 限制敌人列表最多50个
-                .ToList();
-                
-            if (enemies.Count > 0)
-            {
-                // 添加空白分隔
-                if (options.Count > 0)
-                {
-                    options.Add(new FloatMenuOption(" ", null) { Disabled = true });
-                }
-                
-                foreach (var pawn in enemies.OrderBy(p => p.LabelShort))
-                {
-                    Pawn localPawn = pawn;
-                    string optionLabel = "[敌人] " + BuildPawnOptionLabel(pawn, isPrimary);
-                    
-                    options.Add(new FloatMenuOption(optionLabel, delegate
-                    {
-                        SelectPawn(localPawn, isPrimary);
+                        if (isPrimary)
+                        {
+                            selectedPawn = localPawn;
+                            // 如果新选的当前角色与目标角色相同，清除目标角色
+                            if (targetPawn == localPawn)
+                            {
+                                targetPawn = null;
+                            }
+                        }
+                        else
+                        {
+                            targetPawn = localPawn;
+                        }
+                        cachedPreview = ""; // 清空缓存，强制刷新
                     }));
                 }
             }
@@ -268,109 +230,10 @@ namespace RimTalk.Memory.Debug
             }
             else
             {
-                Messages.Message("当前地图没有可用的Pawn", MessageTypeDefOf.RejectInput, false);
+                Messages.Message("当前地图上没有可用的类人生物", MessageTypeDefOf.RejectInput, false);
             }
         }
-        
-        /// <summary>
-        /// ⭐ 构建Pawn选项标签
-        /// </summary>
-        private string BuildPawnOptionLabel(Pawn pawn, bool isPrimary)
-        {
-            string label = pawn.LabelShort;
-            
-            // 添加种族信息
-            if (pawn.def != null && pawn.def.label != "人类")
-            {
-                label += $" ({pawn.def.label})";
-            }
-            
-            // 如果是选择目标角色，且与当前角色相同，添加提示
-            if (!isPrimary && selectedPawn != null && pawn == selectedPawn)
-            {
-                label += " (与当前角色相同)";
-            }
-            
-            return label;
-        }
-        
-        /// <summary>
-        /// ⭐ 选择Pawn并清空缓存
-        /// </summary>
-        private void SelectPawn(Pawn pawn, bool isPrimary)
-        {
-            if (isPrimary)
-            {
-                selectedPawn = pawn;
-                // 如果新选的当前角色与目标角色相同，清除目标角色
-                if (targetPawn == pawn)
-                {
-                    targetPawn = null;
-                }
-            }
-            else
-            {
-                targetPawn = pawn;
-            }
-            
-            cachedPreview = ""; // 清空缓存，强制刷新
-        }
-        
-        /// <summary>
-        /// ⭐ 清理已删除或不在地图上的Pawn
-        /// </summary>
-        private void CleanupInvalidPawns()
-        {
-            if (Find.CurrentMap == null)
-            {
-                selectedPawn = null;
-                targetPawn = null;
-                return;
-            }
-            
-            // 检查selectedPawn
-            if (selectedPawn != null)
-            {
-                if (selectedPawn.Destroyed || 
-                    selectedPawn.Dead || 
-                    selectedPawn.Map != Find.CurrentMap)
-                {
-                    Log.Message($"[Injection Preview] Cleaned up invalid selectedPawn: {selectedPawn.LabelShort}");
-                    selectedPawn = null;
-                    cachedPreview = ""; // 清空缓存
-                }
-            }
-            
-            // 检查targetPawn
-            if (targetPawn != null)
-            {
-                if (targetPawn.Destroyed || 
-                    targetPawn.Dead || 
-                    targetPawn.Map != Find.CurrentMap)
-                {
-                    Log.Message($"[Injection Preview] Cleaned up invalid targetPawn: {targetPawn.LabelShort}");
-                    targetPawn = null;
-                    cachedPreview = ""; // 清空缓存
-                }
-            }
-            
-            // 如果selectedPawn被清理了，尝试自动选择第一个殖民者
-            if (selectedPawn == null)
-            {
-                var colonists = Find.CurrentMap.mapPawns.FreeColonists.ToList();
-                if (colonists.Count > 0)
-                {
-                    selectedPawn = colonists.First();
-                    cachedPreview = ""; // 清空缓存
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message($"[Injection Preview] Auto-selected first colonist: {selectedPawn.LabelShort}");
-                    }
-                }
-            }
-        }
-        
+
         private void DrawStats(Rect rect)
         {
             if (selectedPawn == null) return;

@@ -205,7 +205,8 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.17: 计算Pawn的加入时间（直接使用RimWorld原生记录）
+        /// ★ v3.3.18: 计算Pawn的加入时间（直接使用RimWorld原生记录）
+        /// 修复：使用强引用 RecordDefOf 替代字符串查找
         /// </summary>
         private static int CalculateJoinTick(Pawn pawn, int currentTick)
         {
@@ -214,24 +215,30 @@ namespace RimTalk.Memory
                 if (pawn.records == null)
                     return currentTick; // 无记录系统，视为刚加入
                 
-                var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
+                // ★ v3.3.18: 修复 - 使用强引用替代字符串查找
+                // 旧代码（不可靠）：
+                // var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
+                
+                // 新代码（强引用）：
+                var recordDef = RecordDefOf.TimeAsColonistOrColonyAnimal;
+                
                 if (recordDef == null)
                 {
                     if (Prefs.DevMode)
-                        Log.Warning($"[PawnStatus] RecordDef 'TimeAsColonistOrColonyAnimal' not found");
+                        Log.Warning($"[PawnStatus] RecordDef 'TimeAsColonistOrColonyAnimal' not found (this should never happen with strong reference)");
                     return currentTick;
                 }
                 
-                // 获取作为殖民者的时长（单位：ticks）
+                // 获取作为殖民者的时间（单位：ticks）
                 float timeAsColonist = pawn.records.GetValue(recordDef);
                 
                 if (timeAsColonist <= 0)
                 {
-                    // 新加入的殖民者（记录为0）
+                    // 刚加入的殖民者，记录为0
                     return currentTick;
                 }
                 
-                // 计算加入时间 = 当前时间 - 作为殖民者的时长
+                // 加入的时间 = 当前时间 - 作为殖民者的时间
                 int joinTick = currentTick - (int)timeAsColonist;
                 
                 // 安全检查：加入时间不能早于游戏开始（初始殖民者）

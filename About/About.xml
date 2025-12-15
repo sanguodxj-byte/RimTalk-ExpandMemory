@@ -1,256 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<packageId>sanguo.rimtalk.expandmemory</packageId>
+	<packageId>cj.rimtalk.expandmemory</packageId>
 	<name>RimTalk - Expand Memory</name>
 	<author>SANGUO</author>
 	<supportedVersions>
 		<li>1.5</li>
 		<li>1.6</li>
 	</supportedVersions>
-	<modVersion>3.3.16</modVersion>
+	<modVersion>3.3.19</modVersion>
 	<url>https://github.com/sanguodxj-byte/RimTalk-ExpandMemory</url>
 	
-	<description>[h1]RimTalk - Expand Memory v3.3.16[/h1]
+	<description>[h1]RimTalk - Expand Memory v3.3.19[/h1]
 
-[b]🚀 四层记忆系统 + 智能注入 + 外部Mod集成API + AI多平台支持[/b]
+[b]四层记忆系统 + 智能注入 + 提示词规范化 + AI多平台支持 + 全新UI[/b]
 
 为RimTalk AI对话提供强大的记忆与常识支持，让殖民者拥有真实的记忆和知识！
-同时提供公共API，让其他Mod也能利用常识库功能！
 
 [hr][/hr]
 
-[h1]✨ 核心功能[/h1]
+[h1]核心功能[/h1]
 
-[b]🧠 四层记忆架构[/b]
-超短期(ABM 6条) → 短期(SCM 10-50条) → 中期(ELS 20-100条) → 长期(CLPA 无限)，模拟真实的记忆衰减
+[b]四层记忆架构[/b]
+超短期(ABM 6条) 短期(SCM 10-50条) 中期(ELS 20-100条) 长期(CLPA 无限)，模拟真实的记忆衰减
 
-[b]💬 玩家对话记录[/b]
-• 自动捕获玩家对角色说的话
-• 直接存入ELS层，标记为高优先级(importance=0.8)
-• 自动添加标签：玩家对话、直接记录、重要
-• 角色能记住所有玩家说过的话
+[b]Mind Stream UI (v3.3.19 全新)[/b]
+时间线卡片布局：垂直滚动的记忆卡片，彩色边框区分层级
+拖拽多选：Ctrl/Shift/框选，支持批量操作
+智能过滤：按层级(ABM/SCM/ELS/CLPA)和类型过滤
+实时统计：显示各层记忆数量和选中数量
+图书馆风格常识库：分类导航、搜索、批量管理
 
-[b]🔌 外部Mod集成API (v3.3.16新增)[/b]
-• 公共API供其他Mod注入常识
-• 支持批量导入、单条添加、按来源清理
-• 格式：[标签|重要性]内容
-• 自动标记来源Mod，支持版本管理
-• 完整文档和Copilot提示词模板
-• 应用场景：行为指令、招募策略、外交规则等
+[b]智能动态注入[/b]
+时间衰减30% + 重要性30% + 关键词40%
+自动选择最相关记忆注入对话
+名字识别加成：+0.3分（v3.3.2.38优化）
+支持双角色关键词提取（当前角色 + 交互对象）
+O(1) LRU缓存优化
 
-[b]🎯 智能动态注入[/b]
-• 时间衰减30% + 重要性30% + 关键词40%
-• 自动选择最相关记忆注入对话
-• 支持所有Pawn类型（殖民者、囚犯、访客、敌人）
-• 双角色关键词提取（当前角色 + 交互对象）
-• O(1) LRU缓存优化
+[b]自动清理系统 (v3.3.14)[/b]
+Activity阈值清理：自动删除activity &lt; 0.01的"死亡"记忆
+容量限制强制执行：超过上限时删除最低activity记忆
+三重保护：固定记忆、用户编辑记忆、长期记忆永不删除
+每小时自动执行，防止记忆无限累积
 
-[b]🔍 增强调试预览器 (v3.3.16)[/b]
-• 支持所有Pawn类型选择（殖民者/囚犯/访客/敌人）
-• 自动清理已删除或不在地图的Pawn
-• 分类显示Pawn列表（带图标标识）
-• 实时显示注入效果、评分明细、场景分析
+[b]提示词规范化 (v3.3.2.37)[/b]
+用户自定义文本替换规则
+支持正则表达式（忽略大小写）
+预编译优化 + 20ms超时保护
+实时生效，无需重启
 
-[b]🧹 自动清理系统[/b]
-• Activity阈值清理：自动删除activity &lt; 0.01的"死亡"记忆
-• ELS满时批量归档：归档最早25%记忆到CLPA
-• 容量限制强制执行：超过上限时删除最低activity记忆
-• 三重保护：固定记忆、用户编辑记忆、长期记忆永不删除
+[b]通用常识库[/b]
+格式：[标签|重要性]内容
+支持导入导出、角色专属、可视化UI
+标签解析容错：[Noble] 和 [Noble} 都能识别
+名字匹配智能识别：直接检测角色名字，+0.3加成
 
-[b]✨ 提示词规范化[/b]
-• 用户自定义文本替换规则
-• 支持正则表达式（忽略大小写）
-• 预编译优化 + 20ms超时保护
-• 实时生效，无需重启
-
-[b]📚 通用常识库[/b]
-• 格式：[标签|重要性]内容
-• 支持导入导出、角色专属、可视化UI
-• 标签解析容错 + 名字匹配智能识别
-• 短关键词评分优化
-
-[b]🤖 AI 多平台支持[/b]
-• OpenAI GPT、DeepSeek、Player2、Google Gemini、Custom
-• Prompt Caching 节省50%费用
-• 独立配置，不依赖RimTalk设置
-
+[b]AI 多平台支持[/b]
+OpenAI GPT、DeepSeek、Player2、Google Gemini、Custom
+Prompt Caching 节省50%费用
+独立配置，不依赖RimTalk设置
 
 [hr][/hr]
 
-[h1]🔌 外部Mod集成 (v3.3.16)[/h1]
-
-[b]其他Mod开发者可以通过API向常识库注入内容！[/b]
-
-[b]应用场景：[/b]
-• [b]RimTalk-ExpandActions:[/b] 注入行为指令常识
-• [b]招募系统Mod:[/b] 注入招募策略和话术
-• [b]外交系统Mod:[/b] 注入外交规则和礼仪
-• [b]任务系统Mod:[/b] 注入任务目标和奖励信息
-• [b]故事线Mod:[/b] 注入剧情背景和世界观
-
-[b]快速开始：[/b]
-[code]
-using RimTalk.Memory;
-
-[StaticConstructorOnStartup]
-public static class MyModIntegration
-{
-    static MyModIntegration()
-    {
-        string knowledge = @"
-[行为-战斗|0.9]遭遇敌人时保持冷静，优先寻找掩体
-[行为-建造|0.8]建造前检查材料充足，优先完成紧急建筑
-";
-        
-        CommonKnowledgeLibrary.ImportFromExternalMod(
-            knowledge, 
-            "MyMod", 
-            false
-        );
-    }
-}
-[/code]
-
-[b]支持的API：[/b]
-• ImportFromExternalMod() - 批量导入常识
-• AddKnowledgeEntry() - 添加单条常识
-• RemoveKnowledgeBySource() - 清理指定来源常识
-
-[b]完整文档：[/b]
-GitHub → EXPAND_ACTIONS_INTEGRATION_GUIDE.md
-
-[hr][/hr]
-
-[h1]🎯 使用方法[/h1]
+[h1]使用方法[/h1]
 
 [b]基础配置[/b]
 1. 安装 Harmony + RimTalk
 2. 启用本Mod
-3. Mod设置 → 打开常识库管理
-4. 导入示例：
-[code]
-[世界观|0.9]边缘世界，科技倒退
-[规则|0.8]回复80字内，口语化
-[Noble|0.5]Noble是殖民地领袖，擅长社交
-[/code]
+3. 游戏内打开 Memory 标签页
+4. 点击右上角"Knowledge"按钮打开常识库
 
-[b]提示词规范化[/b]
-1. Mod设置 → 顶部"提示词规范化"
-2. 点击"+ 添加新规则"
-3. 输入模式（正则表达式）：\(Player\)
-4. 输入替换内容：Master
-5. 勾选"启用"
-6. 自动生效，无需重启
+[b]新UI操作指南（v3.3.19）[/b]
+记忆时间线：单击选中、Ctrl+单击多选、Shift+单击范围选择、鼠标拖拽框选多个记忆、批量操作：总结、归档、删除选中的记忆
 
-[b]AI 配置[/b]
-1. Mod设置 → 展开"AI 配置"
-2. 选择提供商（OpenAI/DeepSeek/Player2/Google/Custom）
-3. 输入 API Key
-4. 点击"验证配置"
+常识库管理：左侧分类（全部/规则/世界观/角色状态/历史/其他）、顶部工具栏（新建、导入、导出、删除）、多选操作（Ctrl/Shift/拖拽选择，批量启用/禁用/导出）、右侧面板（查看详情、编辑内容、设置可见范围）
 
 [b]推荐配置[/b]
-• 动态注入：启用 ✅
-• 最大记忆：8-10条
-• 最大常识：3-5条
-• 记忆阈值：0.15
-• 常识阈值：0.10
-
-[b]调试工具[/b]
-Mod设置 → 注入预览器 → 支持所有Pawn类型，实时查看注入效果
+动态注入：启用 - 最大记忆：8-10条 - 最大常识：3-5条 - 记忆阈值：0.15 - 常识阈值：0.10
 
 [hr][/hr]
 
-[h1]📊 性能优化[/h1]
-[b]确定性行为：[/b]
-• 关键词提取：完全确定性排序（长度降序 + 字母顺序）
-• JSON解析：静态编译正则，10-20倍性能提升
-• 纯数字检查：字符循环替代正则，100倍提升
-• 对话缓存：O(1) LRU链表优化
+[h1]更新日志[/h1]
 
-[b]自动清理：[/b]
-• Activity阈值清理：防止"死亡"记忆累积
-• ELS批量归档：满时归档最早25%到CLPA
-• 容量限制：强制执行SCM 20条、ELS 50条上限
-• 保护机制：固定/编辑/长期记忆永不删除
+[b]v3.3.19 最新[/b]
+Mind Stream UI - 全新记忆时间线
+卡片式布局：垂直滚动的记忆卡片，每个卡片带彩色边框
+拖拽多选：支持Ctrl+点击、Shift+范围选择、鼠标框选
+智能过滤：按层级和类型过滤
+实时统计：显示各层记忆数量和选中项数量
+批量操作：总结、归档、删除选中的记忆
+彩色层级：ABM(青)、SCM(绿)、ELS(黄)、CLPA(紫)
 
-[hr][/hr]
+图书馆风格常识库UI
+三栏布局：分类导航 + 列表 + 详情/编辑
+分类过滤：全部/规则/世界观/角色状态/历史/其他
+多选操作：批量启用/禁用/导出/删除
+搜索功能：按标签或内容快速查找
+自动生成：支持Pawn状态和事件记录自动生成
+可视化管理：直观的UI替代手动编辑XML
 
-[h1]🔧 兼容性[/h1]
-[b]必需：[/b]Harmony
-[b]推荐：[/b]RimTalk（获得AI对话功能）
-[b]加载顺序：[/b]Core → Harmony → RimTalk → 本Mod
-
-[b]向后兼容：[/b]旧存档自动兼容
-
-[hr][/hr]
-
-[h1]📝 更新日志[/h1]
-
-[b]v3.3.16 最新 🎉[/b]
-• 🔌 [b]外部Mod集成API[/b]
-  - 公共API供其他Mod注入常识
-  - ImportFromExternalMod() - 批量导入
-  - AddKnowledgeEntry() - 单条添加
-  - RemoveKnowledgeBySource() - 按来源清理
-  - 自动标记来源Mod（来自:ModName, 自动导入）
-  - 支持注释（// 和 # 开头）
-  - 完整文档和Copilot提示词模板
-• 🔍 [b]预览器增强[/b]
-  - 支持所有Pawn类型（殖民者/囚犯/访客/敌人）
-  - 自动清理已删除或不在地图的Pawn
-  - 分类显示Pawn列表（带图标：🏠🔒👤⚔️）
-  - Pawn选择安全检查（自动fallback）
-• 📖 [b]完整文档[/b]
-  - EXPAND_ACTIONS_INTEGRATION_GUIDE.md（集成指南）
-  - SMART_INJECTION_PAWN_SUPPORT.md（Pawn支持文档）
-  - 提供多个Copilot提示词模板
-
-[b]v3.3.15[/b]
-• 💬 玩家对话记录功能
-• 📚 旧版事件条目自动迁移
-• 🛡️ 重复检测增强（三重检查）
-• 🧹 ELS归档优化（批量归档25%）
+完整翻译支持
+新增100+翻译键覆盖所有UI元素
+英文/中文双语完整支持
+所有按钮、提示、消息都使用翻译系统
 
 [b]v3.3.14[/b]
-• 🧹 记忆自动清理系统
-• 📋 完整文档（MEMORY_CLEANUP_SYSTEM.md）
+记忆自动清理系统
+Activity阈值清理：自动删除低活跃度记忆
+容量限制强制执行：超过上限时删除最低activity记忆
+三重保护：固定记忆、用户编辑记忆、长期记忆永不删除
+每小时自动执行，防止记忆无限累积导致性能下降
 
 [b]v3.3.13[/b]
-• 🎯 常识库评分优化（短关键词提升）
-• 🎬 场景分析显示
-• 📝 关键词列表显示
-• 📚 诊断工具文档
-
-[b]v3.3.2.38[/b]
-• 🎯 名字识别优化（直接检查角色名字列表）
-• 🛡️ 标签解析容错（支持 [Noble} 格式）
-
-[b]v3.3.2.37[/b]
-• ✨ 提示词规范化系统
-
-[b]v3.3.2.36[/b]
-• 🐛 修复控制台崩溃（移除 System.ValueTuple）
-
-[b]v3.3.2.34-v3.3.2.35[/b]
-• 🚀 性能优化大礼包
+常识库评分优化：提升2字关键词评分0.10、3字关键词评分0.16
+场景分析显示：预览器显示场景类型（战斗/社交/工作等）
+关键词列表显示：预览器显示具体的上下文关键词
 
 [hr][/hr]
 
-[h1]🙏 鸣谢 Credits[/h1]
-
-[b]Juicy - RimTalk 原作者 Original Author[/b]
-RimTalk 是 RimWorld 最优秀的 AI 对话 Mod 之一，为殖民者赋予了真正的灵魂和个性。它的创新设计启发了我开发这个记忆系统扩展。
-RimTalk is one of the best AI conversation mods for RimWorld, giving colonists real soul and personality. Its innovative design inspired me to create this memory system extension.
-
-[b]GitHub Copilot (Claude Sonnet 4.5)[/b]
-AI 辅助让开发更高效（我没有编写任何代码）
-AI assistance made development more efficient. (I didn't write any code)
+[h1]兼容性[/h1]
+必需：Harmony
+推荐：RimTalk（获得AI对话功能）
+加载顺序：Core Harmony RimTalk 本Mod
+向后兼容：旧存档自动兼容
 
 [hr][/hr]
+
+[h1]鸣谢[/h1]
+
+Juicy - RimTalk 原作者
+RimTalk 是 RimWorld 最优秀的 AI 对话 Mod 之一，为殖民者赋予了真正的灵魂和个性。
+
+GitHub Copilot (Claude Sonnet 4.5)
+AI 辅助让开发更高效
 
 GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
 
-[b]让你的殖民者拥有真实记忆！支持外部Mod集成！[/b] 🎮
+让你的殖民者拥有真实记忆！
 	</description>
 	
 	<modDependencies>
@@ -270,9 +156,6 @@ GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
 	<loadAfter>
 		<li>brrainz.harmony</li>
 		<li>cj.rimtalk</li>
-		<li>Core40k.Core</li>
-		<li>RH2.Faction.Astartes</li>
-		<li>OGI.Core40k</li>
 	</loadAfter>
 	
 	<incompatibleWith>

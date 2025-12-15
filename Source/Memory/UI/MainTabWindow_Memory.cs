@@ -4,873 +4,1028 @@ using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using RimTalk.MemoryPatch;
-using System; // ⭐ 添加System命名空间用于Exception
+using System;
 
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// Main tab window for viewing colonist memories - appears in bottom menu bar
-    /// ⭐ v3.3.2.3: 添加安全检查防止NullReference
+    /// Mind Stream Timeline - Multi-Select Memory Cards
+    /// ★ v3.3.19: 完全重构 - 时间线卡片布局 + 拖拽多选 + 批量操作
     /// </summary>
     public class MainTabWindow_Memory : MainTabWindow
     {
-        private Vector2 scrollPosition = Vector2.zero;
-        private MemoryType? filterType = null;
+        // ==================== Data & State ====================
         private Pawn selectedPawn = null;
+        private FourLayerMemoryComp currentMemoryComp = null;
         
-        // 四层记忆显示开关
-        private bool showABM = true;  // 超短期
-        private bool showSCM = true;  // 短期
-        private bool showELS = true;  // 中期
-        private bool showCLPA = true; // 长期
+        // ⭐ 新增：显示所有类人生物选项
+        private bool showAllHumanlikes = false;
         
-        private PawnMemoryComp currentMemoryComp = null; // 保存当前的记忆组件引用
+        // Multi-select support
+        private HashSet<MemoryEntry> selectedMemories = new HashSet<MemoryEntry>();
+        private MemoryEntry lastSelectedMemory = null;
+        
+        // Drag selection
+        private bool isDragging = false;
+        private Vector2 dragStartPos = Vector2.zero;
+        private Vector2 dragCurrentPos = Vector2.zero;
+        
+        // UI State
+        private Vector2 timelineScrollPosition = Vector2.zero;
+        private MemoryType? filterType = null;
+        
+        // Layer filters
+        private bool showABM = true;
+        private bool showSCM = true;
+        private bool showELS = true;
+        private bool showCLPA = true;
+        
+        // Layout constants
+        private const float TOP_BAR_HEIGHT = 50f;
+        private const float CONTROL_PANEL_WIDTH = 220f;
+        private const float SPACING = 10f;
+        private const float CARD_WIDTH_FULL = 600f;
+        private const float CARD_SPACING = 8f;
+        
+        public override Vector2 RequestedTabSize => new Vector2(1200f, 700f);
 
-        public override Vector2 RequestedTabSize
-        {
-            get { return new Vector2(1010f, 640f); }
-        }
-
+        // ==================== Main Layout ====================
+        
         public override void DoWindowContents(Rect inRect)
         {
-            // Pawn selection
-            Rect pawnSelectRect = new Rect(0f, 0f, inRect.width, 50f);
-            DrawPawnSelection(pawnSelectRect);
-
+            // Top Bar
+            Rect topBarRect = new Rect(0f, 0f, inRect.width, TOP_BAR_HEIGHT);
+            DrawTopBar(topBarRect);
+            
+            // Content area
+            float contentY = TOP_BAR_HEIGHT + SPACING;
+            float contentHeight = inRect.height - contentY;
+            
             if (selectedPawn == null)
             {
-                Rect noPawnRect = new Rect(0f, 60f, inRect.width, 100f);
-                Text.Anchor = TextAnchor.MiddleCenter;
-                Text.Font = GameFont.Medium;
-                Widgets.Label(noPawnRect, "RimTalk_SelectColonist".Translate());
-                Text.Anchor = TextAnchor.UpperLeft;
-                Text.Font = GameFont.Small;
+                DrawNoPawnSelected(new Rect(0f, contentY, inRect.width, contentHeight));
                 return;
             }
-
-            var memoryComp = selectedPawn.TryGetComp<PawnMemoryComp>();
+            
+            var memoryComp = selectedPawn.TryGetComp<FourLayerMemoryComp>();
             if (memoryComp == null)
             {
-                Rect noMemoryRect = new Rect(0f, 60f, inRect.width, 100f);
-                Text.Anchor = TextAnchor.MiddleCenter;
-                Widgets.Label(noMemoryRect, "RimTalk_NoMemoryComponent".Translate());
-                Text.Anchor = TextAnchor.UpperLeft;
+                DrawNoMemoryComponent(new Rect(0f, contentY, inRect.width, contentHeight));
                 return;
             }
-
-            currentMemoryComp = memoryComp; // 保存引用
-            Rect contentRect = new Rect(0f, 60f, inRect.width, inRect.height - 60f);
-            DrawMemoryContent(contentRect, memoryComp);
+            
+            currentMemoryComp = memoryComp;
+            
+            // Left Control Panel
+            Rect controlPanelRect = new Rect(0f, contentY, CONTROL_PANEL_WIDTH, contentHeight);
+            DrawControlPanel(controlPanelRect);
+            
+            // Right Timeline
+            float timelineX = CONTROL_PANEL_WIDTH + SPACING;
+            float timelineWidth = inRect.width - timelineX;
+            Rect timelineRect = new Rect(timelineX, contentY, timelineWidth, contentHeight);
+            DrawTimeline(timelineRect);
+            
+            // Handle drag end
+            if (Event.current.type == EventType.MouseUp && isDragging)
+            {
+                isDragging = false;
+                Event.current.Use();
+            }
         }
 
-        private void DrawPawnSelection(Rect rect)
+        // ==================== Top Bar ====================
+        
+        private void DrawTopBar(Rect rect)
         {
+            Widgets.DrawMenuSection(rect);
+            Rect innerRect = rect.ContractedBy(5f);
+            
+            // Pawn Selector
+            Rect pawnSelectorRect = new Rect(innerRect.x, innerRect.y + 5f, 250f, 35f);
+            DrawPawnSelector(pawnSelectorRect);
+            
+            // ⭐ Show All Humanlikes Checkbox
+            Rect checkboxRect = new Rect(innerRect.x + 260f, innerRect.y + 10f, 180f, 25f);
+            Widgets.CheckboxLabeled(checkboxRect, "RimTalk_ShowAllHumanlikes".Translate(), ref showAllHumanlikes);
+            
+            // ⭐ 统计信息栏（移到这里，替换掉总记忆数）
+            if (currentMemoryComp != null)
+            {
+                Rect statsRect = new Rect(innerRect.x + 450f, innerRect.y + 8f, 350f, 30f);
+                DrawTopBarStats(statsRect);
+            }
+            
+            // Buttons (right side)
+            float buttonWidth = 120f;
+            float spacing = 5f;
+            float rightX = innerRect.xMax;
+            
+            // Preview button
+            rightX -= buttonWidth;
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Preview".Translate()))
+            {
+                Find.WindowStack.Add(new RimTalk.Memory.Debug.Dialog_InjectionPreview());
+            }
+            
+            // Common Knowledge button
+            rightX -= buttonWidth + spacing;
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Knowledge".Translate()))
+            {
+                OpenCommonKnowledgeDialog();
+            }
+        }
+        
+        // ⭐ 新增：TopBar统计信息显示
+        private void DrawTopBarStats(Rect rect)
+        {
+            if (currentMemoryComp == null)
+                return;
+            
+            int abmCount = currentMemoryComp.ActiveMemories.Count;
+            int scmCount = currentMemoryComp.SituationalMemories.Count;
+            int elsCount = currentMemoryComp.EventLogMemories.Count;
+            int clpaCount = currentMemoryComp.ArchiveMemories.Count;
+            
             Text.Font = GameFont.Small;
             
-            // Get all colonists
-            List<Pawn> colonists = Find.CurrentMap?.mapPawns?.FreeColonists?.ToList();
+            // 只显示层级统计（居中显示）
+            string stats = $"ABM: {abmCount}  SCM: {scmCount}  ELS: {elsCount}  CLPA: {clpaCount}";
+            GUI.color = new Color(0.7f, 0.9f, 1f);
+            Widgets.Label(new Rect(rect.x, rect.y, rect.width, rect.height), stats);
+            
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+        }
+        
+        private void DrawPawnSelector(Rect rect)
+        {
+            // ⭐ 根据showAllHumanlikes决定显示哪些Pawn
+            List<Pawn> colonists;
+            if (showAllHumanlikes)
+            {
+                // 显示所有类人生物
+                colonists = Find.CurrentMap?.mapPawns?.AllPawnsSpawned
+                    ?.Where(p => p.RaceProps.Humanlike)
+                    ?.ToList();
+            }
+            else
+            {
+                // 只显示殖民者
+                colonists = Find.CurrentMap?.mapPawns?.FreeColonists?.ToList();
+            }
+            
             if (colonists == null || colonists.Count == 0)
             {
-                Widgets.Label(rect, "RimTalk_NoColonists".Translate());
+                Widgets.Label(rect, "RimTalk_MindStream_NoColonists".Translate());
                 return;
             }
-
-            // Dropdown for colonist selection
-            Rect labelRect = new Rect(rect.x, rect.y, 150f, rect.height);
-            Widgets.Label(labelRect, "RimTalk_SelectColonist".Translate() + ":");
-
-            Rect buttonRect = new Rect(rect.x + 160f, rect.y, 300f, 35f);
-            string buttonLabel = selectedPawn != null 
-                ? selectedPawn.LabelShort 
-                : (string)"RimTalk_ChooseColonist".Translate();
             
-            if (Widgets.ButtonText(buttonRect, buttonLabel))
+            string label = selectedPawn != null ? selectedPawn.LabelShort : "RimTalk_SelectColonist".Translate().ToString();
+            
+            if (Widgets.ButtonText(rect, label))
             {
                 List<FloatMenuOption> options = new List<FloatMenuOption>();
                 foreach (var pawn in colonists)
                 {
-                    Pawn p = pawn; // Capture for lambda
-                    options.Add(new FloatMenuOption(pawn.LabelShort, delegate { selectedPawn = p; }));
+                    Pawn p = pawn;
+                    string pawnLabel = p.LabelShort;
+                    
+                    // 如果是非殖民者，添加标识
+                    if (!p.IsColonist)
+                    {
+                        if (p.Faction != null && p.Faction != Faction.OfPlayer)
+                        {
+                            pawnLabel += $" ({p.Faction.Name})";
+                        }
+                        else if (p.IsPrisoner)
+                        {
+                            pawnLabel += " (Prisoner)";
+                        }
+                        else if (p.IsSlaveOfColony)
+                        {
+                            pawnLabel += " (Slave)";
+                        }
+                    }
+                    
+                    options.Add(new FloatMenuOption(pawnLabel, delegate 
+                    { 
+                        selectedPawn = p;
+                        selectedMemories.Clear(); // Clear selection when changing pawn
+                    }));
                 }
                 Find.WindowStack.Add(new FloatMenu(options));
             }
-
-            // ⭐ 新增：注入预览器按钮（右上角，紧凑版）
-            Rect previewButtonRect = new Rect(rect.xMax - 140f, rect.y, 60f, 35f);
-            if (Widgets.ButtonText(previewButtonRect, "RimTalk_UI_Preview".Translate()))
-            {
-                Find.WindowStack.Add(new RimTalk.Memory.Debug.Dialog_InjectionPreview());
-            }
-            TooltipHandler.TipRegion(previewButtonRect, "RimTalk_Tooltip_Preview".Translate());
             
-            // ⭐ 新增：常识按钮（预览按钮左边）
-            Rect knowledgeButtonRect = new Rect(rect.xMax - 70f, rect.y, 60f, 35f);
-            if (Widgets.ButtonText(knowledgeButtonRect, "RimTalk_UI_Knowledge".Translate()))
-            {
-                OpenCommonKnowledgeDialog();
-            }
-            TooltipHandler.TipRegion(knowledgeButtonRect, "RimTalk_Tooltip_Knowledge".Translate());
-            
-            // 立即总结按钮（SCM → ELS）
-            if (selectedPawn != null)
-            {
-                Rect summarizeButtonRect = new Rect(rect.x + 470f, rect.y, 180f, 35f);
-                string summarizeLabel = "RimTalk_UI_ImmediateSummarize".Translate();
-                
-                var memoryComp = selectedPawn.TryGetComp<PawnMemoryComp>();
-                bool canSummarize = memoryComp != null && memoryComp.GetSituationalMemoryCount() > 0;
-                
-                if (!canSummarize)
-                {
-                    GUI.color = Color.gray;
-                    summarizeLabel = "RimTalk_UI_ImmediateSummarizeNoMemory".Translate();
-                }
-                
-                if (Widgets.ButtonText(summarizeButtonRect, summarizeLabel))
-                {
-                    if (canSummarize)
-                    {
-                        Log.Message($"[RimTalk Memory] 🔄 Manual summarization triggered for {selectedPawn.LabelShort}");
-                        memoryComp.DailySummarization();
-                        Messages.Message("RimTalk_UI_MemorySummarized".Translate(selectedPawn.LabelShort), MessageTypeDefOf.TaskCompletion);
-                    }
-                }
-                
-                GUI.color = Color.white;
-                
-                // 总结所有人按钮
-                Rect summarizeAllButtonRect = new Rect(rect.x + 660f, rect.y, 180f, 35f);
-                if (Widgets.ButtonText(summarizeAllButtonRect, "RimTalk_UI_SummarizeAll".Translate()))
-                {
-                    // ⭐ 使用队列系统（1秒延迟）
-                    List<Pawn> pawnsToSummarize = new List<Pawn>();
-                    foreach (var map in Find.Maps)
-                    {
-                        foreach (var pawn in map.mapPawns.FreeColonists)
-                        {
-                            var comp = pawn.TryGetComp<PawnMemoryComp>();
-                            if (comp != null && comp.GetSituationalMemoryCount() > 0)
-                            {
-                                pawnsToSummarize.Add(pawn);
-                            }
-                        }
-                    }
-                    
-                    if (pawnsToSummarize.Count > 0)
-                    {
-                        var memoryManager = Find.World.GetComponent<MemoryManager>();
-                        memoryManager?.QueueManualSummarization(pawnsToSummarize);
-                        Messages.Message("RimTalk_UI_MemoriesSummarizedCount".Translate(pawnsToSummarize.Count), MessageTypeDefOf.TaskCompletion);
-                    }
-                    else
-                    {
-                        Messages.Message("RimTalk_UI_NoColonistsNeedSummarize".Translate(), MessageTypeDefOf.RejectInput);
-                    }
-                }
-                
-                // === CLPA 归档按钮（对齐） ===
-                Rect archiveButtonRect = new Rect(rect.x + 470f, rect.y + 40f, 180f, 35f);
-                string archiveLabel = "RimTalk_UI_ImmediateArchive".Translate();
-                
-                var archiveComp = selectedPawn.TryGetComp<PawnMemoryComp>();
-                bool canArchive = archiveComp != null && archiveComp.GetEventLogMemoryCount() > 0;
-                
-                if (!canArchive)
-                {
-                    GUI.color = Color.gray;
-                    archiveLabel = "RimTalk_UI_ImmediateArchiveNoMemory".Translate();
-                }
-                
-                if ( Widgets.ButtonText(archiveButtonRect, archiveLabel))
-                {
-                    if (canArchive)
-                    {
-                        Log.Message($"[RimTalk Memory] 📚 Manual archiving triggered for {selectedPawn.LabelShort}");
-                        archiveComp.ManualArchive();
-                        Messages.Message("RimTalk_UI_MemoryArchived".Translate(selectedPawn.LabelShort), MessageTypeDefOf.TaskCompletion);
-                    }
-                }
-                
-                GUI.color = Color.white;
-                
-                // 归档所有人按钮（CLPA）
-                Rect archiveAllButtonRect = new Rect(rect.x + 660f, rect.y + 40f, 180f, 35f);
-                if (Widgets.ButtonText(archiveAllButtonRect, "RimTalk_UI_ArchiveAll".Translate()))
-                {
-                    int count = 0;
-                    foreach (var map in Find.Maps)
-                    {
-                        foreach (var pawn in map.mapPawns.FreeColonists)
-                        {
-                            var comp = pawn.TryGetComp<PawnMemoryComp>();
-                            if (comp != null && comp.GetEventLogMemoryCount() > 0)
-                            {
-                                comp.ManualArchive();
-                                count++;
-                            }
-                        }
-                    }
-                    
-                    Log.Message($"[RimTalk Memory] 📚 Manual archiving triggered for {count} colonists");
-                    Messages.Message("RimTalk_UI_MemoriesArchivedCount".Translate(count), MessageTypeDefOf.TaskCompletion);
-                }
-            }
-
-            // Auto-select if only one colonist or none selected
+            // Auto-select
             if (selectedPawn == null && colonists.Count > 0)
             {
                 selectedPawn = colonists[0];
             }
         }
 
-        private void DrawMemoryContent(Rect rect, PawnMemoryComp memoryComp)
+        // ==================== Control Panel ====================
+        
+        private void DrawControlPanel(Rect rect)
         {
-            GUI.BeginGroup(rect);
-
-            // Header
-            Rect headerRect = new Rect(0f, 0f, rect.width, 40f);
-            Text.Font = GameFont.Medium;
-            Widgets.Label(headerRect, TranslatorFormattedStringExtensions.Translate("RimTalk_MemoryTitle", selectedPawn.LabelShort));
-            Text.Font = GameFont.Small;
-
-            // Filter buttons
-            Rect filterRect = new Rect(0f, 45f, rect.width, 30f);
-            DrawFilterButtons(filterRect);
-
-            // Memory type toggle buttons (短期/长期切换)
-            Rect toggleRect = new Rect(0f, 80f, rect.width, 30f);
-            DrawMemoryTypeToggles(toggleRect);
-
-            // Memory stats
-            Rect statsRect = new Rect(0f, 115f, rect.width, 40f);
-            DrawMemoryStats(statsRect, memoryComp);
-
-            // Memory list
-            Rect listRect = new Rect(0f, 160f, rect.width, rect.height - 160f);
-            DrawMemoryList(listRect, memoryComp);
-
-            GUI.EndGroup();
-        }
-
-        private void DrawFilterButtons(Rect rect)
-        {
-            // 只显示实际使用的类型
-            var types = new List<MemoryType>
-            {
-                MemoryType.Conversation,
-                MemoryType.Action
-            };
+            Widgets.DrawMenuSection(rect);
+            Rect innerRect = rect.ContractedBy(SPACING);
+            float y = innerRect.y;
             
-            int totalButtons = types.Count + 1; // include "All"
-            float buttonWidth = rect.width / totalButtons;
-
-            // All button
-            Rect allRect = new Rect(rect.x, rect.y, buttonWidth, rect.height);
-            if (Widgets.ButtonText(allRect, "RimTalk_Filter_All".Translate()))
-            {
-                filterType = null;
-            }
-
-            // Specific types
-            for (int i = 0; i < types.Count; i++)
-            {
-                MemoryType type = types[i];
-                Rect buttonRect = new Rect(rect.x + buttonWidth * (i + 1), rect.y, buttonWidth, rect.height);
-                string buttonLabel = ("RimTalk_Filter_" + type.ToString()).Translate();
-                if (Widgets.ButtonText(buttonRect, buttonLabel))
-                {
-                    filterType = type;
-                }
-            }
+            // Title
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 30f), "RimTalk_MindStream_MemoryFilters".Translate());
+            Text.Font = GameFont.Small;
+            y += 35f;
+            
+            // Layer Filters
+            y = DrawLayerFilters(innerRect, y);
+            y += 10f;
+            
+            // Type Filters
+            y = DrawTypeFilters(innerRect, y);
+            y += 10f;
+            
+            // ⭐ 移除了 DrawStatistics 调用，统计已移到TopBar
+            
+            // Separator
+            Widgets.DrawLineHorizontal(innerRect.x, y, innerRect.width);
+            y += 15f;
+            
+            // Batch Actions
+            y = DrawBatchActions(innerRect, y);
+            y += 10f;
+            
+            // Global Actions
+            DrawGlobalActions(innerRect, y);
         }
-
-        private void DrawMemoryTypeToggles(Rect rect)
+        
+        private float DrawLayerFilters(Rect parentRect, float startY)
         {
-            float buttonWidth = rect.width / 4f; // 4个按钮
+            float y = startY;
+            
+            Text.Font = GameFont.Tiny;
+            GUI.color = new Color(0.8f, 0.8f, 0.8f);
+            Widgets.Label(new Rect(parentRect.x, y, parentRect.width, 20f), "RimTalk_MindStream_Layers".Translate());
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            y += 22f;
+            
+            float checkboxHeight = 24f;
+            
+            // ABM
+            Rect abmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
+            Color abmColor = new Color(0.3f, 0.8f, 1f); // Cyan
+            DrawColoredCheckbox(abmRect, "RimTalk_MindStream_ABM".Translate(), ref showABM, abmColor);
+            y += checkboxHeight + 2f;
+            
+            // SCM
+            Rect scmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
+            Color scmColor = new Color(0.3f, 1f, 0.5f); // Green
+            DrawColoredCheckbox(scmRect, "RimTalk_MindStream_SCM".Translate(), ref showSCM, scmColor);
+            y += checkboxHeight + 2f;
+            
+            // ELS
+            Rect elsRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
+            Color elsColor = new Color(1f, 0.8f, 0.3f); // Yellow
+            DrawColoredCheckbox(elsRect, "RimTalk_MindStream_ELS".Translate(), ref showELS, elsColor);
+            y += checkboxHeight + 2f;
+            
+            // CLPA
+            Rect clpaRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
+            Color clpaColor = new Color(0.8f, 0.4f, 1f); // Purple
+            DrawColoredCheckbox(clpaRect, "RimTalk_MindStream_CLPA".Translate(), ref showCLPA, clpaColor);
+            y += checkboxHeight;
+            
+            return y;
+        }
+        
+        private void DrawColoredCheckbox(Rect rect, string label, ref bool value, Color color)
+        {
+            // Colored indicator
+            Rect colorRect = new Rect(rect.x, rect.y + 2f, 3f, rect.height - 4f);
+            Widgets.DrawBoxSolid(colorRect, color);
+            
+            // Checkbox
+            Rect checkboxRect = new Rect(rect.x + 8f, rect.y, rect.width - 8f, rect.height);
+            Widgets.CheckboxLabeled(checkboxRect, label, ref value);
+        }
+        
+        private float DrawTypeFilters(Rect parentRect, float startY)
+        {
+            float y = startY;
+            
+            Text.Font = GameFont.Tiny;
+            GUI.color = new Color(0.8f, 0.8f, 0.8f);
+            Widgets.Label(new Rect(parentRect.x, y, parentRect.width, 20f), "RimTalk_MindStream_Type".Translate());
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            y += 22f;
+            
+            float buttonHeight = 28f;
             float spacing = 2f;
             
-            // ABM 按钮（超短期）
-            Rect abmRect = new Rect(rect.x, rect.y, buttonWidth - spacing, rect.height);
-            string abmLabel = "ABM" + (showABM ? " ✓" : "");
-            if (Widgets.ButtonText(abmRect, abmLabel))
+            // All
+            bool isAllSelected = filterType == null;
+            if (isAllSelected)
+                GUI.color = new Color(0.5f, 0.7f, 1f);
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_All".Translate()))
             {
-                showABM = !showABM;
+                filterType = null;
+                selectedMemories.Clear();
             }
-            if (Mouse.IsOver(abmRect))
-            {
-                TooltipHandler.TipRegion(abmRect, "RimTalk_Tooltip_ABM".Translate());
-            }
+            GUI.color = Color.white;
+            y += buttonHeight + spacing;
             
-            // SCM 按钮（短期）
-            Rect scmRect = new Rect(rect.x + buttonWidth, rect.y, buttonWidth - spacing, rect.height);
-            string scmLabel = "SCM" + (showSCM ? " ✓" : "");
-            if (Widgets.ButtonText(scmRect, scmLabel))
+            // Conversation
+            bool isConvSelected = filterType == MemoryType.Conversation;
+            if (isConvSelected)
+                GUI.color = new Color(0.5f, 0.7f, 1f);
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_Conversation".Translate()))
             {
-                showSCM = !showSCM;
+                filterType = MemoryType.Conversation;
+                selectedMemories.Clear();
             }
-            if (Mouse.IsOver(scmRect))
-            {
-                TooltipHandler.TipRegion(scmRect, "RimTalk_Tooltip_SCM".Translate());
-            }
+            GUI.color = Color.white;
+            y += buttonHeight + spacing;
             
-            // ELS 按钮（中期） - 支持右键添加
-            Rect elsRect = new Rect(rect.x + buttonWidth * 2, rect.y, buttonWidth - spacing, rect.height);
-            string elsLabel = "ELS" + (showELS ? " ✓" : "");
-            
-            // 优先检测右键点击（在按钮绘制之前）
-            if (Mouse.IsOver(elsRect) && Event.current.type == EventType.MouseDown && Event.current.button == 1)
+            // Action
+            bool isActionSelected = filterType == MemoryType.Action;
+            if (isActionSelected)
+                GUI.color = new Color(0.5f, 0.7f, 1f);
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_Action".Translate()))
             {
-                Event.current.Use();
-                ShowAddMemoryContextMenu(MemoryLayer.EventLog);
+                filterType = MemoryType.Action;
+                selectedMemories.Clear();
             }
-            // 左键切换显示
-            else if (Widgets.ButtonText(elsRect, elsLabel))
-            {
-                showELS = !showELS;
-            }
+            GUI.color = Color.white;
+            y += buttonHeight;
             
-            if (Mouse.IsOver(elsRect))
-            {
-                TooltipHandler.TipRegion(elsRect, "RimTalk_Tooltip_ELS".Translate());
-            }
+            return y;
+        }
+        
+        private float DrawBatchActions(Rect parentRect, float startY)
+        {
+            float y = startY;
             
-            // CLPA 按钮（长期） - 支持右键添加
-            Rect clpaRect = new Rect(rect.x + buttonWidth * 3, rect.y, buttonWidth - spacing, rect.height);
-            string clpaLabel = "CLPA" + (showCLPA ? " ✓" : "");
+            Text.Font = GameFont.Tiny;
+            GUI.color = new Color(0.8f, 0.8f, 0.8f);
+            Widgets.Label(new Rect(parentRect.x, y, parentRect.width, 20f), "RimTalk_MindStream_BatchActions".Translate());
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            y += 22f;
             
-            // 优先检测右键点击（在按钮绘制之前）
-            if (Mouse.IsOver(clpaRect) && Event.current.type == EventType.MouseDown && Event.current.button == 1)
-            {
-                Event.current.Use();
-                ShowAddMemoryContextMenu(MemoryLayer.Archive);
-            }
-            // 左键切换显示
-            else if (Widgets.ButtonText(clpaRect, clpaLabel))
-            {
-                showCLPA = !showCLPA;
-            }
+            float buttonHeight = 32f;
+            float spacing = 5f;
+            bool hasSelection = selectedMemories.Count > 0;
             
-            if (Mouse.IsOver(clpaRect))
+            // Summarize Selected (SCM -> ELS)
+            GUI.enabled = hasSelection && selectedMemories.Any(m => m.layer == MemoryLayer.Situational);
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), 
+                hasSelection ? "RimTalk_MindStream_SummarizeN".Translate(selectedMemories.Count) : "RimTalk_MindStream_SummarizeSelected".Translate()))
             {
-                TooltipHandler.TipRegion(clpaRect, "RimTalk_Tooltip_CLPA".Translate());
+                SummarizeSelectedMemories();
+            }
+            GUI.enabled = true;
+            y += buttonHeight + spacing;
+            
+            // Archive Selected (ELS -> CLPA)
+            GUI.enabled = hasSelection && selectedMemories.Any(m => m.layer == MemoryLayer.EventLog);
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), 
+                hasSelection ? "RimTalk_MindStream_ArchiveN".Translate(selectedMemories.Count) : "RimTalk_MindStream_ArchiveSelected".Translate()))
+            {
+                ArchiveSelectedMemories();
+            }
+            GUI.enabled = true;
+            y += buttonHeight + spacing;
+            
+            // Delete Selected
+            GUI.enabled = hasSelection;
+            GUI.color = hasSelection ? new Color(1f, 0.4f, 0.4f) : Color.white;
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), 
+                hasSelection ? "RimTalk_MindStream_DeleteN".Translate(selectedMemories.Count) : "RimTalk_MindStream_DeleteSelected".Translate()))
+            {
+                DeleteSelectedMemories();
+            }
+            GUI.color = Color.white;
+            GUI.enabled = true;
+            y += buttonHeight;
+            
+            return y;
+        }
+        
+        private void DrawGlobalActions(Rect parentRect, float startY)
+        {
+            float y = startY;
+            
+            Text.Font = GameFont.Tiny;
+            GUI.color = new Color(0.8f, 0.8f, 0.8f);
+            Widgets.Label(new Rect(parentRect.x, y, parentRect.width, 20f), "RimTalk_MindStream_GlobalActions".Translate());
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            y += 22f;
+            
+            float buttonHeight = 32f;
+            float spacing = 5f;
+            
+            // Summarize All
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_SummarizeAll".Translate()))
+            {
+                SummarizeAll();
+            }
+            y += buttonHeight + spacing;
+            
+            // Archive All
+            if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_ArchiveAll".Translate()))
+            {
+                ArchiveAll();
             }
         }
 
-        /// <summary>
-        /// 显示添加记忆的上下文菜单
-        /// </summary>
-        private void ShowAddMemoryContextMenu(MemoryLayer targetLayer)
+        // ==================== Timeline ====================
+        
+        private void DrawTimeline(Rect rect)
         {
-            if (selectedPawn == null || currentMemoryComp == null) return;
-
-            string layerName = targetLayer == MemoryLayer.EventLog ? 
-                "RimTalk_Layer_ELS".Translate() : "RimTalk_Layer_CLPA".Translate();
+            if (currentMemoryComp == null)
+                return;
             
-            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            Widgets.DrawMenuSection(rect);
+            Rect innerRect = rect.ContractedBy(5f);
             
-            // 选项1：添加行动记忆
-            options.Add(new FloatMenuOption("RimTalk_Menu_AddActionMemory".Translate(layerName), delegate
-            {
-                try
-                {
-                    if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
-                    {
-                        Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, fourLayerComp, targetLayer, MemoryType.Action));
-                    }
-                    else
-                    {
-                        Messages.Message("RimTalk_Menu_MemoryCompUnavailable".Translate(), MessageTypeDefOf.RejectInput, false);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[RimTalk Memory] Failed to create memory: {ex.Message}");
-                    Messages.Message("RimTalk_Menu_CreateMemoryFailed".Translate(), MessageTypeDefOf.RejectInput, false);
-                }
-            }));
+            // Get filtered memories
+            var memories = GetFilteredMemories();
             
-            // 选项2：添加对话记忆
-            options.Add(new FloatMenuOption("RimTalk_Menu_AddConversationMemory".Translate(layerName), delegate
-            {
-                try
-                {
-                    if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
-                    {
-                        Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, fourLayerComp, targetLayer, MemoryType.Conversation));
-                    }
-                    else
-                    {
-                        Messages.Message("RimTalk_Menu_MemoryCompUnavailable".Translate(), MessageTypeDefOf.RejectInput, false);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[RimTalk Memory] Failed to create memory: {ex.Message}");
-                    Messages.Message("RimTalk_Menu_CreateMemoryFailed".Translate(), MessageTypeDefOf.RejectInput, false);
-                }
-            }));
-            
-            Find.WindowStack.Add(new FloatMenu(options));
-        }
-
-        private void DrawMemoryStats(Rect rect, PawnMemoryComp memoryComp)
-        {
-            // 获取四层记忆组件
-            FourLayerMemoryComp fourLayerComp = memoryComp as FourLayerMemoryComp;
-            
-            if (fourLayerComp != null)
-            {
-                // 四层记忆统计
-                Text.Anchor = TextAnchor.MiddleLeft;
-                
-                string stats = string.Format(
-                    "ABM: {0}/3 | SCM: {1}/20 | ELS: {2}/50 | CLPA: {3}",
-                    fourLayerComp.ActiveMemories.Count,
-                    fourLayerComp.SituationalMemories.Count,
-                    fourLayerComp.EventLogMemories.Count,
-                    fourLayerComp.ArchiveMemories.Count
-                );
-                
-                Widgets.Label(rect, stats);
-                Text.Anchor = TextAnchor.UpperLeft;
-            }
-        }
-
-        /// <summary>
-        /// 显示清除确认对话框
-        /// </summary>
-        private void ShowClearConfirmation(PawnMemoryComp memoryComp, ClearType clearType)
-        {
-            string title = "";
-            string message = "";
-            
-            switch (clearType)
-            {
-                case ClearType.All:
-                    title = "确认清除全部记忆";
-                    message = $"确定要清除 {selectedPawn.LabelShort} 的所有记忆吗？\n\n" +
-                             $"这将删除 {memoryComp.ShortTermMemories.Count} 条短期记忆和 " +
-                             $"{memoryComp.LongTermMemories.Count} 条长期记忆。\n\n" +
-                             "此操作不可撤销！";
-                    break;
-                    
-                case ClearType.ShortTerm:
-                    title = "确认清除短期记忆";
-                    message = $"确定要清除 {selectedPawn.LabelShort} 的短期记忆吗？\n\n" +
-                             $"这将删除 {memoryComp.ShortTermMemories.Count} 条短期记忆。\n\n" +
-                             "此操作不可撤销！";
-                    break;
-                    
-                case ClearType.LongTerm:
-                    title = "确认清除长期记忆";
-                    message = $"确定要清除 {selectedPawn.LabelShort} 的长期记忆吗？\n\n" +
-                             $"这将删除 {memoryComp.LongTermMemories.Count} 条长期记忆。\n\n" +
-                             "此操作不可撤销！";
-                    break;
-            }
-            
-            Dialog_MessageBox confirmDialog = Dialog_MessageBox.CreateConfirmation(
-                message,
-                delegate
-                {
-                    // 确认清除
-                    switch (clearType)
-                    {
-                        case ClearType.All:
-                            memoryComp.ClearAllMemories();
-                            Messages.Message($"已清除 {selectedPawn.LabelShort} 的所有记忆", MessageTypeDefOf.TaskCompletion);
-                            break;
-                            
-                        case ClearType.ShortTerm:
-                            memoryComp.ClearShortTermMemories();
-                            Messages.Message($"已清除 {selectedPawn.LabelShort} 的短期记忆", MessageTypeDefOf.TaskCompletion);
-                            break;
-                            
-                        case ClearType.LongTerm:
-                            memoryComp.ClearLongTermMemories();
-                            Messages.Message($"已清除 {selectedPawn.LabelShort} 的长期记忆", MessageTypeDefOf.TaskCompletion);
-                            break;
-                    }
-                },
-                true,
-                title
-            );
-            
-            Find.WindowStack.Add(confirmDialog);
-        }
-
-        private enum ClearType
-        {
-            All,
-            ShortTerm,
-            LongTerm
-        }
-
-        private void DrawMemoryList(Rect rect, PawnMemoryComp memoryComp)
-        {
-            List<MemoryListEntry> allMemories = new List<MemoryListEntry>();
-            
-            // 获取四层记忆组件
-            FourLayerMemoryComp fourLayerComp = memoryComp as FourLayerMemoryComp;
-            
-            if (fourLayerComp != null)
-            {
-                // 四层架构显示
-                if (showABM)
-                {
-                    foreach (var memory in fourLayerComp.ActiveMemories)
-                    {
-                        if (filterType == null || memory.type == filterType.Value)
-                        {
-                            allMemories.Add(new MemoryListEntry { memory = memory, layer = MemoryLayer.Active });
-                        }
-                    }
-                }
-                
-                if (showSCM)
-                {
-                    foreach (var memory in fourLayerComp.SituationalMemories)
-                    {
-                        if (filterType == null || memory.type == filterType.Value)
-                        {
-                            allMemories.Add(new MemoryListEntry { memory = memory, layer = MemoryLayer.Situational });
-                        }
-                    }
-                }
-                
-                if (showELS)
-                {
-                    foreach (var memory in fourLayerComp.EventLogMemories)
-                    {
-                        if (filterType == null || memory.type == filterType.Value)
-                        {
-                            allMemories.Add(new MemoryListEntry { memory = memory, layer = MemoryLayer.EventLog });
-                        }
-                    }
-                }
-                
-                if (showCLPA)
-                {
-                    foreach (var memory in fourLayerComp.ArchiveMemories)
-                    {
-                        if (filterType == null || memory.type == filterType.Value)
-                        {
-                            allMemories.Add(new MemoryListEntry { memory = memory, layer = MemoryLayer.Archive });
-                        }
-                    }
-                }
-            }
-
-            // 动态行高
+            // Calculate card heights
             float totalHeight = 0f;
-            var rowHeights = new List<float>();
-            foreach (var entry in allMemories)
+            var cardHeights = new List<float>();
+            foreach (var memory in memories)
             {
-                float height = GetRowHeight(entry.layer);
-                rowHeights.Add(height);
-                totalHeight += height;
+                float height = GetCardHeight(memory.layer);
+                cardHeights.Add(height);
+                totalHeight += height + CARD_SPACING;
             }
             
-            Rect viewRect = new Rect(0f, 0f, rect.width - 16f, totalHeight);
+            Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, totalHeight);
             
-            Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
-
+            // Handle drag selection
+            HandleDragSelection(innerRect, viewRect);
+            
+            // Draw timeline
+            Widgets.BeginScrollView(innerRect, ref timelineScrollPosition, viewRect, true);
+            
             float y = 0f;
-            for (int i = 0; i < allMemories.Count; i++)
+            for (int i = 0; i < memories.Count; i++)
             {
-                var entry = allMemories[i];
-                float height = rowHeights[i];
-                Rect rowRect = new Rect(0f, y, viewRect.width, height - 5f);
-                DrawMemoryRow(rowRect, entry.memory, entry.layer);
-                y += height;
-            }
-
-            Widgets.EndScrollView();
-        }
-
-        private float GetRowHeight(MemoryLayer layer)
-        {
-            switch (layer)
-            {
-                case MemoryLayer.Active:
-                    return 70f;  // ABM 最紧凑
-                case MemoryLayer.Situational:
-                    return 85f;  // SCM 略大
-                case MemoryLayer.EventLog:
-                    return 110f; // ELS 中等（AI总结内容较长）
-                case MemoryLayer.Archive:
-                    return 130f; // CLPA 最大（重要内容）
-                default:
-                    return 85f;
-            }
-        }
-
-        private void DrawMemoryRow(Rect rect, MemoryEntry memory, MemoryLayer layer)
-        {
-            // Background - 根据层级使用不同颜色
-            Color bgColor;
-            switch (layer)
-            {
-                case MemoryLayer.Active:
-                    bgColor = new Color(0.3f, 0.4f, 0.5f, 0.5f); // ABM: 亮蓝色
-                    break;
-                case MemoryLayer.Situational:
-                    bgColor = new Color(0.2f, 0.3f, 0.4f, 0.5f); // SCM: 中蓝色
-                    break;
-                case MemoryLayer.EventLog:
-                    bgColor = new Color(0.3f, 0.25f, 0.2f, 0.5f); // ELS: 棕色
-                    break;
-                case MemoryLayer.Archive:
-                    bgColor = new Color(0.25f, 0.2f, 0.25f, 0.5f); // CLPA: 紫色
-                    break;
-                default:
-                    bgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
-                    break;
+                var memory = memories[i];
+                float height = cardHeights[i];
+                Rect cardRect = new Rect(0f, y, viewRect.width, height);
+                DrawMemoryCard(cardRect, memory);
+                y += height + CARD_SPACING;
             }
             
-            // 如果被固定，使用金色
+            // Draw selection box
+            if (isDragging)
+            {
+                DrawSelectionBox();
+            }
+            
+            Widgets.EndScrollView();
+            
+            // Show filter status
+            if (filterType != null || !showABM || !showSCM || !showELS || !showCLPA)
+            {
+                Rect statusRect = new Rect(innerRect.x, innerRect.yMax - 25f, innerRect.width, 20f);
+                Text.Font = GameFont.Tiny;
+                GUI.color = new Color(0.7f, 0.7f, 0.7f);
+                Widgets.Label(statusRect, "RimTalk_MindStream_ShowingN".Translate(memories.Count));
+                GUI.color = Color.white;
+                Text.Font = GameFont.Small;
+            }
+        }
+        
+        private void DrawMemoryCard(Rect rect, MemoryEntry memory)
+        {
+            bool isSelected = selectedMemories.Contains(memory);
+            Color borderColor = GetLayerColor(memory.layer);
+            
+            // Background
             if (memory.isPinned)
             {
-                bgColor = new Color(0.3f, 0.25f, 0.1f, 0.5f);
+                Widgets.DrawBoxSolid(rect, new Color(0.25f, 0.2f, 0.1f, 0.5f));
+            }
+            else
+            {
+                Widgets.DrawBoxSolid(rect, new Color(0.15f, 0.15f, 0.15f, 0.9f));
             }
             
-            Widgets.DrawBoxSolid(rect, bgColor);
-            Widgets.DrawBox(rect);
-
-            Rect innerRect = rect.ContractedBy(5f);
-
-            // 按钮区域（右侧）
-            float buttonWidth = 50f;
-            float buttonSpacing = 5f;
-            float buttonsStartX = innerRect.xMax - (buttonWidth * 3 + buttonSpacing * 2);
+            // Border
+            if (isSelected)
+            {
+                Widgets.DrawBox(rect, 2);
+                Rect borderRect = rect.ContractedBy(1f);
+                GUI.color = new Color(1f, 0.8f, 0.3f);
+                Widgets.DrawBox(borderRect, 2);
+                GUI.color = Color.white;
+            }
+            else
+            {
+                GUI.color = borderColor;
+                Widgets.DrawBox(rect, 1);
+                GUI.color = Color.white;
+            }
+            
+            // Hover highlight
+            if (Mouse.IsOver(rect) && !isDragging)
+            {
+                Widgets.DrawLightHighlight(rect);
+            }
+            
+            Rect innerRect = rect.ContractedBy(8f);
+            
+            // ⭐ 计算按钮区域（用于检测是否点击在按钮上）
+            float buttonSize = 24f;
+            float buttonSpacing = 4f;
+            float buttonAreaX = innerRect.xMax - (buttonSize * 2 + buttonSpacing + 8f);
+            Rect buttonAreaRect = new Rect(buttonAreaX, innerRect.y, buttonSize * 2 + buttonSpacing + 8f, buttonSize);
+            bool clickedOnButton = false;
+            
+            // Top-right action buttons
+            float buttonX = innerRect.xMax - buttonSize;
             float buttonY = innerRect.y;
             
-            // 编辑按钮
-            Rect editButtonRect = new Rect(buttonsStartX, buttonY, buttonWidth, 25f);
-            if (Widgets.ButtonText(editButtonRect, "RimTalk_UI_Edit".Translate()))
+            // Pin button
+            Rect pinButtonRect = new Rect(buttonX, buttonY, buttonSize, buttonSize);
+            if (Mouse.IsOver(pinButtonRect))
             {
-                try
-                {
-                    // ⭐ 安全检查：确保组件存在
-                    if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
-                    {
-                        Find.WindowStack.Add(new Dialog_EditMemory(memory, fourLayerComp));
-                    }
-                    else
-                    {
-                        Messages.Message("RimTalk_Menu_MemoryCompUnavailable".Translate(), MessageTypeDefOf.RejectInput, false);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[RimTalk Memory] Failed to open edit dialog: {ex.Message}");
-                    Messages.Message("RimTalk_Menu_OpenEditFailed".Translate(), MessageTypeDefOf.RejectInput, false);
-                }
+                Widgets.DrawHighlight(pinButtonRect);
             }
-            TooltipHandler.TipRegion(editButtonRect, "RimTalk_Tooltip_Edit".Translate());
-
-            // 固定按钮
-            Rect pinButtonRect = new Rect(buttonsStartX + buttonWidth + buttonSpacing, buttonY, buttonWidth, 25f);
-            string pinLabel = memory.isPinned ? "RimTalk_UI_Pinned".Translate() : "RimTalk_UI_Pin".Translate();
-            if (Widgets.ButtonText(pinButtonRect, pinLabel))
+            if (Widgets.ButtonImage(pinButtonRect, memory.isPinned ? TexButton.ReorderUp : TexButton.ReorderDown))
             {
                 memory.isPinned = !memory.isPinned;
-                if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
+                if (currentMemoryComp != null)
                 {
-                    fourLayerComp.PinMemory(memory.id, memory.isPinned);
+                    currentMemoryComp.PinMemory(memory.id, memory.isPinned);
                 }
+                clickedOnButton = true;
+                Event.current.Use();
             }
-            string pinTooltip = memory.isPinned ? "RimTalk_Tooltip_Unpin".Translate() : "RimTalk_Tooltip_Pin".Translate();
-            TooltipHandler.TipRegion(pinButtonRect, pinTooltip);
-
-            // 删除按钮
-            Rect deleteButtonRect = new Rect(buttonsStartX + (buttonWidth + buttonSpacing) * 2, buttonY, buttonWidth, 25f);
-            if (Widgets.ButtonText(deleteButtonRect, "RimTalk_UI_Delete".Translate()))
-            {
-                Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                    "RimTalk_UI_ConfirmDeleteMemory".Translate(),
-                    delegate
-                    {
-                        if (currentMemoryComp is FourLayerMemoryComp fourLayerComp)
-                        {
-                            fourLayerComp.DeleteMemory(memory.id);
-                            Messages.Message("RimTalk_MemoryDeleted".Translate(), MessageTypeDefOf.TaskCompletion);
-                        }
-                    },
-                    true
-                ));
-            }
-            TooltipHandler.TipRegion(deleteButtonRect, "RimTalk_Tooltip_Delete".Translate());
+            TooltipHandler.TipRegion(pinButtonRect, memory.isPinned ? "RimTalk_MindStream_Unpin".Translate() : "RimTalk_MindStream_Pin".Translate());
+            buttonX -= buttonSize + buttonSpacing;
             
-            // Type, time, and layer indicator
-            Rect headerRect = new Rect(innerRect.x, innerRect.y, buttonsStartX - innerRect.x - 10f, 20f);
+            // Edit button
+            Rect editButtonRect = new Rect(buttonX, buttonY, buttonSize, buttonSize);
+            if (Mouse.IsOver(editButtonRect))
+            {
+                Widgets.DrawHighlight(editButtonRect);
+            }
+            if (Widgets.ButtonImage(editButtonRect, TexButton.Rename))
+            {
+                if (currentMemoryComp != null)
+                {
+                    Find.WindowStack.Add(new Dialog_EditMemory(memory, currentMemoryComp));
+                }
+                clickedOnButton = true;
+                Event.current.Use();
+            }
+            TooltipHandler.TipRegion(editButtonRect, "RimTalk_MindStream_Edit".Translate());
+            
+            // ⭐ 只在非按钮区域处理点击选择
+            if (!clickedOnButton && Widgets.ButtonInvisible(rect) && !isDragging && !buttonAreaRect.Contains(Event.current.mousePosition))
+            {
+                HandleMemoryClick(memory);
+            }
+            
+            // Content area (avoid button overlap)
+            Rect contentRect = new Rect(innerRect.x, innerRect.y, innerRect.width - (buttonSize * 2 + buttonSpacing + 8f), innerRect.height);
+            
+            // Header
             Text.Font = GameFont.Tiny;
+            string layerLabel = GetLayerLabel(memory.layer);
+            string typeLabel = memory.type.ToString();
+            string timeLabel = memory.TimeAgoString;
             
-            string memoryTypeLabel = ("RimTalk_MemoryType_" + memory.type.ToString()).Translate();
-            
-            // 显示层级信息（使用缩写）
-            string layerLabel = "";
-            switch (layer)
-            {
-                case MemoryLayer.Active:
-                    layerLabel = "[ABM]";
-                    break;
-                case MemoryLayer.Situational:
-                    layerLabel = "[SCM]";
-                    break;
-                case MemoryLayer.EventLog:
-                    layerLabel = "[ELS]";
-                    break;
-                case MemoryLayer.Archive:
-                    layerLabel = "[CLPA]";
-                    break;
-            }
-            
-            string header = $"{layerLabel} [{memoryTypeLabel}] {memory.TimeAgoString}";
+            string header = $"[{layerLabel}] {typeLabel} • {timeLabel}";
             if (!string.IsNullOrEmpty(memory.relatedPawnName))
-                header += " - " + "RimTalk_With".Translate() + " " + memory.relatedPawnName;
-            
-            // 如果有标签，显示
-            if (memory.tags != null && memory.tags.Any())
             {
-                header += " | " + "RimTalk_Tooltip_Tags".Translate(string.Join(", ", memory.tags.Take(2)));
-                if (memory.tags.Count > 2)
-                    header += "...";
+                header += $" • {"RimTalk_MindStream_With".Translate()} {memory.relatedPawnName}";
             }
             
-            Widgets.Label(headerRect, header);
-
-            // Content - 根据层级决定显示长度
+            GUI.color = new Color(0.8f, 0.8f, 0.8f);
+            Widgets.Label(new Rect(contentRect.x, contentRect.y, contentRect.width, 18f), header);
+            GUI.color = Color.white;
+            
+            // Content
             Text.Font = GameFont.Small;
+            float contentY = contentRect.y + 20f;
+            float contentHeight = contentRect.height - 40f;
+            Rect textRect = new Rect(contentRect.x, contentY, contentRect.width, contentHeight);
             
-            int maxLength = GetContentMaxLength(layer);
             string displayText = memory.content;
-            bool isTruncated = false;
-            
+            int maxLength = GetContentMaxLength(memory.layer);
             if (displayText.Length > maxLength)
             {
-                displayText = displayText.Substring(0, maxLength - 3) + "...";
-                isTruncated = true;
+                displayText = displayText.Substring(0, maxLength) + "...";
             }
             
-            float contentHeight = GetContentHeight(layer);
-            Rect contentRect = new Rect(innerRect.x, innerRect.y + 27f, innerRect.width, contentHeight);
+            Widgets.Label(textRect, displayText);
             
-            // 使用 TextArea 以支持多行显示
-            GUI.enabled = false; // 只读
-            Text.Font = GetContentFont(layer);
-            displayText = GUI.TextArea(contentRect, displayText);
-            GUI.enabled = true;
-            Text.Font = GameFont.Small;
-            
-            // 完整内容 Tooltip
-            if (isTruncated || memory.content.Length > maxLength)
+            // Tooltip for full content
+            if (memory.content.Length > maxLength && Mouse.IsOver(textRect))
             {
-                Rect tooltipRect = new Rect(contentRect.x, contentRect.y, contentRect.width, contentHeight);
-                if (Mouse.IsOver(tooltipRect))
-                {
-                    // 创建多行 tooltip，包含备注
-                    string tooltipText = memory.content;
-                    if (!string.IsNullOrEmpty(memory.notes))
-                    {
-                        tooltipText += "\n\n" + "RimTalk_Tooltip_Notes".Translate(memory.notes);
-                    }
-                    TooltipHandler.TipRegion(tooltipRect, tooltipText);
-                }
+                TooltipHandler.TipRegion(textRect, memory.content);
             }
-
-            // Importance and Activity bars
-            float barY = innerRect.y + 27f + contentHeight + 2f;
             
-            // Importance bar
-            Rect importanceRect = new Rect(innerRect.x, barY, innerRect.width / 2 - 2f, 8f);
-            Widgets.FillableBar(importanceRect, Mathf.Clamp01(memory.importance), 
-                Texture2D.whiteTexture, BaseContent.ClearTex, false);
-            TooltipHandler.TipRegion(importanceRect, "RimTalk_Tooltip_Importance".Translate(memory.importance.ToString("F2")));
+            // Footer (importance/activity bars)
+            float barY = contentRect.yMax - 12f;
+            float barWidth = (contentRect.width - 4f) / 2f;
             
-            // Activity bar
-            Rect activityRect = new Rect(innerRect.x + innerRect.width / 2 + 2f, barY, innerRect.width / 2 - 2f, 8f);
-            Widgets.FillableBar(activityRect, Mathf.Clamp01(memory.activity), 
-                Texture2D.whiteTexture, BaseContent.ClearTex, false);
-            TooltipHandler.TipRegion(activityRect, "RimTalk_Tooltip_Activity".Translate(memory.activity.ToString("F2")));
+            Rect importanceBarRect = new Rect(contentRect.x, barY, barWidth, 8f);
+            Widgets.FillableBar(importanceBarRect, Mathf.Clamp01(memory.importance), Texture2D.whiteTexture, BaseContent.ClearTex, false);
+            TooltipHandler.TipRegion(importanceBarRect, "RimTalk_MindStream_ImportanceLabel".Translate(memory.importance.ToString("F2")));
+            
+            Rect activityBarRect = new Rect(contentRect.x + barWidth + 4f, barY, barWidth, 8f);
+            Widgets.FillableBar(activityBarRect, Mathf.Clamp01(memory.activity), Texture2D.whiteTexture, BaseContent.ClearTex, false);
+            TooltipHandler.TipRegion(activityBarRect, "RimTalk_MindStream_ActivityLabel".Translate(memory.activity.ToString("F2")));
             
             Text.Font = GameFont.Small;
         }
+        
+        private void HandleMemoryClick(MemoryEntry memory)
+        {
+            bool ctrl = Event.current.control;
+            bool shift = Event.current.shift;
+            
+            if (ctrl)
+            {
+                // Toggle selection
+                if (selectedMemories.Contains(memory))
+                    selectedMemories.Remove(memory);
+                else
+                    selectedMemories.Add(memory);
+                    
+                lastSelectedMemory = memory;
+            }
+            else if (shift && lastSelectedMemory != null)
+            {
+                // Range selection
+                var filteredMemories = GetFilteredMemories();
+                int startIndex = filteredMemories.IndexOf(lastSelectedMemory);
+                int endIndex = filteredMemories.IndexOf(memory);
+                
+                if (startIndex >= 0 && endIndex >= 0)
+                {
+                    int min = Math.Min(startIndex, endIndex);
+                    int max = Math.Max(startIndex, endIndex);
+                    
+                    for (int i = min; i <= max; i++)
+                    {
+                        selectedMemories.Add(filteredMemories[i]);
+                    }
+                }
+                
+                lastSelectedMemory = memory;
+            }
+            else
+            {
+                // Single selection
+                selectedMemories.Clear();
+                selectedMemories.Add(memory);
+                lastSelectedMemory = memory;
+            }
+        }
+        
+        private void HandleDragSelection(Rect listRect, Rect viewRect)
+        {
+            Event e = Event.current;
+            
+            if (e.type == EventType.MouseDown && e.button == 0 && listRect.Contains(e.mousePosition))
+            {
+                isDragging = true;
+                dragStartPos = e.mousePosition - listRect.position + timelineScrollPosition;
+                dragCurrentPos = dragStartPos;
+                e.Use();
+            }
+            
+            if (isDragging && e.type == EventType.MouseDrag)
+            {
+                dragCurrentPos = e.mousePosition - listRect.position + timelineScrollPosition;
+                
+                // Select memories that intersect with drag box
+                Rect selectionBox = GetSelectionBox();
+                var filteredMemories = GetFilteredMemories();
+                
+                bool ctrl = Event.current.control;
+                if (!ctrl)
+                {
+                    selectedMemories.Clear();
+                }
+                
+                float y = 0f;
+                foreach (var memory in filteredMemories)
+                {
+                    float height = GetCardHeight(memory.layer);
+                    Rect cardRect = new Rect(0f, y, viewRect.width, height);
+                    
+                    if (selectionBox.Overlaps(cardRect))
+                    {
+                        selectedMemories.Add(memory);
+                    }
+                    
+                    y += height + CARD_SPACING;
+                }
+                
+                e.Use();
+            }
+            
+            if (e.type == EventType.MouseUp && e.button == 0 && isDragging)
+            {
+                isDragging = false;
+                e.Use();
+            }
+        }
+        
+        private void DrawSelectionBox()
+        {
+            Rect selectionBox = GetSelectionBox();
+            Widgets.DrawBox(selectionBox);
+            Widgets.DrawBoxSolid(selectionBox, new Color(1f, 0.8f, 0.3f, 0.2f));
+        }
+        
+        private Rect GetSelectionBox()
+        {
+            float minX = Mathf.Min(dragStartPos.x, dragCurrentPos.x);
+            float minY = Mathf.Min(dragStartPos.y, dragCurrentPos.y);
+            float maxX = Mathf.Max(dragStartPos.x, dragCurrentPos.x);
+            float maxY = Mathf.Max(dragStartPos.y, dragCurrentPos.y);
+            
+            return new Rect(minX, minY, maxX - minX, maxY - minY);
+        }
 
+        // ==================== Batch Actions ====================
+        
+        private void SummarizeSelectedMemories()
+        {
+            if (currentMemoryComp == null || selectedMemories.Count == 0)
+                return;
+            
+            var scmMemories = selectedMemories.Where(m => m.layer == MemoryLayer.Situational).ToList();
+            if (scmMemories.Count == 0)
+            {
+                Messages.Message("RimTalk_MindStream_NoSCMSelected".Translate(), MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+            
+            Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                "RimTalk_MindStream_SummarizeConfirm".Translate(scmMemories.Count),
+                delegate
+                {
+                    foreach (var memory in scmMemories)
+                    {
+                        // Move to ELS
+                        currentMemoryComp.SituationalMemories.Remove(memory);
+                        memory.layer = MemoryLayer.EventLog;
+                        currentMemoryComp.EventLogMemories.Insert(0, memory);
+                    }
+                    
+                    selectedMemories.Clear();
+                    Messages.Message("RimTalk_MindStream_SummarizedN".Translate(scmMemories.Count), MessageTypeDefOf.PositiveEvent, false);
+                }
+            ));
+        }
+        
+        private void ArchiveSelectedMemories()
+        {
+            if (currentMemoryComp == null || selectedMemories.Count == 0)
+                return;
+            
+            var elsMemories = selectedMemories.Where(m => m.layer == MemoryLayer.EventLog).ToList();
+            if (elsMemories.Count == 0)
+            {
+                Messages.Message("RimTalk_MindStream_NoELSSelected".Translate(), MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+            
+            Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                "RimTalk_MindStream_ArchiveConfirm".Translate(elsMemories.Count),
+                delegate
+                {
+                    foreach (var memory in elsMemories)
+                    {
+                        // Move to CLPA
+                        currentMemoryComp.EventLogMemories.Remove(memory);
+                        memory.layer = MemoryLayer.Archive;
+                        currentMemoryComp.ArchiveMemories.Insert(0, memory);
+                    }
+                    
+                    selectedMemories.Clear();
+                    Messages.Message("RimTalk_MindStream_ArchivedN".Translate(elsMemories.Count), MessageTypeDefOf.PositiveEvent, false);
+                }
+            ));
+        }
+        
+        private void DeleteSelectedMemories()
+        {
+            if (currentMemoryComp == null || selectedMemories.Count == 0)
+                return;
+            
+            int count = selectedMemories.Count;
+            
+            Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                "RimTalk_MindStream_DeleteConfirm".Translate(count),
+                delegate
+                {
+                    foreach (var memory in selectedMemories.ToList())
+                    {
+                        currentMemoryComp.DeleteMemory(memory.id);
+                    }
+                    
+                    selectedMemories.Clear();
+                    Messages.Message("RimTalk_MindStream_DeletedN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
+                }
+            ));
+        }
+        
+        private void SummarizeAll()
+        {
+            List<Pawn> pawnsToSummarize = new List<Pawn>();
+            foreach (var map in Find.Maps)
+            {
+                foreach (var pawn in map.mapPawns.FreeColonists)
+                {
+                    var comp = pawn.TryGetComp<PawnMemoryComp>();
+                    if (comp != null && comp.GetSituationalMemoryCount() > 0)
+                    {
+                        pawnsToSummarize.Add(pawn);
+                    }
+                }
+            }
+            
+            if (pawnsToSummarize.Count > 0)
+            {
+                var memoryManager = Find.World.GetComponent<MemoryManager>();
+                memoryManager?.QueueManualSummarization(pawnsToSummarize);
+                Messages.Message("RimTalk_MindStream_QueuedSummarization".Translate(pawnsToSummarize.Count), MessageTypeDefOf.TaskCompletion, false);
+            }
+            else
+            {
+                Messages.Message("RimTalk_MindStream_NoNeedSummarization".Translate(), MessageTypeDefOf.RejectInput, false);
+            }
+        }
+        
+        private void ArchiveAll()
+        {
+            int count = 0;
+            foreach (var map in Find.Maps)
+            {
+                foreach (var pawn in map.mapPawns.FreeColonists)
+                {
+                    var comp = pawn.TryGetComp<PawnMemoryComp>();
+                    if (comp != null && comp.GetEventLogMemoryCount() > 0)
+                    {
+                        comp.ManualArchive();
+                        count++;
+                    }
+                }
+            }
+            
+            Messages.Message("RimTalk_MindStream_ArchivedForN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
+        }
+
+        // ==================== Helper Methods ====================
+        
+        private List<MemoryEntry> GetFilteredMemories()
+        {
+            if (currentMemoryComp == null)
+                return new List<MemoryEntry>();
+            
+            var memories = new List<MemoryEntry>();
+            
+            if (showABM)
+            {
+                memories.AddRange(currentMemoryComp.ActiveMemories.Where(m => filterType == null || m.type == filterType.Value));
+            }
+            
+            if (showSCM)
+            {
+                memories.AddRange(currentMemoryComp.SituationalMemories.Where(m => filterType == null || m.type == filterType.Value));
+            }
+            
+            if (showELS)
+            {
+                memories.AddRange(currentMemoryComp.EventLogMemories.Where(m => filterType == null || m.type == filterType.Value));
+            }
+            
+            if (showCLPA)
+            {
+                memories.AddRange(currentMemoryComp.ArchiveMemories.Where(m => filterType == null || m.type == filterType.Value));
+            }
+            
+            // Sort by timestamp (newest first)
+            memories = memories.OrderByDescending(m => m.timestamp).ToList();
+            
+            return memories;
+        }
+        
+        private float GetCardHeight(MemoryLayer layer)
+        {
+            switch (layer)
+            {
+                case MemoryLayer.Active:
+                    return 80f;
+                case MemoryLayer.Situational:
+                    return 100f;
+                case MemoryLayer.EventLog:
+                    return 130f;
+                case MemoryLayer.Archive:
+                    return 160f;
+                default:
+                    return 100f;
+            }
+        }
+        
         private int GetContentMaxLength(MemoryLayer layer)
         {
             switch (layer)
             {
                 case MemoryLayer.Active:
-                    return 60;   // ABM: 最短
+                    return 80;
                 case MemoryLayer.Situational:
-                    return 100;  // SCM
+                    return 120;
                 case MemoryLayer.EventLog:
-                    return 200;  // ELS: AI总结
+                    return 200;
                 case MemoryLayer.Archive:
-                    return 300;  // CLPA: 最长
+                    return 300;
                 default:
-                    return 100;
-            }
-        }
-
-        private float GetContentHeight(MemoryLayer layer)
-        {
-            switch (layer)
-            {
-                case MemoryLayer.Active:
-                    return 30f;
-                case MemoryLayer.Situational:
-                    return 45f;
-                case MemoryLayer.EventLog:
-                    return 70f;
-                case MemoryLayer.Archive:
-                    return 90f;
-                default:
-                    return 45f;
-            }
-        }
-
-        private GameFont GetContentFont(MemoryLayer layer)
-        {
-            switch (layer)
-            {
-                case MemoryLayer.Active:
-                case MemoryLayer.Situational:
-                    return GameFont.Small;
-                case MemoryLayer.EventLog:
-                case MemoryLayer.Archive:
-                    return GameFont.Tiny; // 较小字体以显示更多内容
-                default:
-                    return GameFont.Small;
+                    return 120;
             }
         }
         
-        /// <summary>
-        /// 打开常识库对话框
-        /// </summary>
+        private Color GetLayerColor(MemoryLayer layer)
+        {
+            switch (layer)
+            {
+                case MemoryLayer.Active:
+                    return new Color(0.3f, 0.8f, 1f); // Cyan
+                case MemoryLayer.Situational:
+                    return new Color(0.3f, 1f, 0.5f); // Green
+                case MemoryLayer.EventLog:
+                    return new Color(1f, 0.8f, 0.3f); // Yellow
+                case MemoryLayer.Archive:
+                    return new Color(0.8f, 0.4f, 1f); // Purple
+                default:
+                    return Color.white;
+            }
+        }
+        
+        private string GetLayerLabel(MemoryLayer layer)
+        {
+            switch (layer)
+            {
+                case MemoryLayer.Active:
+                    return "ABM";
+                case MemoryLayer.Situational:
+                    return "SCM";
+                case MemoryLayer.EventLog:
+                    return "ELS";
+                case MemoryLayer.Archive:
+                    return "CLPA";
+                default:
+                    return "UNK";
+            }
+        }
+        
+        private void DrawNoPawnSelected(Rect rect)
+        {
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Text.Font = GameFont.Medium;
+            Widgets.Label(rect, "RimTalk_MindStream_SelectColonist".Translate());
+            Text.Anchor = TextAnchor.UpperLeft;
+            Text.Font = GameFont.Small;
+        }
+        
+        private void DrawNoMemoryComponent(Rect rect)
+        {
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(rect, "RimTalk_NoMemoryComponent".Translate());
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+        
         private void OpenCommonKnowledgeDialog()
         {
             if (Current.Game == null)
             {
-                Messages.Message("RimTalk_Settings_MustEnterGame".Translate(), MessageTypeDefOf.RejectInput, false);
+                Messages.Message("RimTalk_MindStream_MustEnterGame".Translate(), MessageTypeDefOf.RejectInput, false);
                 return;
             }
-
+            
             var memoryManager = Find.World.GetComponent<MemoryManager>();
             if (memoryManager == null)
             {
-                Messages.Message("RimTalk_Settings_CannotFindManager".Translate(), MessageTypeDefOf.RejectInput, false);
+                Messages.Message("RimTalk_MindStream_CannotFindManager".Translate(), MessageTypeDefOf.RejectInput, false);
                 return;
             }
-
+            
             Find.WindowStack.Add(new Dialog_CommonKnowledge(memoryManager.CommonKnowledge));
-        }
-
-        private class MemoryListEntry
-        {
-            public MemoryEntry memory;
-            public MemoryLayer layer;
         }
     }
 }

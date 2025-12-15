@@ -6,7 +6,7 @@
         <TargetFramework>net472</TargetFramework>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace>RimTalk.MemoryPatch</RootNamespace>
-        <AssemblyName>RimTalkExpandMemory</AssemblyName>
+        <AssemblyName>RimTalk-ExpandMemory</AssemblyName>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <!-- 移除app.manifest引用 -->
         <!-- <ApplicationManifest>app.manifest</ApplicationManifest> -->
@@ -14,7 +14,7 @@
         <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
 
         <OutputPath>$(GameVersion)/Assemblies</OutputPath>
-        <ModFolderName>RimTalk-ExpandMemory</ModFolderName>
+        <ModFolderName>RimTalk-ExpandMemory</ModFolderName>  <!-- ⭐ 修正为正确的 Mod 名称 -->
         <LangVersion>7.3</LangVersion>
         <EnableBubbles>true</EnableBubbles>
         

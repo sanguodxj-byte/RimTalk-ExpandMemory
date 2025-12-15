@@ -5,7 +5,7 @@
     <defName>RimTalk_Memory</defName>
     <label>记忆</label>
     <description>查看和管理殖民者记忆</description>
-    <tabWindowClass>RimTalk.Memory.UI.MainTabWindow_Memory, RimTalkExpandMemory</tabWindowClass>
+    <tabWindowClass>RimTalk.Memory.UI.MainTabWindow_Memory, RimTalk-ExpandMemory</tabWindowClass>
     <order>35</order>
   </MainButtonDef>
 </Defs>

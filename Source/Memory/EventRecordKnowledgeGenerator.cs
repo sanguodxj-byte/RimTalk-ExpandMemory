@@ -126,59 +126,38 @@ namespace RimTalk.Memory
                         
                         if (!string.IsNullOrEmpty(eventText))
                         {
-                            // ? v3.3.3: 提取原始事件文本（移除时间前缀）
-                            string rawEventText = ExtractOriginalEventText(eventText);
-                            
-                            // ? 改进的重复检测逻辑：使用 originalEventText 进行比较
-                            // 检查是否已存在相同的事件（基于原始文本，而不是带时间前缀的完整文本）
+                            // 检查是否已存在
                             bool exists = library.Entries.Any(e => 
-                            {
-                                // 检查1：如果 entry 有 originalEventText，直接比较原始文本
-                                if (!string.IsNullOrEmpty(e.originalEventText))
-                                {
-                                    return e.originalEventText == rawEventText;
-                                }
-                                
-                                // 检查2：如果 entry 没有 originalEventText（旧版条目），使用 content 进行包含检查
-                                // 注意：这里使用 rawEventText 的前15个字符进行模糊匹配（兼容旧版）
-                                if (!string.IsNullOrEmpty(rawEventText) && rawEventText.Length >= 15)
-                                {
-                                    return e.content.Contains(rawEventText.Substring(0, 15));
-                                }
-                                
-                                // 检查3：如果 rawEventText 太短（<15字符），使用完整匹配
-                                return e.content.Contains(rawEventText);
-                            });
+                                e.content.Contains(eventText.Substring(0, Math.Min(15, eventText.Length)))
+                            );
                             
                             if (!exists)
                             {
                                 // 计算重要性
                                 float importance = CalculateImportance(eventText);
                                 
-                                // ? v3.3.3: 创建事件常识，同时保存时间戳和原始文本
+                                // ? v3.3.3: 提取原始事件文本（移除时间前缀）
+                                string originalText = ExtractOriginalEventText(eventText);
+                                
+                                // ? v3.3.3: 创建事件常识，保存创建时间和原始文本
                                 var entry = new CommonKnowledgeEntry("事件,历史", eventText)
                                 {
                                     importance = importance,
                                     isEnabled = true,
                                     isUserEdited = false,
                                     creationTick = currentTick,           // ? 设置创建时间戳
-                                    originalEventText = rawEventText      // ? 保存原始文本
+                                    originalEventText = originalText      // ? 保存原始文本
                                     // targetPawnId = -1 (默认全局)
                                 };
                                 
                                 library.AddEntry(entry);
                                 processedCount++;
                                 
-                                // ? v3.3.2: 降噪日志输出 - 仅DevMode下10%概率
+                                // ? v3.3.2: 减少日志量 - 仅DevMode且10%概率
                                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                                 {
                                     Log.Message($"[EventRecord] Created event knowledge: {eventText.Substring(0, Math.Min(50, eventText.Length))}...");
                                 }
-                            }
-                            else if (Prefs.DevMode && UnityEngine.Random.value < 0.05f)
-                            {
-                                // ? 调试日志：记录被跳过的重复事件
-                                Log.Message($"[EventRecord] Skipped duplicate event (raw match): {rawEventText.Substring(0, Math.Min(30, rawEventText.Length))}...");
                             }
                         }
                     }

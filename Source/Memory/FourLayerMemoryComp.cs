@@ -336,35 +336,18 @@ namespace RimTalk.Memory
             return summary.Length > 0 ? summary.ToString() : $"{type}记忆{memories.Count}条";
         }
 
-        /// <summary>
-        /// 修剪ELS记忆：当超过容量时，归档最早的25%到CLPA
-        /// </summary>
         private void TrimEventLog()
         {
             if (eventLogMemories.Count <= MAX_EVENTLOG)
                 return;
 
-            // ⭐ 计算需要归档的数量（最早的25%）
-            int archiveCount = Math.Max(1, (int)(MAX_EVENTLOG * 0.25f));
-            
-            // 获取最早的记忆（按时间戳排序）
-            var toArchive = eventLogMemories
-                .OrderBy(m => m.timestamp)
-                .Take(archiveCount)
-                .ToList();
-            
-            // 移动到 CLPA
-            foreach (var memory in toArchive)
+            while (eventLogMemories.Count > MAX_EVENTLOG)
             {
-                memory.layer = MemoryLayer.Archive;
-                archiveMemories.Insert(0, memory);
-                eventLogMemories.Remove(memory);
-            }
-            
-            var pawn = parent as Pawn;
-            if (Prefs.DevMode)
-            {
-                Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} ELS full, archived {archiveCount} oldest memories (25%) to CLPA");
+                var oldest = eventLogMemories[eventLogMemories.Count - 1];
+                eventLogMemories.RemoveAt(eventLogMemories.Count - 1);
+                
+                oldest.layer = MemoryLayer.Archive;
+                archiveMemories.Insert(0, oldest);
             }
         }
 

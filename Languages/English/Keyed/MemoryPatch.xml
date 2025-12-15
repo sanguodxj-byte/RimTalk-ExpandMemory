@@ -377,4 +377,358 @@
     <RimTalk_Layer_CLPA>CLPA (Long-term Archive)</RimTalk_Layer_CLPA>
     <RimTalk_Type_Action>Action</RimTalk_Type_Action>
     <RimTalk_Type_Conversation>Conversation</RimTalk_Type_Conversation>
+    
+    <!-- ==================== MindStream Window (v3.3.19) ==================== -->
+    
+    <!-- MindStream Layout -->
+    <RimTalk_MindStream_Title>Mind Stream Timeline</RimTalk_MindStream_Title>
+    <RimTalk_MindStream_SelectColonist>Select Colonist</RimTalk_MindStream_SelectColonist>
+    <RimTalk_MindStream_NoColonists>No colonists</RimTalk_MindStream_NoColonists>
+    <RimTalk_MindStream_Preview>Preview</RimTalk_MindStream_Preview>
+    <RimTalk_MindStream_Knowledge>Knowledge</RimTalk_MindStream_Knowledge>
+    
+    <!-- Control Panel -->
+    <RimTalk_MindStream_MemoryFilters>Memory Filters</RimTalk_MindStream_MemoryFilters>
+    <RimTalk_MindStream_Layers>LAYERS</RimTalk_MindStream_Layers>
+    <RimTalk_MindStream_ABM>ABM (Active)</RimTalk_MindStream_ABM>
+    <RimTalk_MindStream_SCM>SCM (Short)</RimTalk_MindStream_SCM>
+    <RimTalk_MindStream_ELS>ELS (Event)</RimTalk_MindStream_ELS>
+    <RimTalk_MindStream_CLPA>CLPA (Archive)</RimTalk_MindStream_CLPA>
+    
+    <RimTalk_MindStream_Type>TYPE</RimTalk_MindStream_Type>
+    <RimTalk_MindStream_All>All</RimTalk_MindStream_All>
+    <RimTalk_MindStream_Conversation>Conversation</RimTalk_MindStream_Conversation>
+    <RimTalk_MindStream_Action>Action</RimTalk_MindStream_Action>
+    
+    <RimTalk_MindStream_Statistics>STATISTICS</RimTalk_MindStream_Statistics>
+    <RimTalk_MindStream_ABMCount>ABM: {0}/3</RimTalk_MindStream_ABMCount>
+    <RimTalk_MindStream_SCMCount>SCM: {0}/20</RimTalk_MindStream_SCMCount>
+    <RimTalk_MindStream_ELSCount>ELS: {0}/50</RimTalk_MindStream_ELSCount>
+    <RimTalk_MindStream_CLPACount>CLPA: {0}</RimTalk_MindStream_CLPACount>
+    <RimTalk_MindStream_Selected>Selected: {0}</RimTalk_MindStream_Selected>
+    <RimTalk_MindStream_TotalMemories>{0} memories total</RimTalk_MindStream_TotalMemories>
+    
+    <!-- Batch Actions -->
+    <RimTalk_MindStream_BatchActions>BATCH ACTIONS</RimTalk_MindStream_BatchActions>
+    <RimTalk_MindStream_SummarizeSelected>Summarize ({0})</RimTalk_MindStream_SummarizeSelected>
+    <RimTalk_MindStream_SummarizeSelectedEmpty>Summarize Selected</RimTalk_MindStream_SummarizeSelectedEmpty>
+    <RimTalk_MindStream_ArchiveSelected>Archive ({0})</RimTalk_MindStream_ArchiveSelected>
+    <RimTalk_MindStream_ArchiveSelectedEmpty>Archive Selected</RimTalk_MindStream_ArchiveSelectedEmpty>
+    <RimTalk_MindStream_DeleteSelected>Delete ({0})</RimTalk_MindStream_DeleteSelected>
+    <RimTalk_MindStream_DeleteSelectedEmpty>Delete Selected</RimTalk_MindStream_DeleteSelectedEmpty>
+    
+    <!-- Global Actions -->
+    <RimTalk_MindStream_GlobalActions>GLOBAL ACTIONS</RimTalk_MindStream_GlobalActions>
+    <RimTalk_MindStream_SummarizeAll>Summarize All</RimTalk_MindStream_SummarizeAll>
+    <RimTalk_MindStream_ArchiveAll>Archive All</RimTalk_MindStream_ArchiveAll>
+    
+    <!-- Timeline Cards -->
+    <RimTalk_MindStream_Pin>Pin</RimTalk_MindStream_Pin>
+    <RimTalk_MindStream_Unpin>Unpin</RimTalk_MindStream_Unpin>
+    <RimTalk_MindStream_Edit>Edit</RimTalk_MindStream_Edit>
+    <RimTalk_MindStream_Importance>Importance: {0}</RimTalk_MindStream_Importance>
+    <RimTalk_MindStream_Activity>Activity: {0}</RimTalk_MindStream_Activity>
+    <RimTalk_MindStream_Showing>Showing {0} memories</RimTalk_MindStream_Showing>
+    
+    <!-- Batch Confirmations -->
+    <RimTalk_MindStream_ConfirmSummarize>Summarize {0} SCM memories to ELS?</RimTalk_MindStream_ConfirmSummarize>
+    <RimTalk_MindStream_ConfirmArchive>Archive {0} ELS memories to CLPA?</RimTalk_MindStream_ConfirmArchive>
+    <RimTalk_MindStream_ConfirmDelete>Delete {0} selected memories?</RimTalk_MindStream_ConfirmDelete>
+    <RimTalk_MindStream_NoSCM>No SCM memories selected</RimTalk_MindStream_NoSCM>
+    <RimTalk_MindStream_NoELS>No ELS memories selected</RimTalk_MindStream_NoELS>
+    <RimTalk_MindStream_Summarized>Summarized {0} memories</RimTalk_MindStream_Summarized>
+    <RimTalk_MindStream_Archived>Archived {0} memories</RimTalk_MindStream_Archived>
+    <RimTalk_MindStream_Deleted>Deleted {0} memories</RimTalk_MindStream_Deleted>
+    <RimTalk_MindStream_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_MindStream_NoColonistsNeedSummarize>
+    <RimTalk_MindStream_QueuedSummarize>Queued {0} colonists for summarization</RimTalk_MindStream_QueuedSummarize>
+    <RimTalk_MindStream_ArchivedCount>Archived memories for {0} colonists</RimTalk_MindStream_ArchivedCount>
+    
+    <!-- ==================== Library Window (Dialog_CommonKnowledge_Library) ==================== -->
+    
+    <!-- Library Layout -->
+    <RimTalk_Library_Title>Knowledge Library Management</RimTalk_Library_Title>
+    <RimTalk_Library_SearchFilter>Search</RimTalk_Library_SearchFilter>
+    <RimTalk_Library_SearchResults>Search results: {0} / {1}</RimTalk_Library_SearchResults>
+    
+    <!-- Toolbar Buttons -->
+    <RimTalk_Library_New>New</RimTalk_Library_New>
+    <RimTalk_Library_Import>Import</RimTalk_Library_Import>
+    <RimTalk_Library_Export>Export</RimTalk_Library_Export>
+    <RimTalk_Library_Delete>Delete</RimTalk_Library_Delete>
+    <RimTalk_Library_ClearAll>Clear All</RimTalk_Library_ClearAll>
+    <RimTalk_Library_BatchDelete>Delete Selected</RimTalk_Library_BatchDelete>
+    <RimTalk_Library_BatchExport>Export Selected</RimTalk_Library_BatchExport>
+    <RimTalk_Library_BatchEnable>Enable Selected</RimTalk_Library_BatchEnable>
+    <RimTalk_Library_BatchDisable>Disable Selected</RimTalk_Library_BatchDisable>
+    
+    <!-- Categories |
+    <RimTalk_Library_Categories>CATEGORIES</RimTalk_Library_Categories>
+    <RimTalk_Library_AllCategories>All ({0})</RimTalk_Library_AllCategories>
+    <RimTalk_Library_World>World</RimTalk_Library_World>
+    <RimTalk_Library_Rules>Rules</RimTalk_Library_Rules>
+    <RimTalk_Library_PawnStatus>Pawn Status</RimTalk_Library_PawnStatus>
+    <RimTalk_Library_Events>Events</RimTalk_Library_Events>
+    <RimTalk_Library_Other>Other</RimTalk_Library_Other>
+    
+    <!-- Detail Panel -->
+    <RimTalk_Library_DetailsTitle>Details</RimTalk_Library_DetailsTitle>
+    <RimTalk_Library_SelectToView>Select a knowledge entry to view details</RimTalk_Library_SelectToView>
+    <RimTalk_Library_Tag>Tag:</RimTalk_Library_Tag>
+    <RimTalk_Library_Importance>Importance:</RimTalk_Library_Importance>
+    <RimTalk_Library_Status>Status:</RimTalk_Library_Status>
+    <RimTalk_Library_Enabled>Enabled</RimTalk_Library_Enabled>
+    <RimTalk_Library_Disabled>Disabled</RimTalk_Library_Disabled>
+    <RimTalk_Library_Visibility>Visibility:</RimTalk_Library_Visibility>
+    <RimTalk_Library_Global>Global (all colonists)</RimTalk_Library_Global>
+    <RimTalk_Library_Exclusive>Exclusive: {0}</RimTalk_Library_Exclusive>
+    <RimTalk_Library_PawnDeleted>Pawn deleted (ID: {0})</RimTalk_Library_PawnDeleted>
+    <RimTalk_Library_Content>Content:</RimTalk_Library_Content>
+    <RimTalk_Library_EditButton>Edit</RimTalk_Library_EditButton>
+    
+    <!-- Edit Panel -->
+    <RimTalk_Library_EditTitle>Edit Knowledge</RimTalk_Library_EditTitle>
+    <RimTalk_Library_EditTag>Tag:</RimTalk_Library_EditTag>
+    <RimTalk_Library_EditImportance>Importance:</RimTalk_Library_EditImportance>
+    <RimTalk_Library_EditExclusiveColonist>Exclusive Colonist:</RimTalk_Library_EditExclusiveColonist>
+    <RimTalk_Library_GlobalVisible>Global visible</RimTalk_Library_GlobalVisible>
+    <RimTalk_Library_GlobalTip>Global knowledge: All colonists can see</RimTalk_Library_GlobalTip>
+    <RimTalk_Library_ExclusiveTip>Exclusive knowledge: Only the specified colonist can see</RimTalk_Library_ExclusiveTip>
+    <RimTalk_Library_EditContent>Content:</RimTalk_Library_EditContent>
+    <RimTalk_Library_Save>Save</RimTalk_Library_Save>
+    <RimTalk_Library_Cancel>Cancel</RimTalk_Library_Cancel>
+    
+    <!-- Messages -->
+    <RimTalk_Library_TagAndContentRequired>Tag and content cannot be empty</RimTalk_Library_TagAndContentRequired>
+    <RimTalk_Library_Saved>Knowledge saved</RimTalk_Library_Saved>
+    <RimTalk_Library_Deleted>Knowledge deleted</RimTalk_Library_Deleted>
+    <RimTalk_Library_Cleared>Knowledge library cleared</RimTalk_Library_Cleared>
+    <RimTalk_Library_CopiedToClipboard>Knowledge library copied to clipboard</RimTalk_Library_CopiedToClipboard>
+    <RimTalk_Library_ImportedCount>Imported {0} knowledge entries</RimTalk_Library_ImportedCount>
+    <RimTalk_Library_ConfirmClearAll>Are you sure you want to clear all knowledge?</RimTalk_Library_ConfirmClearAll>
+    <RimTalk_Library_ConfirmDeleteSelected>Delete {0} selected knowledge entries?</RimTalk_Library_ConfirmDeleteSelected>
+    <RimTalk_Library_DeletedCount>Deleted {0} knowledge entries</RimTalk_Library_DeletedCount>
+    <RimTalk_Library_ExportedCount>Exported {0} knowledge entries</RimTalk_Library_ExportedCount>
+    <RimTalk_Library_EnabledCount>Enabled {0} knowledge entries</RimTalk_Library_EnabledCount>
+    <RimTalk_Library_DisabledCount>Disabled {0} knowledge entries</RimTalk_Library_DisabledCount>
+    
+    <!-- Auto Generate -->
+    <RimTalk_Library_AutoGenerate>Auto Generate</RimTalk_Library_AutoGenerate>
+    <RimTalk_Library_GeneratePawnStatus>Generate Pawn Status Knowledge</RimTalk_Library_GeneratePawnStatus>
+    <RimTalk_Library_GenerateNow>Generate Now</RimTalk_Library_GenerateNow>
+    <RimTalk_Library_GenerateEventRecord>Generate Event Record Knowledge</RimTalk_Library_GenerateEventRecord>
+    <RimTalk_Library_AutoGenerateTip>Tip: When auto-generate is enabled, the system will periodically update the knowledge library</RimTalk_Library_AutoGenerateTip>
+    <RimTalk_Library_PawnStatusNotEnabled>Pawn status knowledge generation not enabled, please enable in settings</RimTalk_Library_PawnStatusNotEnabled>
+    <RimTalk_Library_NoColonistsOnMap>No colonists on current map</RimTalk_Library_NoColonistsOnMap>
+    <RimTalk_Library_GeneratedForCount>Generated status knowledge for {0} colonists</RimTalk_Library_GeneratedForCount>
+    <RimTalk_Library_GenerateFailed>Generation failed: {0}</RimTalk_Library_GenerateFailed>
+    <RimTalk_Library_EventRecordNotEnabled>Event record knowledge generation not enabled, please enable in settings</RimTalk_Library_EventRecordNotEnabled>
+    <RimTalk_Library_EventScanTriggered>Event record scan triggered, knowledge will be auto-generated</RimTalk_Library_EventScanTriggered>
+    
+    <!-- ==================== Common UI ==================== -->
+    <RimTalk_Memory_Title>Memory of {0}</RimTalk_Memory_Title>
+    <RimTalk_SelectColonist>Select Colonist</RimTalk_SelectColonist>
+    <RimTalk_ChooseColonist>Choose...</RimTalk_ChooseColonist>
+    <RimTalk_NoColonists>No colonists available</RimTalk_NoColonists>
+    <RimTalk_NoMemoryComponent>Selected pawn has no memory component</RimTalk_NoMemoryComponent>
+    <RimTalk_ShowAllHumanlikes>Show All Humans</RimTalk_ShowAllHumanlikes>
+    
+    <!-- ==================== Mind Stream UI Labels ==================== -->
+    <RimTalk_MindStream_SelectColonist>Select a colonist to view memories</RimTalk_MindStream_SelectColonist>
+    <RimTalk_MindStream_NoMemoryComp>Selected pawn has no memory component</RimTalk_MindStream_NoMemoryComp>
+    <RimTalk_MindStream_Preview>Preview</RimTalk_MindStream_Preview>
+    <RimTalk_MindStream_Knowledge>Knowledge</RimTalk_MindStream_Knowledge>
+    <RimTalk_MindStream_NoColonists>No colonists</RimTalk_MindStream_NoColonists>
+    
+    <!-- Control Panel -->
+    <RimTalk_MindStream_MemoryFilters>Memory Filters</RimTalk_MindStream_MemoryFilters>
+    <RimTalk_MindStream_Layers>LAYERS</RimTalk_MindStream_Layers>
+    <RimTalk_MindStream_ABM>ABM (Active)</RimTalk_MindStream_ABM>
+    <RimTalk_MindStream_SCM>SCM (Short)</RimTalk_MindStream_SCM>
+    <RimTalk_MindStream_ELS>ELS (Event)</RimTalk_MindStream_ELS>
+    <RimTalk_MindStream_CLPA>CLPA (Archive)</RimTalk_MindStream_CLPA>
+    
+    <RimTalk_MindStream_Type>TYPE</RimTalk_MindStream_Type>
+    <RimTalk_MindStream_All>All</RimTalk_MindStream_All>
+    <RimTalk_MindStream_Conversation>Conversation</RimTalk_MindStream_Conversation>
+    <RimTalk_MindStream_Action>Action</RimTalk_MindStream_Action>
+    
+    <RimTalk_MindStream_Statistics>STATISTICS</RimTalk_MindStream_Statistics>
+    <RimTalk_MindStream_Selected>Selected: {0}</RimTalk_MindStream_Selected>
+    
+    <!-- Batch Actions -->
+    <RimTalk_MindStream_BatchActions>BATCH ACTIONS</RimTalk_MindStream_BatchActions>
+    <RimTalk_MindStream_SummarizeN>Summarize ({0})</RimTalk_MindStream_SummarizeN>
+    <RimTalk_MindStream_SummarizeSelected>Summarize Selected</RimTalk_MindStream_SummarizeSelected>
+    <RimTalk_MindStream_ArchiveN>Archive ({0})</RimTalk_MindStream_ArchiveN>
+    <RimTalk_MindStream_ArchiveSelected>Archive Selected</RimTalk_MindStream_ArchiveSelected>
+    <RimTalk_MindStream_DeleteN>Delete ({0})</RimTalk_MindStream_DeleteN>
+    <RimTalk_MindStream_DeleteSelected>Delete Selected</RimTalk_MindStream_DeleteSelected>
+    
+    <RimTalk_MindStream_GlobalActions>GLOBAL ACTIONS</RimTalk_MindStream_GlobalActions>
+    <RimTalk_MindStream_SummarizeAll>Summarize All</RimTalk_MindStream_SummarizeAll>
+    <RimTalk_MindStream_ArchiveAll>Archive All</RimTalk_MindStream_ArchiveAll>
+    
+    <!-- Timeline -->
+    <RimTalk_MindStream_ShowingN>Showing {0} memories</RimTalk_MindStream_ShowingN>
+    <RimTalk_MindStream_Pin>Pin</RimTalk_MindStream_Pin>
+    <RimTalk_MindStream_Unpin>Unpin</RimTalk_MindStream_Unpin>
+    <RimTalk_MindStream_Edit>Edit</RimTalk_MindStream_Edit>
+    <RimTalk_MindStream_With>with</RimTalk_MindStream_With>
+    <RimTalk_MindStream_ImportanceLabel>Importance: {0}</RimTalk_MindStream_ImportanceLabel>
+    <RimTalk_MindStream_ActivityLabel>Activity: {0}</RimTalk_MindStream_ActivityLabel>
+    
+    <!-- Messages -->
+    <RimTalk_MindStream_NoSCMSelected>No SCM memories selected</RimTalk_MindStream_NoSCMSelected>
+    <RimTalk_MindStream_SummarizeConfirm>Summarize {0} SCM memories to ELS?</RimTalk_MindStream_SummarizeConfirm>
+    <RimTalk_MindStream_SummarizedN>Summarized {0} memories</RimTalk_MindStream_SummarizedN>
+    <RimTalk_MindStream_NoELSSelected>No ELS memories selected</RimTalk_MindStream_NoELSSelected>
+    <RimTalk_MindStream_ArchiveConfirm>Archive {0} ELS memories to CLPA?</RimTalk_MindStream_ArchiveConfirm>
+    <RimTalk_MindStream_ArchivedN>Archived {0} memories</RimTalk_MindStream_ArchivedN>
+    <RimTalk_MindStream_DeleteConfirm>Delete {0} selected memories?</RimTalk_MindStream_DeleteConfirm>
+    <RimTalk_MindStream_DeletedN>Deleted {0} memories</RimTalk_MindStream_DeletedN>
+    <RimTalk_MindStream_QueuedSummarization>Queued {0} colonists for summarization</RimTalk_MindStream_QueuedSummarization>
+    <RimTalk_MindStream_NoNeedSummarization>No colonists need summarization</RimTalk_MindStream_NoNeedSummarization>
+    <RimTalk_MindStream_ArchivedForN>Archived memories for {0} colonists</RimTalk_MindStream_ArchivedForN>
+    <RimTalk_MindStream_MustEnterGame>Must enter game first</RimTalk_MindStream_MustEnterGame>
+    <RimTalk_MindStream_CannotFindManager>Cannot find memory manager</RimTalk_MindStream_CannotFindManager>
+    
+    <!-- ==================== Knowledge Base UI ==================== -->
+    <RimTalk_Knowledge_Categories>Categories</RimTalk_Knowledge_Categories>
+    <RimTalk_Knowledge_CategoryAll>All</RimTalk_Knowledge_CategoryAll>
+    <RimTalk_Knowledge_CategoryInstructions>Instructions</RimTalk_Knowledge_CategoryInstructions>
+    <RimTalk_Knowledge_CategoryLore>Lore</RimTalk_Knowledge_CategoryLore>
+    <RimTalk_Knowledge_CategoryPawnStatus>Pawn Status</RimTalk_Knowledge_CategoryPawnStatus>
+    <RimTalk_Knowledge_CategoryHistory>History</RimTalk_Knowledge_CategoryHistory>
+    <RimTalk_Knowledge_CategoryOther>Other</RimTalk_Knowledge_CategoryOther>
+    <RimTalk_Knowledge_CategoryUnknown>Unknown</RimTalk_Knowledge_CategoryUnknown>
+    
+    <RimTalk_Knowledge_AutoGenerate>Auto Generate</RimTalk_Knowledge_AutoGenerate>
+    <RimTalk_Knowledge_PawnStatus>Pawn Status</RimTalk_Knowledge_PawnStatus>
+    <RimTalk_Knowledge_GenerateNow>Generate Now</RimTalk_Knowledge_GenerateNow>
+    <RimTalk_Knowledge_EventRecord>Event Record</RimTalk_Knowledge_EventRecord>
+    
+    <RimTalk_Knowledge_Total>Total: {0}</RimTalk_Knowledge_Total>
+    <RimTalk_Knowledge_Enabled>Enabled: {0}</RimTalk_Knowledge_Enabled>
+    <RimTalk_Knowledge_Selected>Selected: {0}</RimTalk_Knowledge_Selected>
+    
+    <!-- Toolbar -->
+    <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
+    <RimTalk_Knowledge_Import>Import</RimTalk_Knowledge_Import>
+    <RimTalk_Knowledge_Export>Export</RimTalk_Knowledge_Export>
+    <RimTalk_Knowledge_ExportAll>Export All</RimTalk_Knowledge_ExportAll>
+    <RimTalk_Knowledge_ExportCount>Export ({0})</RimTalk_Knowledge_ExportCount>
+    <RimTalk_Knowledge_Delete>Delete</RimTalk_Knowledge_Delete>
+    <RimTalk_Knowledge_DeleteCount>Delete ({0})</RimTalk_Knowledge_DeleteCount>
+    <RimTalk_Knowledge_ClearAll>Clear All</RimTalk_Knowledge_ClearAll>
+    
+    <!-- List -->
+    <RimTalk_Knowledge_Showing>Showing {0} / {1}</RimTalk_Knowledge_Showing>
+    
+    <!-- Right Panel -->
+    <RimTalk_Knowledge_SelectOrCreate>Select or create a knowledge entry</RimTalk_Knowledge_SelectOrCreate>
+    <RimTalk_Knowledge_ItemsSelected>{0} items selected</RimTalk_Knowledge_ItemsSelected>
+    <RimTalk_Knowledge_EnabledCount>Enabled: {0}</RimTalk_Knowledge_EnabledCount>
+    <RimTalk_Knowledge_DisabledCount>Disabled: {0}</RimTalk_Knowledge_DisabledCount>
+    <RimTalk_Knowledge_AvgImportance>Avg. Importance: {0}</RimTalk_Knowledge_AvgImportance>
+    <RimTalk_Knowledge_EnableAll>Enable All</RimTalk_Knowledge_EnableAll>
+    <RimTalk_Knowledge_DisableAll>Disable All</RimTalk_Knowledge_DisableAll>
+    <RimTalk_Knowledge_ExportItems>Export ({0})</RimTalk_Knowledge_ExportItems>
+    <RimTalk_Knowledge_DeleteItems>Delete ({0})</RimTalk_Knowledge_DeleteItems>
+    
+    <RimTalk_Knowledge_Details>Details</RimTalk_Knowledge_Details>
+    <RimTalk_Knowledge_Edit>Edit</RimTalk_Knowledge_Edit>
+    <RimTalk_Knowledge_Tag>Tag</RimTalk_Knowledge_Tag>
+    <RimTalk_Knowledge_Importance>Importance</RimTalk_Knowledge_Importance>
+    <RimTalk_Knowledge_Status>Status</RimTalk_Knowledge_Status>
+    <RimTalk_Knowledge_StatusEnabled>Enabled</RimTalk_Knowledge_StatusEnabled>
+    <RimTalk_Knowledge_StatusDisabled>Disabled</RimTalk_Knowledge_StatusDisabled>
+    <RimTalk_Knowledge_Visibility>Visibility</RimTalk_Knowledge_Visibility>
+    <RimTalk_Knowledge_VisibilityGlobal>Global (All Pawns)</RimTalk_Knowledge_VisibilityGlobal>
+    <RimTalk_Knowledge_VisibilityExclusive>Exclusive to {0}</RimTalk_Knowledge_VisibilityExclusive>
+    <RimTalk_Knowledge_VisibilityDeleted>Pawn #{0} (Deleted)</RimTalk_Knowledge_VisibilityDeleted>
+    <RimTalk_Knowledge_Content>Content</RimTalk_Knowledge_Content>
+    
+    <!-- Edit Panel -->
+    <RimTalk_Knowledge_NewEntry>New Entry</RimTalk_Knowledge_NewEntry>
+    <RimTalk_Knowledge_EditEntry>Edit Entry</RimTalk_Knowledge_EditEntry>
+    <RimTalk_Knowledge_Save>Save</RimTalk_Knowledge_Save>
+    <RimTalk_Knowledge_Cancel>Cancel</RimTalk_Knowledge_Cancel>
+    <RimTalk_Knowledge_Global>Global</RimTalk_Knowledge_Global>
+    <RimTalk_Knowledge_GlobalAll>Global (All Pawns)</RimTalk_Knowledge_GlobalAll>
+    <RimTalk_Knowledge_ExclusiveTo>Exclusive to {0}</RimTalk_Knowledge_ExclusiveTo>
+    
+    <!-- Messages -->
+    <RimTalk_Knowledge_TagContentEmpty>Tag and content cannot be empty</RimTalk_Knowledge_TagContentEmpty>
+    <RimTalk_Knowledge_EntrySaved>Knowledge entry saved</RimTalk_Knowledge_EntrySaved>
+    <RimTalk_Knowledge_DeleteConfirm>Delete {0} knowledge entries?</RimTalk_Knowledge_DeleteConfirm>
+    <RimTalk_Knowledge_Deleted>Deleted {0} entries</RimTalk_Knowledge_Deleted>
+    <RimTalk_Knowledge_ExportedToClipboard>Exported {0} entries to clipboard</RimTalk_Knowledge_ExportedToClipboard>
+    <RimTalk_Knowledge_ImportTitle>Import Knowledge</RimTalk_Knowledge_ImportTitle>
+    <RimTalk_Knowledge_ImportDescription>Paste knowledge entries in format: [Tag|Importance]Content</RimTalk_Knowledge_ImportDescription>
+    <RimTalk_Knowledge_Imported>Imported {0} entries</RimTalk_Knowledge_Imported>
+    <RimTalk_Knowledge_ClearConfirm>Clear all knowledge entries?</RimTalk_Knowledge_ClearConfirm>
+    <RimTalk_Knowledge_AllCleared>All entries cleared</RimTalk_Knowledge_AllCleared>
+    <RimTalk_Knowledge_NoColonists>No colonists found</RimTalk_Knowledge_NoColonists>
+    <RimTalk_Knowledge_GeneratedPawnStatus>Generated status for {0} colonists</RimTalk_Knowledge_GeneratedPawnStatus>
+    <RimTalk_Knowledge_EventScanTriggered>Event scan triggered</RimTalk_Knowledge_EventScanTriggered>
+    <RimTalk_Knowledge_GenerationFailed>Generation failed: {0}</RimTalk_Knowledge_GenerationFailed>
+    
+    <!-- Old translations (keep for compatibility) -->
+    <RimTalk_MemoryTitle>Memory of {0}</RimTalk_MemoryTitle>
+    <RimTalk_Filter_All>All</RimTalk_Filter_All>
+    <RimTalk_Filter_Conversation>Conversation</RimTalk_Filter_Conversation>
+    <RimTalk_Filter_Action>Action</RimTalk_Filter_Action>
+  
+    <RimTalk_UI_Preview>Preview</RimTalk_UI_Preview>
+    <RimTalk_UI_Knowledge>Knowledge</RimTalk_UI_Knowledge>
+    <RimTalk_UI_ImmediateSummarize>Summarize Now</RimTalk_UI_ImmediateSummarize>
+    <RimTalk_UI_ImmediateSummarizeNoMemory>Summarize (No SCM)</RimTalk_UI_ImmediateSummarizeNoMemory>
+    <RimTalk_UI_MemorySummarized>Summarized memories for {0}</RimTalk_UI_MemorySummarized>
+    <RimTalk_UI_SummarizeAll>Summarize All</RimTalk_UI_SummarizeAll>
+    <RimTalk_UI_MemoriesSummarizedCount>Queued {0} colonists for summarization</RimTalk_UI_MemoriesSummarizedCount>
+    <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
+    <RimTalk_UI_ImmediateArchive>Archive Now</RimTalk_UI_ImmediateArchive>
+    <RimTalk_UI_ImmediateArchiveNoMemory>Archive (No ELS)</RimTalk_UI_ImmediateArchiveNoMemory>
+    <RimTalk_UI_MemoryArchived>Archived memories for {0}</RimTalk_UI_MemoryArchived>
+    <RimTalk_UI_ArchiveAll>Archive All</RimTalk_UI_ArchiveAll>
+    <RimTalk_UI_MemoriesArchivedCount>Archived memories for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
+  
+    <RimTalk_Tooltip_Preview>View injection preview</RimTalk_Tooltip_Preview>
+    <RimTalk_Tooltip_Knowledge>Manage common knowledge base</RimTalk_Tooltip_Knowledge>
+    <RimTalk_Tooltip_ABM>Active Buffer Memory (3 latest)</RimTalk_Tooltip_ABM>
+    <RimTalk_Tooltip_SCM>Situational Context Memory (20 recent)</RimTalk_Tooltip_SCM>
+    <RimTalk_Tooltip_ELS>Event Log Store (50 events)</RimTalk_Tooltip_ELS>
+    <RimTalk_Tooltip_CLPA>Compressed Long-term Permanent Archive (unlimited)</RimTalk_Tooltip_CLPA>
+  
+    <RimTalk_UI_Edit>Edit</RimTalk_UI_Edit>
+    <RimTalk_UI_Pin>Pin</RimTalk_UI_Pin>
+    <RimTalk_UI_Pinned>Pinned</RimTalk_UI_Pinned>
+    <RimTalk_UI_Delete>Delete</RimTalk_UI_Delete>
+    <RimTalk_UI_ConfirmDeleteMemory>Delete this memory?</RimTalk_UI_ConfirmDeleteMemory>
+    <RimTalk_MemoryDeleted>Memory deleted</RimTalk_MemoryDeleted>
+  
+    <RimTalk_Tooltip_Edit>Edit memory content</RimTalk_Tooltip_Edit>
+    <RimTalk_Tooltip_Pin>Pin to prevent auto-cleanup</RimTalk_Tooltip_Pin>
+    <RimTalk_Tooltip_Unpin>Unpin to allow auto-cleanup</RimTalk_Tooltip_Unpin>
+    <RimTalk_Tooltip_Delete>Delete this memory</RimTalk_Tooltip_Delete>
+    <RimTalk_Tooltip_Importance>Importance score (affects injection priority)</RimTalk_Tooltip_Importance>
+    <RimTalk_Tooltip_Activity>Activity score (used for auto-cleanup)</RimTalk_Tooltip_Activity>
+    <RimTalk_Tooltip_Notes>Additional notes</RimTalk_Tooltip_Notes>
+    <RimTalk_Tooltip_Tags>Tags: {0}</RimTalk_Tooltip_Tags>
+  
+    <RimTalk_With>with</RimTalk_With>
+    <RimTalk_MemoryType_Conversation>Conversation</RimTalk_MemoryType_Conversation>
+    <RimTalk_MemoryType_Action>Action</RimTalk_MemoryType_Action>
+  
+    <RimTalk_Settings_MustEnterGame>Must enter game first</RimTalk_Settings_MustEnterGame>
+    <RimTalk_Settings_CannotFindManager>Cannot find memory manager</RimTalk_Settings_CannotFindManager>
+  
+    <RimTalk_Menu_MemoryCompUnavailable>Memory component unavailable</RimTalk_Menu_MemoryCompUnavailable>
+    <RimTalk_Menu_CreateMemoryFailed>Failed to create memory</RimTalk_Menu_CreateMemoryFailed>
+    <RimTalk_Menu_OpenEditFailed>Failed to open edit dialog</RimTalk_Menu_OpenEditFailed>
+    <RimTalk_Menu_AddActionMemory>Add Action Memory to {0}</RimTalk_Menu_AddActionMemory>
+    <RimTalk_Menu_AddConversationMemory>Add Conversation Memory to {0}</RimTalk_Menu_AddConversationMemory>
+  
+    <RimTalk_Layer_ELS>ELS</RimTalk_Layer_ELS>
+    <RimTalk_Layer_CLPA>CLPA</RimTalk_Layer_CLPA>
 </LanguageData>
