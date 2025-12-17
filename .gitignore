@@ -441,4 +441,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-
+*.onnx
