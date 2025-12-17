@@ -7,22 +7,22 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ÌáÊ¾´Ê¹æ·¶»¯ÒıÇæ
-    /// ¸ºÔğ°²È«¡¢¿ìËÙµØÖ´ĞĞÓÃ»§×Ô¶¨ÒåµÄÎÄ±¾Ìæ»»¹æÔò
-    /// ? v3.3.2.37: ĞÂÔö¹¦ÄÜ
+    /// æç¤ºè¯è§„èŒƒåŒ–å¼•æ“
+    /// è´Ÿè´£å®‰å…¨ã€å¿«é€Ÿåœ°æ‰§è¡Œç”¨æˆ·è‡ªå®šä¹‰çš„æ–‡æœ¬æ›¿æ¢è§„åˆ™
+    /// ? v3.3.2.37: æ–°å¢åŠŸèƒ½
     /// </summary>
     public static class PromptNormalizer
     {
-        // Ô¤±àÒëµÄÕıÔò±í´ïÊ½»º´æ
+        // é¢„ç¼–è¯‘çš„æ­£åˆ™è¡¨è¾¾å¼ç¼“å­˜
         private static List<(Regex regex, string replacement)> compiledRules = new List<(Regex, string)>();
         
-        // ³¬Ê±±£»¤£¨20ms£©
+        // è¶…æ—¶ä¿æŠ¤ï¼ˆ20msï¼‰
         private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(20);
         
         /// <summary>
-        /// ¸üĞÂ¹æÔò£¨´ÓÉèÖÃÖĞ¼ÓÔØ²¢Ô¤±àÒë£©
+        /// æ›´æ–°è§„åˆ™ï¼ˆä»è®¾ç½®ä¸­åŠ è½½å¹¶é¢„ç¼–è¯‘ï¼‰
         /// </summary>
-        public static void UpdateRules(List<RimTalk.MemoryPatch.RimTalkMemoryPatchSettings.ReplacementRule> rules)
+        public static void UpdateRules(List<MemoryPatch.RimTalkMemoryPatchSettings.ReplacementRule> rules)
         {
             if (rules == null)
             {
@@ -36,17 +36,17 @@ namespace RimTalk.Memory
             
             foreach (var rule in rules)
             {
-                // Ìø¹ı½ûÓÃµÄ¹æÔò
+                // è·³è¿‡ç¦ç”¨çš„è§„åˆ™
                 if (!rule.isEnabled)
                     continue;
                 
-                // Ìø¹ı¿Õ¹æÔò
+                // è·³è¿‡ç©ºè§„åˆ™
                 if (string.IsNullOrEmpty(rule.pattern))
                     continue;
                 
                 try
                 {
-                    // Ô¤±àÒëÕıÔò±í´ïÊ½£¨ÆôÓÃ±àÒëÓÅ»¯ + ºöÂÔ´óĞ¡Ğ´ + ³¬Ê±±£»¤£©
+                    // é¢„ç¼–è¯‘æ­£åˆ™è¡¨è¾¾å¼ï¼ˆå¯ç”¨ç¼–è¯‘ä¼˜åŒ– + å¿½ç•¥å¤§å°å†™ + è¶…æ—¶ä¿æŠ¤ï¼‰
                     var regex = new Regex(
                         rule.pattern,
                         RegexOptions.Compiled | RegexOptions.IgnoreCase,
@@ -58,22 +58,22 @@ namespace RimTalk.Memory
                 }
                 catch (ArgumentException ex)
                 {
-                    // ²¶»ñÎŞĞ§µÄÕıÔò±í´ïÊ½
+                    // æ•è·æ— æ•ˆçš„æ­£åˆ™è¡¨è¾¾å¼
                     Log.Warning($"[PromptNormalizer] Invalid regex pattern '{rule.pattern}': {ex.Message}");
                     errorCount++;
                 }
                 catch (Exception ex)
                 {
-                    // ²¶»ñÆäËûÒì³£
+                    // æ•è·å…¶ä»–å¼‚å¸¸
                     Log.Error($"[PromptNormalizer] Failed to compile regex '{rule.pattern}': {ex.Message}");
                     errorCount++;
                 }
             }
             
-            // ¸üĞÂ»º´æ
+            // æ›´æ–°ç¼“å­˜
             compiledRules = newCompiledRules;
             
-            // ÈÕÖ¾Êä³ö£¨½ö¿ª·¢Ä£Ê½£©
+            // æ—¥å¿—è¾“å‡ºï¼ˆä»…å¼€å‘æ¨¡å¼ï¼‰
             if (Prefs.DevMode)
             {
                 Log.Message($"[PromptNormalizer] Updated rules: {successCount} compiled, {errorCount} errors");
@@ -81,21 +81,21 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ¹æ·¶»¯ÊäÈëÎÄ±¾£¨Ó¦ÓÃËùÓĞ¹æÔò£©
+        /// è§„èŒƒåŒ–è¾“å…¥æ–‡æœ¬ï¼ˆåº”ç”¨æ‰€æœ‰è§„åˆ™ï¼‰
         /// </summary>
         public static string Normalize(string input)
         {
-            // ¿ÕÖµ¼ì²é
+            // ç©ºå€¼æ£€æŸ¥
             if (string.IsNullOrEmpty(input))
                 return input;
             
-            // Èç¹ûÃ»ÓĞ¹æÔò£¬Ö±½Ó·µ»Ø
+            // å¦‚æœæ²¡æœ‰è§„åˆ™ï¼Œç›´æ¥è¿”å›
             if (compiledRules.Count == 0)
                 return input;
             
             string result = input;
             
-            // ÒÀ´ÎÓ¦ÓÃËùÓĞ¹æÔò
+            // ä¾æ¬¡åº”ç”¨æ‰€æœ‰è§„åˆ™
             foreach (var (regex, replacement) in compiledRules)
             {
                 try
@@ -104,7 +104,7 @@ namespace RimTalk.Memory
                 }
                 catch (RegexMatchTimeoutException)
                 {
-                    // ³¬Ê±±£»¤£ºÌø¹ıµ±Ç°¹æÔò£¬¼ÌĞø´¦Àí
+                    // è¶…æ—¶ä¿æŠ¤ï¼šè·³è¿‡å½“å‰è§„åˆ™ï¼Œç»§ç»­å¤„ç†
                     if (Prefs.DevMode)
                     {
                         Log.Warning($"[PromptNormalizer] Regex timeout for pattern '{regex}', skipping...");
@@ -113,7 +113,7 @@ namespace RimTalk.Memory
                 }
                 catch (Exception ex)
                 {
-                    // ÆäËûÒì³££ºÌø¹ıµ±Ç°¹æÔò
+                    // å…¶ä»–å¼‚å¸¸ï¼šè·³è¿‡å½“å‰è§„åˆ™
                     Log.Warning($"[PromptNormalizer] Regex replace failed: {ex.Message}");
                     continue;
                 }
@@ -123,7 +123,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// »ñÈ¡µ±Ç°¼¤»îµÄ¹æÔòÊıÁ¿
+        /// è·å–å½“å‰æ¿€æ´»çš„è§„åˆ™æ•°é‡
         /// </summary>
         public static int GetActiveRuleCount()
         {

@@ -12,11 +12,11 @@ Directory.Build.props
 *.sh
 auto_push_github.ps1
 
-# ? ±¾µØÅäÖÃÎÄ¼ş£¨°üº¬ÓÃ»§ÌØ¶¨Â·¾¶£¬²»Ó¦Ìá½»£©
+# ? æœ¬åœ°é…ç½®æ–‡ä»¶ï¼ˆåŒ…å«ç”¨æˆ·ç‰¹å®šè·¯å¾„ï¼Œä¸åº”æäº¤ï¼‰
 .rimworld.config
 deploy.ps1
 
-# ? GitHub Copilot ¸öÈËÅäÖÃ£¨²»Ó¦Ìá½»£©
+# ? GitHub Copilot ä¸ªäººé…ç½®ï¼ˆä¸åº”æäº¤ï¼‰
 .github/
 
 ## Interaction bubble library

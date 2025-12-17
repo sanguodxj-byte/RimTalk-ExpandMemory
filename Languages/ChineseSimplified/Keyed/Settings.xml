@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- 设置界面 -->
+  <RimTalk_SettingsTitle>RimTalk 常识库增强 - 设置</RimTalk_SettingsTitle>
+  
+  <RimTalk_UseNewTagMatching>使用新的标签匹配逻辑</RimTalk_UseNewTagMatching>
+  <RimTalk_UseNewTagMatchingDesc>启用后，常识将只通过标签匹配，不再分析内容关键词。这是一种简单直接的匹配方式，用户可以完全控制。</RimTalk_UseNewTagMatchingDesc>
+  
+  <RimTalk_EnableKnowledgeChaining>启用常识链</RimTalk_EnableKnowledgeChaining>
+  <RimTalk_EnableKnowledgeChainingDesc>启用后，匹配到的常识可以触发额外的常识匹配。</RimTalk_EnableKnowledgeChainingDesc>
+  
+  <RimTalk_MaxChainingRounds>常识链最大轮数：{0}</RimTalk_MaxChainingRounds>
+  
+  <RimTalk_ResetToDefaults>重置为默认值</RimTalk_ResetToDefaults>
+  
+  <!-- UI按钮提示 -->
+  <RimTalk_CanBeExtractedEnabled>允许提取内容用于常识链（点击禁用）</RimTalk_CanBeExtractedEnabled>
+  <RimTalk_CanBeExtractedDisabled>不允许提取内容用于常识链（点击启用）</RimTalk_CanBeExtractedDisabled>
+  
+  <RimTalk_CanBeMatchedEnabled>允许被关键词匹配（点击禁用）</RimTalk_CanBeMatchedEnabled>
+  <RimTalk_CanBeMatchedDisabled>不允许被关键词匹配（点击启用）</RimTalk_CanBeMatchedDisabled>
+  
+  <!-- 详细面板 -->
+  <RimTalk_ExtendedProperties>扩展属性</RimTalk_ExtendedProperties>
+  <RimTalk_CanBeExtracted>允许被提取：</RimTalk_CanBeExtracted>
+  <RimTalk_CanBeMatched>允许被匹配：</RimTalk_CanBeMatched>
+  <RimTalk_Yes>是 (✓)</RimTalk_Yes>
+  <RimTalk_No>否 (×)</RimTalk_No>
+  
+  <!-- 编辑面板 -->
+  <RimTalk_CanBeExtractedCheckbox>允许被提取（用于常识链）</RimTalk_CanBeExtractedCheckbox>
+  <RimTalk_CanBeMatchedCheckbox>允许被关键词匹配</RimTalk_CanBeMatchedCheckbox>
+  
+  <!-- 多选面板批量操作 -->
+  <RimTalk_EnableAllExtract>全部开启提取</RimTalk_EnableAllExtract>
+  <RimTalk_DisableAllExtract>全部关闭提取</RimTalk_DisableAllExtract>
+  <RimTalk_EnableAllMatch>全部开启匹配</RimTalk_EnableAllMatch>
+  <RimTalk_DisableAllMatch>全部关闭匹配</RimTalk_DisableAllMatch>
+</LanguageData>

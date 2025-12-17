@@ -1,40 +1,40 @@
-# ³£Ê¶¿âÆÀ·ÖÕï¶Ï½Å±¾
+# å¸¸è¯†åº“è¯„åˆ†è¯Šæ–­è„šæœ¬
 
-## ²âÊÔ²½Öè
+## æµ‹è¯•æ­¥éª¤
 
-### 1. ÆôÓÃ¿ª·¢Ä£Ê½
-ÓÎÏ·ÖÐ°´ `~` ´ò¿ª¿ØÖÆÌ¨£¬ÊäÈë£º
+### 1. å¯ç”¨å¼€å‘æ¨¡å¼
+æ¸¸æˆä¸­æŒ‰ `~` æ‰“å¼€æŽ§åˆ¶å°ï¼Œè¾“å…¥ï¼š
 ```
 DevMode
 ```
 
-### 2. ²âÊÔ¹Ø¼ü´ÊÌáÈ¡
+### 2. æµ‹è¯•å…³é”®è¯æå–
 
-ÔÚ³£Ê¶¿âÔ¤ÀÀÆ÷ÖÐÊäÈëÒÔÏÂ²âÊÔÓÃÀý£º
+åœ¨å¸¸è¯†åº“é¢„è§ˆå™¨ä¸­è¾“å…¥ä»¥ä¸‹æµ‹è¯•ç”¨ä¾‹ï¼š
 
-#### ²âÊÔÓÃÀý1£º´¿ÖÐÎÄ2×Ö
-**ÊäÈëÉÏÏÂÎÄ**£º`ÀîËÄ`
-**ÆÚÍû¹Ø¼ü´Ê**£º`["ÀîËÄ"]`
+#### æµ‹è¯•ç”¨ä¾‹1ï¼šçº¯ä¸­æ–‡2å­—
+**è¾“å…¥ä¸Šä¸‹æ–‡**ï¼š`æŽå››`
+**æœŸæœ›å…³é”®è¯**ï¼š`["æŽå››"]`
 
-#### ²âÊÔÓÃÀý2£º´¿ÖÐÎÄ3×Ö
-**ÊäÈëÉÏÏÂÎÄ**£º`ÍõÎåºÍ`
-**ÆÚÍû¹Ø¼ü´Ê**£º`["ÍõÎå", "ÎåºÍ", "ÍõÎåºÍ"]`
+#### æµ‹è¯•ç”¨ä¾‹2ï¼šçº¯ä¸­æ–‡3å­—
+**è¾“å…¥ä¸Šä¸‹æ–‡**ï¼š`çŽ‹äº”å’Œ`
+**æœŸæœ›å…³é”®è¯**ï¼š`["çŽ‹äº”", "äº”å’Œ", "çŽ‹äº”å’Œ"]`
 
-#### ²âÊÔÓÃÀý3£º»ìºÏÎÄ±¾
-**ÊäÈëÉÏÏÂÎÄ**£º`ÀîËÄºÍÍõÎåÔÚÁÄÌì`
-**ÆÚÍû¹Ø¼ü´Ê**£º`["ÀîËÄ", "ÍõÎå", "ÁÄÌì", ...]`
+#### æµ‹è¯•ç”¨ä¾‹3ï¼šæ··åˆæ–‡æœ¬
+**è¾“å…¥ä¸Šä¸‹æ–‡**ï¼š`æŽå››å’ŒçŽ‹äº”åœ¨èŠå¤©`
+**æœŸæœ›å…³é”®è¯**ï¼š`["æŽå››", "çŽ‹äº”", "èŠå¤©", ...]`
 
-### 3. ²é¿´ÈÕÖ¾Êä³ö
+### 3. æŸ¥çœ‹æ—¥å¿—è¾“å‡º
 
-ÔÚ `Player.log` ÖÐ²éÕÒ£º
+åœ¨ `Player.log` ä¸­æŸ¥æ‰¾ï¼š
 ```
 [Knowledge] ExtractContextKeywords: X keywords total
-[Knowledge] Top 10 final: [¹Ø¼ü´ÊÁÐ±í]
+[Knowledge] Top 10 final: [å…³é”®è¯åˆ—è¡¨]
 ```
 
-### 4. ¼ì²é¹Ø¼ü´ÊÆ¥Åä
+### 4. æ£€æŸ¥å…³é”®è¯åŒ¹é…
 
-²éÕÒÈÕÖ¾£º
+æŸ¥æ‰¾æ—¥å¿—ï¼š
 ```
 [Knowledge] - Core: X (by length desc + alpha asc)
 [Knowledge] - Fuzzy: X (alphabetical from X pool)
@@ -42,112 +42,112 @@ DevMode
 
 ---
 
-## ³£¼ûÎÊÌâÕï¶Ï
+## å¸¸è§é—®é¢˜è¯Šæ–­
 
-### ÎÊÌâ1£º¹Ø¼ü´ÊÌáÈ¡Îª0
-**Ö¢×´**£ºÈÕÖ¾ÏÔÊ¾ `ExtractContextKeywords: 0 keywords total`
+### é—®é¢˜1ï¼šå…³é”®è¯æå–ä¸º0
+**ç—‡çŠ¶**ï¼šæ—¥å¿—æ˜¾ç¤º `ExtractContextKeywords: 0 keywords total`
 
-**¿ÉÄÜÔ­Òò**£º
-1. SuperKeywordEngine ¹ýÂËÁËËùÓÐ¹Ø¼ü´Ê
-2. ÊäÈëÎÄ±¾È«ÊÇÍ£ÓÃ´Ê
-3. ÊäÈëÎÄ±¾È«ÊÇ±êµã·ûºÅ
+**å¯èƒ½åŽŸå› **ï¼š
+1. SuperKeywordEngine è¿‡æ»¤äº†æ‰€æœ‰å…³é”®è¯
+2. è¾“å…¥æ–‡æœ¬å…¨æ˜¯åœç”¨è¯
+3. è¾“å…¥æ–‡æœ¬å…¨æ˜¯æ ‡ç‚¹ç¬¦å·
 
-**½â¾ö·½°¸**£º
-¼ì²é `SuperKeywordEngine.cs` µÚ219ÐÐ `IsLowQualityKeyword` º¯Êý
+**è§£å†³æ–¹æ¡ˆ**ï¼š
+æ£€æŸ¥ `SuperKeywordEngine.cs` ç¬¬219è¡Œ `IsLowQualityKeyword` å‡½æ•°
 
-### ÎÊÌâ2£º¹Ø¼ü´ÊÌáÈ¡³É¹¦µ«ÆÀ·ÖÎª0
-**Ö¢×´**£ºÈÕÖ¾ÏÔÊ¾ÌáÈ¡ÁË¹Ø¼ü´Ê£¬µ«³£Ê¶ÆÀ·ÖÎª0
+### é—®é¢˜2ï¼šå…³é”®è¯æå–æˆåŠŸä½†è¯„åˆ†ä¸º0
+**ç—‡çŠ¶**ï¼šæ—¥å¿—æ˜¾ç¤ºæå–äº†å…³é”®è¯ï¼Œä½†å¸¸è¯†è¯„åˆ†ä¸º0
 
-**¿ÉÄÜÔ­Òò**£º
-1. ¹Ø¼ü´ÊÎ´Æ¥Åäµ½³£Ê¶ÄÚÈÝ£¨`IndexOf` ·µ»Ø-1£©
-2. ³£Ê¶±»½ûÓÃ£¨`isEnabled=false`£©
-3. ÆÀ·ÖµÍÓÚãÐÖµ£¨`threshold=0.1`£©
+**å¯èƒ½åŽŸå› **ï¼š
+1. å…³é”®è¯æœªåŒ¹é…åˆ°å¸¸è¯†å†…å®¹ï¼ˆ`IndexOf` è¿”å›ž-1ï¼‰
+2. å¸¸è¯†è¢«ç¦ç”¨ï¼ˆ`isEnabled=false`ï¼‰
+3. è¯„åˆ†ä½ŽäºŽé˜ˆå€¼ï¼ˆ`threshold=0.1`ï¼‰
 
-**½â¾ö·½°¸**£º
-¼ì²é³£Ê¶ÄÚÈÝÊÇ·ñÕæµÄ°üº¬ÕâÐ©¹Ø¼ü´Ê£¨Çø·Ö´óÐ¡Ð´£¡£©
+**è§£å†³æ–¹æ¡ˆ**ï¼š
+æ£€æŸ¥å¸¸è¯†å†…å®¹æ˜¯å¦çœŸçš„åŒ…å«è¿™äº›å…³é”®è¯ï¼ˆåŒºåˆ†å¤§å°å†™ï¼ï¼‰
 
-### ÎÊÌâ3£º2×Ö3×ÖÆÀ·ÖÎª0£¬4×Ö¼°ÒÔÉÏÕý³£
-**Ö¢×´**£º³¤¹Ø¼ü´ÊÓÐ·ÖÊý£¬¶Ì¹Ø¼ü´ÊÎÞ·ÖÊý
+### é—®é¢˜3ï¼š2å­—3å­—è¯„åˆ†ä¸º0ï¼Œ4å­—åŠä»¥ä¸Šæ­£å¸¸
+**ç—‡çŠ¶**ï¼šé•¿å…³é”®è¯æœ‰åˆ†æ•°ï¼ŒçŸ­å…³é”®è¯æ— åˆ†æ•°
 
-**¿ÉÄÜÔ­Òò**£º
-1. `SuperKeywordEngine` µÄ `IsLowQualityKeyword` ¹ýÂËÁË¶Ì´Ê
-2. ÍêÈ«Æ¥Åä¼Ó³ÉÖ»¼ÆËã>=3×ÖµÄ¹Ø¼ü´Ê£¨µÚ241-255ÐÐ£©
+**å¯èƒ½åŽŸå› **ï¼š
+1. `SuperKeywordEngine` çš„ `IsLowQualityKeyword` è¿‡æ»¤äº†çŸ­è¯
+2. å®Œå…¨åŒ¹é…åŠ æˆåªè®¡ç®—>=3å­—çš„å…³é”®è¯ï¼ˆç¬¬241-255è¡Œï¼‰
 
-**µ±Ç°´úÂëÎÊÌâ**£º
+**å½“å‰ä»£ç é—®é¢˜**ï¼š
 ```csharp
-// CommonKnowledgeLibrary.cs µÚ241ÐÐ
+// CommonKnowledgeLibrary.cs ç¬¬241è¡Œ
 var longestKeywords = contextKeywords
-    .Where(k => k.Length >= 3)  // ? ÕâÀï¹ýÂËÁË2×Ö¹Ø¼ü´Ê£¡
+    .Where(k => k.Length >= 3)  // ? è¿™é‡Œè¿‡æ»¤äº†2å­—å…³é”®è¯ï¼
     .OrderByDescending(k => k.Length)
     .Take(5);
 ```
 
-**ÐÞ¸´·½°¸**£º
-½« `k.Length >= 3` ¸ÄÎª `k.Length >= 2`
+**ä¿®å¤æ–¹æ¡ˆ**ï¼š
+å°† `k.Length >= 3` æ”¹ä¸º `k.Length >= 2`
 
 ---
 
-## ¿ìËÙ²âÊÔ´úÂë
+## å¿«é€Ÿæµ‹è¯•ä»£ç 
 
-ÔÚ¿ª·¢Õß¿ØÖÆÌ¨ÖÐÔËÐÐ£º
+åœ¨å¼€å‘è€…æŽ§åˆ¶å°ä¸­è¿è¡Œï¼š
 
 ```csharp
-// ²âÊÔ¹Ø¼ü´ÊÌáÈ¡
-var text = "ÀîËÄºÍÍõÎåÔÚÁÄÌì";
+// æµ‹è¯•å…³é”®è¯æå–
+var text = "æŽå››å’ŒçŽ‹äº”åœ¨èŠå¤©";
 var keywords = RimTalk.Memory.SuperKeywordEngine.ExtractKeywords(text, 20);
-Log.Message($"ÌáÈ¡¹Ø¼ü´ÊÊýÁ¿£º{keywords.Count}");
+Log.Message($"æå–å…³é”®è¯æ•°é‡ï¼š{keywords.Count}");
 foreach (var kw in keywords.Take(10))
 {
-    Log.Message($"  - {kw.Word} (È¨ÖØ={kw.Weight:F3})");
+    Log.Message($"  - {kw.Word} (æƒé‡={kw.Weight:F3})");
 }
 ```
 
 ---
 
-## Ô¤ÆÚ½á¹û
+## é¢„æœŸç»“æžœ
 
-### ÕýÈ·µÄ¹Ø¼ü´ÊÌáÈ¡½á¹û
+### æ­£ç¡®çš„å…³é”®è¯æå–ç»“æžœ
 ```
-ÌáÈ¡¹Ø¼ü´ÊÊýÁ¿£º6
-  - ÀîËÄ (È¨ÖØ=0.150)
-  - ÍõÎå (È¨ÖØ=0.150)
-  - ÁÄÌì (È¨ÖØ=0.140)
-  - ËÄºÍ (È¨ÖØ=0.080)
-  - ºÍÍõ (È¨ÖØ=0.070)
-  - ÎåÔÚ (È¨ÖØ=0.060)
+æå–å…³é”®è¯æ•°é‡ï¼š6
+  - æŽå›› (æƒé‡=0.150)
+  - çŽ‹äº” (æƒé‡=0.150)
+  - èŠå¤© (æƒé‡=0.140)
+  - å››å’Œ (æƒé‡=0.080)
+  - å’ŒçŽ‹ (æƒé‡=0.070)
+  - äº”åœ¨ (æƒé‡=0.060)
 ```
 
-### ÕýÈ·µÄ³£Ê¶ÆÀ·Ö½á¹û
-**³£Ê¶**: `[Éç½»]ÀîËÄºÍÍõÎåÊÇºÃÅóÓÑ`
+### æ­£ç¡®çš„å¸¸è¯†è¯„åˆ†ç»“æžœ
+**å¸¸è¯†**: `[ç¤¾äº¤]æŽå››å’ŒçŽ‹äº”æ˜¯å¥½æœ‹å‹`
 
-**ÆÀ·ÖÃ÷Ï¸**:
-- »ù´¡·Ö£¨importance=0.5£©£º0.025
-- ±êÇ©Æ¥Åä£¨Éç½»£©£º0.15
-- ÄÚÈÝÆ¥Åä£º
-  - "ÀîËÄ" (2×Ö): 0.10 ? (ÐÞ¸´ºó)
-  - "ÍõÎå" (2×Ö): 0.10 ? (ÐÞ¸´ºó)
-  - "ÅóÓÑ" (2×Ö): 0.10 ? (ÐÞ¸´ºó)
-- **×Ü·Ö**: 0.025 + 0.15 + 0.30 = **0.475** ?
+**è¯„åˆ†æ˜Žç»†**:
+- åŸºç¡€åˆ†ï¼ˆimportance=0.5ï¼‰ï¼š0.025
+- æ ‡ç­¾åŒ¹é…ï¼ˆç¤¾äº¤ï¼‰ï¼š0.15
+- å†…å®¹åŒ¹é…ï¼š
+  - "æŽå››" (2å­—): 0.10 ? (ä¿®å¤åŽ)
+  - "çŽ‹äº”" (2å­—): 0.10 ? (ä¿®å¤åŽ)
+  - "æœ‹å‹" (2å­—): 0.10 ? (ä¿®å¤åŽ)
+- **æ€»åˆ†**: 0.025 + 0.15 + 0.30 = **0.475** ?
 
-### ´íÎóµÄÆÀ·Ö½á¹û£¨µ±Ç°bug£©
-**³£Ê¶**: `[Éç½»]ÀîËÄºÍÍõÎåÊÇºÃÅóÓÑ`
+### é”™è¯¯çš„è¯„åˆ†ç»“æžœï¼ˆå½“å‰bugï¼‰
+**å¸¸è¯†**: `[ç¤¾äº¤]æŽå››å’ŒçŽ‹äº”æ˜¯å¥½æœ‹å‹`
 
-**ÆÀ·ÖÃ÷Ï¸**:
-- »ù´¡·Ö£¨importance=0.5£©£º0.025
-- ±êÇ©Æ¥Åä£¨Éç½»£©£º0.15
-- ÄÚÈÝÆ¥Åä£º
-  - "ÀîËÄ" (2×Ö): ? Î´ÌáÈ¡»òÎ´Æ¥Åä = 0
-  - "ÍõÎå" (2×Ö): ? Î´ÌáÈ¡»òÎ´Æ¥Åä = 0
-  - "ÅóÓÑ" (2×Ö): ? Î´ÌáÈ¡»òÎ´Æ¥Åä = 0
-- **×Ü·Ö**: 0.025 + 0.15 + 0 = **0.175** ?
+**è¯„åˆ†æ˜Žç»†**:
+- åŸºç¡€åˆ†ï¼ˆimportance=0.5ï¼‰ï¼š0.025
+- æ ‡ç­¾åŒ¹é…ï¼ˆç¤¾äº¤ï¼‰ï¼š0.15
+- å†…å®¹åŒ¹é…ï¼š
+  - "æŽå››" (2å­—): ? æœªæå–æˆ–æœªåŒ¹é… = 0
+  - "çŽ‹äº”" (2å­—): ? æœªæå–æˆ–æœªåŒ¹é… = 0
+  - "æœ‹å‹" (2å­—): ? æœªæå–æˆ–æœªåŒ¹é… = 0
+- **æ€»åˆ†**: 0.025 + 0.15 + 0 = **0.175** ?
 
 ---
 
-## ÐÞ¸´½¨Òé
+## ä¿®å¤å»ºè®®
 
-### ÐÞ¸´1£ºSuperKeywordEngine ²»¹ýÂË2×ÖÖÐÎÄ´Ê
+### ä¿®å¤1ï¼šSuperKeywordEngine ä¸è¿‡æ»¤2å­—ä¸­æ–‡è¯
 
-ÔÚ `SuperKeywordEngine.cs` µÚ219ÐÐÐÞ¸Ä£º
+åœ¨ `SuperKeywordEngine.cs` ç¬¬219è¡Œä¿®æ”¹ï¼š
 
 ```csharp
 private static bool IsLowQualityKeyword(string word)
@@ -155,26 +155,26 @@ private static bool IsLowQualityKeyword(string word)
     if (string.IsNullOrEmpty(word))
         return true;
     
-    // ? ÐÞ¸´£ºÖ»¹ýÂË1-2Î»´¿Êý×Ö£¬²»¹ýÂË2×ÖÖÐÎÄ
+    // ? ä¿®å¤ï¼šåªè¿‡æ»¤1-2ä½çº¯æ•°å­—ï¼Œä¸è¿‡æ»¤2å­—ä¸­æ–‡
     if (word.Length <= 2 && word.All(char.IsDigit))
         return true;
     
-    // ? ÐÞ¸´£º2×ÖÖÐÎÄ´Ê²»ÊÓÎªµÍÖÊÁ¿
+    // ? ä¿®å¤ï¼š2å­—ä¸­æ–‡è¯ä¸è§†ä¸ºä½Žè´¨é‡
     if (word.Length == 2 && ContainsChinese(word))
-        return false;  // ±£Áô2×ÖÖÐÎÄ´Ê
+        return false;  // ä¿ç•™2å­—ä¸­æ–‡è¯
     
-    // ...ÆäËûÂß¼­...
+    // ...å…¶ä»–é€»è¾‘...
 }
 ```
 
-### ÐÞ¸´2£ºÍêÈ«Æ¥Åä¼Ó³É°üº¬2×Ö¹Ø¼ü´Ê
+### ä¿®å¤2ï¼šå®Œå…¨åŒ¹é…åŠ æˆåŒ…å«2å­—å…³é”®è¯
 
-ÔÚ `CommonKnowledgeLibrary.cs` µÚ241ÐÐÐÞ¸Ä£º
+åœ¨ `CommonKnowledgeLibrary.cs` ç¬¬241è¡Œä¿®æ”¹ï¼š
 
 ```csharp
-// ? ÐÞ¸´£ºÍêÈ«Æ¥Åä¼Ó³É°üº¬2×Ö¹Ø¼ü´Ê
+// ? ä¿®å¤ï¼šå®Œå…¨åŒ¹é…åŠ æˆåŒ…å«2å­—å…³é”®è¯
 var longestKeywords = contextKeywords
-    .Where(k => k.Length >= 2)  // ? ¸ÄÎª >= 2
+    .Where(k => k.Length >= 2)  // ? æ”¹ä¸º >= 2
     .OrderByDescending(k => k.Length)
     .Take(5);
 
@@ -189,54 +189,54 @@ foreach (var keyword in longestKeywords)
         else if (keyword.Length >= 4)
             exactMatchBonus += 0.25f;
         else if (keyword.Length >= 3)
-            exactMatchBonus += 0.15f;  // 3×ÖÐ¡¼Ó³É
+            exactMatchBonus += 0.15f;  // 3å­—å°åŠ æˆ
         else if (keyword.Length == 2)
-            exactMatchBonus += 0.10f;  // ? ÐÂÔö£º2×ÖÐ¡¼Ó³É
+            exactMatchBonus += 0.10f;  // ? æ–°å¢žï¼š2å­—å°åŠ æˆ
     }
 }
 ```
 
-### ÐÞ¸´3£ºÌáÉý2×ÖºÍ3×ÖµÄ»ù´¡È¨ÖØ
+### ä¿®å¤3ï¼šæå‡2å­—å’Œ3å­—çš„åŸºç¡€æƒé‡
 
-ÔÚ `CommonKnowledgeLibrary.cs` µÚ213ÐÐÐÞ¸Ä£º
+åœ¨ `CommonKnowledgeLibrary.cs` ç¬¬213è¡Œä¿®æ”¹ï¼š
 
 ```csharp
-// ? ÐÞ¸´ºóµÄÆÀ·ÖÇúÏß
+// ? ä¿®å¤åŽçš„è¯„åˆ†æ›²çº¿
 if (keyword.Length >= 6)
-    contentMatchScore += 0.35f;  // 6×Ö+
+    contentMatchScore += 0.35f;  // 6å­—+
 else if (keyword.Length == 5)
-    contentMatchScore += 0.28f;  // 5×Ö
+    contentMatchScore += 0.28f;  // 5å­—
 else if (keyword.Length == 4)
-    contentMatchScore += 0.22f;  // 4×Ö
+    contentMatchScore += 0.22f;  // 4å­—
 else if (keyword.Length == 3)
-    contentMatchScore += 0.16f;  // 3×Ö£¨ÌáÉý 0.12¡ú0.16£©
+    contentMatchScore += 0.16f;  // 3å­—ï¼ˆæå‡ 0.12â†’0.16ï¼‰
 else if (keyword.Length == 2)
-    contentMatchScore += 0.10f;  // 2×Ö£¨ÌáÉý 0.05¡ú0.10£©
+    contentMatchScore += 0.10f;  // 2å­—ï¼ˆæå‡ 0.05â†’0.10ï¼‰
 else
-    contentMatchScore += 0.05f;  // 1×Ö
+    contentMatchScore += 0.05f;  // 1å­—
 ```
 
 ---
 
-## ÑéÖ¤ÐÞ¸´Ð§¹û
+## éªŒè¯ä¿®å¤æ•ˆæžœ
 
-ÐÞ¸´ºó£¬Ê¹ÓÃÏàÍ¬²âÊÔÓÃÀýÑéÖ¤£º
+ä¿®å¤åŽï¼Œä½¿ç”¨ç›¸åŒæµ‹è¯•ç”¨ä¾‹éªŒè¯ï¼š
 
-**ÊäÈë**: "ÀîËÄºÍÍõÎåÔÚÁÄÌì"
-**³£Ê¶**: "[Éç½»]ÀîËÄºÍÍõÎåÊÇºÃÅóÓÑ"
+**è¾“å…¥**: "æŽå››å’ŒçŽ‹äº”åœ¨èŠå¤©"
+**å¸¸è¯†**: "[ç¤¾äº¤]æŽå››å’ŒçŽ‹äº”æ˜¯å¥½æœ‹å‹"
 
-**ÆÚÍûÆÀ·Ö**:
-- »ù´¡·Ö£º0.025
-- ±êÇ©Æ¥Åä£º0.15
-- ÄÚÈÝÆ¥Åä£º
-  - "ÀîËÄ" (2×Ö): 0.10 ?
-  - "ÍõÎå" (2×Ö): 0.10 ?
-  - "ÅóÓÑ" (2×Ö): 0.10 ? (Èç¹ûÌáÈ¡ÁË)
-- ÍêÈ«Æ¥Åä¼Ó³É£º
-  - "ÀîËÄ" (2×Ö): 0.10 ?
-  - "ÍõÎå" (2×Ö): 0.10 ?
-- **×Ü·Ö**: 0.025 + 0.15 + 0.30 + 0.20 = **0.675** ?
+**æœŸæœ›è¯„åˆ†**:
+- åŸºç¡€åˆ†ï¼š0.025
+- æ ‡ç­¾åŒ¹é…ï¼š0.15
+- å†…å®¹åŒ¹é…ï¼š
+  - "æŽå››" (2å­—): 0.10 ?
+  - "çŽ‹äº”" (2å­—): 0.10 ?
+  - "æœ‹å‹" (2å­—): 0.10 ? (å¦‚æžœæå–äº†)
+- å®Œå…¨åŒ¹é…åŠ æˆï¼š
+  - "æŽå››" (2å­—): 0.10 ?
+  - "çŽ‹äº”" (2å­—): 0.10 ?
+- **æ€»åˆ†**: 0.025 + 0.15 + 0.30 + 0.20 = **0.675** ?
 
 ---
 
-Çë°´ÕÕÉÏÊö²½ÖèÕï¶ÏÎÊÌâ£¬²¢¸æËßÎÒ¾ßÌåµÄÈÕÖ¾Êä³ö½á¹û£¡
+è¯·æŒ‰ç…§ä¸Šè¿°æ­¥éª¤è¯Šæ–­é—®é¢˜ï¼Œå¹¶å‘Šè¯‰æˆ‘å…·ä½“çš„æ—¥å¿—è¾“å‡ºç»“æžœï¼

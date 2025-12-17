@@ -1,55 +1,55 @@
-# MainTabWindow_Memory.cs ·­Òë¼üĞŞ¸´Ö¸ÄÏ
+# MainTabWindow_Memory.cs ç¿»è¯‘é”®ä¿®å¤æŒ‡å—
 
-## ÎÊÌâËµÃ÷
+## é—®é¢˜è¯´æ˜
 
-`MainTabWindow_Memory.cs` ÖĞÓĞ´óÁ¿Ó²±àÂëµÄÓ¢ÎÄ×Ö·û´®£¬ĞèÒªÈ«²¿Ìæ»»Îª·­Òë¼ü£¨`.Translate()`£©¡£
+`MainTabWindow_Memory.cs` ä¸­æœ‰å¤§é‡ç¡¬ç¼–ç çš„è‹±æ–‡å­—ç¬¦ä¸²ï¼Œéœ€è¦å…¨éƒ¨æ›¿æ¢ä¸ºç¿»è¯‘é”®ï¼ˆ`.Translate()`ï¼‰ã€‚
 
-## ĞèÒªĞŞ¸´µÄÎ»ÖÃ
+## éœ€è¦ä¿®å¤çš„ä½ç½®
 
-### 1. DrawMemoryCard ·½·¨£¨Ô¼µÚ600-700ĞĞ£©
+### 1. DrawMemoryCard æ–¹æ³•ï¼ˆçº¦ç¬¬600-700è¡Œï¼‰
 
 **Pin/Unpin tooltip:**
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 TooltipHandler.TipRegion(pinButtonRect, memory.isPinned ? "Unpin" : "Pin");
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 TooltipHandler.TipRegion(pinButtonRect, memory.isPinned ? "RimTalk_MindStream_Unpin".Translate() : "RimTalk_MindStream_Pin".Translate());
 ```
 
 **Edit tooltip:**
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 TooltipHandler.TipRegion(editButtonRect, "Edit");
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 TooltipHandler.TipRegion(editButtonRect, "RimTalk_MindStream_Edit".Translate());
 ```
 
 **Header "with" text:**
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 header += $" ? with {memory.relatedPawnName}";
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 header += $" ? {"RimTalk_MindStream_With".Translate()} {memory.relatedPawnName}";
 ```
 
 **Importance/Activity tooltips:**
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 TooltipHandler.TipRegion(importanceBarRect, $"Importance: {memory.importance:F2}");
 TooltipHandler.TipRegion(activityBarRect, $"Activity: {memory.activity:F2}");
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 TooltipHandler.TipRegion(importanceBarRect, "RimTalk_MindStream_ImportanceLabel".Translate(memory.importance.ToString("F2")));
 TooltipHandler.TipRegion(activityBarRect, "RimTalk_MindStream_ActivityLabel".Translate(memory.activity.ToString("F2")));
 ```
 
-### 2. SummarizeSelectedMemories ·½·¨£¨Ô¼µÚ800ĞĞ£©
+### 2. SummarizeSelectedMemories æ–¹æ³•ï¼ˆçº¦ç¬¬800è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Messages.Message("No SCM memories selected", MessageTypeDefOf.RejectInput, false);
 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
     $"Summarize {scmMemories.Count} SCM memories to ELS?",
@@ -57,7 +57,7 @@ Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
 ));
 Messages.Message($"Summarized {scmMemories.Count} memories", MessageTypeDefOf.PositiveEvent, false);
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Messages.Message("RimTalk_MindStream_NoSCMSelected".Translate(), MessageTypeDefOf.RejectInput, false);
 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
     "RimTalk_MindStream_SummarizeConfirm".Translate(scmMemories.Count),
@@ -66,10 +66,10 @@ Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
 Messages.Message("RimTalk_MindStream_SummarizedN".Translate(scmMemories.Count), MessageTypeDefOf.PositiveEvent, false);
 ```
 
-### 3. ArchiveSelectedMemories ·½·¨£¨Ô¼µÚ830ĞĞ£©
+### 3. ArchiveSelectedMemories æ–¹æ³•ï¼ˆçº¦ç¬¬830è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Messages.Message("No ELS memories selected", MessageTypeDefOf.RejectInput, false);
 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
     $"Archive {elsMemories.Count} ELS memories to CLPA?",
@@ -77,7 +77,7 @@ Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
 ));
 Messages.Message($"Archived {elsMemories.Count} memories", MessageTypeDefOf.PositiveEvent, false);
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Messages.Message("RimTalk_MindStream_NoELSSelected".Translate(), MessageTypeDefOf.RejectInput, false);
 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
     "RimTalk_MindStream_ArchiveConfirm".Translate(elsMemories.Count),
@@ -86,17 +86,17 @@ Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
 Messages.Message("RimTalk_MindStream_ArchivedN".Translate(elsMemories.Count), MessageTypeDefOf.PositiveEvent, false);
 ```
 
-### 4. DeleteSelectedMemories ·½·¨£¨Ô¼µÚ860ĞĞ£©
+### 4. DeleteSelectedMemories æ–¹æ³•ï¼ˆçº¦ç¬¬860è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
     $"Delete {count} selected memories?",
     delegate { /*...*/ }
 ));
 Messages.Message($"Deleted {count} memories", MessageTypeDefOf.PositiveEvent, false);
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
     "RimTalk_MindStream_DeleteConfirm".Translate(count),
     delegate { /*...*/ }
@@ -104,81 +104,81 @@ Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
 Messages.Message("RimTalk_MindStream_DeletedN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
 ```
 
-### 5. SummarizeAll ·½·¨£¨Ô¼µÚ890ĞĞ£©
+### 5. SummarizeAll æ–¹æ³•ï¼ˆçº¦ç¬¬890è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Messages.Message($"Queued {pawnsToSummarize.Count} colonists for summarization", MessageTypeDefOf.TaskCompletion, false);
 Messages.Message("No colonists need summarization", MessageTypeDefOf.RejectInput, false);
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Messages.Message("RimTalk_MindStream_QueuedSummarization".Translate(pawnsToSummarize.Count), MessageTypeDefOf.TaskCompletion, false);
 Messages.Message("RimTalk_MindStream_NoNeedSummarization".Translate(), MessageTypeDefOf.RejectInput, false);
 ```
 
-### 6. ArchiveAll ·½·¨£¨Ô¼µÚ910ĞĞ£©
+### 6. ArchiveAll æ–¹æ³•ï¼ˆçº¦ç¬¬910è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Messages.Message($"Archived memories for {count} colonists", MessageTypeDefOf.PositiveEvent, false);
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Messages.Message("RimTalk_MindStream_ArchivedForN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
 ```
 
-### 7. DrawNoPawnSelected ·½·¨£¨Ô¼µÚ1010ĞĞ£©
+### 7. DrawNoPawnSelected æ–¹æ³•ï¼ˆçº¦ç¬¬1010è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Widgets.Label(rect, "Select a colonist to view memories");
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Widgets.Label(rect, "RimTalk_MindStream_SelectColonist".Translate());
 ```
 
-### 8. DrawNoMemoryComponent ·½·¨£¨Ô¼µÚ1020ĞĞ£©
+### 8. DrawNoMemoryComponent æ–¹æ³•ï¼ˆçº¦ç¬¬1020è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Widgets.Label(rect, "Selected pawn has no memory component");
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Widgets.Label(rect, "RimTalk_MindStream_NoMemoryComp".Translate());
 ```
 
-### 9. OpenCommonKnowledgeDialog ·½·¨£¨Ô¼µÚ1030ĞĞ£©
+### 9. OpenCommonKnowledgeDialog æ–¹æ³•ï¼ˆçº¦ç¬¬1030è¡Œï¼‰
 
 ```csharp
-// ĞŞ¸´Ç°£º
+// ä¿®å¤å‰ï¼š
 Messages.Message("Must enter game first", MessageTypeDefOf.RejectInput, false);
 Messages.Message("Cannot find memory manager", MessageTypeDefOf.RejectInput, false);
 
-// ĞŞ¸´ºó£º
+// ä¿®å¤åï¼š
 Messages.Message("RimTalk_MindStream_MustEnterGame".Translate(), MessageTypeDefOf.RejectInput, false);
 Messages.Message("RimTalk_MindStream_CannotFindManager".Translate(), MessageTypeDefOf.RejectInput, false);
 ```
 
-## ×ó²àÃæ°åÏÔÊ¾²»È«ÎÊÌâ
+## å·¦ä¾§é¢æ¿æ˜¾ç¤ºä¸å…¨é—®é¢˜
 
-### ÎÊÌâÃèÊö
-¿ØÖÆÃæ°åÄÚÈİ¹ı¶à£¬µ×²¿µÄ"Summarize All"ºÍ"Archive All"°´Å¥±»ÕÚµ²¡£
+### é—®é¢˜æè¿°
+æ§åˆ¶é¢æ¿å†…å®¹è¿‡å¤šï¼Œåº•éƒ¨çš„"Summarize All"å’Œ"Archive All"æŒ‰é’®è¢«é®æŒ¡ã€‚
 
-### ½â¾ö·½°¸
-ÔÚ`DrawControlPanel`·½·¨ÖĞÊ¹ÓÃ¹ö¶¯ÊÓÍ¼£º
+### è§£å†³æ–¹æ¡ˆ
+åœ¨`DrawControlPanel`æ–¹æ³•ä¸­ä½¿ç”¨æ»šåŠ¨è§†å›¾ï¼š
 
 ```csharp
 private void DrawControlPanel(Rect rect)
 {
     Widgets.DrawMenuSection(rect);
     
-    // ? Ìí¼Ó¹ö¶¯ÊÓÍ¼
+    // ? æ·»åŠ æ»šåŠ¨è§†å›¾
     Rect innerRect = rect.ContractedBy(SPACING);
     
-    // ¼ÆËã×ÜÄÚÈİ¸ß¶È
-    float contentHeight = 800f; // ¸ù¾İÊµ¼ÊÄÚÈİµ÷Õû
+    // è®¡ç®—æ€»å†…å®¹é«˜åº¦
+    float contentHeight = 800f; // æ ¹æ®å®é™…å†…å®¹è°ƒæ•´
     Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, contentHeight);
     
-    Vector2 scrollPosition = Vector2.zero; // ĞèÒªÌí¼ÓÎªÀà³ÉÔ±±äÁ¿
+    Vector2 scrollPosition = Vector2.zero; // éœ€è¦æ·»åŠ ä¸ºç±»æˆå‘˜å˜é‡
     Widgets.BeginScrollView(innerRect, ref scrollPosition, viewRect);
     
     float y = 0f;
@@ -189,24 +189,24 @@ private void DrawControlPanel(Rect rect)
     Text.Font = GameFont.Small;
     y += 35f;
     
-    // ... ÆäËûÄÚÈİ ...
+    // ... å…¶ä»–å†…å®¹ ...
     
     Widgets.EndScrollView();
 }
 ```
 
-**ĞèÒªÌí¼ÓµÄÀà³ÉÔ±±äÁ¿£º**
+**éœ€è¦æ·»åŠ çš„ç±»æˆå‘˜å˜é‡ï¼š**
 ```csharp
 private Vector2 controlPanelScrollPosition = Vector2.zero;
 ```
 
-## ¼ÇÒäĞŞ¸ÄºÍ¹Ì¶¨¹¦ÄÜÎÊÌâ
+## è®°å¿†ä¿®æ”¹å’Œå›ºå®šåŠŸèƒ½é—®é¢˜
 
-### Dialog_EditMemory È±Ê§
+### Dialog_EditMemory ç¼ºå¤±
 
-Èç¹û±àÒëÆ÷±¨´íÕÒ²»µ½`Dialog_EditMemory`£¬ĞèÒª´´½¨Õâ¸öÀà¡£
+å¦‚æœç¼–è¯‘å™¨æŠ¥é”™æ‰¾ä¸åˆ°`Dialog_EditMemory`ï¼Œéœ€è¦åˆ›å»ºè¿™ä¸ªç±»ã€‚
 
-²Î¿¼´úÂë£º
+å‚è€ƒä»£ç ï¼š
 ```csharp
 public class Dialog_EditMemory : Window
 {
@@ -226,14 +226,14 @@ public class Dialog_EditMemory : Window
     
     public override void DoWindowContents(Rect inRect)
     {
-        // ±à¼­UI
+        // ç¼–è¾‘UI
         Widgets.Label(new Rect(0f, 0f, inRect.width, 30f), "RimTalk_MindStream_Edit".Translate());
         
-        // ÎÄ±¾¿ò
+        // æ–‡æœ¬æ¡†
         Rect textRect = new Rect(0f, 40f, inRect.width, inRect.height - 90f);
         editedContent = Widgets.TextArea(textRect, editedContent);
         
-        // °´Å¥
+        // æŒ‰é’®
         if (Widgets.ButtonText(new Rect(0f, inRect.height - 40f, 100f, 35f), "Save".Translate()))
         {
             memory.content = editedContent;
@@ -249,27 +249,27 @@ public class Dialog_EditMemory : Window
 }
 ```
 
-## ¼ì²éÇåµ¥
+## æ£€æŸ¥æ¸…å•
 
-- [ ] ĞŞ¸´ËùÓĞÓ²±àÂëÓ¢ÎÄÎª·­Òë¼ü
-- [ ] Ìí¼Ó¿ØÖÆÃæ°å¹ö¶¯ÊÓÍ¼
-- [ ] È·±£Dialog_EditMemoryÀà´æÔÚ
-- [ ] ²âÊÔ¹Ì¶¨¹¦ÄÜ£¨PinMemory·½·¨£©
-- [ ] ²âÊÔ±à¼­¹¦ÄÜ
-- [ ] ÑéÖ¤ËùÓĞ·­Òë¼ü¶¼ÔÚXMLÖĞ¶¨Òå
-- [ ] ÖĞÓ¢ÎÄ¶¼Òª²âÊÔ
+- [ ] ä¿®å¤æ‰€æœ‰ç¡¬ç¼–ç è‹±æ–‡ä¸ºç¿»è¯‘é”®
+- [ ] æ·»åŠ æ§åˆ¶é¢æ¿æ»šåŠ¨è§†å›¾
+- [ ] ç¡®ä¿Dialog_EditMemoryç±»å­˜åœ¨
+- [ ] æµ‹è¯•å›ºå®šåŠŸèƒ½ï¼ˆPinMemoryæ–¹æ³•ï¼‰
+- [ ] æµ‹è¯•ç¼–è¾‘åŠŸèƒ½
+- [ ] éªŒè¯æ‰€æœ‰ç¿»è¯‘é”®éƒ½åœ¨XMLä¸­å®šä¹‰
+- [ ] ä¸­è‹±æ–‡éƒ½è¦æµ‹è¯•
 
-## ¿ìËÙ²âÊÔ
+## å¿«é€Ÿæµ‹è¯•
 
-1. Æô¶¯ÓÎÏ·£¬ÇĞ»»ÓïÑÔµ½Ó¢ÎÄ/ÖĞÎÄ
-2. ´ò¿ªMemory±êÇ©Ò³
-3. ¼ì²éÊÇ·ñ»¹ÓĞ·­Òë¼üÏÔÊ¾£¨Èç"RimTalk_xxx"£©
-4. ²âÊÔ¹Ì¶¨°´Å¥£¨??Í¼±ê£©
-5. ²âÊÔ±à¼­°´Å¥£¨??Í¼±ê£©
-6. ¹ö¶¯×ó²àÃæ°å£¬È·ÈÏµ×²¿°´Å¥¿É¼û
+1. å¯åŠ¨æ¸¸æˆï¼Œåˆ‡æ¢è¯­è¨€åˆ°è‹±æ–‡/ä¸­æ–‡
+2. æ‰“å¼€Memoryæ ‡ç­¾é¡µ
+3. æ£€æŸ¥æ˜¯å¦è¿˜æœ‰ç¿»è¯‘é”®æ˜¾ç¤ºï¼ˆå¦‚"RimTalk_xxx"ï¼‰
+4. æµ‹è¯•å›ºå®šæŒ‰é’®ï¼ˆ??å›¾æ ‡ï¼‰
+5. æµ‹è¯•ç¼–è¾‘æŒ‰é’®ï¼ˆ??å›¾æ ‡ï¼‰
+6. æ»šåŠ¨å·¦ä¾§é¢æ¿ï¼Œç¡®è®¤åº•éƒ¨æŒ‰é’®å¯è§
 
-## ×¢ÒâÊÂÏî
+## æ³¨æ„äº‹é¡¹
 
-- ËùÓĞÓÃ»§¿É¼ûµÄÎÄ±¾¶¼±ØĞëÊ¹ÓÃ`.Translate()`
-- TooltipÒ²ĞèÒª·­Òë
-- È·ÈÏ·­Òë¼üÔÚÁ½¸öXMLÎÄ¼şÖĞ¶¼´æÔÚ£¨EnglishºÍChineseSimplified£©
+- æ‰€æœ‰ç”¨æˆ·å¯è§çš„æ–‡æœ¬éƒ½å¿…é¡»ä½¿ç”¨`.Translate()`
+- Tooltipä¹Ÿéœ€è¦ç¿»è¯‘
+- ç¡®è®¤ç¿»è¯‘é”®åœ¨ä¸¤ä¸ªXMLæ–‡ä»¶ä¸­éƒ½å­˜åœ¨ï¼ˆEnglishå’ŒChineseSimplifiedï¼‰

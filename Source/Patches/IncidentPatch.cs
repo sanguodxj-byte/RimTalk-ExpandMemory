@@ -5,27 +5,30 @@ using HarmonyLib;
 using Verse;
 using RimWorld;
 
+using RimTalk.MemoryPatch;
+using RimTalk.Memory;
+
 namespace RimTalk.Memory.Patches
 {
     /// <summary>
-    /// ¼àÌýÓÎÏ·ÊÂ¼þ£¨Incident£©ÏµÍ³£¬ÊµÊ±²¶»ñÖØÒªÊÂ¼þ
-    /// ? Ö§³ÖÁ½½×¶ÎÊÂ¼þ¼ÇÂ¼£ºÏ®»÷µ½À´ ¡ú »÷ÍË¸üÐÂ
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½Â¼ï¿½ï¿½ï¿½Incidentï¿½ï¿½ÏµÍ³ï¿½ï¿½ÊµÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Â¼ï¿½
+    /// ? Ö§ï¿½ï¿½ï¿½ï¿½ï¿½×¶ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Ï®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½
     /// </summary>
     [HarmonyPatch(typeof(IncidentWorker), nameof(IncidentWorker.TryExecute))]
     public static class IncidentPatch
     {
-        // ? ×·×Ù»îÔ¾µÄÏ®»÷ÊÂ¼þ£¨ÓÃÓÚºóÐø¸üÐÂ£©
+        // ? ×·ï¿½Ù»ï¿½Ô¾ï¿½ï¿½Ï®ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½
         private static Dictionary<int, RaidEventInfo> activeRaids = new Dictionary<int, RaidEventInfo>();
         
         [HarmonyPostfix]
         public static void Postfix(IncidentWorker __instance, IncidentParms parms, bool __result)
         {
-            // Ö»´¦Àí³É¹¦Ö´ÐÐµÄÊÂ¼þ
+            // Ö»ï¿½ï¿½ï¿½ï¿½É¹ï¿½Ö´ï¿½Ðµï¿½ï¿½Â¼ï¿½
             if (!__result)
                 return;
             
-            // ¼ì²éÉèÖÃÊÇ·ñÆôÓÃ
-            if (!RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings.enableEventRecordKnowledge)
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
+            if (!RimTalkMemoryPatchMod.Settings.enableEventRecordKnowledge)
                 return;
             
             try
@@ -34,27 +37,27 @@ namespace RimTalk.Memory.Patches
                 if (incidentDef == null)
                     return;
                 
-                // ? ÌØÊâ´¦ÀíÏ®»÷ÊÂ¼þ
+                // ? ï¿½ï¿½ï¿½â´¦ï¿½ï¿½Ï®ï¿½ï¿½ï¿½Â¼ï¿½
                 if (IsRaidIncident(incidentDef))
                 {
                     HandleRaidStart(incidentDef, parms);
                     return;
                 }
                 
-                // ·ÖÎöÊÂ¼þÀàÐÍºÍÖØÒªÐÔ
+                // ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Íºï¿½ï¿½ï¿½Òªï¿½ï¿½
                 float importance = CalculateIncidentImportance(incidentDef);
                 
-                // Ö»¼ÇÂ¼ÖØÒªÊÂ¼þ
+                // Ö»ï¿½ï¿½Â¼ï¿½ï¿½Òªï¿½Â¼ï¿½
                 if (importance < 0.5f)
                     return;
                 
-                // Éú³ÉÊÂ¼þÃèÊö
+                // ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½
                 string eventText = GenerateEventDescription(incidentDef, parms);
                 
                 if (string.IsNullOrEmpty(eventText))
                     return;
                 
-                // Ìí¼Óµ½³£Ê¶¿â
+                // ï¿½ï¿½Óµï¿½ï¿½ï¿½Ê¶ï¿½ï¿½
                 AddOrUpdateKnowledge(null, eventText, importance);
             }
             catch (Exception ex)
@@ -64,7 +67,7 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ? ÅÐ¶ÏÊÇ·ñÊÇÏ®»÷ÊÂ¼þ
+        /// ? ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ï®ï¿½ï¿½ï¿½Â¼ï¿½
         /// </summary>
         private static bool IsRaidIncident(IncidentDef incidentDef)
         {
@@ -76,30 +79,30 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ? ´¦ÀíÏ®»÷¿ªÊ¼
+        /// ? ï¿½ï¿½ï¿½ï¿½Ï®ï¿½ï¿½ï¿½ï¿½Ê¼
         /// </summary>
         private static void HandleRaidStart(IncidentDef incidentDef, IncidentParms parms)
         {
-            // Éú³ÉÏ®»÷ID£¨ÓÃÓÚºóÐø¸üÐÂ£©
+            // ï¿½ï¿½ï¿½ï¿½Ï®ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½
             int raidId = GenTicks.TicksGame;
             
-            // »ñÈ¡ÅÉÏµÐÅÏ¢
-            string factionName = "Î´ÖªµÐÈË";
+            // ï¿½ï¿½È¡ï¿½ï¿½Ïµï¿½ï¿½Ï¢
+            string factionName = "Î´Öªï¿½ï¿½ï¿½ï¿½";
             if (parms.faction != null && !string.IsNullOrEmpty(parms.faction.Name))
             {
                 factionName = parms.faction.Name;
             }
             
-            // »ñÈ¡Ï®»÷ÀàÐÍ
+            // ï¿½ï¿½È¡Ï®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             string raidType = GetRaidType(incidentDef);
             
-            // Éú³É³õÊ¼ÃèÊö
-            string eventText = $"½ñÌì{factionName}·¢¶¯ÁË{raidType}";
+            // ï¿½ï¿½ï¿½É³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
+            string eventText = $"ï¿½ï¿½ï¿½ï¿½{factionName}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{raidType}";
             
-            // Ìí¼Óµ½³£Ê¶¿â
+            // ï¿½ï¿½Óµï¿½ï¿½ï¿½Ê¶ï¿½ï¿½
             var entry = AddOrUpdateKnowledge(null, eventText, 0.9f);
             
-            // ¼ÇÂ¼»îÔ¾Ï®»÷ÐÅÏ¢
+            // ï¿½ï¿½Â¼ï¿½ï¿½Ô¾Ï®ï¿½ï¿½ï¿½ï¿½Ï¢
             if (entry != null)
             {
                 activeRaids[raidId] = new RaidEventInfo
@@ -111,7 +114,7 @@ namespace RimTalk.Memory.Patches
                     initialText = eventText
                 };
                 
-                // Æô¶¯¼àÌý£¨¼ì²éÏ®»÷½áÊø£©
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 if (!raidCheckActive)
                 {
                     raidCheckActive = true;
@@ -125,26 +128,26 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ? »ñÈ¡Ï®»÷ÀàÐÍ
+        /// ? ï¿½ï¿½È¡Ï®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         private static string GetRaidType(IncidentDef incidentDef)
         {
             string defName = incidentDef.defName;
             
             if (defName.Contains("Siege"))
-                return "Î§³Ç";
+                return "Î§ï¿½ï¿½";
             else if (defName.Contains("Mech"))
-                return "»úÐµ×å¹¥»÷";
+                return "ï¿½ï¿½Ðµï¿½å¹¥ï¿½ï¿½";
             else if (defName.Contains("Sapper"))
-                return "¹¤±øÏ®»÷";
+                return "ï¿½ï¿½ï¿½ï¿½Ï®ï¿½ï¿½";
             else if (defName.Contains("Breacher"))
-                return "ÆÆ»µÕßÏ®»÷";
+                return "ï¿½Æ»ï¿½ï¿½ï¿½Ï®ï¿½ï¿½";
             else
-                return "Ï®»÷";
+                return "Ï®ï¿½ï¿½";
         }
         
         /// <summary>
-        /// ? ¼ì²éÏ®»÷×´Ì¬£¨Ã¿Ð¡Ê±µ÷ÓÃÒ»´Î£©
+        /// ? ï¿½ï¿½ï¿½Ï®ï¿½ï¿½×´Ì¬ï¿½ï¿½Ã¿Ð¡Ê±ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î£ï¿½
         /// </summary>
         private static bool raidCheckActive = false;
         
@@ -155,7 +158,7 @@ namespace RimTalk.Memory.Patches
             
             try
             {
-                var library = RimTalk.Memory.MemoryManager.GetCommonKnowledge();
+                var library = MemoryManager.GetCommonKnowledge();
                 if (library == null)
                     return;
                 
@@ -167,35 +170,35 @@ namespace RimTalk.Memory.Patches
                     int raidId = kvp.Key;
                     var raidInfo = kvp.Value;
                     
-                    // ¼ì²éÊÇ·ñ³¬Ê±£¨³¬¹ý4Ð¡Ê±ÊÓÎª½áÊø£©
+                    // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½4Ð¡Ê±ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     int elapsedTicks = currentTick - raidInfo.startTick;
                     if (elapsedTicks > 10000) // 4Ð¡Ê± = 2500 * 4
                     {
-                        // ³¬Ê±£¬ÅÐ¶¨Îª»÷ÍË
+                        // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½Îªï¿½ï¿½ï¿½ï¿½
                         UpdateRaidOutcome(library, raidInfo, true);
                         completedRaids.Add(raidId);
                     }
                     else
                     {
-                        // ¼ì²éµØÍ¼ÉÏÊÇ·ñ»¹ÓÐµÐÈË
+                        // ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ðµï¿½ï¿½ï¿½
                         bool hasEnemies = CheckForEnemies();
                         
-                        if (!hasEnemies && elapsedTicks > 1000) // ÖÁÉÙ³ÖÐøÒ»¶ÎÊ±¼ä²ÅËã»÷ÍË
+                        if (!hasEnemies && elapsedTicks > 1000) // ï¿½ï¿½ï¿½Ù³ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                         {
-                            // »÷ÍË³É¹¦
+                            // ï¿½ï¿½ï¿½Ë³É¹ï¿½
                             UpdateRaidOutcome(library, raidInfo, true);
                             completedRaids.Add(raidId);
                         }
                     }
                 }
                 
-                // ÇåÀíÒÑÍê³ÉµÄÏ®»÷
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éµï¿½Ï®ï¿½ï¿½
                 foreach (var raidId in completedRaids)
                 {
                     activeRaids.Remove(raidId);
                 }
                 
-                // Èç¹ûÃ»ÓÐ»îÔ¾Ï®»÷£¬Í£Ö¹¼ì²é
+                // ï¿½ï¿½ï¿½Ã»ï¿½Ð»ï¿½Ô¾Ï®ï¿½ï¿½ï¿½ï¿½Í£Ö¹ï¿½ï¿½ï¿½
                 if (activeRaids.Count == 0)
                 {
                     raidCheckActive = false;
@@ -208,7 +211,7 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ? ¼ì²éµØÍ¼ÉÏÊÇ·ñ»¹ÓÐµÐ¶ÔÉúÎï
+        /// ? ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ÐµÐ¶ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         private static bool CheckForEnemies()
         {
@@ -227,29 +230,29 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ? ¸üÐÂÏ®»÷½á¹û
+        /// ? ï¿½ï¿½ï¿½ï¿½Ï®ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         private static void UpdateRaidOutcome(CommonKnowledgeLibrary library, RaidEventInfo raidInfo, bool defeated)
         {
-            // ²éÕÒÔ­Ê¼ÌõÄ¿
+            // ï¿½ï¿½ï¿½ï¿½Ô­Ê¼ï¿½ï¿½Ä¿
             var entry = library.Entries.FirstOrDefault(e => e.id == raidInfo.entryId);
             
             if (entry == null)
             {
-                // ÌõÄ¿±»É¾³ýÁË£¬Ö±½Ó·µ»Ø
+                // ï¿½ï¿½Ä¿ï¿½ï¿½É¾ï¿½ï¿½ï¿½Ë£ï¿½Ö±ï¿½Ó·ï¿½ï¿½ï¿½
                 return;
             }
             
-            // ¸üÐÂÄÚÈÝ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             if (defeated)
             {
-                entry.content = $"{raidInfo.initialText}£¬Ö³ÃñµØ³É¹¦»÷ÍËÁË½ø¹¥";
-                entry.importance = 0.95f; // Ìá¸ßÖØÒªÐÔ
+                entry.content = $"{raidInfo.initialText}ï¿½ï¿½Ö³ï¿½ï¿½Ø³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë½ï¿½ï¿½ï¿½";
+                entry.importance = 0.95f; // ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½
             }
             else
             {
-                entry.content = $"{raidInfo.initialText}£¬Ôì³ÉÁËÑÏÖØËðÊ§";
-                entry.importance = 1.0f; // ×î¸ßÖØÒªÐÔ
+                entry.content = $"{raidInfo.initialText}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§";
+                entry.importance = 1.0f; // ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½
             }
             
             if (Prefs.DevMode)
@@ -259,17 +262,17 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// Ìí¼Ó»ò¸üÐÂ³£Ê¶
+        /// ï¿½ï¿½Ó»ï¿½ï¿½ï¿½Â³ï¿½Ê¶
         /// </summary>
         private static CommonKnowledgeEntry AddOrUpdateKnowledge(string existingId, string eventText, float importance)
         {
-            var library = RimTalk.Memory.MemoryManager.GetCommonKnowledge();
+            var library = MemoryManager.GetCommonKnowledge();
             if (library == null)
                 return null;
             
             CommonKnowledgeEntry entry = null;
             
-            // Èç¹ûÌá¹©ÁËID£¬³¢ÊÔ¸üÐÂÏÖÓÐÌõÄ¿
+            // ï¿½ï¿½ï¿½ï¿½á¹©ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½ï¿½Ô¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
             if (!string.IsNullOrEmpty(existingId))
             {
                 entry = library.Entries.FirstOrDefault(e => e.id == existingId);
@@ -281,14 +284,14 @@ namespace RimTalk.Memory.Patches
                 }
             }
             
-            // ¼ì²éÊÇ·ñÒÑ´æÔÚÏàËÆÄÚÈÝ
+            // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             bool exists = library.Entries.Any(e => 
                 e.content.Contains(eventText.Substring(0, Math.Min(15, eventText.Length)))
             );
             
             if (!exists)
             {
-                entry = new CommonKnowledgeEntry("ÊÂ¼þ,ÀúÊ·", eventText)
+                entry = new CommonKnowledgeEntry("ï¿½Â¼ï¿½,ï¿½ï¿½Ê·", eventText)
                 {
                     importance = importance,
                     isEnabled = true,
@@ -307,140 +310,140 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ¼ÆËãÊÂ¼þÖØÒªÐÔ
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Òªï¿½ï¿½
         /// </summary>
         private static float CalculateIncidentImportance(IncidentDef incidentDef)
         {
             string defName = incidentDef.defName;
             string label = incidentDef.label;
             
-            // Ï®»÷Ïà¹ØÔÚHandleRaidStartÖÐ´¦Àí£¬ÕâÀï²»ÔÙÅÐ¶Ï
+            // Ï®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HandleRaidStartï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï²»ï¿½ï¿½ï¿½Ð¶ï¿½
             
-            // ËÀÍöÏà¹Ø£¨×îÖØÒª1.0£©
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½Òª1.0ï¿½ï¿½
             if (defName.Contains("Death") || defName.Contains("Dead") || 
-                label.Contains("ËÀ") || label.Contains("death"))
+                label.Contains("ï¿½ï¿½") || label.Contains("death"))
                 return 1.0f;
             
-            // ¹ØÏµ±ä»¯£¨ÖØÒªÐÔ0.85£©
+            // ï¿½ï¿½Ïµï¿½ä»¯ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½0.85ï¿½ï¿½
             if (defName.Contains("Marriage") || defName.Contains("Wedding") || 
-                label.Contains("½á»é") || label.Contains("»é"))
+                label.Contains("ï¿½ï¿½ï¿½") || label.Contains("ï¿½ï¿½"))
                 return 0.85f;
             
-            // ? ÐÂÔö£ºÔáÀñÏà¹Ø£¨ÖØÒªÐÔ0.9£©
+            // ? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½Òªï¿½ï¿½0.9ï¿½ï¿½
             if (defName.Contains("Funeral") || defName.Contains("Burial") || 
-                label.Contains("ÔáÀñ") || label.Contains("Ôá") || label.Contains("ÂñÔá"))
+                label.Contains("ï¿½ï¿½ï¿½ï¿½") || label.Contains("ï¿½ï¿½") || label.Contains("ï¿½ï¿½ï¿½ï¿½"))
                 return 0.9f;
             
-            // ? ÐÂÔö£ºÉúÈÕÏà¹Ø£¨ÖØÒªÐÔ0.7£©
-            if (defName.Contains("Birthday") || label.Contains("ÉúÈÕ"))
+            // ? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½Òªï¿½ï¿½0.7ï¿½ï¿½
+            if (defName.Contains("Birthday") || label.Contains("ï¿½ï¿½ï¿½ï¿½"))
                 return 0.7f;
             
-            // ? ÐÂÔö£ºÑÐ¾¿Í»ÆÆ£¨ÖØÒªÐÔ0.8£©
+            // ? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¾ï¿½Í»ï¿½Æ£ï¿½ï¿½ï¿½Òªï¿½ï¿½0.8ï¿½ï¿½
             if (defName.Contains("Breakthrough") || defName.Contains("Research") && defName.Contains("Complete") ||
-                label.Contains("Í»ÆÆ") || label.Contains("Íê³ÉÑÐ¾¿"))
+                label.Contains("Í»ï¿½ï¿½") || label.Contains("ï¿½ï¿½ï¿½ï¿½Ð¾ï¿½"))
                 return 0.8f;
             
-            // ? ÐÂÔö£ºÖÜÄê¼ÍÄî£¨ÖØÒªÐÔ0.7£©
-            if (defName.Contains("Anniversary") || label.Contains("ÖÜÄê"))
+            // ? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½î£¨ï¿½ï¿½Òªï¿½ï¿½0.7ï¿½ï¿½
+            if (defName.Contains("Anniversary") || label.Contains("ï¿½ï¿½ï¿½ï¿½"))
                 return 0.7f;
             
-            // ³ÉÔ±±ä¶¯£¨ÖØÒªÐÔ0.8£©
+            // ï¿½ï¿½Ô±ï¿½ä¶¯ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½0.8ï¿½ï¿½
             if (defName.Contains("Join") || defName.Contains("Refugee") || 
                 defName.Contains("WandererJoin") || 
-                label.Contains("¼ÓÈë") || label.Contains("ÄÑÃñ"))
+                label.Contains("ï¿½ï¿½ï¿½ï¿½") || label.Contains("ï¿½ï¿½ï¿½ï¿½"))
                 return 0.8f;
             
-            // ³æ×å
-            if (defName.Contains("Infestation") || label.Contains("³æ"))
+            // ï¿½ï¿½ï¿½ï¿½
+            if (defName.Contains("Infestation") || label.Contains("ï¿½ï¿½"))
                 return 0.85f;
             
-            // ÔÖÄÑ£¨ÖØÒªÐÔ0.85£©
+            // ï¿½ï¿½ï¿½Ñ£ï¿½ï¿½ï¿½Òªï¿½ï¿½0.85ï¿½ï¿½
             if (defName.Contains("Fire") || defName.Contains("Explosion") || 
                 defName.Contains("Tornado") || defName.Contains("Eclipse") ||
-                label.Contains("»ð") || label.Contains("±¬Õ¨") || label.Contains("Áú¾í·ç"))
+                label.Contains("ï¿½ï¿½") || label.Contains("ï¿½ï¿½Õ¨") || label.Contains("ï¿½ï¿½ï¿½ï¿½ï¿½"))
                 return 0.85f;
             
-            // Ã³Ò×/·Ã¿Í£¨ÖØÒªÐÔ0.6£©
+            // Ã³ï¿½ï¿½/ï¿½Ã¿Í£ï¿½ï¿½ï¿½Òªï¿½ï¿½0.6ï¿½ï¿½
             if (defName.Contains("Caravan") || defName.Contains("Visitor") || 
                 defName.Contains("Trade") ||
-                label.Contains("Ã³Ò×") || label.Contains("·Ã¿Í"))
+                label.Contains("Ã³ï¿½ï¿½") || label.Contains("ï¿½Ã¿ï¿½"))
                 return 0.6f;
             
-            // ¼²²¡£¨ÖØÒªÐÔ0.7£©
-            if (defName.Contains("Disease") || label.Contains("¼²²¡") || label.Contains("ÎÁÒß"))
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½0.7ï¿½ï¿½
+            if (defName.Contains("Disease") || label.Contains("ï¿½ï¿½ï¿½ï¿½") || label.Contains("ï¿½ï¿½ï¿½ï¿½"))
                 return 0.75f;
             
-            // ÈÎÎñÍê³É£¨ÖØÒªÐÔ0.65£©
-            if (defName.Contains("Quest") || label.Contains("ÈÎÎñ"))
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½Òªï¿½ï¿½0.65ï¿½ï¿½
+            if (defName.Contains("Quest") || label.Contains("ï¿½ï¿½ï¿½ï¿½"))
                 return 0.65f;
             
-            // ÆäËûµÍÓÅÏÈ¼¶ÊÂ¼þ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½Â¼ï¿½
             return 0.3f;
         }
         
         /// <summary>
-        /// Éú³ÉÊÂ¼þÃèÊö£¨·ÇÏ®»÷ÊÂ¼þ£©
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï®ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½
         /// </summary>
         private static string GenerateEventDescription(IncidentDef incidentDef, IncidentParms parms)
         {
             string label = incidentDef.label;
             string defName = incidentDef.defName;
             
-            // Ìí¼ÓÊ±¼äÇ°×º
-            string timePrefix = "½ñÌì";
+            // ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ç°×º
+            string timePrefix = "ï¿½ï¿½ï¿½ï¿½";
             
-            // ´¦ÀíÌØÊâÊÂ¼þÀàÐÍ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½
             if (defName.Contains("Marriage") || defName.Contains("Wedding"))
             {
-                return $"{timePrefix}¾ÙÐÐÁË»éÀñ";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Funeral") || defName.Contains("Burial"))
             {
-                return $"{timePrefix}¾ÙÐÐÁËÔáÀñ";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Birthday"))
             {
-                return $"{timePrefix}Çì×£ÁËÉúÈÕ";
+                return $"{timePrefix}ï¿½ï¿½×£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Breakthrough") || defName.Contains("Research") && defName.Contains("Complete"))
             {
-                return $"{timePrefix}È¡µÃÁËÑÐ¾¿Í»ÆÆ";
+                return $"{timePrefix}È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ð¾ï¿½Í»ï¿½ï¿½";
             }
             else if (defName.Contains("Anniversary"))
             {
-                return $"{timePrefix}Çì×£ÁËÖÜÄê¼ÍÄî";
+                return $"{timePrefix}ï¿½ï¿½×£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("WandererJoin") || defName.Contains("RefugeeJoin"))
             {
-                return $"{timePrefix}ÓÐÐÂ³ÉÔ±¼ÓÈëÖ³ÃñµØ";
+                return $"{timePrefix}ï¿½ï¿½ï¿½Â³ï¿½Ô±ï¿½ï¿½ï¿½ï¿½Ö³ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Infestation"))
             {
-                return $"{timePrefix}·¢ÉúÁË³æ×åÈëÇÖ";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Fire"))
             {
-                return $"{timePrefix}·¢ÉúÁË»ðÔÖ";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Explosion"))
             {
-                return $"{timePrefix}·¢ÉúÁË±¬Õ¨";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½Ë±ï¿½Õ¨";
             }
             else if (defName.Contains("Tornado"))
             {
-                return $"{timePrefix}ÔâÓöÁËÁú¾í·ç";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
             }
             else if (defName.Contains("Eclipse"))
             {
-                return $"{timePrefix}·¢ÉúÁËÈÕÊ³";
+                return $"{timePrefix}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³";
             }
             else if (defName.Contains("TraderCaravan") || defName.Contains("VisitorGroup"))
             {
-                // Ã³Ò×/·Ã¿ÍÍ¨³£²»¼ÇÂ¼
+                // Ã³ï¿½ï¿½/ï¿½Ã¿ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼
                 return null;
             }
             
-            // Í¨ÓÃÃèÊö£ºÊ¹ÓÃÓÎÏ·±¾µØ»¯µÄlabel
+            // Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½Ø»ï¿½ï¿½ï¿½label
             if (!string.IsNullOrEmpty(label))
             {
                 return $"{timePrefix}{label}";
@@ -450,15 +453,15 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// ? Ï®»÷ÊÂ¼þÐÅÏ¢
+        /// ? Ï®ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ï¢
         /// </summary>
         private class RaidEventInfo
         {
-            public string entryId;          // ³£Ê¶ÌõÄ¿ID
-            public string factionName;      // ÅÉÏµÃû³Æ
-            public string raidType;         // Ï®»÷ÀàÐÍ
-            public int startTick;           // ¿ªÊ¼Ê±¼ä
-            public string initialText;      // ³õÊ¼ÃèÊö
+            public string entryId;          // ï¿½ï¿½Ê¶ï¿½ï¿½Ä¿ID
+            public string factionName;      // ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½
+            public string raidType;         // Ï®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public int startTick;           // ï¿½ï¿½Ê¼Ê±ï¿½ï¿½
+            public string initialText;      // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
         }
     }
 }

@@ -3,15 +3,16 @@ using Verse;
 using RimWorld;
 using RimTalk.Memory;
 using RimTalk.Memory.UI;
-using System.Collections.Generic; // ? Ìí¼Ó
+using System.Collections.Generic; // ? æ·»åŠ 
+using System.Linq;
 
 namespace RimTalk.MemoryPatch
 {
     public class RimTalkMemoryPatchSettings : ModSettings
     {
-        // ? ĞÂÔö£ºÌáÊ¾´Ê¹æ·¶»¯¹æÔò
+        // ? æ–°å¢ï¼šæç¤ºè¯è§„èŒƒåŒ–è§„åˆ™
         /// <summary>
-        /// Ìæ»»¹æÔò¶¨Òå
+        /// æ›¿æ¢è§„åˆ™å®šä¹‰
         /// </summary>
         public class ReplacementRule : IExposable
         {
@@ -36,35 +37,35 @@ namespace RimTalk.MemoryPatch
             }
         }
         
-        // ? ÌáÊ¾´Ê¹æ·¶»¯¹æÔòÁĞ±í
+        // ? æç¤ºè¯è§„èŒƒåŒ–è§„åˆ™åˆ—è¡¨
         public List<ReplacementRule> normalizationRules = new List<ReplacementRule>
         {
             new ReplacementRule(@"\(Player\)", "Master", true),
-            new ReplacementRule(@"\(Íæ¼Ò\)", "Ö÷ÈË", true)
+            new ReplacementRule(@"\(ç©å®¶\)", "ä¸»äºº", true)
         };
         
-        // ËÄ²ã¼ÇÒäÈİÁ¿ÅäÖÃ
+        // å››å±‚è®°å¿†å®¹é‡é…ç½®
         public int maxActiveMemories = 6;
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
         
-        // Ë¥¼õËÙÂÊÉèÖÃ
+        // è¡°å‡é€Ÿç‡è®¾ç½®
         public float scmDecayRate = 0.01f;
         public float elsDecayRate = 0.005f;
         public float clpaDecayRate = 0.001f;
         
-        // ×Ü½áÉèÖÃ
+        // æ€»ç»“è®¾ç½®
         public bool enableDailySummarization = true;
         public int summarizationHour = 0;
         public bool useAISummarization = true;
         public int maxSummaryLength = 80;
         
-        // CLPA ¹éµµÉèÖÃ
+        // CLPA å½’æ¡£è®¾ç½®
         public bool enableAutoArchive = true;
         public int archiveIntervalDays = 7;
         public int maxArchiveMemories = 30;
 
-        // AI ÅäÖÃ
+        // AI é…ç½®
         public bool useRimTalkAIConfig = true;
         public string independentApiKey = "";
         public string independentApiUrl = "";
@@ -72,58 +73,98 @@ namespace RimTalk.MemoryPatch
         public string independentProvider = "OpenAI";
         public bool enablePromptCaching = true;
 
-        // UI ÉèÖÃ
+        // UI è®¾ç½®
         public bool enableMemoryUI = true;
         
-        // ¼ÇÒäÀàĞÍ¿ª¹Ø
+        // è®°å¿†ç±»å‹å¼€å…³
         public bool enableActionMemory = true;
         public bool enableConversationMemory = true;
         
-        // Pawn×´Ì¬³£Ê¶×Ô¶¯Éú³É
+        // PawnçŠ¶æ€å¸¸è¯†è‡ªåŠ¨ç”Ÿæˆ
         public bool enablePawnStatusKnowledge = false;
         
-        // ÊÂ¼ş¼ÇÂ¼³£Ê¶×Ô¶¯Éú³É
+        // äº‹ä»¶è®°å½•å¸¸è¯†è‡ªåŠ¨ç”Ÿæˆ
         public bool enableEventRecordKnowledge = false;
 
-        // ¶Ô»°»º´æÉèÖÃ
+        // å¯¹è¯ç¼“å­˜è®¾ç½®
         public bool enableConversationCache = true;
         public int conversationCacheSize = 200;
         public int conversationCacheExpireDays = 14;
         
-        // ÌáÊ¾´Ê»º´æÉèÖÃ
+        // æç¤ºè¯ç¼“å­˜è®¾ç½®
         public bool enablePromptCache = true;
         public int promptCacheSize = 100;
         public int promptCacheExpireMinutes = 60;
 
-        // ¶¯Ì¬×¢ÈëÉèÖÃ
+        // åŠ¨æ€æ³¨å…¥è®¾ç½®
         public bool useDynamicInjection = true;
         public int maxInjectedMemories = 10;
         public int maxInjectedKnowledge = 5;
         
-        // ¶¯Ì¬×¢ÈëÈ¨ÖØÅäÖÃ
+        // åŠ¨æ€æ³¨å…¥æƒé‡é…ç½®
         public float weightTimeDecay = 0.3f;
         public float weightImportance = 0.3f;
         public float weightKeywordMatch = 0.4f;
         
-        // ×¢ÈëãĞÖµÉèÖÃ
+        // æ³¨å…¥é˜ˆå€¼è®¾ç½®
         public float memoryScoreThreshold = 0.15f;
         public float knowledgeScoreThreshold = 0.1f;
         
-        // ×ÔÊÊÓ¦ãĞÖµÉèÖÃ
+        // è‡ªé€‚åº”é˜ˆå€¼è®¾ç½®
         public bool enableAdaptiveThreshold = false;
         public bool autoApplyAdaptiveThreshold = false;
         
-        // Ö÷¶¯¼ÇÒäÕÙ»Ø
+        // ä¸»åŠ¨è®°å¿†å¬å›
         public bool enableProactiveRecall = false;
         public float recallTriggerChance = 0.15f;
         
-        // ³£Ê¶¿âÈ¨ÖØÅäÖÃ
+        // å¸¸è¯†åº“æƒé‡é…ç½®
         public float knowledgeBaseScore = 0.05f;
         public float knowledgeJaccardWeight = 0.7f;
         public float knowledgeTagWeight = 0.3f;
         public float knowledgeMatchBonus = 0.08f;
 
-        // UIÕÛµş×´Ì¬
+        // Vector Enhancement Settings
+        public bool enableVectorEnhancement = false;
+        public float vectorSimilarityThreshold = 0.75f;
+        public int maxVectorResults = 5;
+
+        // Knowledge Matching Settings
+        public bool enableKnowledgeChaining = true;
+        public int maxChainingRounds = 2;
+        
+        // â­ v3.3.20: æ–°å¢é«˜çº§åŒ¹é…è®¾ç½®
+        public float confidenceMargin = 0.05f; // é˜²è¯¯è§¦é¢†è·‘åˆ† (0.0 - 0.2)
+        public float hybridWeightBalance = 0.5f; // æ··åˆæ£€ç´¢æƒé‡ (0.0 - 1.0, 0=Keywords, 1=Vector)
+        public string globalExcludeKeywords = ""; // å…¨å±€æ’é™¤è¯ (é€—å·åˆ†éš”)
+        
+        private string[] cachedGlobalExcludeKeywords; // ç¼“å­˜çš„å…¨å±€æ’é™¤è¯æ•°ç»„
+
+        public string[] GetGlobalExcludeKeywords()
+        {
+            if (cachedGlobalExcludeKeywords == null)
+            {
+                if (string.IsNullOrEmpty(globalExcludeKeywords))
+                {
+                    cachedGlobalExcludeKeywords = new string[0];
+                }
+                else
+                {
+                    cachedGlobalExcludeKeywords = globalExcludeKeywords.Split(new[] { ',', 'ï¼Œ', 'ã€', ';', 'ï¼›' }, System.StringSplitOptions.RemoveEmptyEntries)
+                        .Select(k => k.Trim())
+                        .Where(k => !string.IsNullOrEmpty(k))
+                        .ToArray();
+                }
+            }
+            return cachedGlobalExcludeKeywords;
+        }
+        
+        public void ClearGlobalExcludeCache()
+        {
+            cachedGlobalExcludeKeywords = null;
+        }
+
+        // UIæŠ˜å çŠ¶æ€
         private static bool expandDynamicInjection = true;
         private static bool expandMemoryCapacity = false;
         private static bool expandDecayRates = false;
@@ -131,6 +172,7 @@ namespace RimTalk.MemoryPatch
         private static bool expandAIConfig = true;
         private static bool expandMemoryTypes = false;
         private static bool expandExperimentalFeatures = true;
+        private static bool expandVectorEnhancement = true;
         
         private static Vector2 scrollPosition = Vector2.zero;
 
@@ -138,16 +180,16 @@ namespace RimTalk.MemoryPatch
         {
             base.ExposeData();
             
-            // ? ĞòÁĞ»¯ÌáÊ¾´Ê¹æ·¶»¯¹æÔò
+            // ? åºåˆ—åŒ–æç¤ºè¯è§„èŒƒåŒ–è§„åˆ™
             Scribe_Collections.Look(ref normalizationRules, "normalizationRules", LookMode.Deep);
             
-            // ? ¼æÈİĞÔ£ºÈç¹û¼ÓÔØºóÎª null£¬³õÊ¼»¯Ä¬ÈÏ¹æÔò
+            // ? å…¼å®¹æ€§ï¼šå¦‚æœåŠ è½½åä¸º nullï¼Œåˆå§‹åŒ–é»˜è®¤è§„åˆ™
             if (Scribe.mode == LoadSaveMode.PostLoadInit && normalizationRules == null)
             {
                 normalizationRules = new List<ReplacementRule>
                 {
                     new ReplacementRule(@"\(Player\)", "Master", true),
-                    new ReplacementRule(@"\(Íæ¼Ò\)", "Ö÷ÈË", true)
+                    new ReplacementRule(@"\(ç©å®¶\)", "ä¸»äºº", true)
                 };
             }
             
@@ -206,23 +248,42 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref knowledgeJaccardWeight, "knowledge_jaccardWeight", 0.7f);
             Scribe_Values.Look(ref knowledgeTagWeight, "knowledge_tagWeight", 0.3f);
             Scribe_Values.Look(ref knowledgeMatchBonus, "knowledge_matchBonus", 0.08f);
+
+            // Vector Enhancement
+            Scribe_Values.Look(ref enableVectorEnhancement, "vector_enableVectorEnhancement", false);
+            Scribe_Values.Look(ref vectorSimilarityThreshold, "vector_vectorSimilarityThreshold", 0.75f);
+            Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
+
+            // Knowledge Matching
+            Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", true);
+            Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
+            
+            // â­ v3.3.20: åºåˆ—åŒ–é«˜çº§åŒ¹é…è®¾ç½®
+            Scribe_Values.Look(ref confidenceMargin, "knowledge_confidenceMargin", 0.05f);
+            Scribe_Values.Look(ref hybridWeightBalance, "knowledge_hybridWeightBalance", 0.5f);
+            Scribe_Values.Look(ref globalExcludeKeywords, "knowledge_globalExcludeKeywords", "");
+            
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                ClearGlobalExcludeCache();
+            }
         }
 
         public void DoSettingsWindowContents(Rect inRect)
         {
             Listing_Standard listingStandard = new Listing_Standard();
             
-            Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2400f); // ? Ôö¼Ó¸ß¶ÈÒÔÈİÄÉĞÂÄÚÈİ
+            Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2400f); // ? å¢åŠ é«˜åº¦ä»¥å®¹çº³æ–°å†…å®¹
             Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
             listingStandard.Begin(viewRect);
 
-            // ? ĞÂÔö£ºÌáÊ¾´Ê¹æ·¶»¯ÉèÖÃ
+            // ? æ–°å¢ï¼šæç¤ºè¯è§„èŒƒåŒ–è®¾ç½®
             Text.Font = GameFont.Medium;
-            listingStandard.Label("ÌáÊ¾´Ê¹æ·¶»¯");
+            listingStandard.Label("æç¤ºè¯è§„èŒƒåŒ–");
             Text.Font = GameFont.Small;
             
             GUI.color = Color.gray;
-            listingStandard.Label("×Ô¶¨ÒåÌæ»»¹æÔò£¬ÔÚ·¢ËÍ¸ø AI Ç°×Ô¶¯´¦ÀíÌáÊ¾´Ê");
+            listingStandard.Label("è‡ªå®šä¹‰æ›¿æ¢è§„åˆ™ï¼Œåœ¨å‘é€ç»™ AI å‰è‡ªåŠ¨å¤„ç†æç¤ºè¯");
             GUI.color = Color.white;
             
             listingStandard.Gap(6f);
@@ -232,19 +293,19 @@ namespace RimTalk.MemoryPatch
             listingStandard.Gap();
             listingStandard.GapLine();
 
-            // ³£Ê¶¿â¹ÜÀí
+            // å¸¸è¯†åº“ç®¡ç†
             Text.Font = GameFont.Medium;
-            listingStandard.Label("³£Ê¶¿â¹ÜÀí");
+            listingStandard.Label("å¸¸è¯†åº“ç®¡ç†");
             Text.Font = GameFont.Small;
             
             GUI.color = Color.gray;
-            listingStandard.Label("¹ÜÀíÈ«¾Ö³£Ê¶¿â£¬ÎªAI¶Ô»°Ìá¹©±³¾°ÖªÊ¶");
+            listingStandard.Label("ç®¡ç†å…¨å±€å¸¸è¯†åº“ï¼Œä¸ºAIå¯¹è¯æä¾›èƒŒæ™¯çŸ¥è¯†");
             GUI.color = Color.white;
             
             listingStandard.Gap(6f);
             
             Rect knowledgeButtonRect = listingStandard.GetRect(35f);
-            if (Widgets.ButtonText(knowledgeButtonRect, "´ò¿ª³£Ê¶¿â"))
+            if (Widgets.ButtonText(knowledgeButtonRect, "æ‰“å¼€å¸¸è¯†åº“"))
             {
                 OpenCommonKnowledgeDialog();
             }
@@ -252,41 +313,42 @@ namespace RimTalk.MemoryPatch
             listingStandard.Gap();
             listingStandard.GapLine();
 
-            // ¶¯Ì¬×¢ÈëÉèÖÃ
-            DrawCollapsibleSection(listingStandard, "¶¯Ì¬×¢ÈëÉèÖÃ", ref expandDynamicInjection, () => DrawDynamicInjectionSettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "¼ÇÒäÈİÁ¿ÅäÖÃ", ref expandMemoryCapacity, () => DrawMemoryCapacitySettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "¼ÇÒäË¥¼õÅäÖÃ", ref expandDecayRates, () => DrawDecaySettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "¼ÇÒä×Ü½áÉèÖÃ", ref expandSummarization, () => DrawSummarizationSettings(listingStandard));
+            // åŠ¨æ€æ³¨å…¥è®¾ç½®
+            DrawCollapsibleSection(listingStandard, "åŠ¨æ€æ³¨å…¥è®¾ç½®", ref expandDynamicInjection, () => DrawDynamicInjectionSettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "?? å‘é‡å¢å¼ºè®¾ç½®", ref expandVectorEnhancement, () => DrawVectorEnhancementSettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "è®°å¿†å®¹é‡é…ç½®", ref expandMemoryCapacity, () => DrawMemoryCapacitySettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "è®°å¿†è¡°å‡é…ç½®", ref expandDecayRates, () => DrawDecaySettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "è®°å¿†æ€»ç»“è®¾ç½®", ref expandSummarization, () => DrawSummarizationSettings(listingStandard));
 
             if (useAISummarization)
             {
-                DrawCollapsibleSection(listingStandard, "AI ÅäÖÃ", ref expandAIConfig, () => DrawAIConfigSettings(listingStandard));
+                DrawCollapsibleSection(listingStandard, "AI é…ç½®", ref expandAIConfig, () => DrawAIConfigSettings(listingStandard));
             }
 
-            DrawCollapsibleSection(listingStandard, "¼ÇÒäÀàĞÍ¿ª¹Ø", ref expandMemoryTypes, () => DrawMemoryTypesSettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "?? ÊµÑéĞÔ¹¦ÄÜ", ref expandExperimentalFeatures, () => DrawExperimentalFeaturesSettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "è®°å¿†ç±»å‹å¼€å…³", ref expandMemoryTypes, () => DrawMemoryTypesSettings(listingStandard));
+            DrawCollapsibleSection(listingStandard, "?? å®éªŒæ€§åŠŸèƒ½", ref expandExperimentalFeatures, () => DrawExperimentalFeaturesSettings(listingStandard));
 
-            // µ÷ÊÔ¹¤¾ß
+            // è°ƒè¯•å·¥å…·
             listingStandard.Gap();
             Text.Font = GameFont.Small;
             GUI.color = new Color(1f, 0.9f, 0.7f);
-            listingStandard.Label("µ÷ÊÔ¹¤¾ß");
+            listingStandard.Label("è°ƒè¯•å·¥å…·");
             GUI.color = Color.white;
             
             Rect previewButtonRect = listingStandard.GetRect(35f);
-            if (Widgets.ButtonText(previewButtonRect, "×¢ÈëÔ¤ÀÀÆ÷"))
+            if (Widgets.ButtonText(previewButtonRect, "æ³¨å…¥é¢„è§ˆå™¨"))
             {
-                Find.WindowStack.Add(new RimTalk.Memory.Debug.Dialog_InjectionPreview());
+                Find.WindowStack.Add(new Memory.Debug.Dialog_InjectionPreview());
             }
             
             GUI.color = Color.gray;
-            listingStandard.Label("ÊµÊ±Ô¤ÀÀ¼ÇÒä/³£Ê¶×¢ÈëĞ§¹û");
+            listingStandard.Label("å®æ—¶é¢„è§ˆè®°å¿†/å¸¸è¯†æ³¨å…¥æ•ˆæœ");
             GUI.color = Color.white;
 
             listingStandard.End();
             Widgets.EndScrollView();
             
-            // ? v3.3.2.37: ÔÚÉèÖÃ´°¿ÚÃ¿Ö¡¸üĞÂÊ±¸üĞÂ¹æÔò£¨ÓÃ»§ĞŞ¸ÄºóÁ¢¼´ÉúĞ§£©
+            // ? v3.3.2.37: åœ¨è®¾ç½®çª—å£æ¯å¸§æ›´æ–°æ—¶æ›´æ–°è§„åˆ™ï¼ˆç”¨æˆ·ä¿®æ”¹åç«‹å³ç”Ÿæ•ˆï¼‰
             PromptNormalizer.UpdateRules(normalizationRules);
         }
 
@@ -320,92 +382,92 @@ namespace RimTalk.MemoryPatch
 
         private void DrawDynamicInjectionSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("ÆôÓÃ¶¯Ì¬×¢Èë", ref useDynamicInjection);
+            listing.CheckboxLabeled("å¯ç”¨åŠ¨æ€æ³¨å…¥", ref useDynamicInjection);
             
             if (useDynamicInjection)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  ÖÇÄÜÑ¡Ôñ×îÏà¹ØµÄ¼ÇÒäºÍ³£Ê¶×¢Èëµ½AI¶Ô»°ÖĞ");
+                listing.Label("  æ™ºèƒ½é€‰æ‹©æœ€ç›¸å…³çš„è®°å¿†å’Œå¸¸è¯†æ³¨å…¥åˆ°AIå¯¹è¯ä¸­");
                 GUI.color = Color.white;
                 
                 listing.Gap();
                 
-                listing.Label($"×î´ó×¢Èë¼ÇÒäÊı: {maxInjectedMemories}");
+                listing.Label($"æœ€å¤§æ³¨å…¥è®°å¿†æ•°: {maxInjectedMemories}");
                 maxInjectedMemories = (int)listing.Slider(maxInjectedMemories, 1, 20);
                 
-                listing.Label($"×î´ó×¢Èë³£Ê¶Êı: {maxInjectedKnowledge}");
+                listing.Label($"æœ€å¤§æ³¨å…¥å¸¸è¯†æ•°: {maxInjectedKnowledge}");
                 maxInjectedKnowledge = (int)listing.Slider(maxInjectedKnowledge, 1, 10);
                 
                 listing.Gap();
                 
-                listing.Label($"¼ÇÒäÆÀ·ÖãĞÖµ: {memoryScoreThreshold:P0}");
+                listing.Label($"è®°å¿†è¯„åˆ†é˜ˆå€¼: {memoryScoreThreshold:P0}");
                 memoryScoreThreshold = listing.Slider(memoryScoreThreshold, 0f, 1f);
                 
-                listing.Label($"³£Ê¶ÆÀ·ÖãĞÖµ: {knowledgeScoreThreshold:P0}");
+                listing.Label($"å¸¸è¯†è¯„åˆ†é˜ˆå€¼: {knowledgeScoreThreshold:P0}");
                 knowledgeScoreThreshold = listing.Slider(knowledgeScoreThreshold, 0f, 1f);
             }
         }
 
         private void DrawMemoryCapacitySettings(Listing_Standard listing)
         {
-            listing.Label($"SCM (¶ÌÆÚ¼ÇÒä): {maxSituationalMemories} Ìõ");
+            listing.Label($"SCM (çŸ­æœŸè®°å¿†): {maxSituationalMemories} æ¡");
             maxSituationalMemories = (int)listing.Slider(maxSituationalMemories, 10, 50);
             
-            listing.Label($"ELS (ÖĞÆÚ¼ÇÒä): {maxEventLogMemories} Ìõ");
+            listing.Label($"ELS (ä¸­æœŸè®°å¿†): {maxEventLogMemories} æ¡");
             maxEventLogMemories = (int)listing.Slider(maxEventLogMemories, 20, 100);
         }
 
         private void DrawDecaySettings(Listing_Standard listing)
         {
-            listing.Label($"SCM Ë¥¼õÂÊ: {scmDecayRate:P1}");
+            listing.Label($"SCM è¡°å‡ç‡: {scmDecayRate:P1}");
             scmDecayRate = listing.Slider(scmDecayRate, 0.001f, 0.05f);
             
-            listing.Label($"ELS Ë¥¼õÂÊ: {elsDecayRate:P1}");
+            listing.Label($"ELS è¡°å‡ç‡: {elsDecayRate:P1}");
             elsDecayRate = listing.Slider(elsDecayRate, 0.0005f, 0.02f);
         }
 
         private void DrawSummarizationSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("ÆôÓÃÃ¿ÈÕ×Ü½á", ref enableDailySummarization);
+            listing.CheckboxLabeled("å¯ç”¨æ¯æ—¥æ€»ç»“", ref enableDailySummarization);
             
             if (enableDailySummarization)
             {
-                listing.Label($"´¥·¢Ê±¼ä: {summarizationHour}Ê±");
+                listing.Label($"è§¦å‘æ—¶é—´: {summarizationHour}æ—¶");
                 summarizationHour = (int)listing.Slider(summarizationHour, 0, 23);
             }
             
-            listing.CheckboxLabeled("ÆôÓÃ×Ô¶¯¹éµµ", ref enableAutoArchive);
+            listing.CheckboxLabeled("å¯ç”¨è‡ªåŠ¨å½’æ¡£", ref enableAutoArchive);
         }
 
         private void DrawAIConfigSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("ÓÅÏÈÊ¹ÓÃ RimTalk ÅäÖÃ", ref useRimTalkAIConfig);
+            listing.CheckboxLabeled("ä¼˜å…ˆä½¿ç”¨ RimTalk é…ç½®", ref useRimTalkAIConfig);
             
             if (useRimTalkAIConfig)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  ½«×Ô¶¯¸úËæ RimTalk Mod µÄ AI ÅäÖÃ");
+                listing.Label("  å°†è‡ªåŠ¨è·Ÿéš RimTalk Mod çš„ AI é…ç½®");
                 GUI.color = Color.white;
                 listing.Gap();
             }
             
             listing.Gap();
             
-            // ? v3.3.8: AI Ìá¹©ÉÌÑ¡Ôñ
-            listing.Label("AI Ìá¹©ÉÌ:");
+            // ? v3.3.8: AI æä¾›å•†é€‰æ‹©
+            listing.Label("AI æä¾›å•†:");
             GUI.color = Color.gray;
-            listing.Label($"  µ±Ç°: {independentProvider}");
+            listing.Label($"  å½“å‰: {independentProvider}");
             GUI.color = Color.white;
             
-            // Ìá¹©ÉÌÑ¡Ôñ°´Å¥
+            // æä¾›å•†é€‰æ‹©æŒ‰é’®
             Rect providerHeaderRect = listing.GetRect(25f);
             Widgets.DrawBoxSolid(providerHeaderRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
-            Widgets.Label(providerHeaderRect.ContractedBy(5f), "Ñ¡ÔñÌá¹©ÉÌ");
+            Widgets.Label(providerHeaderRect.ContractedBy(5f), "é€‰æ‹©æä¾›å•†");
             
             Rect providerButtonRect1 = listing.GetRect(30f);
             float buttonWidth = (providerButtonRect1.width - 20f) / 3f;
             
-            // µÚÒ»ĞĞ£ºOpenAI, DeepSeek, Player2
+            // ç¬¬ä¸€è¡Œï¼šOpenAI, DeepSeek, Player2
             Rect openaiRect = new Rect(providerButtonRect1.x, providerButtonRect1.y, buttonWidth, 30f);
             Rect deepseekRect = new Rect(providerButtonRect1.x + buttonWidth + 10f, providerButtonRect1.y, buttonWidth, 30f);
             Rect player2Rect = new Rect(providerButtonRect1.x + 2 * (buttonWidth + 10f), providerButtonRect1.y, buttonWidth, 30f);
@@ -439,7 +501,7 @@ namespace RimTalk.MemoryPatch
             }
             GUI.color = Color.white;
             
-            // µÚ¶şĞĞ£ºGoogle, Custom
+            // ç¬¬äºŒè¡Œï¼šGoogle, Custom
             Rect providerButtonRect2 = listing.GetRect(30f);
             Rect googleRect = new Rect(providerButtonRect2.x, providerButtonRect2.y, buttonWidth, 30f);
             Rect customRect = new Rect(providerButtonRect2.x + buttonWidth + 10f, providerButtonRect2.y, buttonWidth, 30f);
@@ -466,38 +528,38 @@ namespace RimTalk.MemoryPatch
             
             listing.Gap();
             
-            // Ìá¹©ÉÌËµÃ÷
+            // æä¾›å•†è¯´æ˜
             GUI.color = new Color(0.7f, 0.9f, 1f);
             if (independentProvider == "OpenAI")
             {
-                listing.Label("?? OpenAI GPT ÏµÁĞÄ£ĞÍ£¬ÎÈ¶¨¿É¿¿");
-                listing.Label("   ÍÆ¼öÄ£ĞÍ: gpt-3.5-turbo, gpt-4");
+                listing.Label("?? OpenAI GPT ç³»åˆ—æ¨¡å‹ï¼Œç¨³å®šå¯é ");
+                listing.Label("   æ¨èæ¨¡å‹: gpt-3.5-turbo, gpt-4");
             }
             else if (independentProvider == "DeepSeek")
             {
-                listing.Label("?? DeepSeek ÖĞÎÄÓÅ»¯Ä£ĞÍ£¬ĞÔ¼Û±È¸ß");
-                listing.Label("   ÍÆ¼öÄ£ĞÍ: deepseek-chat, deepseek-coder");
+                listing.Label("?? DeepSeek ä¸­æ–‡ä¼˜åŒ–æ¨¡å‹ï¼Œæ€§ä»·æ¯”é«˜");
+                listing.Label("   æ¨èæ¨¡å‹: deepseek-chat, deepseek-coder");
             }
             else if (independentProvider == "Player2")
             {
-                listing.Label("?? Player2 ÓÎÏ·ÓÅ»¯ AI£¬Ö§³Ö±¾µØ¿Í»§¶Ë");
-                listing.Label("   ÍÆ¼öÄ£ĞÍ: gpt-4o, gpt-4-turbo");
+                listing.Label("?? Player2 æ¸¸æˆä¼˜åŒ– AIï¼Œæ”¯æŒæœ¬åœ°å®¢æˆ·ç«¯");
+                listing.Label("   æ¨èæ¨¡å‹: gpt-4o, gpt-4-turbo");
             }
             else if (independentProvider == "Google")
             {
-                listing.Label("?? Google Gemini ÏµÁĞ£¬¶àÄ£Ì¬ÄÜÁ¦Ç¿");
-                listing.Label("   ÍÆ¼öÄ£ĞÍ: gemini-2.0-flash-exp");
+                listing.Label("?? Google Gemini ç³»åˆ—ï¼Œå¤šæ¨¡æ€èƒ½åŠ›å¼º");
+                listing.Label("   æ¨èæ¨¡å‹: gemini-2.0-flash-exp");
             }
             else if (independentProvider == "Custom")
             {
-                listing.Label("?? ×Ô¶¨Òå API ¶Ëµã£¬Ö§³ÖµÚÈı·½´úÀí");
-                listing.Label("   ÇëÊÖ¶¯ÅäÖÃ API URL ºÍ Model");
+                listing.Label("?? è‡ªå®šä¹‰ API ç«¯ç‚¹ï¼Œæ”¯æŒç¬¬ä¸‰æ–¹ä»£ç†");
+                listing.Label("   è¯·æ‰‹åŠ¨é…ç½® API URL å’Œ Model");
             }
             GUI.color = Color.white;
             
             listing.Gap();
             
-            // API ÅäÖÃ
+            // API é…ç½®
             listing.Label("API Key:");
             independentApiKey = listing.TextEntry(independentApiKey);
             
@@ -509,103 +571,103 @@ namespace RimTalk.MemoryPatch
             
             listing.Gap();
             
-            // Prompt Caching Ñ¡Ïî
-            listing.CheckboxLabeled("ÆôÓÃ Prompt Caching", ref enablePromptCaching);
+            // Prompt Caching é€‰é¡¹
+            listing.CheckboxLabeled("å¯ç”¨ Prompt Caching", ref enablePromptCaching);
             
             if (enablePromptCaching)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 if (independentProvider == "OpenAI")
                 {
-                    listing.Label("  ? OpenAI Ö§³Ö Prompt Caching (Beta)");
-                    listing.Label("  ÊÊÓÃÄ£ĞÍ: gpt-4o, gpt-4-turbo");
+                    listing.Label("  ? OpenAI æ”¯æŒ Prompt Caching (Beta)");
+                    listing.Label("  é€‚ç”¨æ¨¡å‹: gpt-4o, gpt-4-turbo");
                 }
                 else if (independentProvider == "DeepSeek")
                 {
-                    listing.Label("  ? DeepSeek Ö§³Ö Prompt Caching");
-                    listing.Label("  ¿É½ÚÊ¡Ô¼ 50% ·ÑÓÃ");
+                    listing.Label("  ? DeepSeek æ”¯æŒ Prompt Caching");
+                    listing.Label("  å¯èŠ‚çœçº¦ 50% è´¹ç”¨");
                 }
                 else if (independentProvider == "Player2")
                 {
-                    listing.Label("  ? Player2 Ö§³Ö Prompt Caching");
-                    listing.Label("  ±¾µØ¿Í»§¶Ë×Ô¶¯»º´æ");
+                    listing.Label("  ? Player2 æ”¯æŒ Prompt Caching");
+                    listing.Label("  æœ¬åœ°å®¢æˆ·ç«¯è‡ªåŠ¨ç¼“å­˜");
                 }
                 else if (independentProvider == "Google")
                 {
-                    listing.Label("  ? Google Gemini Ôİ²»Ö§³Ö Prompt Caching");
+                    listing.Label("  ? Google Gemini æš‚ä¸æ”¯æŒ Prompt Caching");
                 }
                 else if (independentProvider == "Custom")
                 {
-                    listing.Label("  ?? È¡¾öÓÚÄúµÄ×Ô¶¨Òå API ÊµÏÖ");
+                    listing.Label("  ?? å–å†³äºæ‚¨çš„è‡ªå®šä¹‰ API å®ç°");
                 }
                 GUI.color = Color.white;
             }
             
             listing.Gap();
             
-            // ÅäÖÃÑéÖ¤°´Å¥
+            // é…ç½®éªŒè¯æŒ‰é’®
             Rect validateButtonRect = listing.GetRect(35f);
-            if (Widgets.ButtonText(validateButtonRect, "?? ÑéÖ¤ÅäÖÃ"))
+            if (Widgets.ButtonText(validateButtonRect, "?? éªŒè¯é…ç½®"))
             {
                 ValidateAIConfig();
             }
             
-            // ÌáÊ¾ĞÅÏ¢
+            // æç¤ºä¿¡æ¯
             GUI.color = Color.gray;
-            listing.Label("ÌáÊ¾: ÑéÖ¤½«²âÊÔ API Á¬½ÓºÍÅäÖÃ");
+            listing.Label("æç¤º: éªŒè¯å°†æµ‹è¯• API è¿æ¥å’Œé…ç½®");
             GUI.color = Color.white;
         }
         
         /// <summary>
-        /// ÑéÖ¤ AI ÅäÖÃ
+        /// éªŒè¯ AI é…ç½®
         /// </summary>
         private void ValidateAIConfig()
         {
             if (useRimTalkAIConfig)
             {
-                Messages.Message("µ±Ç°Ê¹ÓÃ RimTalk ÅäÖÃ£¬ÎŞĞèÑéÖ¤¶ÀÁ¢ÅäÖÃ", MessageTypeDefOf.NeutralEvent);
+                Messages.Message("å½“å‰ä½¿ç”¨ RimTalk é…ç½®ï¼Œæ— éœ€éªŒè¯ç‹¬ç«‹é…ç½®", MessageTypeDefOf.NeutralEvent);
                 return;
             }
             
             if (string.IsNullOrEmpty(independentApiKey))
             {
-                Messages.Message("ÇëÏÈÊäÈë API Key", MessageTypeDefOf.RejectInput);
+                Messages.Message("è¯·å…ˆè¾“å…¥ API Key", MessageTypeDefOf.RejectInput);
                 return;
             }
             
             if (string.IsNullOrEmpty(independentApiUrl))
             {
-                Messages.Message("ÇëÏÈÊäÈë API URL", MessageTypeDefOf.RejectInput);
+                Messages.Message("è¯·å…ˆè¾“å…¥ API URL", MessageTypeDefOf.RejectInput);
                 return;
             }
             
             if (string.IsNullOrEmpty(independentModel))
             {
-                Messages.Message("ÇëÏÈÊäÈë Model", MessageTypeDefOf.RejectInput);
+                Messages.Message("è¯·å…ˆè¾“å…¥ Model", MessageTypeDefOf.RejectInput);
                 return;
             }
             
-            Messages.Message("ÅäÖÃÑéÖ¤ÖĞ...", MessageTypeDefOf.NeutralEvent);
+            Messages.Message("é…ç½®éªŒè¯ä¸­...", MessageTypeDefOf.NeutralEvent);
             
-            // Ç¿ÖÆÖØĞÂ³õÊ¼»¯ AI Summarizer
+            // å¼ºåˆ¶é‡æ–°åˆå§‹åŒ– AI Summarizer
             System.Threading.Tasks.Task.Run(() =>
             {
                 try
                 {
-                    RimTalk.Memory.AI.IndependentAISummarizer.ForceReinitialize();
+                    Memory.AI.IndependentAISummarizer.ForceReinitialize();
                     
-                    if (RimTalk.Memory.AI.IndependentAISummarizer.IsAvailable())
+                    if (Memory.AI.IndependentAISummarizer.IsAvailable())
                     {
                         LongEventHandler.ExecuteWhenFinished(() =>
                         {
-                            Messages.Message($"? ÅäÖÃÑéÖ¤³É¹¦£¡Ìá¹©ÉÌ: {independentProvider}", MessageTypeDefOf.PositiveEvent);
+                            Messages.Message($"? é…ç½®éªŒè¯æˆåŠŸï¼æä¾›å•†: {independentProvider}", MessageTypeDefOf.PositiveEvent);
                         });
                     }
                     else
                     {
                         LongEventHandler.ExecuteWhenFinished(() =>
                         {
-                            Messages.Message("? ÅäÖÃÑéÖ¤Ê§°Ü£¬Çë¼ì²é API Key ºÍ URL", MessageTypeDefOf.RejectInput);
+                            Messages.Message("? é…ç½®éªŒè¯å¤±è´¥ï¼Œè¯·æ£€æŸ¥ API Key å’Œ URL", MessageTypeDefOf.RejectInput);
                         });
                     }
                 }
@@ -614,7 +676,7 @@ namespace RimTalk.MemoryPatch
                     Log.Error($"AI Config validation failed: {ex.Message}");
                     LongEventHandler.ExecuteWhenFinished(() =>
                     {
-                        Messages.Message($"? ÑéÖ¤Ê§°Ü: {ex.Message}", MessageTypeDefOf.RejectInput);
+                        Messages.Message($"? éªŒè¯å¤±è´¥: {ex.Message}", MessageTypeDefOf.RejectInput);
                     });
                 }
             });
@@ -622,33 +684,105 @@ namespace RimTalk.MemoryPatch
 
         private void DrawMemoryTypesSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("ĞĞ¶¯¼ÇÒä", ref enableActionMemory);
-            listing.CheckboxLabeled("¶Ô»°¼ÇÒä", ref enableConversationMemory);
+            listing.CheckboxLabeled("è¡ŒåŠ¨è®°å¿†", ref enableActionMemory);
+            listing.CheckboxLabeled("å¯¹è¯è®°å¿†", ref enableConversationMemory);
         }
 
         private void DrawExperimentalFeaturesSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("ÆôÓÃÖ÷¶¯¼ÇÒäÕÙ»Ø", ref enableProactiveRecall);
+            listing.CheckboxLabeled("å¯ç”¨ä¸»åŠ¨è®°å¿†å¬å›", ref enableProactiveRecall);
             
             if (enableProactiveRecall)
             {
-                listing.Label($"´¥·¢¸ÅÂÊ: {recallTriggerChance:P0}");
+                listing.Label($"è§¦å‘æ¦‚ç‡: {recallTriggerChance:P0}");
                 recallTriggerChance = listing.Slider(recallTriggerChance, 0.05f, 0.60f);
             }
+        }
+
+        private void DrawVectorEnhancementSettings(Listing_Standard listing)
+        {
+            listing.CheckboxLabeled("å¯ç”¨å‘é‡å¢å¼º (éœ€è¦é‡å¯)", ref enableVectorEnhancement);
+            if (enableVectorEnhancement)
+            {
+                GUI.color = new Color(0.8f, 1f, 0.8f);
+                listing.Label("  ä½¿ç”¨è¯­ä¹‰å‘é‡æ£€ç´¢æ¥å¢å¼ºå¸¸è¯†åŒ¹é…ã€‚");
+                GUI.color = Color.white;
+                listing.Gap();
+                
+                listing.Label($"ç›¸ä¼¼åº¦é˜ˆå€¼: {vectorSimilarityThreshold:F2}");
+                vectorSimilarityThreshold = listing.Slider(vectorSimilarityThreshold, 0.5f, 1.0f);
+                
+                listing.Label($"æœ€å¤§è¡¥å……ç»“æœ: {maxVectorResults}");
+                maxVectorResults = (int)listing.Slider(maxVectorResults, 1, 15);
+            }
+            
+            listing.Gap();
+            listing.GapLine();
+            
+            // å¸¸è¯†åŒ¹é…è®¾ç½®
+            Text.Font = GameFont.Small;
+            GUI.color = new Color(1f, 0.9f, 0.7f);
+            listing.Label("å¸¸è¯†åŒ¹é…è®¾ç½®");
+            GUI.color = Color.white;
+            listing.Gap();
+            
+            listing.CheckboxLabeled("å¯ç”¨å¸¸è¯†é“¾", ref enableKnowledgeChaining);
+            if (enableKnowledgeChaining)
+            {
+                GUI.color = new Color(0.8f, 1f, 0.8f);
+                listing.Label("  å…è®¸å¸¸è¯†è§¦å‘å¸¸è¯†ï¼Œè¿›è¡Œå¤šè½®åŒ¹é…");
+                GUI.color = Color.white;
+                listing.Gap();
+                
+                listing.Label($"æœ€å¤§è½®æ•°: {maxChainingRounds}");
+                maxChainingRounds = (int)listing.Slider(maxChainingRounds, 1, 5);
+            }
+            
+            listing.Gap();
+            
+            // â­ v3.3.20: é«˜çº§åŒ¹é…è®¾ç½® UI
+            listing.Label($"é˜²è¯¯è§¦é¢†è·‘åˆ† (Confidence Margin): {confidenceMargin:P0}");
+            confidenceMargin = listing.Slider(confidenceMargin, 0.0f, 0.2f);
+            GUI.color = Color.gray;
+            listing.Label("  å¦‚æœç¬¬ä¸€ååˆ†æ•°æ¯”ç¬¬äºŒåé«˜å‡ºè¿™ä¹ˆå¤šï¼Œåˆ™è‡ªåŠ¨ä¸¢å¼ƒåç»­æ¡ç›®");
+            GUI.color = Color.white;
+            
+            listing.Gap();
+            
+            listing.Label($"æ··åˆæ£€ç´¢æƒé‡ (Hybrid Weight Balance): {hybridWeightBalance:P0}");
+            hybridWeightBalance = listing.Slider(hybridWeightBalance, 0.0f, 1.0f);
+            
+            Rect balanceLabelRect = listing.GetRect(20f);
+            Text.Font = GameFont.Tiny;
+            Widgets.Label(balanceLabelRect, "å…³é”®è¯ä¼˜å…ˆ (Keywords) <--- å¹³è¡¡ ---> è¯­ä¹‰ä¼˜å…ˆ (Vector)");
+            Text.Font = GameFont.Small;
+            
+            listing.Gap();
+            
+            listing.Label("å…¨å±€æ’é™¤è¯ (Global Exclude List):");
+            string newExclude = listing.TextEntry(globalExcludeKeywords);
+            if (newExclude != globalExcludeKeywords)
+            {
+                globalExcludeKeywords = newExclude;
+                ClearGlobalExcludeCache();
+            }
+            GUI.color = Color.gray;
+            listing.Label("  é€—å·åˆ†éš”ã€‚å¦‚æœå‡ºç°è¿™äº›è¯ï¼Œç»å¯¹ä¸è¦è§¦å‘ä»»ä½•å¸¸è¯†ã€‚");
+            GUI.color = Color.white;
         }
 
         private void OpenCommonKnowledgeDialog()
         {
             if (Current.Game == null)
             {
-                Messages.Message("ÇëÏÈ½øÈëÓÎÏ·", MessageTypeDefOf.RejectInput);
+                Messages.Message("è¯·å…ˆè¿›å…¥æ¸¸æˆ", MessageTypeDefOf.RejectInput);
                 return;
             }
 
             var memoryManager = Find.World.GetComponent<MemoryManager>();
             if (memoryManager == null)
             {
-                Messages.Message("ÎŞ·¨ÕÒµ½ÄÚ´æ¹ÜÀíÆ÷", MessageTypeDefOf.RejectInput);
+                Messages.Message("æ— æ³•æ‰¾åˆ°å†…å­˜ç®¡ç†å™¨", MessageTypeDefOf.RejectInput);
                 return;
             }
 
@@ -656,87 +790,87 @@ namespace RimTalk.MemoryPatch
         }
         
         /// <summary>
-        /// ? »æÖÆÌáÊ¾´Ê¹æ·¶»¯ÉèÖÃ UI
+        /// ? ç»˜åˆ¶æç¤ºè¯è§„èŒƒåŒ–è®¾ç½® UI
         /// </summary>
         private void DrawPromptNormalizationSettings(Listing_Standard listing)
         {
-            // ±³¾°¿ò
-            Rect sectionRect = listing.GetRect(300f); // Ô¤¹À¸ß¶È
+            // èƒŒæ™¯æ¡†
+            Rect sectionRect = listing.GetRect(300f); // é¢„ä¼°é«˜åº¦
             Widgets.DrawBoxSolid(sectionRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
             
             Listing_Standard inner = new Listing_Standard();
             inner.Begin(sectionRect.ContractedBy(10f));
             
-            // ±êÌâ
+            // æ ‡é¢˜
             Text.Font = GameFont.Small;
             GUI.color = new Color(1f, 0.9f, 0.7f);
-            inner.Label("Ìæ»»¹æÔòÁĞ±í");
+            inner.Label("æ›¿æ¢è§„åˆ™åˆ—è¡¨");
             GUI.color = Color.white;
             
             inner.Gap(5f);
             
-            // ¹æÔòÁĞ±í£¨×î¶àÏÔÊ¾ 10 Ìõ£©
+            // è§„åˆ™åˆ—è¡¨ï¼ˆæœ€å¤šæ˜¾ç¤º 10 æ¡ï¼‰
             if (normalizationRules == null)
             {
                 normalizationRules = new List<ReplacementRule>();
             }
             
-            // »æÖÆÃ¿Ìõ¹æÔò
+            // ç»˜åˆ¶æ¯æ¡è§„åˆ™
             for (int i = 0; i < normalizationRules.Count; i++)
             {
                 var rule = normalizationRules[i];
                 
                 Rect ruleRect = inner.GetRect(30f);
                 
-                // ÆôÓÃ¸´Ñ¡¿ò
+                // å¯ç”¨å¤é€‰æ¡†
                 Rect checkboxRect = new Rect(ruleRect.x, ruleRect.y, 24f, 24f);
                 Widgets.Checkbox(checkboxRect.position, ref rule.isEnabled);
                 
-                // Ä£Ê½ÊäÈë¿ò
+                // æ¨¡å¼è¾“å…¥æ¡†
                 Rect patternRect = new Rect(ruleRect.x + 30f, ruleRect.y, 200f, 25f);
                 rule.pattern = Widgets.TextField(patternRect, rule.pattern ?? "");
                 
-                // ¼ıÍ·
+                // ç®­å¤´
                 Rect arrowRect = new Rect(ruleRect.x + 235f, ruleRect.y, 30f, 25f);
-                Widgets.Label(arrowRect, " ¡ú ");
+                Widgets.Label(arrowRect, " â†’ ");
                 
-                // Ìæ»»ÊäÈë¿ò
+                // æ›¿æ¢è¾“å…¥æ¡†
                 Rect replacementRect = new Rect(ruleRect.x + 270f, ruleRect.y, 150f, 25f);
                 rule.replacement = Widgets.TextField(replacementRect, rule.replacement ?? "");
                 
-                // É¾³ı°´Å¥
+                // åˆ é™¤æŒ‰é’®
                 Rect deleteRect = new Rect(ruleRect.x + 430f, ruleRect.y, 30f, 25f);
                 GUI.color = new Color(1f, 0.3f, 0.3f);
                 if (Widgets.ButtonText(deleteRect, "?"))
                 {
                     normalizationRules.RemoveAt(i);
-                    i--; // µ÷ÕûË÷Òı
+                    i--; // è°ƒæ•´ç´¢å¼•
                 }
                 GUI.color = Color.white;
                 
                 inner.Gap(3f);
             }
             
-            // Ìí¼ÓĞÂ¹æÔò°´Å¥
+            // æ·»åŠ æ–°è§„åˆ™æŒ‰é’®
             Rect addButtonRect = inner.GetRect(30f);
-            if (Widgets.ButtonText(addButtonRect, "+ Ìí¼ÓĞÂ¹æÔò"))
+            if (Widgets.ButtonText(addButtonRect, "+ æ·»åŠ æ–°è§„åˆ™"))
             {
                 normalizationRules.Add(new ReplacementRule("", "", true));
             }
             
             inner.Gap(5f);
             
-            // Í³¼ÆĞÅÏ¢
+            // ç»Ÿè®¡ä¿¡æ¯
             int enabledCount = normalizationRules.Count(r => r.isEnabled);
             GUI.color = Color.gray;
-            inner.Label($"ÒÑÆôÓÃ: {enabledCount} / {normalizationRules.Count} Ìõ¹æÔò");
+            inner.Label($"å·²å¯ç”¨: {enabledCount} / {normalizationRules.Count} æ¡è§„åˆ™");
             GUI.color = Color.white;
             
-            // Ê¾ÀıÌáÊ¾
+            // ç¤ºä¾‹æç¤º
             inner.Gap(3f);
             GUI.color = new Color(0.7f, 0.9f, 1f);
-            inner.Label("?? Ê¾Àı£ºÄ£Ê½ \\(Player\\) ¡ú Ìæ»» Master");
-            inner.Label("   Ö§³ÖÕıÔò±í´ïÊ½£¨ºöÂÔ´óĞ¡Ğ´£©");
+            inner.Label("?? ç¤ºä¾‹ï¼šæ¨¡å¼ \\(Player\\) â†’ æ›¿æ¢ Master");
+            inner.Label("   æ”¯æŒæ­£åˆ™è¡¨è¾¾å¼ï¼ˆå¿½ç•¥å¤§å°å†™ï¼‰");
             GUI.color = Color.white;
             
             inner.End();

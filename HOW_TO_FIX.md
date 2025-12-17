@@ -1,84 +1,84 @@
-# ?? v3.3.19 ¿ìËÙÐÞ¸´Ö¸ÄÏ
+# ?? v3.3.19 å¿«é€Ÿä¿®å¤æŒ‡å—
 
-## ÎÊÌâÕªÒª
+## é—®é¢˜æ‘˜è¦
 
-v3.3.19 µÄ UI ÖØ¹¹ÒÑÍê³É£¬µ«´æÔÚÒÔÏÂÐèÒªÊÖ¶¯ÐÞ¸´µÄÎÊÌâ£º
+v3.3.19 çš„ UI é‡æž„å·²å®Œæˆï¼Œä½†å­˜åœ¨ä»¥ä¸‹éœ€è¦æ‰‹åŠ¨ä¿®å¤çš„é—®é¢˜ï¼š
 
-1. ? **·­Òë¼üÎ´ÉúÐ§** - ²¿·Ö´úÂëÈÔÊ¹ÓÃÓ²±àÂëÓ¢ÎÄ
-2. ? **×ó²àÃæ°åÏÔÊ¾²»È«** - µ×²¿°´Å¥±»ÕÚµ²£¬ÐèÒª¹ö¶¯ÊÓÍ¼
-3. ?? **¼ÇÒä¹Ì¶¨/±à¼­¿ÉÄÜÎÞÐ§** - ÐèÒª²âÊÔÈ·ÈÏ
+1. ? **ç¿»è¯‘é”®æœªç”Ÿæ•ˆ** - éƒ¨åˆ†ä»£ç ä»ä½¿ç”¨ç¡¬ç¼–ç è‹±æ–‡
+2. ? **å·¦ä¾§é¢æ¿æ˜¾ç¤ºä¸å…¨** - åº•éƒ¨æŒ‰é’®è¢«é®æŒ¡ï¼Œéœ€è¦æ»šåŠ¨è§†å›¾
+3. ?? **è®°å¿†å›ºå®š/ç¼–è¾‘å¯èƒ½æ— æ•ˆ** - éœ€è¦æµ‹è¯•ç¡®è®¤
 
-## ?? ÐÞ¸´²½Öè
+## ?? ä¿®å¤æ­¥éª¤
 
-### ·½·¨Ò»£º×Ô¶¯ÐÞ¸´£¨ÍÆ¼ö£©
+### æ–¹æ³•ä¸€ï¼šè‡ªåŠ¨ä¿®å¤ï¼ˆæŽ¨èï¼‰
 
-#### 1. ÔËÐÐ×Ô¶¯ÐÞ¸´½Å±¾
+#### 1. è¿è¡Œè‡ªåŠ¨ä¿®å¤è„šæœ¬
 
 ```powershell
-# ÔÚÏîÄ¿¸ùÄ¿Â¼´ò¿ª PowerShell
+# åœ¨é¡¹ç›®æ ¹ç›®å½•æ‰“å¼€ PowerShell
 .\quick_fix_translations.ps1
 ```
 
-½Å±¾»á×Ô¶¯£º
-- ? ´´½¨±¸·ÝÎÄ¼þ
-- ? Ìæ»»ËùÓÐÓ²±àÂëÓ¢ÎÄÎª·­Òë¼ü
-- ? ÏÔÊ¾ÐÞ¸´Í³¼Æ
-- ? ¼ì²éÒÅÂ©Ïî
-- ? ÌáÊ¾±àÒë²âÊÔ
+è„šæœ¬ä¼šè‡ªåŠ¨ï¼š
+- ? åˆ›å»ºå¤‡ä»½æ–‡ä»¶
+- ? æ›¿æ¢æ‰€æœ‰ç¡¬ç¼–ç è‹±æ–‡ä¸ºç¿»è¯‘é”®
+- ? æ˜¾ç¤ºä¿®å¤ç»Ÿè®¡
+- ? æ£€æŸ¥é—æ¼é¡¹
+- ? æç¤ºç¼–è¯‘æµ‹è¯•
 
-#### 2. ¼ì²éÐÞ¸´½á¹û
+#### 2. æ£€æŸ¥ä¿®å¤ç»“æžœ
 
 ```powershell
-# ²é¿´ÐÞ¸ÄÄÚÈÝ
+# æŸ¥çœ‹ä¿®æ”¹å†…å®¹
 git diff Source/Memory/UI/MainTabWindow_Memory.cs
 
-# Èç¹ûÓÐÎÊÌâ£¬»Ö¸´±¸·Ý
+# å¦‚æžœæœ‰é—®é¢˜ï¼Œæ¢å¤å¤‡ä»½
 Copy-Item "Source\Memory\UI\MainTabWindow_Memory.cs.backup" "Source\Memory\UI\MainTabWindow_Memory.cs" -Force
 ```
 
-#### 3. ÊÖ¶¯Ìí¼Ó¹ö¶¯ÊÓÍ¼
+#### 3. æ‰‹åŠ¨æ·»åŠ æ»šåŠ¨è§†å›¾
 
-ÔÚ `MainTabWindow_Memory.cs` ÖÐ£º
+åœ¨ `MainTabWindow_Memory.cs` ä¸­ï¼š
 
-**Ìí¼Ó³ÉÔ±±äÁ¿**£¨Ô¼µÚ45ÐÐ£©£º
+**æ·»åŠ æˆå‘˜å˜é‡**ï¼ˆçº¦ç¬¬45è¡Œï¼‰ï¼š
 ```csharp
 private Vector2 controlPanelScrollPosition = Vector2.zero;
 ```
 
-**ÐÞ¸Ä DrawControlPanel ·½·¨**£¨Ô¼µÚ200ÐÐ£©£º
+**ä¿®æ”¹ DrawControlPanel æ–¹æ³•**ï¼ˆçº¦ç¬¬200è¡Œï¼‰ï¼š
 ```csharp
 private void DrawControlPanel(Rect rect)
 {
     Widgets.DrawMenuSection(rect);
     Rect innerRect = rect.ContractedBy(SPACING);
     
-    // ? Ìí¼Ó¹ö¶¯Ö§³Ö
-    float contentHeight = 600f; // ¿ÉÒÔµ÷Õû
+    // ? æ·»åŠ æ»šåŠ¨æ”¯æŒ
+    float contentHeight = 600f; // å¯ä»¥è°ƒæ•´
     Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, contentHeight);
     
     Widgets.BeginScrollView(innerRect, ref controlPanelScrollPosition, viewRect);
     
-    float y = 0f; // ¸ÄÎª´Ó0¿ªÊ¼
+    float y = 0f; // æ”¹ä¸ºä»Ž0å¼€å§‹
     
     // Title
     Text.Font = GameFont.Medium;
     Widgets.Label(new Rect(0f, y, viewRect.width, 30f), "RimTalk_MindStream_MemoryFilters".Translate());
-    // ... ÆäÓà´úÂë ...
+    // ... å…¶ä½™ä»£ç  ...
     
-    Widgets.EndScrollView(); // ? ×îºóÌí¼Ó
+    Widgets.EndScrollView(); // ? æœ€åŽæ·»åŠ 
 }
 ```
 
-**ÐÞ¸ÄËùÓÐ×Ó·½·¨µ÷ÓÃ**£¨Ô¼µÚ220-280ÐÐ£©£º
+**ä¿®æ”¹æ‰€æœ‰å­æ–¹æ³•è°ƒç”¨**ï¼ˆçº¦ç¬¬220-280è¡Œï¼‰ï¼š
 ```csharp
-// ´Ó£º
+// ä»Žï¼š
 y = DrawLayerFilters(innerRect, y);
 y = DrawTypeFilters(innerRect, y);
 y = DrawStatistics(innerRect, y);
 y = DrawBatchActions(innerRect, y);
 DrawGlobalActions(innerRect, y);
 
-// ¸ÄÎª£º
+// æ”¹ä¸ºï¼š
 Rect methodRect = new Rect(0f, 0f, viewRect.width, viewRect.height);
 y = DrawLayerFilters(methodRect, y);
 y = DrawTypeFilters(methodRect, y);
@@ -87,150 +87,150 @@ y = DrawBatchActions(methodRect, y);
 DrawGlobalActions(methodRect, y);
 ```
 
-#### 4. ±àÒë²âÊÔ
+#### 4. ç¼–è¯‘æµ‹è¯•
 
 ```bash
-# ÇåÀí²¢ÖØÐÂ±àÒë
+# æ¸…ç†å¹¶é‡æ–°ç¼–è¯‘
 dotnet clean
 dotnet build
 
-# ¼ì²é´íÎó
-# Èç¹ûÓÐ´íÎó£¬Çë²Î¿¼ UI_TRANSLATION_FIX_GUIDE.md
+# æ£€æŸ¥é”™è¯¯
+# å¦‚æžœæœ‰é”™è¯¯ï¼Œè¯·å‚è€ƒ UI_TRANSLATION_FIX_GUIDE.md
 ```
 
-#### 5. ÓÎÏ·²âÊÔ
+#### 5. æ¸¸æˆæµ‹è¯•
 
-1. Æô¶¯ RimWorld
-2. ¼ÓÔØ´æµµ
-3. ´ò¿ª Memory ±êÇ©Ò³
-4. ²âÊÔÒÔÏÂ¹¦ÄÜ£º
-   - [ ] Ñ¡ÔñÖ³ÃñÕß
-   - [ ] ¹´Ñ¡"ÏÔÊ¾ËùÓÐÀàÈËÉúÎï"
-   - [ ] ²é¿´¼ÇÒä¿¨Æ¬
-   - [ ] µã»÷¹Ì¶¨°´Å¥
-   - [ ] µã»÷±à¼­°´Å¥
-   - [ ] ¶àÑ¡¼ÇÒä£¨Ctrl/Shift/ÍÏ×§£©
-   - [ ] ÅúÁ¿×Ü½á/¹éµµ/É¾³ý
-   - [ ] ¹ö¶¯×ó²àÃæ°åµ½µ×²¿
-   - [ ] ÇÐ»»ÓïÑÔ£¨Ó¢ÎÄ/ÖÐÎÄ£©
+1. å¯åŠ¨ RimWorld
+2. åŠ è½½å­˜æ¡£
+3. æ‰“å¼€ Memory æ ‡ç­¾é¡µ
+4. æµ‹è¯•ä»¥ä¸‹åŠŸèƒ½ï¼š
+   - [ ] é€‰æ‹©æ®–æ°‘è€…
+   - [ ] å‹¾é€‰"æ˜¾ç¤ºæ‰€æœ‰ç±»äººç”Ÿç‰©"
+   - [ ] æŸ¥çœ‹è®°å¿†å¡ç‰‡
+   - [ ] ç‚¹å‡»å›ºå®šæŒ‰é’®
+   - [ ] ç‚¹å‡»ç¼–è¾‘æŒ‰é’®
+   - [ ] å¤šé€‰è®°å¿†ï¼ˆCtrl/Shift/æ‹–æ‹½ï¼‰
+   - [ ] æ‰¹é‡æ€»ç»“/å½’æ¡£/åˆ é™¤
+   - [ ] æ»šåŠ¨å·¦ä¾§é¢æ¿åˆ°åº•éƒ¨
+   - [ ] åˆ‡æ¢è¯­è¨€ï¼ˆè‹±æ–‡/ä¸­æ–‡ï¼‰
 
-### ·½·¨¶þ£ºÊÖ¶¯ÐÞ¸´
+### æ–¹æ³•äºŒï¼šæ‰‹åŠ¨ä¿®å¤
 
-Èç¹û×Ô¶¯½Å±¾Ê§°Ü£¬Çë°´ÕÕÒÔÏÂÎÄµµÊÖ¶¯ÐÞ¸´£º
+å¦‚æžœè‡ªåŠ¨è„šæœ¬å¤±è´¥ï¼Œè¯·æŒ‰ç…§ä»¥ä¸‹æ–‡æ¡£æ‰‹åŠ¨ä¿®å¤ï¼š
 
-1. **·­ÒëÐÞ¸´**: ²Î¿¼ `UI_TRANSLATION_FIX_GUIDE.md`
-2. **¹ö¶¯ÊÓÍ¼**: ²Î¿¼ÉÏÃæµÄ´úÂëÆ¬¶Î
-3. **ÏêÏ¸ËµÃ÷**: ²Î¿¼ `DEPLOYMENT_SUMMARY_v3.3.19.md`
+1. **ç¿»è¯‘ä¿®å¤**: å‚è€ƒ `UI_TRANSLATION_FIX_GUIDE.md`
+2. **æ»šåŠ¨è§†å›¾**: å‚è€ƒä¸Šé¢çš„ä»£ç ç‰‡æ®µ
+3. **è¯¦ç»†è¯´æ˜Ž**: å‚è€ƒ `DEPLOYMENT_SUMMARY_v3.3.19.md`
 
-## ?? ÑéÖ¤¼ì²éÇåµ¥
+## ?? éªŒè¯æ£€æŸ¥æ¸…å•
 
-### ·­ÒëÑéÖ¤
+### ç¿»è¯‘éªŒè¯
 
 ```bash
-# ËÑË÷Ó²±àÂëÓ¢ÎÄ£¨Ó¦¸ÃÎª0£©
+# æœç´¢ç¡¬ç¼–ç è‹±æ–‡ï¼ˆåº”è¯¥ä¸º0ï¼‰
 grep -n 'Messages\.Message("(?!RimTalk_)' Source/Memory/UI/MainTabWindow_Memory.cs
 grep -n 'Widgets\.Label(.*?, "(?!RimTalk_)' Source/Memory/UI/MainTabWindow_Memory.cs
 grep -n 'TooltipHandler\.TipRegion(.*?, "(?!RimTalk_)' Source/Memory/UI/MainTabWindow_Memory.cs
 ```
 
-### ÓÎÏ·ÄÚÑéÖ¤
+### æ¸¸æˆå†…éªŒè¯
 
-- [ ] **Ó¢ÎÄ½çÃæ** - ÎÞ·­Òë¼üÏÔÊ¾£¨Èç `RimTalk_xxx`£©
-- [ ] **ÖÐÎÄ½çÃæ** - ËùÓÐÎÄ±¾ÎªÖÐÎÄ
-- [ ] **°´Å¥ÌáÊ¾** - Êó±êÐüÍ£ÓÐÕýÈ·ÌáÊ¾
-- [ ] **×ó²àÃæ°å** - ¿ÉÒÔ¹ö¶¯µ½µ×²¿
-- [ ] **¼ÇÒä²Ù×÷** - ¹Ì¶¨/±à¼­¹¦ÄÜÕý³£
-- [ ] **ÅúÁ¿²Ù×÷** - ×Ü½á/¹éµµ/É¾³ýÕý³£
-- [ ] **×Ü¼ÇÒäÊý** - ¶¥À¸ÏÔÊ¾ÕýÈ·
-- [ ] **ÀàÈËÉúÎï** - ¹´Ñ¡¿ò¹¤×÷Õý³£
+- [ ] **è‹±æ–‡ç•Œé¢** - æ— ç¿»è¯‘é”®æ˜¾ç¤ºï¼ˆå¦‚ `RimTalk_xxx`ï¼‰
+- [ ] **ä¸­æ–‡ç•Œé¢** - æ‰€æœ‰æ–‡æœ¬ä¸ºä¸­æ–‡
+- [ ] **æŒ‰é’®æç¤º** - é¼ æ ‡æ‚¬åœæœ‰æ­£ç¡®æç¤º
+- [ ] **å·¦ä¾§é¢æ¿** - å¯ä»¥æ»šåŠ¨åˆ°åº•éƒ¨
+- [ ] **è®°å¿†æ“ä½œ** - å›ºå®š/ç¼–è¾‘åŠŸèƒ½æ­£å¸¸
+- [ ] **æ‰¹é‡æ“ä½œ** - æ€»ç»“/å½’æ¡£/åˆ é™¤æ­£å¸¸
+- [ ] **æ€»è®°å¿†æ•°** - é¡¶æ æ˜¾ç¤ºæ­£ç¡®
+- [ ] **ç±»äººç”Ÿç‰©** - å‹¾é€‰æ¡†å·¥ä½œæ­£å¸¸
 
-## ?? ÒÑÖªÏÞÖÆ
+## ?? å·²çŸ¥é™åˆ¶
 
-### 1. ¿ØÖÆÃæ°å¹ö¶¯
-- **ÎÊÌâ**: ÐèÒªÊÖ¶¯Ìí¼Ó¹ö¶¯ÊÓÍ¼´úÂë
-- **Ô­Òò**: ÎÞ·¨×Ô¶¯»¯ÐÞ¸Ä¸´ÔÓµÄÇ¶Ì×²¼¾Ö
-- **½â¾ö**: °´ÕÕÉÏÃæµÄ´úÂëÆ¬¶ÎÊÖ¶¯Ìí¼Ó
+### 1. æŽ§åˆ¶é¢æ¿æ»šåŠ¨
+- **é—®é¢˜**: éœ€è¦æ‰‹åŠ¨æ·»åŠ æ»šåŠ¨è§†å›¾ä»£ç 
+- **åŽŸå› **: æ— æ³•è‡ªåŠ¨åŒ–ä¿®æ”¹å¤æ‚çš„åµŒå¥—å¸ƒå±€
+- **è§£å†³**: æŒ‰ç…§ä¸Šé¢çš„ä»£ç ç‰‡æ®µæ‰‹åŠ¨æ·»åŠ 
 
-### 2. ÐÔÄÜÓÅ»¯
-- **ÎÊÌâ**: ´óÁ¿¼ÇÒäÊ±¿ÉÄÜ¿¨¶Ù
-- **½¨Òé**: ¿¼ÂÇÊ¹ÓÃÐéÄâ»¯¹ö¶¯
-- **ÁÙÊ±·½°¸**: Ê¹ÓÃ¹ýÂËÆ÷¼õÉÙÏÔÊ¾ÊýÁ¿
+### 2. æ€§èƒ½ä¼˜åŒ–
+- **é—®é¢˜**: å¤§é‡è®°å¿†æ—¶å¯èƒ½å¡é¡¿
+- **å»ºè®®**: è€ƒè™‘ä½¿ç”¨è™šæ‹ŸåŒ–æ»šåŠ¨
+- **ä¸´æ—¶æ–¹æ¡ˆ**: ä½¿ç”¨è¿‡æ»¤å™¨å‡å°‘æ˜¾ç¤ºæ•°é‡
 
-### 3. ¾É´æµµ¼æÈÝÐÔ
-- **ÎÊÌâ**: ¿ÉÄÜÐèÒªÖØÐÂÉú³É¼ÇÒäÊý¾Ý
-- **½¨Òé**: ¼ÓÔØ´æµµºóµÈ´ýÒ»¸öÓÎÏ·ÈÕ
-- **×¢Òâ**: ±¸·Ý´æµµÎÄ¼þ
+### 3. æ—§å­˜æ¡£å…¼å®¹æ€§
+- **é—®é¢˜**: å¯èƒ½éœ€è¦é‡æ–°ç”Ÿæˆè®°å¿†æ•°æ®
+- **å»ºè®®**: åŠ è½½å­˜æ¡£åŽç­‰å¾…ä¸€ä¸ªæ¸¸æˆæ—¥
+- **æ³¨æ„**: å¤‡ä»½å­˜æ¡£æ–‡ä»¶
 
-## ?? ³£¼ûÎÊÌâ
+## ?? å¸¸è§é—®é¢˜
 
-### Q: ½Å±¾Ö´ÐÐÊ§°Ü
+### Q: è„šæœ¬æ‰§è¡Œå¤±è´¥
 **A**: 
 ```powershell
-# ÔÊÐí½Å±¾Ö´ÐÐ
+# å…è®¸è„šæœ¬æ‰§è¡Œ
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
-# ÖØÐÂÔËÐÐ
+# é‡æ–°è¿è¡Œ
 .\quick_fix_translations.ps1
 ```
 
-### Q: ±àÒë´íÎó
+### Q: ç¼–è¯‘é”™è¯¯
 **A**: 
-1. ¼ì²éÓï·¨´íÎó
-2. »¹Ô­±¸·ÝÎÄ¼þ
-3. ²Î¿¼ `UI_TRANSLATION_FIX_GUIDE.md` ÊÖ¶¯ÐÞ¸´
+1. æ£€æŸ¥è¯­æ³•é”™è¯¯
+2. è¿˜åŽŸå¤‡ä»½æ–‡ä»¶
+3. å‚è€ƒ `UI_TRANSLATION_FIX_GUIDE.md` æ‰‹åŠ¨ä¿®å¤
 
-### Q: ·­Òë¼üÈÔÈ»ÏÔÊ¾
+### Q: ç¿»è¯‘é”®ä»ç„¶æ˜¾ç¤º
 **A**:
-1. È·ÈÏ·­ÒëÎÄ¼þ´æÔÚ£º
+1. ç¡®è®¤ç¿»è¯‘æ–‡ä»¶å­˜åœ¨ï¼š
    - `Languages/English/Keyed/MemoryPatch.xml`
    - `Languages/ChineseSimplified/Keyed/MemoryPatch.xml`
-2. È·ÈÏ·­Òë¼üÆ´Ð´ÕýÈ·
-3. ÖØÆôÓÎÏ·
+2. ç¡®è®¤ç¿»è¯‘é”®æ‹¼å†™æ­£ç¡®
+3. é‡å¯æ¸¸æˆ
 
-### Q: ×ó²àÃæ°åÈÔÈ»ÏÔÊ¾²»È«
+### Q: å·¦ä¾§é¢æ¿ä»ç„¶æ˜¾ç¤ºä¸å…¨
 **A**:
-1. È·ÈÏÌí¼ÓÁË `controlPanelScrollPosition` ³ÉÔ±±äÁ¿
-2. È·ÈÏ `Widgets.BeginScrollView` ºÍ `EndScrollView` Åä¶Ô
-3. È·ÈÏ `contentHeight` ×ã¹»´ó£¨½¨Òé 600f£©
+1. ç¡®è®¤æ·»åŠ äº† `controlPanelScrollPosition` æˆå‘˜å˜é‡
+2. ç¡®è®¤ `Widgets.BeginScrollView` å’Œ `EndScrollView` é…å¯¹
+3. ç¡®è®¤ `contentHeight` è¶³å¤Ÿå¤§ï¼ˆå»ºè®® 600fï¼‰
 
-### Q: ¹Ì¶¨°´Å¥ÎÞÐ§
+### Q: å›ºå®šæŒ‰é’®æ— æ•ˆ
 **A**:
-1. ¼ì²é `FourLayerMemoryComp.PinMemory` ·½·¨
-2. È·ÈÏ¼ÇÒäÊý¾ÝÕýÈ·±£´æ
-3. ÖØÆôÓÎÏ·²âÊÔ
+1. æ£€æŸ¥ `FourLayerMemoryComp.PinMemory` æ–¹æ³•
+2. ç¡®è®¤è®°å¿†æ•°æ®æ­£ç¡®ä¿å­˜
+3. é‡å¯æ¸¸æˆæµ‹è¯•
 
-## ?? »ñÈ¡°ïÖú
+## ?? èŽ·å–å¸®åŠ©
 
 - **GitHub Issues**: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/issues
-- **ÎÄµµ**: ²é¿´ÏîÄ¿¸ùÄ¿Â¼µÄ `.md` ÎÄ¼þ
-- **Ô´´úÂë**: ²é¿´ `Source/Memory/UI/` Ä¿Â¼
+- **æ–‡æ¡£**: æŸ¥çœ‹é¡¹ç›®æ ¹ç›®å½•çš„ `.md` æ–‡ä»¶
+- **æºä»£ç **: æŸ¥çœ‹ `Source/Memory/UI/` ç›®å½•
 
-## ?? ÎÄ¼þÇåµ¥
+## ?? æ–‡ä»¶æ¸…å•
 
-ÐÞ¸´¹ý³ÌÖÐ´´½¨µÄÎÄ¼þ£º
+ä¿®å¤è¿‡ç¨‹ä¸­åˆ›å»ºçš„æ–‡ä»¶ï¼š
 
-| ÎÄ¼þ | ÓÃÍ¾ |
+| æ–‡ä»¶ | ç”¨é€” |
 |------|------|
-| `quick_fix_translations.ps1` | ×Ô¶¯ÐÞ¸´·­ÒëµÄ½Å±¾ |
-| `UI_TRANSLATION_FIX_GUIDE.md` | ÊÖ¶¯ÐÞ¸´Ö¸ÄÏ |
-| `DEPLOYMENT_SUMMARY_v3.3.19.md` | ÍêÕû²¿Êð×Ü½á |
-| `DEPLOYMENT_CHECKLIST_v3.3.19.md` | ²¿Êð¼ì²éÇåµ¥ |
-| `QUICKSTART_UI_v3.3.19.md` | UI ¿ìËÙÈëÃÅ |
-| `HOW_TO_FIX.md` | ±¾ÎÄ¼þ |
+| `quick_fix_translations.ps1` | è‡ªåŠ¨ä¿®å¤ç¿»è¯‘çš„è„šæœ¬ |
+| `UI_TRANSLATION_FIX_GUIDE.md` | æ‰‹åŠ¨ä¿®å¤æŒ‡å— |
+| `DEPLOYMENT_SUMMARY_v3.3.19.md` | å®Œæ•´éƒ¨ç½²æ€»ç»“ |
+| `DEPLOYMENT_CHECKLIST_v3.3.19.md` | éƒ¨ç½²æ£€æŸ¥æ¸…å• |
+| `QUICKSTART_UI_v3.3.19.md` | UI å¿«é€Ÿå…¥é—¨ |
+| `HOW_TO_FIX.md` | æœ¬æ–‡ä»¶ |
 
-## ? Íê³É±êÖ¾
+## ? å®Œæˆæ ‡å¿—
 
-µ±ÒÔÏÂËùÓÐÏî¶¼Íê³ÉÊ±£¬v3.3.19 ¼´¿É·¢²¼£º
+å½“ä»¥ä¸‹æ‰€æœ‰é¡¹éƒ½å®Œæˆæ—¶ï¼Œv3.3.19 å³å¯å‘å¸ƒï¼š
 
-- [x] ·­Òë¼üÒÑÌí¼Óµ½ XML
-- [x] UI ÖØ¹¹Íê³É
-- [x] ÎÄµµÒÑ´´½¨
-- [ ] **·­Òë¼üÒÑÓ¦ÓÃµ½´úÂë** ?? ÐèÒªÍê³É
-- [ ] **¹ö¶¯ÊÓÍ¼ÒÑÌí¼Ó** ?? ÐèÒªÍê³É
-- [ ] ±àÒëÎÞ´íÎó
-- [ ] ÓÎÏ·²âÊÔÍ¨¹ý
-- [ ] Á½ÖÖÓïÑÔ²âÊÔÍ¨¹ý
+- [x] ç¿»è¯‘é”®å·²æ·»åŠ åˆ° XML
+- [x] UI é‡æž„å®Œæˆ
+- [x] æ–‡æ¡£å·²åˆ›å»º
+- [ ] **ç¿»è¯‘é”®å·²åº”ç”¨åˆ°ä»£ç ** ?? éœ€è¦å®Œæˆ
+- [ ] **æ»šåŠ¨è§†å›¾å·²æ·»åŠ ** ?? éœ€è¦å®Œæˆ
+- [ ] ç¼–è¯‘æ— é”™è¯¯
+- [ ] æ¸¸æˆæµ‹è¯•é€šè¿‡
+- [ ] ä¸¤ç§è¯­è¨€æµ‹è¯•é€šè¿‡
 
 ---
 
-**×£ÄãÐÞ¸´Ë³Àû£¡** ??
+**ç¥ä½ ä¿®å¤é¡ºåˆ©ï¼** ??

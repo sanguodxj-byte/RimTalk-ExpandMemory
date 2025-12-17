@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Verse;
 using RimWorld;
 using System.Collections.Generic;
+using RimTalk.Memory;
 using System.Linq;
 using RimTalk.MemoryPatch;
 using System;
@@ -125,7 +126,7 @@ namespace RimTalk.Memory.UI
             rightX -= buttonWidth;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Preview".Translate()))
             {
-                Find.WindowStack.Add(new RimTalk.Memory.Debug.Dialog_InjectionPreview());
+                Find.WindowStack.Add(new Debug.Dialog_InjectionPreview());
             }
             
             // Common Knowledge button

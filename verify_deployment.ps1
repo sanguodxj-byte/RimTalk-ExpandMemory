@@ -1,43 +1,43 @@
-# RimTalk-ExpandMemory v3.3.19 ²¿ÊğÑéÖ¤½Å±¾
-# ÑéÖ¤²¿ÊğÊÇ·ñ³É¹¦
+# RimTalk-ExpandMemory v3.3.19 éƒ¨ç½²éªŒè¯è„šæœ¬
+# éªŒè¯éƒ¨ç½²æ˜¯å¦æˆåŠŸ
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  v3.3.19 ²¿ÊğÑéÖ¤" -ForegroundColor Cyan
+Write-Host "  v3.3.19 éƒ¨ç½²éªŒè¯" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 $gameDir = "D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory"
 
-# 1. ¼ì²éDLL
-Write-Host "[1/4] ¼ì²é DLL..." -ForegroundColor Yellow
+# 1. æ£€æŸ¥DLL
+Write-Host "[1/4] æ£€æŸ¥ DLL..." -ForegroundColor Yellow
 $dllPath = "$gameDir\1.6\Assemblies\RimTalk-ExpandMemory.dll"
 if (Test-Path $dllPath) {
     $dll = Get-Item $dllPath
-    Write-Host "  ? DLL ÒÑ²¿Êğ" -ForegroundColor Green
-    Write-Host "    Î»ÖÃ: $dllPath" -ForegroundColor Gray
-    Write-Host "    ´óĞ¡: $($dll.Length) bytes" -ForegroundColor Gray
-    Write-Host "    ĞŞ¸ÄÊ±¼ä: $($dll.LastWriteTime)" -ForegroundColor Gray
+    Write-Host "  ? DLL å·²éƒ¨ç½²" -ForegroundColor Green
+    Write-Host "    ä½ç½®: $dllPath" -ForegroundColor Gray
+    Write-Host "    å¤§å°: $($dll.Length) bytes" -ForegroundColor Gray
+    Write-Host "    ä¿®æ”¹æ—¶é—´: $($dll.LastWriteTime)" -ForegroundColor Gray
 } else {
-    Write-Host "  ? Î´ÕÒµ½ DLL" -ForegroundColor Red
+    Write-Host "  ? æœªæ‰¾åˆ° DLL" -ForegroundColor Red
     exit 1
 }
 
-# 2. ¼ì²é About.xml
-Write-Host "[2/4] ¼ì²é About.xml..." -ForegroundColor Yellow
+# 2. æ£€æŸ¥ About.xml
+Write-Host "[2/4] æ£€æŸ¥ About.xml..." -ForegroundColor Yellow
 $aboutPath = "$gameDir\About\About.xml"
 if (Test-Path $aboutPath) {
     $content = Get-Content $aboutPath -Raw
     if ($content -match 'v3.3.19') {
-        Write-Host "  ? About.xml °æ±¾ÕıÈ· (v3.3.19)" -ForegroundColor Green
+        Write-Host "  ? About.xml ç‰ˆæœ¬æ­£ç¡® (v3.3.19)" -ForegroundColor Green
     } else {
-        Write-Host "  ? About.xml °æ±¾¿ÉÄÜ²»ÕıÈ·" -ForegroundColor Yellow
+        Write-Host "  ? About.xml ç‰ˆæœ¬å¯èƒ½ä¸æ­£ç¡®" -ForegroundColor Yellow
     }
 } else {
-    Write-Host "  ? Î´ÕÒµ½ About.xml" -ForegroundColor Red
+    Write-Host "  ? æœªæ‰¾åˆ° About.xml" -ForegroundColor Red
 }
 
-# 3. ¼ì²éÓïÑÔÎÄ¼ş
-Write-Host "[3/4] ¼ì²éÓïÑÔÎÄ¼ş..." -ForegroundColor Yellow
+# 3. æ£€æŸ¥è¯­è¨€æ–‡ä»¶
+Write-Host "[3/4] æ£€æŸ¥è¯­è¨€æ–‡ä»¶..." -ForegroundColor Yellow
 $langFiles = @(
     "$gameDir\Languages\English\Keyed\MemoryPatch.xml",
     "$gameDir\Languages\ChineseSimplified\Keyed\MemoryPatch.xml"
@@ -47,15 +47,15 @@ foreach ($file in $langFiles) {
     if (Test-Path $file) {
         $content = Get-Content $file -Raw
         $keyCount = ([regex]::Matches($content, '<RimTalk_')).Count
-        Write-Host "  ? $(Split-Path (Split-Path $file) -Leaf): $keyCount ¸ö·­Òë¼ü" -ForegroundColor Green
+        Write-Host "  ? $(Split-Path (Split-Path $file) -Leaf): $keyCount ä¸ªç¿»è¯‘é”®" -ForegroundColor Green
     } else {
-        Write-Host "  ? È±ÉÙ: $(Split-Path $file -Leaf)" -ForegroundColor Red
+        Write-Host "  ? ç¼ºå°‘: $(Split-Path $file -Leaf)" -ForegroundColor Red
         $allLangOK = $false
     }
 }
 
-# 4. ¼ì²é¾ÉÎÄ¼ş
-Write-Host "[4/4] ¼ì²é¾ÉÎÄ¼şÇåÀí..." -ForegroundColor Yellow
+# 4. æ£€æŸ¥æ—§æ–‡ä»¶
+Write-Host "[4/4] æ£€æŸ¥æ—§æ–‡ä»¶æ¸…ç†..." -ForegroundColor Yellow
 $oldFiles = @(
     "$gameDir\Source\Memory\UI\MainTabWindow_Memory_MindStream.cs",
     "$gameDir\Source\Memory\UI\Dialog_CommonKnowledge_Library.cs"
@@ -63,54 +63,54 @@ $oldFiles = @(
 $needClean = $false
 foreach ($file in $oldFiles) {
     if (Test-Path $file) {
-        Write-Host "  ? ·¢ÏÖ¾ÉÎÄ¼ş: $(Split-Path $file -Leaf)" -ForegroundColor Yellow
+        Write-Host "  ? å‘ç°æ—§æ–‡ä»¶: $(Split-Path $file -Leaf)" -ForegroundColor Yellow
         $needClean = $true
     }
 }
 if (-not $needClean) {
-    Write-Host "  ? ÎŞ¾ÉÎÄ¼ş²ĞÁô" -ForegroundColor Green
+    Write-Host "  ? æ— æ—§æ–‡ä»¶æ®‹ç•™" -ForegroundColor Green
 }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  ? ÑéÖ¤Íê³É£¡" -ForegroundColor Green
+Write-Host "  ? éªŒè¯å®Œæˆï¼" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 5. ÏÔÊ¾²¿Êğ×Ü½á
-Write-Host "?? ²¿Êğ×Ü½á:" -ForegroundColor Cyan
-Write-Host "  ? °æ±¾: v3.3.19" -ForegroundColor White
-Write-Host "  ? DLL: ? ÒÑ²¿Êğ" -ForegroundColor White
-Write-Host "  ? About.xml: ? ÒÑ¸üĞÂ" -ForegroundColor White
-Write-Host "  ? ÓïÑÔÎÄ¼ş: ? ÍêÕû" -ForegroundColor White
+# 5. æ˜¾ç¤ºéƒ¨ç½²æ€»ç»“
+Write-Host "?? éƒ¨ç½²æ€»ç»“:" -ForegroundColor Cyan
+Write-Host "  ? ç‰ˆæœ¬: v3.3.19" -ForegroundColor White
+Write-Host "  ? DLL: ? å·²éƒ¨ç½²" -ForegroundColor White
+Write-Host "  ? About.xml: ? å·²æ›´æ–°" -ForegroundColor White
+Write-Host "  ? è¯­è¨€æ–‡ä»¶: ? å®Œæ•´" -ForegroundColor White
 Write-Host ""
 
-Write-Host "?? ÏÂÒ»²½:" -ForegroundColor Yellow
-Write-Host "  1. Æô¶¯ RimWorld" -ForegroundColor White
-Write-Host "  2. È·ÈÏ Mod ¼ÓÔØÕı³££¨ÎŞºìÉ«´íÎó£©" -ForegroundColor White
-Write-Host "  3. ½øÈëÓÎÏ·£¬´ò¿ª Memory ±êÇ©Ò³" -ForegroundColor White
-Write-Host "  4. ²âÊÔĞÂµÄ Mind Stream UI" -ForegroundColor White
-Write-Host "  5. µã»÷'³£Ê¶'°´Å¥£¬²âÊÔ³£Ê¶¿â UI" -ForegroundColor White
-Write-Host "  6. ¼ì²éËùÓĞÎÄ±¾ÊÇ·ñÏÔÊ¾ÖĞÎÄ£¨»òÓ¢ÎÄ£©" -ForegroundColor White
+Write-Host "?? ä¸‹ä¸€æ­¥:" -ForegroundColor Yellow
+Write-Host "  1. å¯åŠ¨ RimWorld" -ForegroundColor White
+Write-Host "  2. ç¡®è®¤ Mod åŠ è½½æ­£å¸¸ï¼ˆæ— çº¢è‰²é”™è¯¯ï¼‰" -ForegroundColor White
+Write-Host "  3. è¿›å…¥æ¸¸æˆï¼Œæ‰“å¼€ Memory æ ‡ç­¾é¡µ" -ForegroundColor White
+Write-Host "  4. æµ‹è¯•æ–°çš„ Mind Stream UI" -ForegroundColor White
+Write-Host "  5. ç‚¹å‡»'å¸¸è¯†'æŒ‰é’®ï¼Œæµ‹è¯•å¸¸è¯†åº“ UI" -ForegroundColor White
+Write-Host "  6. æ£€æŸ¥æ‰€æœ‰æ–‡æœ¬æ˜¯å¦æ˜¾ç¤ºä¸­æ–‡ï¼ˆæˆ–è‹±æ–‡ï¼‰" -ForegroundColor White
 Write-Host ""
 
-Write-Host "?? ²âÊÔÎÄµµ:" -ForegroundColor Yellow
-Write-Host "  - ²âÊÔÇåµ¥: TESTING_CHECKLIST_v3.3.19.md" -ForegroundColor White
-Write-Host "  - ¿ìËÙÈëÃÅ: QUICKSTART_UI_v3.3.19.md" -ForegroundColor White
-Write-Host "  - ²¿Êğ±¨¸æ: FINAL_DEPLOYMENT_REPORT_v3.3.19.md" -ForegroundColor White
+Write-Host "?? æµ‹è¯•æ–‡æ¡£:" -ForegroundColor Yellow
+Write-Host "  - æµ‹è¯•æ¸…å•: TESTING_CHECKLIST_v3.3.19.md" -ForegroundColor White
+Write-Host "  - å¿«é€Ÿå…¥é—¨: QUICKSTART_UI_v3.3.19.md" -ForegroundColor White
+Write-Host "  - éƒ¨ç½²æŠ¥å‘Š: FINAL_DEPLOYMENT_REPORT_v3.3.19.md" -ForegroundColor White
 Write-Host ""
 
-# Ñ¯ÎÊÊÇ·ñÆô¶¯ÓÎÏ·
-$response = Read-Host "ÊÇ·ñÏÖÔÚÆô¶¯ÓÎÏ·½øĞĞ²âÊÔ? (Y/N)"
+# è¯¢é—®æ˜¯å¦å¯åŠ¨æ¸¸æˆ
+$response = Read-Host "æ˜¯å¦ç°åœ¨å¯åŠ¨æ¸¸æˆè¿›è¡Œæµ‹è¯•? (Y/N)"
 if ($response -eq "Y" -or $response -eq "y") {
     Write-Host ""
-    Write-Host "ÕıÔÚÆô¶¯ RimWorld..." -ForegroundColor Green
+    Write-Host "æ­£åœ¨å¯åŠ¨ RimWorld..." -ForegroundColor Green
     Start-Process "steam://rungameid/294100"
-    Write-Host "ÓÎÏ·Æô¶¯ÃüÁîÒÑ·¢ËÍ£¡" -ForegroundColor Green
+    Write-Host "æ¸¸æˆå¯åŠ¨å‘½ä»¤å·²å‘é€ï¼" -ForegroundColor Green
     Write-Host ""
-    Write-Host "ÌáÊ¾: ÓÎÏ·Æô¶¯ºó£¬¼ÇµÃ°´ÕÕ²âÊÔÇåµ¥ÑéÖ¤ËùÓĞ¹¦ÄÜ¡£" -ForegroundColor Cyan
+    Write-Host "æç¤º: æ¸¸æˆå¯åŠ¨åï¼Œè®°å¾—æŒ‰ç…§æµ‹è¯•æ¸…å•éªŒè¯æ‰€æœ‰åŠŸèƒ½ã€‚" -ForegroundColor Cyan
 }
 
 Write-Host ""
-Write-Host "°´ÈÎÒâ¼üÍË³ö..." -ForegroundColor Gray
+Write-Host "æŒ‰ä»»æ„é”®é€€å‡º..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

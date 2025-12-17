@@ -1,26 +1,26 @@
 # Quick Fix Script for MainTabWindow_Memory.cs
-# ÓÃÓÚÅúÁ¿Ìæ»»Ó²±àÂëÓ¢ÎÄÎª·­Òë¼ü
+# ç”¨äºæ‰¹é‡æ›¿æ¢ç¡¬ç¼–ç è‹±æ–‡ä¸ºç¿»è¯‘é”®
 
 $filePath = "Source\Memory\UI\MainTabWindow_Memory.cs"
 
 if (!(Test-Path $filePath)) {
-    Write-Host "? ÎÄ¼ş²»´æÔÚ: $filePath" -ForegroundColor Red
+    Write-Host "? æ–‡ä»¶ä¸å­˜åœ¨: $filePath" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "?? ¿ªÊ¼ĞŞ¸´ $filePath..." -ForegroundColor Cyan
+Write-Host "?? å¼€å§‹ä¿®å¤ $filePath..." -ForegroundColor Cyan
 
-# ±¸·İÔ­ÎÄ¼ş
+# å¤‡ä»½åŸæ–‡ä»¶
 $backupPath = "$filePath.backup"
 Copy-Item $filePath $backupPath -Force
-Write-Host "? ÒÑ´´½¨±¸·İ: $backupPath" -ForegroundColor Green
+Write-Host "? å·²åˆ›å»ºå¤‡ä»½: $backupPath" -ForegroundColor Green
 
-# ¶ÁÈ¡ÎÄ¼şÄÚÈİ
+# è¯»å–æ–‡ä»¶å†…å®¹
 $content = Get-Content $filePath -Raw -Encoding UTF8
 
-# Ó¦ÓÃÌæ»»¹æÔò£¨°´ÓÅÏÈ¼¶Ë³Ğò£©
+# åº”ç”¨æ›¿æ¢è§„åˆ™ï¼ˆæŒ‰ä¼˜å…ˆçº§é¡ºåºï¼‰
 $replacements = @(
-    # Tooltip ĞŞ¸´
+    # Tooltip ä¿®å¤
     @{
         Pattern = 'TooltipHandler\.TipRegion\(pinButtonRect, memory\.isPinned \? "Unpin" : "Pin"\)'
         Replacement = 'TooltipHandler.TipRegion(pinButtonRect, memory.isPinned ? "RimTalk_MindStream_Unpin".Translate() : "RimTalk_MindStream_Pin".Translate())'
@@ -38,13 +38,13 @@ $replacements = @(
         Replacement = 'TooltipHandler.TipRegion(activityBarRect, "RimTalk_MindStream_ActivityLabel".Translate(memory.activity.ToString("F2")))'
     },
     
-    # Header "with" ĞŞ¸´
+    # Header "with" ä¿®å¤
     @{
         Pattern = 'header \+= \$" ? with \{memory\.relatedPawnName\}";'
         Replacement = 'header += $" ? {"RimTalk_MindStream_With".Translate()} {memory.relatedPawnName}";'
     },
     
-    # Messages.Message ĞŞ¸´
+    # Messages.Message ä¿®å¤
     @{
         Pattern = 'Messages\.Message\("No SCM memories selected", MessageTypeDefOf\.RejectInput, false\)'
         Replacement = 'Messages.Message("RimTalk_MindStream_NoSCMSelected".Translate(), MessageTypeDefOf.RejectInput, false)'
@@ -86,7 +86,7 @@ $replacements = @(
         Replacement = 'Messages.Message("RimTalk_MindStream_ArchivedForN".Translate(count), MessageTypeDefOf.PositiveEvent, false)'
     },
     
-    # Dialog È·ÈÏ¿òĞŞ¸´
+    # Dialog ç¡®è®¤æ¡†ä¿®å¤
     @{
         Pattern = '\$"Summarize \{scmMemories\.Count\} SCM memories to ELS\?"'
         Replacement = '"RimTalk_MindStream_SummarizeConfirm".Translate(scmMemories.Count)'
@@ -100,7 +100,7 @@ $replacements = @(
         Replacement = '"RimTalk_MindStream_DeleteConfirm".Translate(count)'
     },
     
-    # Widgets.Label ĞŞ¸´
+    # Widgets.Label ä¿®å¤
     @{
         Pattern = 'Widgets\.Label\(rect, "Select a colonist to view memories"\)'
         Replacement = 'Widgets.Label(rect, "RimTalk_MindStream_SelectColonist".Translate())'
@@ -120,19 +120,19 @@ foreach ($replacement in $replacements) {
     if ($content -match $pattern) {
         $content = $content -replace $pattern, $newValue
         $fixedCount++
-        Write-Host "? ĞŞ¸´: $($pattern.Substring(0, [Math]::Min(50, $pattern.Length)))..." -ForegroundColor Green
+        Write-Host "? ä¿®å¤: $($pattern.Substring(0, [Math]::Min(50, $pattern.Length)))..." -ForegroundColor Green
     }
 }
 
-# ±£´æĞŞ¸ÄºóµÄÎÄ¼ş
+# ä¿å­˜ä¿®æ”¹åçš„æ–‡ä»¶
 $content | Set-Content $filePath -Encoding UTF8 -NoNewline
 
-Write-Host "`n? Íê³É! ¹²ĞŞ¸´ $fixedCount ´¦Ó²±àÂëÎÄ±¾" -ForegroundColor Cyan
-Write-Host "?? ±¸·İÎÄ¼ş: $backupPath" -ForegroundColor Yellow
-Write-Host "`n?? ÇëÊÖ¶¯¼ì²éĞŞ¸´½á¹û£¬È·±£Ã»ÓĞÒÅÂ©»ò´íÎó" -ForegroundColor Yellow
+Write-Host "`n? å®Œæˆ! å…±ä¿®å¤ $fixedCount å¤„ç¡¬ç¼–ç æ–‡æœ¬" -ForegroundColor Cyan
+Write-Host "?? å¤‡ä»½æ–‡ä»¶: $backupPath" -ForegroundColor Yellow
+Write-Host "`n?? è¯·æ‰‹åŠ¨æ£€æŸ¥ä¿®å¤ç»“æœï¼Œç¡®ä¿æ²¡æœ‰é—æ¼æˆ–é”™è¯¯" -ForegroundColor Yellow
 
-# ÏÔÊ¾ÈÔĞèÊÖ¶¯ĞŞ¸´µÄÄÚÈİ
-Write-Host "`n?? ¼ì²éÊÇ·ñ»¹ÓĞÎ´ĞŞ¸´µÄÓ²±àÂëÓ¢ÎÄ..." -ForegroundColor Cyan
+# æ˜¾ç¤ºä»éœ€æ‰‹åŠ¨ä¿®å¤çš„å†…å®¹
+Write-Host "`n?? æ£€æŸ¥æ˜¯å¦è¿˜æœ‰æœªä¿®å¤çš„ç¡¬ç¼–ç è‹±æ–‡..." -ForegroundColor Cyan
 
 $patterns = @(
     'Messages\.Message\("(?!RimTalk_)',
@@ -145,33 +145,33 @@ $foundIssues = $false
 foreach ($pattern in $patterns) {
     $matches = [regex]::Matches($content, $pattern)
     if ($matches.Count -gt 0) {
-        Write-Host "?? ·¢ÏÖ $($matches.Count) ´¦¿ÉÄÜµÄÓ²±àÂë: $pattern" -ForegroundColor Yellow
+        Write-Host "?? å‘ç° $($matches.Count) å¤„å¯èƒ½çš„ç¡¬ç¼–ç : $pattern" -ForegroundColor Yellow
         $foundIssues = $true
     }
 }
 
 if (!$foundIssues) {
-    Write-Host "? Î´·¢ÏÖÃ÷ÏÔµÄÓ²±àÂëÓ¢ÎÄ!" -ForegroundColor Green
+    Write-Host "? æœªå‘ç°æ˜æ˜¾çš„ç¡¬ç¼–ç è‹±æ–‡!" -ForegroundColor Green
 }
 
-Write-Host "`n?? ÏÂÒ»²½:" -ForegroundColor Cyan
-Write-Host "1. ÓÃ Visual Studio/VSCode ´ò¿ªÎÄ¼ş¼ì²é" -ForegroundColor White
-Write-Host "2. ±àÒë²âÊÔ: dotnet build" -ForegroundColor White
-Write-Host "3. Æô¶¯ÓÎÏ·²âÊÔUI" -ForegroundColor White
-Write-Host "4. ÇĞ»»ÓïÑÔ²âÊÔ·­Òë" -ForegroundColor White
+Write-Host "`n?? ä¸‹ä¸€æ­¥:" -ForegroundColor Cyan
+Write-Host "1. ç”¨ Visual Studio/VSCode æ‰“å¼€æ–‡ä»¶æ£€æŸ¥" -ForegroundColor White
+Write-Host "2. ç¼–è¯‘æµ‹è¯•: dotnet build" -ForegroundColor White
+Write-Host "3. å¯åŠ¨æ¸¸æˆæµ‹è¯•UI" -ForegroundColor White
+Write-Host "4. åˆ‡æ¢è¯­è¨€æµ‹è¯•ç¿»è¯‘" -ForegroundColor White
 
-# Ñ¯ÎÊÊÇ·ñ±àÒë
-Write-Host "`nÊÇ·ñÁ¢¼´±àÒë²âÊÔ? (Y/N): " -NoNewline -ForegroundColor Cyan
+# è¯¢é—®æ˜¯å¦ç¼–è¯‘
+Write-Host "`næ˜¯å¦ç«‹å³ç¼–è¯‘æµ‹è¯•? (Y/N): " -NoNewline -ForegroundColor Cyan
 $response = Read-Host
 
 if ($response -eq 'Y' -or $response -eq 'y') {
-    Write-Host "`n?? ¿ªÊ¼±àÒë..." -ForegroundColor Cyan
+    Write-Host "`n?? å¼€å§‹ç¼–è¯‘..." -ForegroundColor Cyan
     dotnet build
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "`n? ±àÒë³É¹¦!" -ForegroundColor Green
+        Write-Host "`n? ç¼–è¯‘æˆåŠŸ!" -ForegroundColor Green
     } else {
-        Write-Host "`n? ±àÒëÊ§°Ü! Çë¼ì²é´íÎóĞÅÏ¢" -ForegroundColor Red
-        Write-Host "?? ÌáÊ¾: Èç¹ûÓĞÓï·¨´íÎó£¬Çë»¹Ô­±¸·İÎÄ¼ş²¢ÊÖ¶¯ĞŞ¸´" -ForegroundColor Yellow
+        Write-Host "`n? ç¼–è¯‘å¤±è´¥! è¯·æ£€æŸ¥é”™è¯¯ä¿¡æ¯" -ForegroundColor Red
+        Write-Host "?? æç¤º: å¦‚æœæœ‰è¯­æ³•é”™è¯¯ï¼Œè¯·è¿˜åŸå¤‡ä»½æ–‡ä»¶å¹¶æ‰‹åŠ¨ä¿®å¤" -ForegroundColor Yellow
     }
 }

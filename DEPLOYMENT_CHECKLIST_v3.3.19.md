@@ -1,163 +1,163 @@
-# v3.3.19 ²¿Êð¼ì²éÇåµ¥
+# v3.3.19 éƒ¨ç½²æ£€æŸ¥æ¸…å•
 
-## ? ±àÒëºÍ²¿Êð
+## ? ç¼–è¯‘å’Œéƒ¨ç½²
 
-- [x] ´úÂë±àÒë³É¹¦
-- [x] DLL ×Ô¶¯²¿Êðµ½ÓÎÏ·Ä¿Â¼
-- [x] ¾ÉUIÎÄ¼þÒÑÉ¾³ý
+- [x] ä»£ç ç¼–è¯‘æˆåŠŸ
+- [x] DLL è‡ªåŠ¨éƒ¨ç½²åˆ°æ¸¸æˆç›®å½•
+- [x] æ—§UIæ–‡ä»¶å·²åˆ é™¤
   - [x] MainTabWindow_Memory_MindStream.cs
   - [x] Dialog_CommonKnowledge_Library.cs
 
-## ? °æ±¾¸üÐÂ
+## ? ç‰ˆæœ¬æ›´æ–°
 
-- [x] About.xml °æ±¾ºÅ¸üÐÂµ½ v3.3.19
-- [x] About.xml ÃèÊö¸üÐÂ
-- [x] Ìí¼ÓÐÂ¹¦ÄÜËµÃ÷
-- [x] ¸üÐÂ²Ù×÷Ö¸ÄÏ
+- [x] About.xml ç‰ˆæœ¬å·æ›´æ–°åˆ° v3.3.19
+- [x] About.xml æè¿°æ›´æ–°
+- [x] æ·»åŠ æ–°åŠŸèƒ½è¯´æ˜Ž
+- [x] æ›´æ–°æ“ä½œæŒ‡å—
 
-## ? ÎÄµµ¸üÐÂ
+## ? æ–‡æ¡£æ›´æ–°
 
-- [x] ´´½¨ CHANGELOG.md
-- [x] ¼ÇÂ¼ËùÓÐÐÂ¹¦ÄÜ
-- [x] ¼ÇÂ¼¼¼ÊõÏ¸½Ú
+- [x] åˆ›å»º CHANGELOG.md
+- [x] è®°å½•æ‰€æœ‰æ–°åŠŸèƒ½
+- [x] è®°å½•æŠ€æœ¯ç»†èŠ‚
 
-## ? ´úÂëÖÊÁ¿
+## ? ä»£ç è´¨é‡
 
-- [x] ËùÓÐÎÄ¼þ±àÒëÍ¨¹ý
-- [x] Ã»ÓÐ±àÒë¾¯¸æ
-- [x] ´úÂë½á¹¹ÇåÎú
+- [x] æ‰€æœ‰æ–‡ä»¶ç¼–è¯‘é€šè¿‡
+- [x] æ²¡æœ‰ç¼–è¯‘è­¦å‘Š
+- [x] ä»£ç ç»“æž„æ¸…æ™°
 
-## ? ¹¦ÄÜÍêÕûÐÔ
+## ? åŠŸèƒ½å®Œæ•´æ€§
 
 ### Mind Stream UI
-- [x] Ê±¼äÏß¿¨Æ¬²¼¾Ö
-- [x] ÍÏ×§¶àÑ¡£¨Ctrl/Shift/¿òÑ¡£©
-- [x] ²ã¼¶¹ýÂË£¨ABM/SCM/ELS/CLPA£©
-- [x] ÀàÐÍ¹ýÂË£¨¶Ô»°/ÐÐ¶¯£©
-- [x] ÅúÁ¿²Ù×÷£¨×Ü½á/¹éµµ/É¾³ý£©
-- [x] ²ÊÉ«²ã¼¶Ö¸Ê¾
-- [x] ×ÔÊÊÓ¦¿¨Æ¬¸ß¶È
-- [x] ÊµÊ±Í³¼ÆÏÔÊ¾
+- [x] æ—¶é—´çº¿å¡ç‰‡å¸ƒå±€
+- [x] æ‹–æ‹½å¤šé€‰ï¼ˆCtrl/Shift/æ¡†é€‰ï¼‰
+- [x] å±‚çº§è¿‡æ»¤ï¼ˆABM/SCM/ELS/CLPAï¼‰
+- [x] ç±»åž‹è¿‡æ»¤ï¼ˆå¯¹è¯/è¡ŒåŠ¨ï¼‰
+- [x] æ‰¹é‡æ“ä½œï¼ˆæ€»ç»“/å½’æ¡£/åˆ é™¤ï¼‰
+- [x] å½©è‰²å±‚çº§æŒ‡ç¤º
+- [x] è‡ªé€‚åº”å¡ç‰‡é«˜åº¦
+- [x] å®žæ—¶ç»Ÿè®¡æ˜¾ç¤º
 
-### Í¼Êé¹Ý·ç¸ñ³£Ê¶¿â
-- [x] ÈýÀ¸²¼¾Ö
-- [x] ·ÖÀàµ¼º½
-- [x] ¶àÑ¡²Ù×÷
-- [x] ËÑË÷¹¦ÄÜ
-- [x] ÐÂ½¨/±à¼­/É¾³ý
-- [x] µ¼Èë/µ¼³ö
-- [x] ×Ô¶¯Éú³ÉÉèÖÃ
+### å›¾ä¹¦é¦†é£Žæ ¼å¸¸è¯†åº“
+- [x] ä¸‰æ å¸ƒå±€
+- [x] åˆ†ç±»å¯¼èˆª
+- [x] å¤šé€‰æ“ä½œ
+- [x] æœç´¢åŠŸèƒ½
+- [x] æ–°å»º/ç¼–è¾‘/åˆ é™¤
+- [x] å¯¼å…¥/å¯¼å‡º
+- [x] è‡ªåŠ¨ç”Ÿæˆè®¾ç½®
 
-## ? ·­ÒëÖ§³Ö
+## ? ç¿»è¯‘æ”¯æŒ
 
-- [x] English ·­ÒëÍêÕû
-- [x] ChineseSimplified ·­ÒëÍêÕû
-- [x] ËùÓÐUIÔªËØÊ¹ÓÃ·­Òë¼ü
-- [x] ËùÓÐÏûÏ¢Ê¹ÓÃ·­Òë¼ü
+- [x] English ç¿»è¯‘å®Œæ•´
+- [x] ChineseSimplified ç¿»è¯‘å®Œæ•´
+- [x] æ‰€æœ‰UIå…ƒç´ ä½¿ç”¨ç¿»è¯‘é”®
+- [x] æ‰€æœ‰æ¶ˆæ¯ä½¿ç”¨ç¿»è¯‘é”®
 
-## ?? ²¿Êðºó²âÊÔÇåµ¥
+## ?? éƒ¨ç½²åŽæµ‹è¯•æ¸…å•
 
-### »ù´¡¹¦ÄÜ²âÊÔ
-- [ ] Æô¶¯ÓÎÏ·£¬¼ÓÔØ Mod ÎÞ´íÎó
-- [ ] ´ò¿ª Memory ±êÇ©Ò³£¬ÏÔÊ¾Õý³£
-- [ ] Ñ¡ÔñÖ³ÃñÕß£¬¼ÇÒäÏÔÊ¾Õý³£
-- [ ] µã»÷ Knowledge °´Å¥£¬³£Ê¶¿â´ò¿ªÕý³£
+### åŸºç¡€åŠŸèƒ½æµ‹è¯•
+- [ ] å¯åŠ¨æ¸¸æˆï¼ŒåŠ è½½ Mod æ— é”™è¯¯
+- [ ] æ‰“å¼€ Memory æ ‡ç­¾é¡µï¼Œæ˜¾ç¤ºæ­£å¸¸
+- [ ] é€‰æ‹©æ®–æ°‘è€…ï¼Œè®°å¿†æ˜¾ç¤ºæ­£å¸¸
+- [ ] ç‚¹å‡» Knowledge æŒ‰é’®ï¼Œå¸¸è¯†åº“æ‰“å¼€æ­£å¸¸
 
-### Mind Stream UI ²âÊÔ
-- [ ] µ¥»÷Ñ¡Ôñ¼ÇÒä
-- [ ] Ctrl+µã»÷¶àÑ¡
-- [ ] Shift+µã»÷·¶Î§Ñ¡Ôñ
-- [ ] ÍÏ×§¿òÑ¡¼ÇÒä
-- [ ] ²ã¼¶¹ýÂË¹¤×÷Õý³£
-- [ ] ÀàÐÍ¹ýÂË¹¤×÷Õý³£
-- [ ] ÅúÁ¿×Ü½á¹¦ÄÜÕý³£
-- [ ] ÅúÁ¿¹éµµ¹¦ÄÜÕý³£
-- [ ] ÅúÁ¿É¾³ý¹¦ÄÜÕý³£
-- [ ] ±à¼­¼ÇÒä¹¦ÄÜÕý³£
-- [ ] ¹Ì¶¨¼ÇÒä¹¦ÄÜÕý³£
+### Mind Stream UI æµ‹è¯•
+- [ ] å•å‡»é€‰æ‹©è®°å¿†
+- [ ] Ctrl+ç‚¹å‡»å¤šé€‰
+- [ ] Shift+ç‚¹å‡»èŒƒå›´é€‰æ‹©
+- [ ] æ‹–æ‹½æ¡†é€‰è®°å¿†
+- [ ] å±‚çº§è¿‡æ»¤å·¥ä½œæ­£å¸¸
+- [ ] ç±»åž‹è¿‡æ»¤å·¥ä½œæ­£å¸¸
+- [ ] æ‰¹é‡æ€»ç»“åŠŸèƒ½æ­£å¸¸
+- [ ] æ‰¹é‡å½’æ¡£åŠŸèƒ½æ­£å¸¸
+- [ ] æ‰¹é‡åˆ é™¤åŠŸèƒ½æ­£å¸¸
+- [ ] ç¼–è¾‘è®°å¿†åŠŸèƒ½æ­£å¸¸
+- [ ] å›ºå®šè®°å¿†åŠŸèƒ½æ­£å¸¸
 
-### ³£Ê¶¿â UI ²âÊÔ
-- [ ] ·ÖÀàµ¼º½ÇÐ»»Õý³£
-- [ ] ËÑË÷¹¦ÄÜÕý³£
-- [ ] ÐÂ½¨³£Ê¶Õý³£
-- [ ] ±à¼­³£Ê¶Õý³£
-- [ ] É¾³ý³£Ê¶Õý³£
-- [ ] µ¼Èë³£Ê¶Õý³£
-- [ ] µ¼³ö³£Ê¶Õý³£
-- [ ] ¶àÑ¡²Ù×÷Õý³£
-- [ ] ÅúÁ¿ÆôÓÃ/½ûÓÃÕý³£
+### å¸¸è¯†åº“ UI æµ‹è¯•
+- [ ] åˆ†ç±»å¯¼èˆªåˆ‡æ¢æ­£å¸¸
+- [ ] æœç´¢åŠŸèƒ½æ­£å¸¸
+- [ ] æ–°å»ºå¸¸è¯†æ­£å¸¸
+- [ ] ç¼–è¾‘å¸¸è¯†æ­£å¸¸
+- [ ] åˆ é™¤å¸¸è¯†æ­£å¸¸
+- [ ] å¯¼å…¥å¸¸è¯†æ­£å¸¸
+- [ ] å¯¼å‡ºå¸¸è¯†æ­£å¸¸
+- [ ] å¤šé€‰æ“ä½œæ­£å¸¸
+- [ ] æ‰¹é‡å¯ç”¨/ç¦ç”¨æ­£å¸¸
 
-### ·­Òë²âÊÔ
-- [ ] Ó¢ÎÄ½çÃæÏÔÊ¾Õý³£
-- [ ] ÖÐÎÄ½çÃæÏÔÊ¾Õý³£
-- [ ] ËùÓÐ°´Å¥ÓÐ·­Òë
-- [ ] ËùÓÐÌáÊ¾ÓÐ·­Òë
-- [ ] ËùÓÐÏûÏ¢ÓÐ·­Òë
+### ç¿»è¯‘æµ‹è¯•
+- [ ] è‹±æ–‡ç•Œé¢æ˜¾ç¤ºæ­£å¸¸
+- [ ] ä¸­æ–‡ç•Œé¢æ˜¾ç¤ºæ­£å¸¸
+- [ ] æ‰€æœ‰æŒ‰é’®æœ‰ç¿»è¯‘
+- [ ] æ‰€æœ‰æç¤ºæœ‰ç¿»è¯‘
+- [ ] æ‰€æœ‰æ¶ˆæ¯æœ‰ç¿»è¯‘
 
-### ÐÔÄÜ²âÊÔ
-- [ ] ´óÁ¿¼ÇÒäÊ±UIÁ÷³©
-- [ ] ÍÏ×§Ñ¡ÔñÏìÓ¦¿ìËÙ
-- [ ] ¹ýÂË²Ù×÷¼´Ê±ÏìÓ¦
-- [ ] ÎÞÃ÷ÏÔ¿¨¶Ù
+### æ€§èƒ½æµ‹è¯•
+- [ ] å¤§é‡è®°å¿†æ—¶UIæµç•…
+- [ ] æ‹–æ‹½é€‰æ‹©å“åº”å¿«é€Ÿ
+- [ ] è¿‡æ»¤æ“ä½œå³æ—¶å“åº”
+- [ ] æ— æ˜Žæ˜¾å¡é¡¿
 
-## ?? ÎÄ¼þÇåµ¥
+## ?? æ–‡ä»¶æ¸…å•
 
-### ÒÑ²¿Êðµ½ÓÎÏ·Ä¿Â¼
+### å·²éƒ¨ç½²åˆ°æ¸¸æˆç›®å½•
 ```
 D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\
-©À©¤©¤ About\
-©¦   ©¸©¤©¤ About.xml (v3.3.19)
-©À©¤©¤ 1.6\
-©¦   ©¸©¤©¤ Assemblies\
-©¦       ©¸©¤©¤ RimTalk-ExpandMemory.dll
-©À©¤©¤ Defs\
-©À©¤©¤ Languages\
-©¦   ©À©¤©¤ English\
-©¦   ©¸©¤©¤ ChineseSimplified\
-©¸©¤©¤ Textures\
+â”œâ”€â”€ About\
+â”‚   â””â”€â”€ About.xml (v3.3.19)
+â”œâ”€â”€ 1.6\
+â”‚   â””â”€â”€ Assemblies\
+â”‚       â””â”€â”€ RimTalk-ExpandMemory.dll
+â”œâ”€â”€ Defs\
+â”œâ”€â”€ Languages\
+â”‚   â”œâ”€â”€ English\
+â”‚   â””â”€â”€ ChineseSimplified\
+â””â”€â”€ Textures\
 ```
 
-### Ô´´úÂëÎÄ¼þ
+### æºä»£ç æ–‡ä»¶
 ```
 Source\Memory\UI\
-©À©¤©¤ MainTabWindow_Memory.cs (Mind Stream UI)
-©À©¤©¤ Dialog_CommonKnowledge.cs (Library UI)
-©¸©¤©¤ Dialog_TextInput.cs (Helper)
+â”œâ”€â”€ MainTabWindow_Memory.cs (Mind Stream UI)
+â”œâ”€â”€ Dialog_CommonKnowledge.cs (Library UI)
+â””â”€â”€ Dialog_TextInput.cs (Helper)
 ```
 
-## ?? ÏÂÒ»²½
+## ?? ä¸‹ä¸€æ­¥
 
-1. **ÓÎÏ·ÄÚ²âÊÔ**£º
-   - Æô¶¯ RimWorld
-   - ¼ÓÔØ´øÓÐ RimTalk µÄ´æµµ
-   - ²âÊÔËùÓÐ¹¦ÄÜ
+1. **æ¸¸æˆå†…æµ‹è¯•**ï¼š
+   - å¯åŠ¨ RimWorld
+   - åŠ è½½å¸¦æœ‰ RimTalk çš„å­˜æ¡£
+   - æµ‹è¯•æ‰€æœ‰åŠŸèƒ½
 
-2. **Git Ìá½»**£º
+2. **Git æäº¤**ï¼š
    ```bash
    git add .
    git commit -m "v3.3.19: Mind Stream UI + Library Style Knowledge Base"
    git push origin main
    ```
 
-3. **GitHub Release**£º
-   - ´´½¨ÐÂµÄ Release (v3.3.19)
-   - ÉÏ´« DLL ÎÄ¼þ
-   - ¸´ÖÆ CHANGELOG ÄÚÈÝµ½ Release Notes
+3. **GitHub Release**ï¼š
+   - åˆ›å»ºæ–°çš„ Release (v3.3.19)
+   - ä¸Šä¼  DLL æ–‡ä»¶
+   - å¤åˆ¶ CHANGELOG å†…å®¹åˆ° Release Notes
 
-4. **Steam Workshop** (Èç¹ûÓÐ)£º
-   - ¸üÐÂ Workshop ÃèÊö
-   - ÉÏ´«ÐÂ°æ±¾
-   - Ìí¼Ó¸üÐÂËµÃ÷
+4. **Steam Workshop** (å¦‚æžœæœ‰)ï¼š
+   - æ›´æ–° Workshop æè¿°
+   - ä¸Šä¼ æ–°ç‰ˆæœ¬
+   - æ·»åŠ æ›´æ–°è¯´æ˜Ž
 
-## ?? ×¢ÒâÊÂÏî
+## ?? æ³¨æ„äº‹é¡¹
 
-- ? Ïòºó¼æÈÝ£º¾É´æµµ¿ÉÒÔÕý³£Ê¹ÓÃ
-- ? ÎÞÆÆ»µÐÔ¸ü¸Ä£ºËùÓÐ¾É¹¦ÄÜ¶¼±£Áô
-- ? ÐÔÄÜÓÅ»¯£ºÊ¹ÓÃÁË¸ßÐ§µÄÊý¾Ý½á¹¹
-- ? ÓÃ»§ÓÑºÃ£ºUI¸üÖ±¹Û£¬²Ù×÷¸ü±ã½Ý
+- ? å‘åŽå…¼å®¹ï¼šæ—§å­˜æ¡£å¯ä»¥æ­£å¸¸ä½¿ç”¨
+- ? æ— ç ´åæ€§æ›´æ”¹ï¼šæ‰€æœ‰æ—§åŠŸèƒ½éƒ½ä¿ç•™
+- ? æ€§èƒ½ä¼˜åŒ–ï¼šä½¿ç”¨äº†é«˜æ•ˆçš„æ•°æ®ç»“æž„
+- ? ç”¨æˆ·å‹å¥½ï¼šUIæ›´ç›´è§‚ï¼Œæ“ä½œæ›´ä¾¿æ·
 
 ---
 
-**²¿ÊðÈÕÆÚ**£º2025-01-XX  
-**°æ±¾**£ºv3.3.19  
-**¹¹½¨×´Ì¬**£º? ³É¹¦
+**éƒ¨ç½²æ—¥æœŸ**ï¼š2025-01-XX  
+**ç‰ˆæœ¬**ï¼šv3.3.19  
+**æž„å»ºçŠ¶æ€**ï¼š? æˆåŠŸ

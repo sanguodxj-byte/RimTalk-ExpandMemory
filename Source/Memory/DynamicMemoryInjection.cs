@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Verse;
 using RimWorld;
+
+using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory
 {
@@ -89,7 +91,7 @@ namespace RimTalk.Memory
                 return string.Empty;
 
             // 获取阈值设置
-            float threshold = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.15f;
+            float threshold = RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.15f;
 
             // ⭐ v3.3.16: 步骤4 - 使用动态权重计算评分
             var scoredMemories = allMemories
