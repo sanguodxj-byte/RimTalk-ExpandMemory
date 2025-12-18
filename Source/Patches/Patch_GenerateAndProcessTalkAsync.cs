@@ -116,6 +116,37 @@ namespace RimTalk.Memory.Patches
                     return;
                 }
 
+                // ⭐ 去重逻辑：先获取关键词匹配的条目ID
+                var keywordMatchedIds = new HashSet<string>();
+                try
+                {
+                    // 调用关键词匹配获取已匹配的条目
+                    memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
+                        cleanedContext,
+                        settings.maxVectorResults,
+                        out var keywordScores,
+                        allInvolvedPawns?.FirstOrDefault(),
+                        allInvolvedPawns?.Skip(1).FirstOrDefault()
+                    );
+                    
+                    if (keywordScores != null)
+                    {
+                        foreach (var score in keywordScores)
+                        {
+                            keywordMatchedIds.Add(score.Entry.id);
+                        }
+                        
+                        if (keywordMatchedIds.Count > 0)
+                        {
+                            Log.Message($"[RimTalk Memory] Found {keywordMatchedIds.Count} keyword-matched entries, will exclude from vector results");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning($"[RimTalk Memory] Failed to get keyword matches for deduplication: {ex.Message}");
+                }
+
                 var sb = new StringBuilder();
                 sb.AppendLine("## World Knowledge (Vector Enhanced)");
 
@@ -128,6 +159,13 @@ namespace RimTalk.Memory.Patches
 
                 foreach (var (id, similarity) in vectorResults)
                 {
+                    // ⭐ 去重：跳过已被关键词匹配的条目
+                    if (keywordMatchedIds.Contains(id))
+                    {
+                        Log.Message($"[RimTalk Memory] Skipping vector result '{id}' (already matched by keyword)");
+                        continue;
+                    }
+                    
                     var entry = entriesSnapshot.FirstOrDefault(e => e.id == id);
                     if (entry != null)
                     {
@@ -139,6 +177,12 @@ namespace RimTalk.Memory.Patches
                 // 按综合得分排序
                 var finalResults = scoredResults.OrderByDescending(x => x.Score).ToList();
 
+                if (finalResults.Count == 0)
+                {
+                    Log.Message("[RimTalk Memory] No unique vector results after deduplication");
+                    return;
+                }
+
                 foreach (var item in finalResults)
                 {
                     sb.AppendLine($"[{item.Entry.tag}|{item.Similarity:F2}] {item.Entry.content}");
@@ -148,7 +192,7 @@ namespace RimTalk.Memory.Patches
                 string enhancedPrompt = currentPrompt + "\n\n" + sb.ToString();
                 promptProperty.SetValue(talkRequest, enhancedPrompt);
 
-                Log.Message($"[RimTalk Memory] Successfully injected {vectorResults.Count} vector knowledge entries into prompt");
+                Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries into prompt (excluded {keywordMatchedIds.Count} keyword-matched entries)");
             }
             catch (Exception ex)
             {
