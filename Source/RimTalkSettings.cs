@@ -671,7 +671,7 @@ namespace RimTalk.MemoryPatch
 
         private void DrawVectorEnhancementSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("启用向量增强 (需要重启)", ref enableVectorEnhancement);
+            listing.CheckboxLabeled("启用向量增强", ref enableVectorEnhancement);
             if (enableVectorEnhancement)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
