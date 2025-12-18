@@ -70,7 +70,10 @@ namespace RimTalk.Memory.VectorDB
             }
         }
 
-        public List<(string id, float similarity)> FindBestLoreIds(string userMessage, int topK = 5, float threshold = 0.7f)
+        /// <summary>
+        /// 异步查找最佳匹配的知识条目
+        /// </summary>
+        public async Task<List<(string id, float similarity)>> FindBestLoreIdsAsync(string userMessage, int topK = 5, float threshold = 0.7f)
         {
             var results = new List<(string id, float similarity)>();
             
@@ -87,8 +90,8 @@ namespace RimTalk.Memory.VectorDB
                     return results;
                 }
 
-                // 同步调用异步方法（注意：此方法应在后台线程调用）
-                float[] queryVector = GetEmbedding(userMessage);
+                // 异步获取查询向量
+                float[] queryVector = await GetEmbeddingAsync(userMessage).ConfigureAwait(false);
                 if (queryVector == null || queryVector.Length == 0)
                 {
                     return results;
@@ -117,9 +120,19 @@ namespace RimTalk.Memory.VectorDB
             }
             catch (Exception ex)
             {
-                Log.Error($"[RimTalk-ExpandMemory] VectorService: Error in FindBestLoreIds: {ex}");
+                Log.Error($"[RimTalk-ExpandMemory] VectorService: Error in FindBestLoreIdsAsync: {ex}");
                 return results;
             }
+        }
+
+        /// <summary>
+        /// 同步版本（已废弃，仅用于向后兼容）
+        /// 注意：此方法会阻塞调用线程，建议使用 FindBestLoreIdsAsync
+        /// </summary>
+        [Obsolete("Use FindBestLoreIdsAsync instead to avoid blocking")]
+        public List<(string id, float similarity)> FindBestLoreIds(string userMessage, int topK = 5, float threshold = 0.7f)
+        {
+            return FindBestLoreIdsAsync(userMessage, topK, threshold).GetAwaiter().GetResult();
         }
         
         public void SyncKnowledgeLibrary(CommonKnowledgeLibrary library)

@@ -35,12 +35,12 @@ namespace RimTalk.Memory.Patches
             var tcs = new TaskCompletionSource<Payload>();
             __result = tcs.Task;
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
                     var settings = RimTalkMemoryPatchMod.Settings;
-                    var bestLores = VectorService.Instance.FindBestLoreIds(userMessage, settings.maxVectorResults, settings.vectorSimilarityThreshold);
+                    var bestLores = await VectorService.Instance.FindBestLoreIdsAsync(userMessage, settings.maxVectorResults, settings.vectorSimilarityThreshold).ConfigureAwait(false);
 
                     LongEventHandler.ExecuteWhenFinished(() =>
                     {
