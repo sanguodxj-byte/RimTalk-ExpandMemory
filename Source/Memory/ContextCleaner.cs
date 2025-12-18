@@ -24,17 +24,18 @@ namespace RimTalk.Memory
             if (context.Contains(" said to '"))
             {
                 // 尝试匹配带说话人前缀的格式 (例如 'Renata: 内容')
-                var match = Regex.Match(context, @"said to '.*?: (.+?)'");
+                // 使用 [^']+ 匹配除单引号外的所有字符，确保匹配到正确的引号结束位置
+                var match = Regex.Match(context, @"said to '[^']*?: ([^']+)'");
                 if (match.Success)
                 {
-                    return match.Groups[1].Value;
+                    return match.Groups[1].Value.Trim();
                 }
                 
                 // 如果没有冒号，尝试直接提取引号内的内容
-                match = Regex.Match(context, @"said to '(.+?)'");
+                match = Regex.Match(context, @"said to '([^']+)'");
                 if (match.Success)
                 {
-                    return match.Groups[1].Value;
+                    return match.Groups[1].Value.Trim();
                 }
             }
 

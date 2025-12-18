@@ -587,105 +587,20 @@ namespace RimTalk.Memory
                 currentMatchText = BuildMatchTextFromKnowledge(roundMatches);
             }
             
-            // 向量增强阶段
-            var vectorSimilarities = new Dictionary<CommonKnowledgeEntry, float>();
-
-            if (settings.enableVectorEnhancement)
-            {
-                try
-                {
-                    // ⭐ v3.3.26: 向量匹配优先使用纯上下文，避免Pawn信息稀释语义
-                    // 如果上下文为空，才使用完整文本(包含Pawn信息)
-                    // ⭐ v3.3.27: 使用 ContextCleaner 提取核心语义，去除 RimTalk 格式噪音
-                    string rawContext = !string.IsNullOrWhiteSpace(context) ? context : originalMatchText;
-                    string vectorSearchText = ContextCleaner.CleanForVectorMatching(rawContext);
-                    
-                    // 如果清理后为空（可能全是噪音），回退到原始文本，防止完全匹配失败
-                    if (string.IsNullOrWhiteSpace(vectorSearchText))
-                    {
-                        vectorSearchText = rawContext;
-                    }
-                    
-                    string trimmedMatchText = vectorSearchText?.Trim() ?? "";
-                    
-                    if (trimmedMatchText.Length >= 2) // 放宽长度限制
-                    {
-                        var vectorMatches = MatchKnowledgeByVector(trimmedMatchText, currentPawn, allMatchedEntries, settings.maxVectorResults, settings.vectorSimilarityThreshold);
-                        
-                        foreach (var (match, similarity) in vectorMatches)
-                        {
-                            allMatchedEntries.Add(match);
-                            vectorSimilarities[match] = similarity;
-                        }
-                        
-                        if (vectorMatches.Count > 0)
-                        {
-                            Log.Message($"[RimTalk-ExpandMemory] Vector enhancement: matched {vectorMatches.Count} entries for context: '{trimmedMatchText.Substring(0, Math.Min(50, trimmedMatchText.Length))}'");
-                        }
-                    }
-                    else
-                    {
-                        Log.Message($"[RimTalk-ExpandMemory] Vector enhancement: skipped (context too short: '{trimmedMatchText}')");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[RimTalk-ExpandMemory] Vector enhancement failed: {ex.Message}");
-                }
-            }
-
-            // ⭐ v3.3.25: 重构评分系统 - 引入相似度加权 + 混合权重平衡
-            // 优先级：标签匹配(100分) vs 向量匹配(100分 * 相似度)
-            // 这样高相似度的向量匹配可以与标签匹配平起平坐
+            // ⭐ v3.3.28: 向量增强已移至 Patch_GenerateAndProcessTalkAsync（异步后台线程）
+            // CommonKnowledgeLibrary 只负责关键词匹配，不再进行向量搜索（避免主线程卡顿）
             
-            // 计算混合权重系数 (0.0=Keywords, 0.5=Equal, 1.0=Vector)
-            float keywordWeight = 1.0f;
-            float vectorWeight = 1.0f;
-            float balance = settings.hybridWeightBalance;
-
-            if (balance < 0.5f)
-            {
-                // 关键词优先: Key [1.0-1.5], Vec [0.5-1.0]
-                // 0.0 -> Key=1.5, Vec=0.5
-                // 0.5 -> Key=1.0, Vec=1.0
-                keywordWeight = 1.0f + (0.5f - balance);
-                vectorWeight = 0.5f + balance;
-            }
-            else
-            {
-                // 向量优先: Key [0.5-1.0], Vec [1.0-1.5]
-                // 0.5 -> Key=1.0, Vec=1.0
-                // 1.0 -> Key=0.5, Vec=1.5
-                keywordWeight = 1.0f - (balance - 0.5f);
-                vectorWeight = 1.0f + (balance - 0.5f);
-            }
-
             var scoredEntries = new List<KnowledgeScore>();
             
             foreach (var entry in allMatchedEntries)
             {
-                // 判断匹配类型（使用原始匹配文本）
-                bool isKeywordMatched = IsMatched(originalMatchText, entry);
-                KnowledgeMatchType matchType = isKeywordMatched ? 
-                    KnowledgeMatchType.Keyword : KnowledgeMatchType.Vector;
+                // 既然 allMatchedEntries 都是通过 MatchKnowledgeByTags 找到的，那么它们必然是 Keyword 匹配
+                KnowledgeMatchType matchType = KnowledgeMatchType.Keyword;
                 
                 // 计算最终得分
-                float finalScore = 0f;
-                float matchTypeScore = 0f;
-                
-                if (isKeywordMatched)
-                {
-                    // 标签匹配：100 * 权重 + 重要性
-                    matchTypeScore = 100f * keywordWeight;
-                    finalScore = matchTypeScore + entry.importance;
-                }
-                else
-                {
-                    // 向量匹配：100 * 相似度 * 权重 + 重要性
-                    float similarity = vectorSimilarities.ContainsKey(entry) ? vectorSimilarities[entry] : 0f;
-                    matchTypeScore = 100f * similarity * vectorWeight;
-                    finalScore = matchTypeScore + entry.importance;
-                }
+                // 标签匹配：100分 + 重要性
+                float matchTypeScore = 100f;
+                float finalScore = matchTypeScore + entry.importance;
                 
                 // ⭐ 同时添加到 allScores（所有候选）
                 allScores.Add(new KnowledgeScoreDetail
@@ -923,55 +838,6 @@ namespace RimTalk.Memory
             return sb.ToString();
         }
 
-        /// <summary>
-        /// 通过向量匹配常识（补充标签未匹配的语义相关常识）
-        /// ⭐ v3.3.25: 返回相似度
-        /// </summary>
-        private List<(CommonKnowledgeEntry entry, float similarity)> MatchKnowledgeByVector(
-            string context,
-            Verse.Pawn currentPawn,
-            HashSet<CommonKnowledgeEntry> alreadyMatched,
-            int maxResults,
-            float similarityThreshold)
-        {
-            var matches = new List<(CommonKnowledgeEntry, float)>();
-
-            if (string.IsNullOrEmpty(context))
-                return matches;
-
-            try
-            {
-                var vectorResults = VectorDB.VectorService.Instance.FindBestLoreIds(context, maxResults * 2, similarityThreshold);
-                
-                foreach (var (id, similarity) in vectorResults)
-                {
-                    var entry = entries.FirstOrDefault(e => e.id == id);
-                    
-                    if (entry == null)
-                        continue;
-                    
-                    if (alreadyMatched.Contains(entry))
-                        continue;
-                    
-                    if (!entry.isEnabled)
-                        continue;
-                    
-                    if (entry.targetPawnId != -1 && (currentPawn == null || entry.targetPawnId != currentPawn.thingIDNumber))
-                        continue;
-                    
-                    matches.Add((entry, similarity));
-                    
-                    if (matches.Count >= maxResults)
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[RimTalk-ExpandMemory] Error in MatchKnowledgeByVector: {ex}");
-            }
-
-            return matches;
-        }
         
         /// <summary>
         /// 构建Pawn信息文本

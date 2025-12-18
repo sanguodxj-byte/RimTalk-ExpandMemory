@@ -138,36 +138,6 @@ namespace RimTalk.MemoryPatch
         public bool enableKnowledgeChaining = true;
         public int maxChainingRounds = 2;
         
-        // ⭐ v3.3.20: 新增高级匹配设置
-        public float confidenceMargin = 0.05f; // 防误触领跑分 (0.0 - 0.2)
-        public float hybridWeightBalance = 0.5f; // 混合检索权重 (0.0 - 1.0, 0=Keywords, 1=Vector)
-        public string globalExcludeKeywords = ""; // 全局排除词 (逗号分隔)
-        
-        private string[] cachedGlobalExcludeKeywords; // 缓存的全局排除词数组
-
-        public string[] GetGlobalExcludeKeywords()
-        {
-            if (cachedGlobalExcludeKeywords == null)
-            {
-                if (string.IsNullOrEmpty(globalExcludeKeywords))
-                {
-                    cachedGlobalExcludeKeywords = new string[0];
-                }
-                else
-                {
-                    cachedGlobalExcludeKeywords = globalExcludeKeywords.Split(new[] { ',', '，', '、', ';', '；' }, System.StringSplitOptions.RemoveEmptyEntries)
-                        .Select(k => k.Trim())
-                        .Where(k => !string.IsNullOrEmpty(k))
-                        .ToArray();
-                }
-            }
-            return cachedGlobalExcludeKeywords;
-        }
-        
-        public void ClearGlobalExcludeCache()
-        {
-            cachedGlobalExcludeKeywords = null;
-        }
 
         // UI折叠状态
         private static bool expandDynamicInjection = true;
@@ -267,15 +237,6 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", true);
             Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
             
-            // ⭐ v3.3.20: 序列化高级匹配设置
-            Scribe_Values.Look(ref confidenceMargin, "knowledge_confidenceMargin", 0.05f);
-            Scribe_Values.Look(ref hybridWeightBalance, "knowledge_hybridWeightBalance", 0.5f);
-            Scribe_Values.Look(ref globalExcludeKeywords, "knowledge_globalExcludeKeywords", "");
-            
-            if (Scribe.mode == LoadSaveMode.PostLoadInit)
-            {
-                ClearGlobalExcludeCache();
-            }
         }
 
         public void DoSettingsWindowContents(Rect inRect)
@@ -768,35 +729,6 @@ namespace RimTalk.MemoryPatch
             
             listing.Gap();
             
-            // ⭐ v3.3.20: 高级匹配设置 UI
-            listing.Label($"防误触领跑分 (Confidence Margin): {confidenceMargin:P0}");
-            confidenceMargin = listing.Slider(confidenceMargin, 0.0f, 0.2f);
-            GUI.color = Color.gray;
-            listing.Label("  如果第一名分数比第二名高出这么多，则自动丢弃后续条目");
-            GUI.color = Color.white;
-            
-            listing.Gap();
-            
-            listing.Label($"混合检索权重 (Hybrid Weight Balance): {hybridWeightBalance:P0}");
-            hybridWeightBalance = listing.Slider(hybridWeightBalance, 0.0f, 1.0f);
-            
-            Rect balanceLabelRect = listing.GetRect(20f);
-            Text.Font = GameFont.Tiny;
-            Widgets.Label(balanceLabelRect, "关键词优先 (Keywords) <--- 平衡 ---> 语义优先 (Vector)");
-            Text.Font = GameFont.Small;
-            
-            listing.Gap();
-            
-            listing.Label("全局排除词 (Global Exclude List):");
-            string newExclude = listing.TextEntry(globalExcludeKeywords);
-            if (newExclude != globalExcludeKeywords)
-            {
-                globalExcludeKeywords = newExclude;
-                ClearGlobalExcludeCache();
-            }
-            GUI.color = Color.gray;
-            listing.Label("  逗号分隔。如果出现这些词，绝对不要触发任何常识。");
-            GUI.color = Color.white;
         }
 
         private void OpenCommonKnowledgeDialog()

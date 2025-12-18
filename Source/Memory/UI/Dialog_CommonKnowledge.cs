@@ -44,7 +44,6 @@ namespace RimTalk.Memory.UI
         private string editContent = "";
         private float editImportance = 0.5f;
         private int editTargetPawnId = -1;
-        private string editExcludeKeywords = "";
         private KeywordMatchMode editMatchMode = KeywordMatchMode.Any;
         
         // Layout constants
@@ -717,14 +716,6 @@ namespace RimTalk.Memory.UI
             DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 50f), "RimTalk_Knowledge_Visibility".Translate(), visibility);
             scrollY += 55f;
             
-            // Exclude Keywords
-            if (entry.excludeKeywords != null && entry.excludeKeywords.Count > 0)
-            {
-                string excludes = string.Join(", ", entry.excludeKeywords);
-                DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 50f), "排除词", excludes);
-                scrollY += 55f;
-            }
-            
             // Content
             Widgets.Label(new Rect(0f, scrollY, scrollViewRect.width, 20f), "RimTalk_Knowledge_Content".Translate() + ":");
             scrollY += 22f;
@@ -824,11 +815,6 @@ namespace RimTalk.Memory.UI
             }
             y += 35f;
             
-            // Exclude Keywords
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "排除词:");
-            editExcludeKeywords = Widgets.TextField(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), editExcludeKeywords);
-            y += 35f;
-
             // Match Mode
             Widgets.Label(new Rect(rect.x, y, 100f, 25f), "匹配模式:");
             if (Widgets.ButtonText(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), editMatchMode.ToString()))
@@ -959,7 +945,6 @@ namespace RimTalk.Memory.UI
             editContent = "";
             editImportance = 0.5f;
             editTargetPawnId = -1;
-            editExcludeKeywords = "";
             editMatchMode = KeywordMatchMode.Any;
             lastSelectedEntry = null;
             selectedEntries.Clear();
@@ -975,7 +960,6 @@ namespace RimTalk.Memory.UI
                 editContent = entry.content;
                 editImportance = entry.importance;
                 editTargetPawnId = entry.targetPawnId;
-                editExcludeKeywords = entry.excludeKeywords != null ? string.Join(", ", entry.excludeKeywords) : "";
                 editMatchMode = entry.matchMode;
                 lastSelectedEntry = entry;
                 editMode = true;
@@ -990,11 +974,6 @@ namespace RimTalk.Memory.UI
                 return;
             }
             
-            List<string> excludes = editExcludeKeywords.Split(new[] { ',', '，', '、', ';', '；' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(k => k.Trim())
-                .Where(k => !string.IsNullOrEmpty(k))
-                .ToList();
-            
             if (lastSelectedEntry == null)
             {
                 // Create new
@@ -1003,7 +982,6 @@ namespace RimTalk.Memory.UI
                     importance = editImportance,
                     targetPawnId = editTargetPawnId,
                     isUserEdited = true,
-                    excludeKeywords = excludes,
                     matchMode = editMatchMode
                 };
                 library.AddEntry(newEntry);
@@ -1022,7 +1000,6 @@ namespace RimTalk.Memory.UI
                 lastSelectedEntry.importance = editImportance;
                 lastSelectedEntry.targetPawnId = editTargetPawnId;
                 lastSelectedEntry.isUserEdited = true;
-                lastSelectedEntry.excludeKeywords = excludes;
                 lastSelectedEntry.matchMode = editMatchMode;
                 
                 // ⭐ 清除缓存，确保新标签生效

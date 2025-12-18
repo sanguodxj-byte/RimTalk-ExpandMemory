@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using RimTalk.Memory;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using Verse;
 using RimWorld;
 using RimTalk.MemoryPatch;
 using RimTalk.Memory.Patches;
+using RimTalk.Memory.VectorDB;
 
 namespace RimTalk.Memory.Debug
 {
@@ -120,8 +122,7 @@ namespace RimTalk.Memory.Debug
             {
                 GUI.color = Color.gray;
                 string info = $"{selectedPawn.def.label}";
-                if (selectedPawn.gender != null)
-                    info += $" | {selectedPawn.gender.GetLabel()}";
+                info += $" | {selectedPawn.gender.GetLabel()}";
                 Widgets.Label(new Rect(rect.x + 340f, rect.y + 8f, 300f, rect.height / 2), info);
                 GUI.color = Color.white;
             }
@@ -145,8 +146,7 @@ namespace RimTalk.Memory.Debug
             {
                 GUI.color = Color.gray;
                 string targetInfo = $"{targetPawn.def.label}";
-                if (targetPawn.gender != null)
-                    targetInfo += $" | {targetPawn.gender.GetLabel()}";
+                targetInfo += $" | {targetPawn.gender.GetLabel()}";
                 Widgets.Label(new Rect(rect.x + 340f, secondRowY + 8f, 300f, rect.height / 2), targetInfo);
                 GUI.color = Color.white;
                 
@@ -445,12 +445,95 @@ namespace RimTalk.Memory.Debug
                     selectedPawn,
                     targetPawn
                 );
+
+                // ⭐ 新增：手动模拟向量匹配（因为库函数中已移除，移到了 Patch 中）
+                if (settings.enableVectorEnhancement && !string.IsNullOrEmpty(testContext))
+                {
+                    try 
+                    {
+                        // 使用 ContextCleaner 清理上下文
+                        string cleanedContext = ContextCleaner.CleanForVectorMatching(testContext);
+                        
+                        // 同步调用向量搜索
+                        var vectorResults = VectorService.Instance.FindBestLoreIds(
+                            cleanedContext,
+                            settings.maxVectorResults,
+                            settings.vectorSimilarityThreshold
+                        );
+                        
+                        if (vectorResults != null && vectorResults.Count > 0)
+                        {
+                            var vectorSb = new StringBuilder();
+                            
+                            // 如果已有标签匹配内容，添加分隔
+                            if (!string.IsNullOrEmpty(knowledgeInjection))
+                            {
+                                vectorSb.AppendLine();
+                                vectorSb.AppendLine(); // 空行分隔
+                            }
+                            
+                            vectorSb.AppendLine("## World Knowledge (Vector Enhanced)");
+                            
+                            foreach (var (id, similarity) in vectorResults)
+                            {
+                                var entry = library.Entries.FirstOrDefault(e => e.id == id);
+                                if (entry != null)
+                                {
+                                    vectorSb.AppendLine($"[{entry.tag}|{similarity:F2}] {entry.content}");
+                                    
+                                    // 更新评分详情列表
+                                    var existingDetail = allKnowledgeScores.FirstOrDefault(d => d.Entry == entry);
+                                    if (existingDetail != null)
+                                    {
+                                        // 已存在：更新为混合匹配
+                                        existingDetail.MatchType = KnowledgeMatchType.Mixed;
+                                        float vectorScore = 100f * similarity;
+                                        existingDetail.TotalScore += vectorScore; // 叠加分数用于排序展示
+                                        existingDetail.MatchTypeScore += vectorScore;
+                                        
+                                        // 向量匹配总是被选中
+                                        if (existingDetail.FailReason != "Selected")
+                                        {
+                                            existingDetail.FailReason = "Selected (Vector)";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 新增：向量匹配
+                                        allKnowledgeScores.Add(new KnowledgeScoreDetail
+                                        {
+                                            Entry = entry,
+                                            IsEnabled = entry.isEnabled,
+                                            TotalScore = 100f * similarity + entry.importance,
+                                            BaseScore = entry.importance,
+                                            MatchTypeScore = 100f * similarity,
+                                            MatchType = KnowledgeMatchType.Vector,
+                                            FailReason = "Selected (Vector)",
+                                            MatchedTags = entry.GetTags()
+                                        });
+                                    }
+                                }
+                            }
+                            
+                            // 追加到 knowledgeInjection
+                            knowledgeInjection += vectorSb.ToString();
+                            
+                            // 重新排序详情列表
+                            allKnowledgeScores.Sort((a, b) => b.TotalScore.CompareTo(a.TotalScore));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning($"[RimTalk-ExpandMemory] Preview vector search failed: {ex.Message}");
+                    }
+                }
                 
                 // ⭐ 缓存所有评分详情
                 cachedAllKnowledgeScores = allKnowledgeScores;
 
                 cachedMemoryCount = memoryScores?.Count ?? 0;
-                cachedKnowledgeCount = knowledgeScores?.Count ?? 0;
+                // 更新常识计数：统计所有 FailReason 为 Selected 或 Selected (Vector) 的条目
+                cachedKnowledgeCount = allKnowledgeScores.Count(s => s.FailReason.StartsWith("Selected"));
                 
                 // 构建完整的system content
                 var systemContent = new System.Text.StringBuilder();
@@ -566,8 +649,8 @@ namespace RimTalk.Memory.Debug
                 // ⭐ 显示常识注入统计和详细信息
                 if (cachedAllKnowledgeScores != null && cachedAllKnowledgeScores.Count > 0)
                 {
-                    var selectedKnowledge = cachedAllKnowledgeScores.Where(s => s.FailReason == "Selected").ToList();
-                    var rejectedKnowledge = cachedAllKnowledgeScores.Where(s => s.FailReason != "Selected").ToList();
+                    var selectedKnowledge = cachedAllKnowledgeScores.Where(s => s.FailReason != null && s.FailReason.StartsWith("Selected")).ToList();
+                    var rejectedKnowledge = cachedAllKnowledgeScores.Where(s => s.FailReason == null || !s.FailReason.StartsWith("Selected")).ToList();
                     
                     preview.AppendLine($"🎯 已注入: {selectedKnowledge.Count} 条");
                     preview.AppendLine($"❌ 未注入: {rejectedKnowledge.Count} 条");
@@ -963,9 +1046,12 @@ namespace RimTalk.Memory.Debug
             
             try
             {
+                // ⭐ 使用 ContextCleaner 清理上下文，去除噪音
+                string cleanedContext = ContextCleaner.CleanForVectorMatching(contextInput);
+                
                 // 调用向量服务进行匹配
                 var vectorResults = VectorDB.VectorService.Instance.FindBestLoreIds(
-                    contextInput, 
+                    cleanedContext, 
                     settings.maxVectorResults * 2,  // 多获取一些结果
                     settings.vectorSimilarityThreshold
                 );
@@ -984,7 +1070,8 @@ namespace RimTalk.Memory.Debug
                 
                 // 输出详细日志
                 Log.Message($"[RimTalk-ExpandMemory] ========== 向量匹配测试 ==========");
-                Log.Message($"[RimTalk-ExpandMemory] 上下文: {contextInput.Substring(0, Math.Min(100, contextInput.Length))}");
+                Log.Message($"[RimTalk-ExpandMemory] 原始上下文: {contextInput.Substring(0, Math.Min(100, contextInput.Length))}");
+                Log.Message($"[RimTalk-ExpandMemory] 清理后上下文: {cleanedContext}");
                 Log.Message($"[RimTalk-ExpandMemory] 阈值: {settings.vectorSimilarityThreshold:F2}");
                 Log.Message($"[RimTalk-ExpandMemory] 结果数: {vectorResults.Count}");
                 
@@ -1140,10 +1227,11 @@ namespace RimTalk.Memory.Debug
         /// </summary>
         private string GetFailReasonLabel(string failReason)
         {
+            if (failReason != null && failReason.StartsWith("Selected"))
+                return "✅ 已选中";
+
             switch (failReason)
             {
-                case "Selected":
-                    return "✅ 已选中";
                 case "LowScore":
                     return "📉 分数过低";
                 case "ConfidenceMargin":
