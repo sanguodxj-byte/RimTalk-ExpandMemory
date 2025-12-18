@@ -49,7 +49,6 @@ namespace RimTalk.Memory
 
         // ⭐ v3.3.20: 新增匹配控制属性
         public KeywordMatchMode matchMode = KeywordMatchMode.Any; // 关键词匹配模式（默认Any）
-        public List<string> excludeKeywords = new List<string>(); // 局部排除词
         
         private List<string> cachedTags; // 缓存分割后的标签列表
 
@@ -71,7 +70,6 @@ namespace RimTalk.Memory
             creationTick = -1; // 默认永久
             originalEventText = "";
             matchMode = KeywordMatchMode.Any;
-            excludeKeywords = new List<string>();
         }
 
         public CommonKnowledgeEntry(string tag, string content) : this()
@@ -95,12 +93,10 @@ namespace RimTalk.Memory
             
             // ⭐ v3.3.20: 序列化新属性
             Scribe_Values.Look(ref matchMode, "matchMode", KeywordMatchMode.Any);
-            Scribe_Collections.Look(ref excludeKeywords, "excludeKeywords", LookMode.Value);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (keywords == null) keywords = new List<string>();
-                if (excludeKeywords == null) excludeKeywords = new List<string>();
                 cachedTags = null; // 清除缓存，强制重新解析
                 
                 // ⭐ v3.3.3: 兼容旧存档 - 如果没有originalEventText，从content中提取
@@ -700,6 +696,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 通过标签匹配常识（新版：支持多种匹配模式和排除词）
+        /// ⭐ v3.3.28: 移除全局排除词功能
         /// </summary>
         private List<CommonKnowledgeEntry> MatchKnowledgeByTags(
             string matchText,
@@ -711,9 +708,6 @@ namespace RimTalk.Memory
 
             if (string.IsNullOrEmpty(matchText))
                 return matches;
-
-            var settings = RimTalkMemoryPatchMod.Settings;
-            string[] globalExcludeList = settings.GetGlobalExcludeKeywords();
 
             foreach (var entry in entries)
             {
@@ -729,11 +723,7 @@ namespace RimTalk.Memory
                 if (entry.targetPawnId != -1 && (currentPawn == null || entry.targetPawnId != currentPawn.thingIDNumber))
                     continue;
 
-                // 1. 检查排除词 (Global & Local)
-                if (IsExcluded(matchText, entry, globalExcludeList))
-                    continue;
-
-                // 2. 检查匹配模式
+                // 检查匹配模式
                 if (IsMatched(matchText, entry))
                 {
                     matches.Add(entry);
@@ -741,39 +731,6 @@ namespace RimTalk.Memory
             }
 
             return matches;
-        }
-
-        /// <summary>
-        /// 检查是否被排除
-        /// ⭐ 修复：添加空字符串检查，防止全军覆没
-        /// </summary>
-        private bool IsExcluded(string text, CommonKnowledgeEntry entry, string[] globalExcludeList)
-        {
-            // 检查全局排除词
-            if (globalExcludeList != null)
-            {
-                foreach (var exclude in globalExcludeList)
-                {
-                    // ⭐ 救命代码：跳过空字符串
-                    if (string.IsNullOrWhiteSpace(exclude)) continue;
-                    if (text.IndexOf(exclude, StringComparison.OrdinalIgnoreCase) >= 0)
-                        return true;
-                }
-            }
-
-            // 检查局部排除词
-            if (entry.excludeKeywords != null)
-            {
-                foreach (var exclude in entry.excludeKeywords)
-                {
-                    // ⭐ 救命代码：跳过空字符串
-                    if (string.IsNullOrWhiteSpace(exclude)) continue;
-                    if (text.IndexOf(exclude, StringComparison.OrdinalIgnoreCase) >= 0)
-                        return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
