@@ -35,6 +35,12 @@ namespace RimTalk.Memory.UI
         private Vector2 timelineScrollPosition = Vector2.zero;
         private MemoryType? filterType = null;
         
+        // ⭐ Virtualization cache
+        private List<MemoryEntry> cachedFilteredMemories = null;
+        private List<float> cachedCardHeights = null;
+        private float cachedTotalHeight = 0f;
+        private int cachedMemoryHash = 0;
+        
         // Layer filters
         private bool showABM = true;
         private bool showSCM = true;
@@ -453,25 +459,23 @@ namespace RimTalk.Memory.UI
             Widgets.DrawMenuSection(rect);
             Rect innerRect = rect.ContractedBy(5f);
             
-            // Get filtered memories
-            var memories = GetFilteredMemories();
-            
-            // Calculate card heights
-            float totalHeight = 0f;
-            var cardHeights = new List<float>();
-            foreach (var memory in memories)
-            {
-                float height = GetCardHeight(memory.layer);
-                cardHeights.Add(height);
-                totalHeight += height + CARD_SPACING;
-            }
+            // ⭐ Update cache for virtualization
+            UpdateMemoryCache();
+            var memories = cachedFilteredMemories;
+            var cardHeights = cachedCardHeights;
+            float totalHeight = cachedTotalHeight;
             
             Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, totalHeight);
             
             // Handle drag selection
             HandleDragSelection(innerRect, viewRect);
             
-            // Draw timeline
+            // ⭐ Calculate visible range for virtualization
+            float scrollTop = timelineScrollPosition.y;
+            float scrollBottom = scrollTop + innerRect.height;
+            float renderMargin = 200f; // Render extra cards above/below for smooth scrolling
+            
+            // Draw timeline with virtualization
             Widgets.BeginScrollView(innerRect, ref timelineScrollPosition, viewRect, true);
             
             float y = 0f;
@@ -480,7 +484,15 @@ namespace RimTalk.Memory.UI
                 var memory = memories[i];
                 float height = cardHeights[i];
                 Rect cardRect = new Rect(0f, y, viewRect.width, height);
-                DrawMemoryCard(cardRect, memory);
+                
+                // ⭐ Only draw cards that are visible (with margin)
+                bool isVisible = (y + height >= scrollTop - renderMargin) && (y <= scrollBottom + renderMargin);
+                
+                if (isVisible)
+                {
+                    DrawMemoryCard(cardRect, memory);
+                }
+                
                 y += height + CARD_SPACING;
             }
             
@@ -893,6 +905,61 @@ namespace RimTalk.Memory.UI
         }
 
         // ==================== Helper Methods ====================
+        
+        // ⭐ Update memory cache for virtualization
+        private void UpdateMemoryCache()
+        {
+            if (currentMemoryComp == null)
+            {
+                cachedFilteredMemories = new List<MemoryEntry>();
+                cachedCardHeights = new List<float>();
+                cachedTotalHeight = 0f;
+                cachedMemoryHash = 0;
+                return;
+            }
+            
+            // Calculate hash to detect changes
+            int currentHash = CalculateMemoryHash();
+            
+            // Only recalculate if data changed
+            if (cachedMemoryHash != currentHash || cachedFilteredMemories == null)
+            {
+                cachedFilteredMemories = GetFilteredMemories();
+                cachedCardHeights = new List<float>(cachedFilteredMemories.Count);
+                cachedTotalHeight = 0f;
+                
+                foreach (var memory in cachedFilteredMemories)
+                {
+                    float height = GetCardHeight(memory.layer);
+                    cachedCardHeights.Add(height);
+                    cachedTotalHeight += height + CARD_SPACING;
+                }
+                
+                cachedMemoryHash = currentHash;
+            }
+        }
+        
+        // ⭐ Calculate hash for cache invalidation
+        private int CalculateMemoryHash()
+        {
+            if (currentMemoryComp == null)
+                return 0;
+            
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + currentMemoryComp.ActiveMemories.Count;
+                hash = hash * 31 + currentMemoryComp.SituationalMemories.Count;
+                hash = hash * 31 + currentMemoryComp.EventLogMemories.Count;
+                hash = hash * 31 + currentMemoryComp.ArchiveMemories.Count;
+                hash = hash * 31 + (filterType?.GetHashCode() ?? 0);
+                hash = hash * 31 + (showABM ? 1 : 0);
+                hash = hash * 31 + (showSCM ? 2 : 0);
+                hash = hash * 31 + (showELS ? 4 : 0);
+                hash = hash * 31 + (showCLPA ? 8 : 0);
+                return hash;
+            }
+        }
         
         private List<MemoryEntry> GetFilteredMemories()
         {

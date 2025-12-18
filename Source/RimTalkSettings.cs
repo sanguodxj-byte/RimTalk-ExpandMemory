@@ -128,6 +128,11 @@ namespace RimTalk.MemoryPatch
         public bool enableVectorEnhancement = false;
         public float vectorSimilarityThreshold = 0.75f;
         public int maxVectorResults = 5;
+        
+        // Cloud Embedding Settings
+        public string embeddingApiKey = "";
+        public string embeddingApiUrl = "https://api.openai.com/v1/embeddings";
+        public string embeddingModel = "text-embedding-3-small";
 
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = true;
@@ -253,6 +258,10 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableVectorEnhancement, "vector_enableVectorEnhancement", false);
             Scribe_Values.Look(ref vectorSimilarityThreshold, "vector_vectorSimilarityThreshold", 0.75f);
             Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
+            
+            Scribe_Values.Look(ref embeddingApiKey, "vector_embeddingApiKey", "");
+            Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.openai.com/v1/embeddings");
+            Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "text-embedding-3-small");
 
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", true);
@@ -714,6 +723,25 @@ namespace RimTalk.MemoryPatch
                 
                 listing.Label($"最大补充结果: {maxVectorResults}");
                 maxVectorResults = (int)listing.Slider(maxVectorResults, 1, 15);
+                
+                listing.Gap();
+                
+                GUI.color = new Color(1f, 0.9f, 0.7f);
+                listing.Label("云端 Embedding 配置");
+                GUI.color = Color.white;
+                
+                listing.Label("API Key:");
+                embeddingApiKey = listing.TextEntry(embeddingApiKey);
+                
+                listing.Label("API URL:");
+                embeddingApiUrl = listing.TextEntry(embeddingApiUrl);
+                
+                listing.Label("Model:");
+                embeddingModel = listing.TextEntry(embeddingModel);
+                
+                GUI.color = Color.gray;
+                listing.Label("提示: 留空 API Key 将使用上方 AI 配置中的 API Key");
+                GUI.color = Color.white;
             }
             
             listing.Gap();

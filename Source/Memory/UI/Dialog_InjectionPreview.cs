@@ -22,6 +22,7 @@ namespace RimTalk.Memory.Debug
         private int cachedMemoryCount = 0;
         private int cachedKnowledgeCount = 0;
         private string contextInput = "";  // ⭐ 新增：上下文输入
+        private string lastRefreshedContext = "";  // ⭐ 新增：上次刷新时的上下文
         
         // ⭐ 新增：注入预览增强
         private bool showRejectedKnowledge = false; // 是否显示未注入的常识
@@ -892,6 +893,7 @@ namespace RimTalk.Memory.Debug
                 preview.AppendLine();
 
                 cachedPreview = preview.ToString();
+                lastRefreshedContext = contextInput; // ⭐ 更新上次刷新的上下文
             }
             catch (Exception ex)
             {
@@ -928,12 +930,8 @@ namespace RimTalk.Memory.Debug
             // 输入框 - 使用TextArea支持多行
             Rect textFieldRect = new Rect(rect.x + 130f, rect.y, rect.width - 470f, 60f);
             
-            string newInput = Widgets.TextArea(textFieldRect, contextInput);
-            if (newInput != contextInput)
-            {
-                contextInput = newInput;
-                cachedPreview = ""; // 清空缓存，标记需要刷新
-            }
+            // ⭐ 修复：不要在输入时立即刷新，只更新输入内容
+            contextInput = Widgets.TextArea(textFieldRect, contextInput);
             
             // 提示文字（如果为空）
             if (string.IsNullOrEmpty(contextInput))
@@ -1048,6 +1046,7 @@ namespace RimTalk.Memory.Debug
                 
                 // 清空缓存，标记需要刷新
                 cachedPreview = "";
+                RefreshPreview(); // 立即刷新预览
                 
                 // 显示成功消息
                 string pawnName = lastPawn != null ? lastPawn.LabelShort : "未知";
