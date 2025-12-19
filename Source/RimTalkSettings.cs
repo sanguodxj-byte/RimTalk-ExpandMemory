@@ -173,6 +173,7 @@ namespace RimTalk.MemoryPatch
         private static bool expandSummarization = false;
         private static bool expandAIConfig = true;
         private static bool expandMemoryTypes = false;
+        private static bool expandVectorEnhancement = true; // ⭐ 恢复向量增强折叠状态
         private static bool expandExperimentalFeatures = true;
         
         private static Vector2 scrollPosition = Vector2.zero;
@@ -650,6 +651,20 @@ namespace RimTalk.MemoryPatch
                 recallTriggerChance = listing.Slider(recallTriggerChance, 0.05f, 0.60f);
             }
         }
+        
+        /// <summary>
+        /// ⭐ 绘制向量增强设置（SiliconFlow + 高级匹配）
+        /// </summary>
+        private void DrawVectorEnhancementSettings(Listing_Standard listing)
+        {
+            // ⭐ SiliconFlow向量服务设置
+            SettingsUIDrawers.DrawSiliconFlowSettings(listing, this);
+            
+            listing.GapLine();
+            
+            // ⭐ 高级匹配设置
+            SettingsUIDrawers.DrawAdvancedMatchingSettings(listing, this);
+        }
 
         private void OpenCommonKnowledgeDialog()
         {
@@ -697,7 +712,7 @@ namespace RimTalk.MemoryPatch
             public override void DoWindowContents(Rect inRect)
             {
                 Listing_Standard listing = new Listing_Standard();
-                Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 1600f);
+                Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2200f); // ⭐ 增加高度
                 Widgets.BeginScrollView(inRect, ref scrollPos, viewRect);
                 listing.Begin(viewRect);
 
@@ -720,6 +735,10 @@ namespace RimTalk.MemoryPatch
                 }
 
                 settings.DrawCollapsibleSection(listing, "记忆类型开关", ref expandMemoryTypes, delegate { settings.DrawMemoryTypesSettings(listing); });
+                
+                // ⭐ 添加向量增强设置
+                settings.DrawCollapsibleSection(listing, "🔬 向量增强设置", ref expandVectorEnhancement, delegate { settings.DrawVectorEnhancementSettings(listing); });
+                
                 settings.DrawCollapsibleSection(listing, "🚀 实验性功能", ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
 
                 listing.End();

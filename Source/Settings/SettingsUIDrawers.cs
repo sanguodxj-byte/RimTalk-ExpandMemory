@@ -251,5 +251,87 @@ namespace RimTalk.MemoryPatch
             
             inner.End();
         }
+        
+        // ==================== SiliconFlow设置绘制 ====================
+        
+        public static void DrawSiliconFlowSettings(Listing_Standard listing, RimTalkMemoryPatchSettings settings)
+        {
+            Text.Font = GameFont.Small;
+            GUI.color = new Color(1f, 0.9f, 0.7f);
+            listing.Label("SiliconFlow 向量增强检索");
+            GUI.color = Color.white;
+            listing.Gap();
+            
+            listing.CheckboxLabeled("启用记忆向量检索", ref settings.enableMemoryVectorSearch);
+            if (settings.enableMemoryVectorSearch)
+            {
+                GUI.color = new Color(0.8f, 1f, 0.8f);
+                listing.Label("  使用语义向量检索来增强记忆匹配");
+                GUI.color = Color.white;
+            }
+            
+            listing.CheckboxLabeled("启用常识向量检索", ref settings.enableKnowledgeVectorSearch);
+            if (settings.enableKnowledgeVectorSearch)
+            {
+                GUI.color = new Color(0.8f, 1f, 0.8f);
+                listing.Label("  使用语义向量检索来增强常识匹配");
+                GUI.color = Color.white;
+            }
+            
+            if (settings.enableMemoryVectorSearch || settings.enableKnowledgeVectorSearch)
+            {
+                listing.Gap();
+                
+                // API Key配置
+                listing.Label("SiliconFlow API Key:");
+                settings.siliconFlowApiKey = listing.TextEntry(settings.siliconFlowApiKey);
+                
+                GUI.color = Color.gray;
+                listing.Label("  获取免费Key: https://cloud.siliconflow.cn");
+                GUI.color = Color.white;
+                
+                listing.Gap();
+                
+                // 模型显示（固定）
+                listing.Label($"嵌入模型: {settings.siliconFlowModel}");
+                GUI.color = Color.gray;
+                listing.Label("  (BAAI/bge-large-zh-v1.5 - 中文优化)");
+                GUI.color = Color.white;
+                
+                listing.Gap();
+                
+                // 初始化按钮
+                Rect initButtonRect = listing.GetRect(30f);
+                if (Widgets.ButtonText(initButtonRect, "初始化向量服务"))
+                {
+                    if (string.IsNullOrEmpty(settings.siliconFlowApiKey))
+                    {
+                        Messages.Message("请先输入API Key", MessageTypeDefOf.RejectInput);
+                    }
+                    else
+                    {
+                        Memory.AI.SiliconFlowEmbeddingService.Initialize(settings.siliconFlowApiKey);
+                        if (Memory.AI.SiliconFlowEmbeddingService.IsAvailable())
+                        {
+                            Messages.Message("向量服务初始化成功", MessageTypeDefOf.PositiveEvent);
+                        }
+                        else
+                        {
+                            Messages.Message("初始化失败，请检查API Key", MessageTypeDefOf.RejectInput);
+                        }
+                    }
+                }
+                
+                // 缓存统计
+                if (Memory.AI.SiliconFlowEmbeddingService.IsAvailable())
+                {
+                    GUI.color = new Color(0.7f, 0.9f, 1f);
+                    listing.Label($"  ? {Memory.AI.SiliconFlowEmbeddingService.GetCacheStats()}");
+                    GUI.color = Color.white;
+                }
+                
+                listing.Gap();
+            }
+        }
     }
 }
