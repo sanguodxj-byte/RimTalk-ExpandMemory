@@ -1,145 +1,145 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Verse;
+// using System;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Threading.Tasks;
+// using Verse;
 
-namespace RimTalk.Memory
-{
-    /// <summary>
-    /// ¼ÇÒäÏòÁ¿¼ìË÷¸¨ÖúÀà
-    /// ¡ï v3.3.20: ÎªMemoryEntryÌí¼ÓÏòÁ¿¼ìË÷Ö§³Ö
-    /// </summary>
-    public static class MemoryVectorSearch
-    {
-        /// <summary>
-        /// Ê¹ÓÃÏòÁ¿¼ìË÷ÔöÇ¿¼ÇÒäÆ¥Åä
-        /// </summary>
-        public static List<MemoryEntry> EnhanceMemoriesWithVectorSearch(
-            string context,
-            List<MemoryEntry> candidates,
-            int maxResults = 10)
-        {
-            // ¼ì²éÏòÁ¿·şÎñÊÇ·ñ¿ÉÓÃ
-            if (!AI.SiliconFlowEmbeddingService.IsAvailable())
-            {
-                Log.Warning("[MemoryVectorSearch] SiliconFlow service not available");
-                return candidates;
-            }
+// namespace RimTalk.Memory
+// {
+//     /// <summary>
+//     /// è®°å¿†å‘é‡æ£€ç´¢è¾…åŠ©ç±»
+//     /// â˜… v3.3.20: ä¸ºMemoryEntryæ·»åŠ å‘é‡æ£€ç´¢æ”¯æŒ
+//     /// </summary>
+//     public static class MemoryVectorSearch
+//     {
+//         /// <summary>
+//         /// ä½¿ç”¨å‘é‡æ£€ç´¢å¢å¼ºè®°å¿†åŒ¹é…
+//         /// </summary>
+//         public static List<MemoryEntry> EnhanceMemoriesWithVectorSearch(
+//             string context,
+//             List<MemoryEntry> candidates,
+//             int maxResults = 10)
+//         {
+//             // æ£€æŸ¥å‘é‡æœåŠ¡æ˜¯å¦å¯ç”¨
+//             if (!AI.SiliconFlowEmbeddingService.IsAvailable())
+//             {
+//                 Log.Warning("[MemoryVectorSearch] SiliconFlow service not available");
+//                 return candidates;
+//             }
             
-            try
-            {
-                // Òì²½»ñÈ¡ÉÏÏÂÎÄÏòÁ¿£¨Í¬²½µÈ´ı£©
-                var contextEmbeddingTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(context);
-                contextEmbeddingTask.Wait(TimeSpan.FromSeconds(10));
+//             try
+//             {
+//                 // å¼‚æ­¥è·å–ä¸Šä¸‹æ–‡å‘é‡ï¼ˆåŒæ­¥ç­‰å¾…ï¼‰
+//                 var contextEmbeddingTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(context);
+//                 contextEmbeddingTask.Wait(TimeSpan.FromSeconds(10));
                 
-                if (!contextEmbeddingTask.IsCompleted || contextEmbeddingTask.Result == null)
-                {
-                    Log.Warning("[MemoryVectorSearch] Failed to get context embedding");
-                    return candidates;
-                }
+//                 if (!contextEmbeddingTask.IsCompleted || contextEmbeddingTask.Result == null)
+//                 {
+//                     Log.Warning("[MemoryVectorSearch] Failed to get context embedding");
+//                     return candidates;
+//                 }
                 
-                var contextEmbedding = contextEmbeddingTask.Result;
+//                 var contextEmbedding = contextEmbeddingTask.Result;
                 
-                // ÎªÃ¿¸öºòÑ¡¼ÇÒä¼ÆËãÏòÁ¿ÏàËÆ¶È
-                var scoredMemories = new List<Tuple<MemoryEntry, float>>();
+//                 // ä¸ºæ¯ä¸ªå€™é€‰è®°å¿†è®¡ç®—å‘é‡ç›¸ä¼¼åº¦
+//                 var scoredMemories = new List<Tuple<MemoryEntry, float>>();
                 
-                foreach (var memory in candidates)
-                {
-                    try
-                    {
-                        // »ñÈ¡¼ÇÒäÄÚÈİµÄÏòÁ¿
-                        var memoryEmbeddingTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(memory.content);
-                        memoryEmbeddingTask.Wait(TimeSpan.FromSeconds(5));
+//                 foreach (var memory in candidates)
+//                 {
+//                     try
+//                     {
+//                         // è·å–è®°å¿†å†…å®¹çš„å‘é‡
+//                         var memoryEmbeddingTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(memory.content);
+//                         memoryEmbeddingTask.Wait(TimeSpan.FromSeconds(5));
                         
-                        if (memoryEmbeddingTask.IsCompleted && memoryEmbeddingTask.Result != null)
-                        {
-                            var memoryEmbedding = memoryEmbeddingTask.Result;
+//                         if (memoryEmbeddingTask.IsCompleted && memoryEmbeddingTask.Result != null)
+//                         {
+//                             var memoryEmbedding = memoryEmbeddingTask.Result;
                             
-                            // ¼ÆËãÓàÏÒÏàËÆ¶È
-                            float similarity = AI.SiliconFlowEmbeddingService.CosineSimilarity(contextEmbedding, memoryEmbedding);
+//                             // è®¡ç®—ä½™å¼¦ç›¸ä¼¼åº¦
+//                             float similarity = AI.SiliconFlowEmbeddingService.CosineSimilarity(contextEmbedding, memoryEmbedding);
                             
-                            scoredMemories.Add(new Tuple<MemoryEntry, float>(memory, similarity));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Warning($"[MemoryVectorSearch] Failed to process memory {memory.id}: {ex.Message}");
-                    }
-                }
+//                             scoredMemories.Add(new Tuple<MemoryEntry, float>(memory, similarity));
+//                         }
+//                     }
+//                     catch (Exception ex)
+//                     {
+//                         Log.Warning($"[MemoryVectorSearch] Failed to process memory {memory.id}: {ex.Message}");
+//                     }
+//                 }
                 
-                // °´ÏàËÆ¶È½µĞòÅÅĞò
-                var sorted = scoredMemories
-                    .OrderByDescending(tuple => tuple.Item2)
-                    .Take(maxResults)
-                    .Select(tuple => tuple.Item1)
-                    .ToList();
+//                 // æŒ‰ç›¸ä¼¼åº¦é™åºæ’åº
+//                 var sorted = scoredMemories
+//                     .OrderByDescending(tuple => tuple.Item2)
+//                     .Take(maxResults)
+//                     .Select(tuple => tuple.Item1)
+//                     .ToList();
                 
-                Log.Message($"[MemoryVectorSearch] Enhanced {sorted.Count} memories from {candidates.Count} candidates");
+//                 Log.Message($"[MemoryVectorSearch] Enhanced {sorted.Count} memories from {candidates.Count} candidates");
                 
-                return sorted;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[MemoryVectorSearch] Error during vector search: {ex.Message}");
-                return candidates;
-            }
-        }
+//                 return sorted;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[MemoryVectorSearch] Error during vector search: {ex.Message}");
+//                 return candidates;
+//             }
+//         }
         
-        /// <summary>
-        /// ¼ÆËã¼ÇÒäµÄÏòÁ¿ÏàËÆ¶È·ÖÊı
-        /// </summary>
-        public static float CalculateVectorScore(string context, string memoryContent)
-        {
-            if (!AI.SiliconFlowEmbeddingService.IsAvailable())
-            {
-                return 0f;
-            }
+//         /// <summary>
+//         /// è®¡ç®—è®°å¿†çš„å‘é‡ç›¸ä¼¼åº¦åˆ†æ•°
+//         /// </summary>
+//         public static float CalculateVectorScore(string context, string memoryContent)
+//         {
+//             if (!AI.SiliconFlowEmbeddingService.IsAvailable())
+//             {
+//                 return 0f;
+//             }
             
-            try
-            {
-                // »ñÈ¡ÏòÁ¿²¢¼ÆËãÏàËÆ¶È£¨Í¬²½µÈ´ı£©
-                var contextTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(context);
-                var memoryTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(memoryContent);
+//             try
+//             {
+//                 // è·å–å‘é‡å¹¶è®¡ç®—ç›¸ä¼¼åº¦ï¼ˆåŒæ­¥ç­‰å¾…ï¼‰
+//                 var contextTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(context);
+//                 var memoryTask = AI.SiliconFlowEmbeddingService.GetEmbeddingAsync(memoryContent);
                 
-                Task.WaitAll(new Task[] { contextTask, memoryTask }, TimeSpan.FromSeconds(8));
+//                 Task.WaitAll(new Task[] { contextTask, memoryTask }, TimeSpan.FromSeconds(8));
                 
-                if (contextTask.IsCompleted && memoryTask.IsCompleted && 
-                    contextTask.Result != null && memoryTask.Result != null)
-                {
-                    return AI.SiliconFlowEmbeddingService.CosineSimilarity(contextTask.Result, memoryTask.Result);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[MemoryVectorSearch] Failed to calculate vector score: {ex.Message}");
-            }
+//                 if (contextTask.IsCompleted && memoryTask.IsCompleted && 
+//                     contextTask.Result != null && memoryTask.Result != null)
+//                 {
+//                     return AI.SiliconFlowEmbeddingService.CosineSimilarity(contextTask.Result, memoryTask.Result);
+//                 }
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Warning($"[MemoryVectorSearch] Failed to calculate vector score: {ex.Message}");
+//             }
             
-            return 0f;
-        }
+//             return 0f;
+//         }
         
-        /// <summary>
-        /// »ìºÏ¼ìË÷£º½áºÏ¹Ø¼ü´ÊÆ¥ÅäºÍÏòÁ¿ÏàËÆ¶È£¨ÓÃÓÚ¼ÇÒä¼ìË÷£©
-        /// </summary>
-        public static float CalculateHybridMemoryScore(
-            MemoryEntry memory,
-            List<string> contextKeywords,
-            float keywordScore,
-            float vectorWeight)
-        {
-            if (!AI.SiliconFlowEmbeddingService.IsAvailable())
-            {
-                return keywordScore;
-            }
+//         /// <summary>
+//         /// æ··åˆæ£€ç´¢ï¼šç»“åˆå…³é”®è¯åŒ¹é…å’Œå‘é‡ç›¸ä¼¼åº¦ï¼ˆç”¨äºè®°å¿†æ£€ç´¢ï¼‰
+//         /// </summary>
+//         public static float CalculateHybridMemoryScore(
+//             MemoryEntry memory,
+//             List<string> contextKeywords,
+//             float keywordScore,
+//             float vectorWeight)
+//         {
+//             if (!AI.SiliconFlowEmbeddingService.IsAvailable())
+//             {
+//                 return keywordScore;
+//             }
             
-            // »ñÈ¡ÏòÁ¿·ÖÊı£¨ĞèÒªcontext£¬ÕâÀï¼ò»¯´¦Àí£©
-            // Êµ¼ÊÊ¹ÓÃÊ±ĞèÒª´«ÈëÍêÕûcontext
-            float vectorScore = 0f;
+//             // è·å–å‘é‡åˆ†æ•°ï¼ˆéœ€è¦contextï¼Œè¿™é‡Œç®€åŒ–å¤„ç†ï¼‰
+//             // å®é™…ä½¿ç”¨æ—¶éœ€è¦ä¼ å…¥å®Œæ•´context
+//             float vectorScore = 0f;
             
-            // »ìºÏ¼ÆËã
-            float finalScore = keywordScore * (1f - vectorWeight) + vectorScore * vectorWeight;
+//             // æ··åˆè®¡ç®—
+//             float finalScore = keywordScore * (1f - vectorWeight) + vectorScore * vectorWeight;
             
-            return finalScore;
-        }
-    }
-}
+//             return finalScore;
+//         }
+//     }
+// }
