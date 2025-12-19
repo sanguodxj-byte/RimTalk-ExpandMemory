@@ -143,6 +143,9 @@ namespace RimTalk.Memory
                 // 定期清理
                 PawnStatusKnowledgeGenerator.CleanupUpdateRecords();
                 EventRecordKnowledgeGenerator.CleanupProcessedRecords();
+                
+                // ⭐ 修复2：每小时更新事件常识的时间前缀
+                UpdateEventKnowledgeTimePrefixes();
             }
             
             // ⭐ 处理总结队列（每tick检查）
@@ -154,7 +157,44 @@ namespace RimTalk.Memory
             // 每天 0 点触发总结
             CheckDailySummarization();
         }
-
+        
+        /// <summary>
+        /// ⭐ 修复2：更新所有事件常识的时间前缀
+        /// </summary>
+        private void UpdateEventKnowledgeTimePrefixes()
+        {
+            if (commonKnowledge == null || commonKnowledge.Entries == null)
+                return;
+            
+            int currentTick = Find.TickManager.TicksGame;
+            int updatedCount = 0;
+            
+            // 只更新带时间戳的事件常识
+            foreach (var entry in commonKnowledge.Entries)
+            {
+                if (entry.creationTick >= 0 && !string.IsNullOrEmpty(entry.originalEventText))
+                {
+                    // 保存原始内容用于比较
+                    string oldContent = entry.content;
+                    
+                    // 更新时间前缀
+                    entry.UpdateEventTimePrefix(currentTick);
+                    
+                    // 如果内容发生变化，计数
+                    if (entry.content != oldContent)
+                    {
+                        updatedCount++;
+                    }
+                }
+            }
+            
+            // 开发模式日志（每10次更新才输出一次）
+            if (Prefs.DevMode && updatedCount > 0 && UnityEngine.Random.value < 0.1f)
+            {
+                Log.Message($"[RimTalk Memory] Updated {updatedCount} event knowledge time prefixes");
+            }
+        }
+        
         /// <summary>
         /// 检查并触发每日总结（游戏时间 0 点）
         /// </summary>

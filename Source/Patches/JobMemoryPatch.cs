@@ -58,15 +58,26 @@ namespace RimTalk.Patches
                 // 尝试获取有意义的名称
                 if (targetThing is Blueprint blueprint)
                 {
-                    targetName = blueprint.def.entityDefToBuild?.label ?? "";
+                    var entityDef = blueprint.def.entityDefToBuild;
+                    if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                    {
+                        targetName = entityDef.label;
+                    }
+                    // ⭐ 修复：如果entityDefToBuild为空，不使用LabelShort
                 }
                 else if (targetThing is Frame frame)
                 {
-                    targetName = frame.def.entityDefToBuild?.label ?? "";
+                    var entityDef = frame.def.entityDefToBuild;
+                    if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                    {
+                        targetName = entityDef.label;
+                    }
+                    // ⭐ 修复：如果entityDefToBuild为空，不使用LabelShort
                 }
                 else
                 {
-                    targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
+                    // 其他类型的目标，使用def.label而不是LabelShort
+                    targetName = targetThing.def?.label ?? "";
                 }
                 
                 // 使用正则表达式过滤无意义的目标名称

@@ -338,12 +338,24 @@ namespace RimTalk.Memory
             // 对于建筑：使用蓝图的目标
             if (target is Blueprint blueprint)
             {
-                return blueprint.def.entityDefToBuild?.label ?? "";
+                var entityDef = blueprint.def.entityDefToBuild;
+                if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                {
+                    return entityDef.label;
+                }
+                // ⭐ 修复：如果entityDefToBuild为空，返回空字符串而不是LabelShort
+                return "";
             }
             
             if (target is Frame frame)
             {
-                return frame.def.entityDefToBuild?.label ?? "";
+                var entityDef = frame.def.entityDefToBuild;
+                if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                {
+                    return entityDef.label;
+                }
+                // ⭐ 修复：如果entityDefToBuild为空，返回空字符串而不是LabelShort
+                return "";
             }
             
             // 获取标签
