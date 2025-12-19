@@ -924,6 +924,58 @@ namespace RimTalk.Memory
                 .ThenBy(se => se.Entry.id, StringComparer.Ordinal) // ⭐ 最后按 ID（稳定排序）
                 .ToList();
             
+            // ⭐ v3.3.20: 向量增强检索集成点
+            // 检查是否启用向量检索
+            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+            bool vectorEnabled = settings?.enableKnowledgeVectorSearch ?? false;
+            
+            if (vectorEnabled && RimTalk.Memory.AI.SiliconFlowEmbeddingService.IsAvailable() && allScores.Count > 0)
+            {
+                try
+                {
+                    // 获取超过阈值的候选常识
+                    var candidates = allScores
+                        .Where(se => se.TotalScore >= threshold)
+                        .Take(maxEntries * 2)  // 获取更多候选进行向量筛选
+                        .Select(se => se.Entry)
+                        .ToList();
+                    
+                    if (candidates.Count > 0)
+                    {
+                        // 使用向量检索重新排序（VectorSearchHelper在RimTalk.Memory命名空间）
+                        var vectorEnhanced = VectorSearchHelper.EnhanceWithVectorSearch(
+                            context,
+                            candidates,
+                            maxEntries
+                        );
+                        
+                        // 保存原始分数列表（避免lambda捕获ref参数）
+                        var originalScores = new List<KnowledgeScoreDetail>(allScores);
+                        
+                        // 重建评分列表（保留原始关键词分数）
+                        allScores = vectorEnhanced
+                            .Select(entry =>
+                            {
+                                var original = originalScores.FirstOrDefault(s => s.Entry == entry);
+                                return original ?? new KnowledgeScoreDetail
+                                {
+                                    Entry = entry,
+                                    IsEnabled = entry.isEnabled,
+                                    TotalScore = 0f
+                                };
+                            })
+                            .ToList();
+                        
+                        Log.Message($"[Knowledge] Vector enhancement applied: {vectorEnhanced.Count} entries");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning($"[Knowledge] Vector enhancement failed, falling back to keyword matching: {ex.Message}");
+                    // 失败时继续使用关键词匹配结果
+                }
+            }
+            
             // ⭐ v3.3.2.29: 过滤并获取前N条（已排序，无需再次排序）
             var scopedEntries = allScores
                 .Where(se => se.TotalScore >= threshold)
