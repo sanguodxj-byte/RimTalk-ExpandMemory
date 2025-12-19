@@ -1,466 +1,466 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Verse;
+// using System;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Net.Http;
+// using System.Text;
+// using System.Threading.Tasks;
+// using Verse;
 
-namespace RimTalk.Memory.AI
-{
-    /// <summary>
-    /// SiliconFlowÏòÁ¿Ç¶Èë·şÎñ
-    /// ¡ï v3.3.20: »ùÓÚSiliconFlow APIµÄÓïÒåÏòÁ¿¼ìË÷
-    /// APIÎÄµµ: https://docs.siliconflow.cn/cn/api-reference/embeddings/create-embeddings
-    /// ? ×¢Òâ£ºÊ¹ÓÃÊÖ¶¯JSON¹¹½¨±ÜÃâÍâ²¿ÒÀÀµ
-    /// </summary>
-    public static class SiliconFlowEmbeddingService
-    {
-        private static readonly HttpClient httpClient = new HttpClient();
-        private static bool isInitialized = false;
+// namespace RimTalk.Memory.AI
+// {
+//     /// <summary>
+//     /// SiliconFlowå‘é‡åµŒå…¥æœåŠ¡
+//     /// â˜… v3.3.20: åŸºäºSiliconFlow APIçš„è¯­ä¹‰å‘é‡æ£€ç´¢
+//     /// APIæ–‡æ¡£: https://docs.siliconflow.cn/cn/api-reference/embeddings/create-embeddings
+//     /// ? æ³¨æ„ï¼šä½¿ç”¨æ‰‹åŠ¨JSONæ„å»ºé¿å…å¤–éƒ¨ä¾èµ–
+//     /// </summary>
+//     public static class SiliconFlowEmbeddingService
+//     {
+//         private static readonly HttpClient httpClient = new HttpClient();
+//         private static bool isInitialized = false;
         
-        // »º´æÏòÁ¿£¨±ÜÃâÖØ¸´¼ÆËã£©
-        private static Dictionary<string, float[]> embeddingCache = new Dictionary<string, float[]>();
-        private const int MAX_CACHE_SIZE = 1000;
+//         // ç¼“å­˜å‘é‡ï¼ˆé¿å…é‡å¤è®¡ç®—ï¼‰
+//         private static Dictionary<string, float[]> embeddingCache = new Dictionary<string, float[]>();
+//         private const int MAX_CACHE_SIZE = 1000;
         
-        /// <summary>
-        /// ³õÊ¼»¯·şÎñ
-        /// </summary>
-        public static void Initialize(string apiKey)
-        {
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                Log.Warning("[SiliconFlow] API Key is empty, embedding service disabled");
-                isInitialized = false;
-                return;
-            }
+//         /// <summary>
+//         /// åˆå§‹åŒ–æœåŠ¡
+//         /// </summary>
+//         public static void Initialize(string apiKey)
+//         {
+//             if (string.IsNullOrEmpty(apiKey))
+//             {
+//                 Log.Warning("[SiliconFlow] API Key is empty, embedding service disabled");
+//                 isInitialized = false;
+//                 return;
+//             }
             
-            httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-            httpClient.Timeout = TimeSpan.FromSeconds(30);
+//             httpClient.DefaultRequestHeaders.Clear();
+//             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+//             httpClient.Timeout = TimeSpan.FromSeconds(30);
             
-            isInitialized = true;
-            Log.Message("[SiliconFlow] Embedding service initialized");
-        }
+//             isInitialized = true;
+//             Log.Message("[SiliconFlow] Embedding service initialized");
+//         }
         
-        /// <summary>
-        /// ¼ì²é·şÎñÊÇ·ñ¿ÉÓÃ
-        /// </summary>
-        public static bool IsAvailable()
-        {
-            return isInitialized;
-        }
+//         /// <summary>
+//         /// æ£€æŸ¥æœåŠ¡æ˜¯å¦å¯ç”¨
+//         /// </summary>
+//         public static bool IsAvailable()
+//         {
+//             return isInitialized;
+//         }
         
-        /// <summary>
-        /// »ñÈ¡ÎÄ±¾µÄÏòÁ¿±íÊ¾
-        /// </summary>
-        public static async Task<float[]> GetEmbeddingAsync(string text, string model = "BAAI/bge-large-zh-v1.5")
-        {
-            if (!isInitialized)
-            {
-                Log.Warning("[SiliconFlow] Service not initialized");
-                return null;
-            }
+//         /// <summary>
+//         /// è·å–æ–‡æœ¬çš„å‘é‡è¡¨ç¤º
+//         /// </summary>
+//         public static async Task<float[]> GetEmbeddingAsync(string text, string model = "BAAI/bge-large-zh-v1.5")
+//         {
+//             if (!isInitialized)
+//             {
+//                 Log.Warning("[SiliconFlow] Service not initialized");
+//                 return null;
+//             }
             
-            if (string.IsNullOrEmpty(text))
-                return null;
+//             if (string.IsNullOrEmpty(text))
+//                 return null;
             
-            // ¼ì²é»º´æ
-            string cacheKey = $"{model}:{text}";
-            if (embeddingCache.TryGetValue(cacheKey, out float[] cached))
-            {
-                return cached;
-            }
+//             // æ£€æŸ¥ç¼“å­˜
+//             string cacheKey = $"{model}:{text}";
+//             if (embeddingCache.TryGetValue(cacheKey, out float[] cached))
+//             {
+//                 return cached;
+//             }
             
-            try
-            {
-                // ÊÖ¶¯¹¹½¨JSONÇëÇó£¨±ÜÃâNewtonsoft.JsonÒÀÀµ£©
-                string jsonRequest = $"{{\"model\":\"{model}\",\"input\":\"{EscapeJson(text)}\",\"encoding_format\":\"float\"}}";
-                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+//             try
+//             {
+//                 // æ‰‹åŠ¨æ„å»ºJSONè¯·æ±‚ï¼ˆé¿å…Newtonsoft.Jsonä¾èµ–ï¼‰
+//                 string jsonRequest = $"{{\"model\":\"{model}\",\"input\":\"{EscapeJson(text)}\",\"encoding_format\":\"float\"}}";
+//                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
                 
-                // ·¢ËÍÇëÇó
-                var response = await httpClient.PostAsync(
-                    "https://api.siliconflow.cn/v1/embeddings",
-                    content
-                );
+//                 // å‘é€è¯·æ±‚
+//                 var response = await httpClient.PostAsync(
+//                     "https://api.siliconflow.cn/v1/embeddings",
+//                     content
+//                 );
                 
-                if (!response.IsSuccessStatusCode)
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Log.Error($"[SiliconFlow] API error: {response.StatusCode} - {error}");
-                    return null;
-                }
+//                 if (!response.IsSuccessStatusCode)
+//                 {
+//                     string error = await response.Content.ReadAsStringAsync();
+//                     Log.Error($"[SiliconFlow] API error: {response.StatusCode} - {error}");
+//                     return null;
+//                 }
                 
-                // ½âÎöÏìÓ¦£¨¼ò»¯°æJSON½âÎö£©
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                float[] embedding = ParseEmbeddingFromJson(jsonResponse);
+//                 // è§£æå“åº”ï¼ˆç®€åŒ–ç‰ˆJSONè§£æï¼‰
+//                 string jsonResponse = await response.Content.ReadAsStringAsync();
+//                 float[] embedding = ParseEmbeddingFromJson(jsonResponse);
                 
-                if (embedding != null)
-                {
-                    // »º´æ½á¹û
-                    if (embeddingCache.Count >= MAX_CACHE_SIZE)
-                    {
-                        // ÇåÀí×î¾ÉµÄÒ»°ë»º´æ
-                        var keysToRemove = embeddingCache.Keys.Take(MAX_CACHE_SIZE / 2).ToList();
-                        foreach (var key in keysToRemove)
-                        {
-                            embeddingCache.Remove(key);
-                        }
-                    }
+//                 if (embedding != null)
+//                 {
+//                     // ç¼“å­˜ç»“æœ
+//                     if (embeddingCache.Count >= MAX_CACHE_SIZE)
+//                     {
+//                         // æ¸…ç†æœ€æ—§çš„ä¸€åŠç¼“å­˜
+//                         var keysToRemove = embeddingCache.Keys.Take(MAX_CACHE_SIZE / 2).ToList();
+//                         foreach (var key in keysToRemove)
+//                         {
+//                             embeddingCache.Remove(key);
+//                         }
+//                     }
                     
-                    embeddingCache[cacheKey] = embedding;
-                    return embedding;
-                }
+//                     embeddingCache[cacheKey] = embedding;
+//                     return embedding;
+//                 }
                 
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SiliconFlow] GetEmbedding failed: {ex.Message}");
-                return null;
-            }
-        }
+//                 return null;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[SiliconFlow] GetEmbedding failed: {ex.Message}");
+//                 return null;
+//             }
+//         }
         
-        /// <summary>
-        /// ÅúÁ¿»ñÈ¡ÏòÁ¿£¨¸ü¸ßĞ§£©
-        /// ? v3.3.20: ÍêÕûÊµÏÖÅúÁ¿JSON´¦Àí
-        /// </summary>
-        public static async Task<List<float[]>> GetEmbeddingsBatchAsync(List<string> texts, string model = "BAAI/bge-large-zh-v1.5")
-        {
-            if (!isInitialized || texts == null || texts.Count == 0)
-                return new List<float[]>();
+//         /// <summary>
+//         /// æ‰¹é‡è·å–å‘é‡ï¼ˆæ›´é«˜æ•ˆï¼‰
+//         /// ? v3.3.20: å®Œæ•´å®ç°æ‰¹é‡JSONå¤„ç†
+//         /// </summary>
+//         public static async Task<List<float[]>> GetEmbeddingsBatchAsync(List<string> texts, string model = "BAAI/bge-large-zh-v1.5")
+//         {
+//             if (!isInitialized || texts == null || texts.Count == 0)
+//                 return new List<float[]>();
             
-            try
-            {
-                // ÊÖ¶¯¹¹½¨JSONÊı×éÇëÇó
-                var escapedTexts = texts.Select(t => $"\"{EscapeJson(t)}\"");
-                string inputArray = "[" + string.Join(",", escapedTexts) + "]";
-                string jsonRequest = $"{{\"model\":\"{model}\",\"input\":{inputArray},\"encoding_format\":\"float\"}}";
+//             try
+//             {
+//                 // æ‰‹åŠ¨æ„å»ºJSONæ•°ç»„è¯·æ±‚
+//                 var escapedTexts = texts.Select(t => $"\"{EscapeJson(t)}\"");
+//                 string inputArray = "[" + string.Join(",", escapedTexts) + "]";
+//                 string jsonRequest = $"{{\"model\":\"{model}\",\"input\":{inputArray},\"encoding_format\":\"float\"}}";
                 
-                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+//                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
                 
-                // ·¢ËÍÇëÇó
-                var response = await httpClient.PostAsync(
-                    "https://api.siliconflow.cn/v1/embeddings",
-                    content
-                );
+//                 // å‘é€è¯·æ±‚
+//                 var response = await httpClient.PostAsync(
+//                     "https://api.siliconflow.cn/v1/embeddings",
+//                     content
+//                 );
                 
-                if (!response.IsSuccessStatusCode)
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Log.Error($"[SiliconFlow] Batch API error: {response.StatusCode} - {error}");
-                    return new List<float[]>();
-                }
+//                 if (!response.IsSuccessStatusCode)
+//                 {
+//                     string error = await response.Content.ReadAsStringAsync();
+//                     Log.Error($"[SiliconFlow] Batch API error: {response.StatusCode} - {error}");
+//                     return new List<float[]>();
+//                 }
                 
-                // ½âÎöÏìÓ¦£¨ÅúÁ¿°æ±¾£©
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                var embeddings = ParseBatchEmbeddingsFromJson(jsonResponse);
+//                 // è§£æå“åº”ï¼ˆæ‰¹é‡ç‰ˆæœ¬ï¼‰
+//                 string jsonResponse = await response.Content.ReadAsStringAsync();
+//                 var embeddings = ParseBatchEmbeddingsFromJson(jsonResponse);
                 
-                return embeddings;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SiliconFlow] GetEmbeddingsBatch failed: {ex.Message}");
-                return new List<float[]>();
-            }
-        }
+//                 return embeddings;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[SiliconFlow] GetEmbeddingsBatch failed: {ex.Message}");
+//                 return new List<float[]>();
+//             }
+//         }
         
-        /// <summary>
-        /// ¼ÆËãÓàÏÒÏàËÆ¶È
-        /// </summary>
-        public static float CosineSimilarity(float[] vec1, float[] vec2)
-        {
-            if (vec1 == null || vec2 == null || vec1.Length != vec2.Length)
-                return 0f;
+//         /// <summary>
+//         /// è®¡ç®—ä½™å¼¦ç›¸ä¼¼åº¦
+//         /// </summary>
+//         public static float CosineSimilarity(float[] vec1, float[] vec2)
+//         {
+//             if (vec1 == null || vec2 == null || vec1.Length != vec2.Length)
+//                 return 0f;
             
-            float dotProduct = 0f;
-            float magnitude1 = 0f;
-            float magnitude2 = 0f;
+//             float dotProduct = 0f;
+//             float magnitude1 = 0f;
+//             float magnitude2 = 0f;
             
-            for (int i = 0; i < vec1.Length; i++)
-            {
-                dotProduct += vec1[i] * vec2[i];
-                magnitude1 += vec1[i] * vec1[i];
-                magnitude2 += vec2[i] * vec2[i];
-            }
+//             for (int i = 0; i < vec1.Length; i++)
+//             {
+//                 dotProduct += vec1[i] * vec2[i];
+//                 magnitude1 += vec1[i] * vec1[i];
+//                 magnitude2 += vec2[i] * vec2[i];
+//             }
             
-            magnitude1 = (float)Math.Sqrt(magnitude1);
-            magnitude2 = (float)Math.Sqrt(magnitude2);
+//             magnitude1 = (float)Math.Sqrt(magnitude1);
+//             magnitude2 = (float)Math.Sqrt(magnitude2);
             
-            if (magnitude1 == 0f || magnitude2 == 0f)
-                return 0f;
+//             if (magnitude1 == 0f || magnitude2 == 0f)
+//                 return 0f;
             
-            return dotProduct / (magnitude1 * magnitude2);
-        }
+//             return dotProduct / (magnitude1 * magnitude2);
+//         }
         
-        /// <summary>
-        /// Çå³ı»º´æ
-        /// </summary>
-        public static void ClearCache()
-        {
-            embeddingCache.Clear();
-            Log.Message("[SiliconFlow] Embedding cache cleared");
-        }
+//         /// <summary>
+//         /// æ¸…é™¤ç¼“å­˜
+//         /// </summary>
+//         public static void ClearCache()
+//         {
+//             embeddingCache.Clear();
+//             Log.Message("[SiliconFlow] Embedding cache cleared");
+//         }
         
-        /// <summary>
-        /// »ñÈ¡»º´æÍ³¼Æ
-        /// </summary>
-        public static string GetCacheStats()
-        {
-            return $"Cache: {embeddingCache.Count}/{MAX_CACHE_SIZE} entries";
-        }
+//         /// <summary>
+//         /// è·å–ç¼“å­˜ç»Ÿè®¡
+//         /// </summary>
+//         public static string GetCacheStats()
+//         {
+//             return $"Cache: {embeddingCache.Count}/{MAX_CACHE_SIZE} entries";
+//         }
         
-        /// <summary>
-        /// ? v3.3.20: ±£´æ»º´æµ½ÎÄ¼ş
-        /// </summary>
-        public static void SaveCacheToFile(string filePath)
-        {
-            try
-            {
-                if (embeddingCache.Count == 0)
-                {
-                    Log.Message("[SiliconFlow] No cache to save");
-                    return;
-                }
+//         /// <summary>
+//         /// ? v3.3.20: ä¿å­˜ç¼“å­˜åˆ°æ–‡ä»¶
+//         /// </summary>
+//         public static void SaveCacheToFile(string filePath)
+//         {
+//             try
+//             {
+//                 if (embeddingCache.Count == 0)
+//                 {
+//                     Log.Message("[SiliconFlow] No cache to save");
+//                     return;
+//                 }
                 
-                var cacheData = new List<string>();
-                foreach (var kvp in embeddingCache)
-                {
-                    // ¸ñÊ½: key|vector1,vector2,vector3,...
-                    string vectorStr = string.Join(",", kvp.Value.Select(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture)));
-                    cacheData.Add($"{kvp.Key}|{vectorStr}");
-                }
+//                 var cacheData = new List<string>();
+//                 foreach (var kvp in embeddingCache)
+//                 {
+//                     // æ ¼å¼: key|vector1,vector2,vector3,...
+//                     string vectorStr = string.Join(",", kvp.Value.Select(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+//                     cacheData.Add($"{kvp.Key}|{vectorStr}");
+//                 }
                 
-                System.IO.File.WriteAllLines(filePath, cacheData);
-                Log.Message($"[SiliconFlow] Saved {embeddingCache.Count} cached embeddings to {filePath}");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SiliconFlow] Failed to save cache: {ex.Message}");
-            }
-        }
+//                 System.IO.File.WriteAllLines(filePath, cacheData);
+//                 Log.Message($"[SiliconFlow] Saved {embeddingCache.Count} cached embeddings to {filePath}");
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[SiliconFlow] Failed to save cache: {ex.Message}");
+//             }
+//         }
         
-        /// <summary>
-        /// ? v3.3.20: ´ÓÎÄ¼ş¼ÓÔØ»º´æ
-        /// </summary>
-        public static void LoadCacheFromFile(string filePath)
-        {
-            try
-            {
-                if (!System.IO.File.Exists(filePath))
-                {
-                    Log.Message("[SiliconFlow] No cache file found");
-                    return;
-                }
+//         /// <summary>
+//         /// ? v3.3.20: ä»æ–‡ä»¶åŠ è½½ç¼“å­˜
+//         /// </summary>
+//         public static void LoadCacheFromFile(string filePath)
+//         {
+//             try
+//             {
+//                 if (!System.IO.File.Exists(filePath))
+//                 {
+//                     Log.Message("[SiliconFlow] No cache file found");
+//                     return;
+//                 }
                 
-                var lines = System.IO.File.ReadAllLines(filePath);
-                int loaded = 0;
+//                 var lines = System.IO.File.ReadAllLines(filePath);
+//                 int loaded = 0;
                 
-                foreach (var line in lines)
-                {
-                    if (string.IsNullOrEmpty(line))
-                        continue;
+//                 foreach (var line in lines)
+//                 {
+//                     if (string.IsNullOrEmpty(line))
+//                         continue;
                     
-                    int separatorIndex = line.IndexOf('|');
-                    if (separatorIndex < 0)
-                        continue;
+//                     int separatorIndex = line.IndexOf('|');
+//                     if (separatorIndex < 0)
+//                         continue;
                     
-                    string key = line.Substring(0, separatorIndex);
-                    string vectorStr = line.Substring(separatorIndex + 1);
+//                     string key = line.Substring(0, separatorIndex);
+//                     string vectorStr = line.Substring(separatorIndex + 1);
                     
-                    var parts = vectorStr.Split(',');
-                    var vector = new List<float>();
+//                     var parts = vectorStr.Split(',');
+//                     var vector = new List<float>();
                     
-                    foreach (var part in parts)
-                    {
-                        if (float.TryParse(part.Trim(), System.Globalization.NumberStyles.Float,
-                            System.Globalization.CultureInfo.InvariantCulture, out float value))
-                        {
-                            vector.Add(value);
-                        }
-                    }
+//                     foreach (var part in parts)
+//                     {
+//                         if (float.TryParse(part.Trim(), System.Globalization.NumberStyles.Float,
+//                             System.Globalization.CultureInfo.InvariantCulture, out float value))
+//                         {
+//                             vector.Add(value);
+//                         }
+//                     }
                     
-                    if (vector.Count > 0)
-                    {
-                        embeddingCache[key] = vector.ToArray();
-                        loaded++;
-                    }
+//                     if (vector.Count > 0)
+//                     {
+//                         embeddingCache[key] = vector.ToArray();
+//                         loaded++;
+//                     }
                     
-                    // ÏŞÖÆ¼ÓÔØÊıÁ¿
-                    if (loaded >= MAX_CACHE_SIZE)
-                        break;
-                }
+//                     // é™åˆ¶åŠ è½½æ•°é‡
+//                     if (loaded >= MAX_CACHE_SIZE)
+//                         break;
+//                 }
                 
-                Log.Message($"[SiliconFlow] Loaded {loaded} cached embeddings from {filePath}");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SiliconFlow] Failed to load cache: {ex.Message}");
-            }
-        }
+//                 Log.Message($"[SiliconFlow] Loaded {loaded} cached embeddings from {filePath}");
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[SiliconFlow] Failed to load cache: {ex.Message}");
+//             }
+//         }
         
-        /// <summary>
-        /// ? v3.3.20: »ñÈ¡»º´æÎÄ¼şÂ·¾¶
-        /// </summary>
-        public static string GetCacheFilePath()
-        {
-            string configDir = GenFilePaths.ConfigFolderPath;
-            return System.IO.Path.Combine(configDir, "RimTalk_VectorCache.txt");
-        }
+//         /// <summary>
+//         /// ? v3.3.20: è·å–ç¼“å­˜æ–‡ä»¶è·¯å¾„
+//         /// </summary>
+//         public static string GetCacheFilePath()
+//         {
+//             string configDir = GenFilePaths.ConfigFolderPath;
+//             return System.IO.Path.Combine(configDir, "RimTalk_VectorCache.txt");
+//         }
         
-        // ==================== Ë½ÓĞ¸¨Öú·½·¨ ====================
+//         // ==================== ç§æœ‰è¾…åŠ©æ–¹æ³• ====================
         
-        /// <summary>
-        /// ×ªÒåJSON×Ö·û´®
-        /// </summary>
-        private static string EscapeJson(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return "";
+//         /// <summary>
+//         /// è½¬ä¹‰JSONå­—ç¬¦ä¸²
+//         /// </summary>
+//         private static string EscapeJson(string text)
+//         {
+//             if (string.IsNullOrEmpty(text))
+//                 return "";
             
-            return text
-                .Replace("\\", "\\\\")
-                .Replace("\"", "\\\"")
-                .Replace("\n", "\\n")
-                .Replace("\r", "\\r")
-                .Replace("\t", "\\t");
-        }
+//             return text
+//                 .Replace("\\", "\\\\")
+//                 .Replace("\"", "\\\"")
+//                 .Replace("\n", "\\n")
+//                 .Replace("\r", "\\r")
+//                 .Replace("\t", "\\t");
+//         }
         
-        /// <summary>
-        /// ´ÓJSONÏìÓ¦ÖĞ½âÎöÏòÁ¿Êı×é£¨¼ò»¯°æ½âÎöÆ÷£©
-        /// </summary>
-        private static float[] ParseEmbeddingFromJson(string json)
-        {
-            try
-            {
-                // ²éÕÒ "embedding":[ ¿ªÊ¼Î»ÖÃ
-                int embeddingStart = json.IndexOf("\"embedding\":");
-                if (embeddingStart < 0)
-                    return null;
+//         /// <summary>
+//         /// ä»JSONå“åº”ä¸­è§£æå‘é‡æ•°ç»„ï¼ˆç®€åŒ–ç‰ˆè§£æå™¨ï¼‰
+//         /// </summary>
+//         private static float[] ParseEmbeddingFromJson(string json)
+//         {
+//             try
+//             {
+//                 // æŸ¥æ‰¾ "embedding":[ å¼€å§‹ä½ç½®
+//                 int embeddingStart = json.IndexOf("\"embedding\":");
+//                 if (embeddingStart < 0)
+//                     return null;
                 
-                int arrayStart = json.IndexOf('[', embeddingStart);
-                int arrayEnd = json.IndexOf(']', arrayStart);
+//                 int arrayStart = json.IndexOf('[', embeddingStart);
+//                 int arrayEnd = json.IndexOf(']', arrayStart);
                 
-                if (arrayStart < 0 || arrayEnd < 0)
-                    return null;
+//                 if (arrayStart < 0 || arrayEnd < 0)
+//                     return null;
                 
-                // ÌáÈ¡Êı×éÄÚÈİ
-                string arrayContent = json.Substring(arrayStart + 1, arrayEnd - arrayStart - 1);
+//                 // æå–æ•°ç»„å†…å®¹
+//                 string arrayContent = json.Substring(arrayStart + 1, arrayEnd - arrayStart - 1);
                 
-                // ·Ö¸î²¢½âÎö
-                var parts = arrayContent.Split(',');
-                var result = new List<float>();
+//                 // åˆ†å‰²å¹¶è§£æ
+//                 var parts = arrayContent.Split(',');
+//                 var result = new List<float>();
                 
-                foreach (var part in parts)
-                {
-                    if (float.TryParse(part.Trim(), System.Globalization.NumberStyles.Float,
-                        System.Globalization.CultureInfo.InvariantCulture, out float value))
-                    {
-                        result.Add(value);
-                    }
-                }
+//                 foreach (var part in parts)
+//                 {
+//                     if (float.TryParse(part.Trim(), System.Globalization.NumberStyles.Float,
+//                         System.Globalization.CultureInfo.InvariantCulture, out float value))
+//                     {
+//                         result.Add(value);
+//                     }
+//                 }
                 
-                return result.Count > 0 ? result.ToArray() : null;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SiliconFlow] Failed to parse embedding JSON: {ex.Message}");
-                return null;
-            }
-        }
+//                 return result.Count > 0 ? result.ToArray() : null;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[SiliconFlow] Failed to parse embedding JSON: {ex.Message}");
+//                 return null;
+//             }
+//         }
         
-        /// <summary>
-        /// ? v3.3.20: ´ÓÅúÁ¿JSONÏìÓ¦ÖĞ½âÎö¶à¸öÏòÁ¿Êı×é
-        /// </summary>
-        private static List<float[]> ParseBatchEmbeddingsFromJson(string json)
-        {
-            var results = new List<float[]>();
+//         /// <summary>
+//         /// ? v3.3.20: ä»æ‰¹é‡JSONå“åº”ä¸­è§£æå¤šä¸ªå‘é‡æ•°ç»„
+//         /// </summary>
+//         private static List<float[]> ParseBatchEmbeddingsFromJson(string json)
+//         {
+//             var results = new List<float[]>();
             
-            try
-            {
-                // ²éÕÒ "data":[ ¿ªÊ¼Î»ÖÃ
-                int dataStart = json.IndexOf("\"data\":");
-                if (dataStart < 0)
-                    return results;
+//             try
+//             {
+//                 // æŸ¥æ‰¾ "data":[ å¼€å§‹ä½ç½®
+//                 int dataStart = json.IndexOf("\"data\":");
+//                 if (dataStart < 0)
+//                     return results;
                 
-                int dataArrayStart = json.IndexOf('[', dataStart);
-                if (dataArrayStart < 0)
-                    return results;
+//                 int dataArrayStart = json.IndexOf('[', dataStart);
+//                 if (dataArrayStart < 0)
+//                     return results;
                 
-                // Öğ¸ö²éÕÒ "embedding":[ ¿é
-                int searchPos = dataArrayStart;
-                while (true)
-                {
-                    int embeddingStart = json.IndexOf("\"embedding\":", searchPos);
-                    if (embeddingStart < 0)
-                        break;
+//                 // é€ä¸ªæŸ¥æ‰¾ "embedding":[ å—
+//                 int searchPos = dataArrayStart;
+//                 while (true)
+//                 {
+//                     int embeddingStart = json.IndexOf("\"embedding\":", searchPos);
+//                     if (embeddingStart < 0)
+//                         break;
                     
-                    int arrayStart = json.IndexOf('[', embeddingStart);
-                    int arrayEnd = json.IndexOf(']', arrayStart);
+//                     int arrayStart = json.IndexOf('[', embeddingStart);
+//                     int arrayEnd = json.IndexOf(']', arrayStart);
                     
-                    if (arrayStart < 0 || arrayEnd < 0)
-                        break;
+//                     if (arrayStart < 0 || arrayEnd < 0)
+//                         break;
                     
-                    // ÌáÈ¡Êı×éÄÚÈİ
-                    string arrayContent = json.Substring(arrayStart + 1, arrayEnd - arrayStart - 1);
+//                     // æå–æ•°ç»„å†…å®¹
+//                     string arrayContent = json.Substring(arrayStart + 1, arrayEnd - arrayStart - 1);
                     
-                    // ·Ö¸î²¢½âÎö
-                    var parts = arrayContent.Split(',');
-                    var embedding = new List<float>();
+//                     // åˆ†å‰²å¹¶è§£æ
+//                     var parts = arrayContent.Split(',');
+//                     var embedding = new List<float>();
                     
-                    foreach (var part in parts)
-                    {
-                        if (float.TryParse(part.Trim(), System.Globalization.NumberStyles.Float,
-                            System.Globalization.CultureInfo.InvariantCulture, out float value))
-                        {
-                            embedding.Add(value);
-                        }
-                    }
+//                     foreach (var part in parts)
+//                     {
+//                         if (float.TryParse(part.Trim(), System.Globalization.NumberStyles.Float,
+//                             System.Globalization.CultureInfo.InvariantCulture, out float value))
+//                         {
+//                             embedding.Add(value);
+//                         }
+//                     }
                     
-                    if (embedding.Count > 0)
-                    {
-                        results.Add(embedding.ToArray());
-                    }
+//                     if (embedding.Count > 0)
+//                     {
+//                         results.Add(embedding.ToArray());
+//                     }
                     
-                    // ÒÆ¶¯ËÑË÷Î»ÖÃµ½ÏÂÒ»¸ö¿ÉÄÜµÄembedding
-                    searchPos = arrayEnd + 1;
-                }
+//                     // ç§»åŠ¨æœç´¢ä½ç½®åˆ°ä¸‹ä¸€ä¸ªå¯èƒ½çš„embedding
+//                     searchPos = arrayEnd + 1;
+//                 }
                 
-                return results;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SiliconFlow] Failed to parse batch embeddings JSON: {ex.Message}");
-                return results;
-            }
-        }
-    }
+//                 return results;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Log.Error($"[SiliconFlow] Failed to parse batch embeddings JSON: {ex.Message}");
+//                 return results;
+//             }
+//         }
+//     }
     
-    // ==================== APIÏìÓ¦Ä£ĞÍ£¨ÒÑ·ÏÆú£¬±£ÁôÓÃÓÚ²Î¿¼£© ====================
+//     // ==================== APIå“åº”æ¨¡å‹ï¼ˆå·²åºŸå¼ƒï¼Œä¿ç•™ç”¨äºå‚è€ƒï¼‰ ====================
     
-    /*
-    [Serializable]
-    public class EmbeddingResponse
-    {
-        public string @object;
-        public List<EmbeddingData> data;
-        public string model;
-        public Usage usage;
-    }
+//     /*
+//     [Serializable]
+//     public class EmbeddingResponse
+//     {
+//         public string @object;
+//         public List<EmbeddingData> data;
+//         public string model;
+//         public Usage usage;
+//     }
     
-    [Serializable]
-    public class EmbeddingData
-    {
-        public string @object;
-        public float[] embedding;
-        public int index;
-    }
+//     [Serializable]
+//     public class EmbeddingData
+//     {
+//         public string @object;
+//         public float[] embedding;
+//         public int index;
+//     }
     
-    [Serializable]
-    public class Usage
-    {
-        public int prompt_tokens;
-        public int total_tokens;
-    }
-    */
-}
+//     [Serializable]
+//     public class Usage
+//     {
+//         public int prompt_tokens;
+//         public int total_tokens;
+//     }
+//     */
+// }

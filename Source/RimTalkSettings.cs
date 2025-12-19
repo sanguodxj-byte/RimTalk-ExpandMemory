@@ -114,57 +114,19 @@ namespace RimTalk.MemoryPatch
         public bool enableProactiveRecall = false;
         public float recallTriggerChance = 0.15f;
         
-        // 常识库权重配置
-        public float knowledgeBaseScore = 0.05f;
-        public float knowledgeJaccardWeight = 0.7f;
-        public float knowledgeTagWeight = 0.3f;
-        public float knowledgeMatchBonus = 0.08f;
-
         // Vector Enhancement Settings
         public bool enableVectorEnhancement = false;
         public float vectorSimilarityThreshold = 0.75f;
         public int maxVectorResults = 5;
         
-        // ⭐ v3.3.20: SiliconFlow向量嵌入服务配置
-        public string siliconFlowApiKey = "";
-        public string siliconFlowModel = "BAAI/bge-large-zh-v1.5";
-        public bool enableMemoryVectorSearch = false;      // 记忆向量检索
-        public bool enableKnowledgeVectorSearch = false;   // 常识向量检索
-
+        // Cloud Embedding Settings
+        public string embeddingApiKey = "";
+        public string embeddingApiUrl = "https://api.openai.com/v1/embeddings";
+        public string embeddingModel = "text-embedding-3-small";
+        
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
         public int maxChainingRounds = 2;
-        
-        // ⭐ v3.3.20: 新增高级匹配设置
-        public float confidenceMargin = 0.05f; // 防误触领跑分 (0.0 - 0.2)
-        public float hybridWeightBalance = 0.5f; // 混合检索权重 (0.0 - 1.0, 0=Keywords, 1=Vector)
-        public string globalExcludeKeywords = ""; // 全局排除词 (逗号分隔)
-        
-        private string[] cachedGlobalExcludeKeywords; // 缓存的全局排除词数组
-
-        public string[] GetGlobalExcludeKeywords()
-        {
-            if (cachedGlobalExcludeKeywords == null)
-            {
-                if (string.IsNullOrEmpty(globalExcludeKeywords))
-                {
-                    cachedGlobalExcludeKeywords = new string[0];
-                }
-                else
-                {
-                    cachedGlobalExcludeKeywords = globalExcludeKeywords.Split(new[] { ',', '，', '、', ';', '；' }, System.StringSplitOptions.RemoveEmptyEntries)
-                        .Select(k => k.Trim())
-                        .Where(k => !string.IsNullOrEmpty(k))
-                        .ToArray();
-                }
-            }
-            return cachedGlobalExcludeKeywords;
-        }
-        
-        public void ClearGlobalExcludeCache()
-        {
-            cachedGlobalExcludeKeywords = null;
-        }
 
         // UI折叠状态
         private static bool expandDynamicInjection = true;
@@ -242,35 +204,18 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableProactiveRecall, "recall_enableProactiveRecall", false);
             Scribe_Values.Look(ref recallTriggerChance, "recall_triggerChance", 0.15f);
 
-            Scribe_Values.Look(ref knowledgeBaseScore, "knowledge_baseScore", 0.05f);
-            Scribe_Values.Look(ref knowledgeJaccardWeight, "knowledge_jaccardWeight", 0.7f);
-            Scribe_Values.Look(ref knowledgeTagWeight, "knowledge_tagWeight", 0.3f);
-            Scribe_Values.Look(ref knowledgeMatchBonus, "knowledge_matchBonus", 0.08f);
-
             // Vector Enhancement
             Scribe_Values.Look(ref enableVectorEnhancement, "vector_enableVectorEnhancement", false);
             Scribe_Values.Look(ref vectorSimilarityThreshold, "vector_vectorSimilarityThreshold", 0.75f);
             Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
             
-            // ⭐ v3.3.20: SiliconFlow向量嵌入服务
-            Scribe_Values.Look(ref siliconFlowApiKey, "siliconFlow_apiKey", "");
-            Scribe_Values.Look(ref siliconFlowModel, "siliconFlow_model", "BAAI/bge-large-zh-v1.5");
-            Scribe_Values.Look(ref enableMemoryVectorSearch, "siliconFlow_enableMemoryVector", false);
-            Scribe_Values.Look(ref enableKnowledgeVectorSearch, "siliconFlow_enableKnowledgeVector", false);
+            Scribe_Values.Look(ref embeddingApiKey, "vector_embeddingApiKey", "");
+            Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.openai.com/v1/embeddings");
+            Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "text-embedding-3-small");
 
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
             Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
-            
-            // ⭐ v3.3.20: 序列化高级匹配设置
-            Scribe_Values.Look(ref confidenceMargin, "knowledge_confidenceMargin", 0.05f);
-            Scribe_Values.Look(ref hybridWeightBalance, "knowledge_hybridWeightBalance", 0.5f);
-            Scribe_Values.Look(ref globalExcludeKeywords, "knowledge_globalExcludeKeywords", "");
-            
-            if (Scribe.mode == LoadSaveMode.PostLoadInit)
-            {
-                ClearGlobalExcludeCache();
-            }
         }
 
         public void DoSettingsWindowContents(Rect inRect)
@@ -650,20 +595,18 @@ namespace RimTalk.MemoryPatch
                 listing.Label($"触发概率: {recallTriggerChance:P0}");
                 recallTriggerChance = listing.Slider(recallTriggerChance, 0.05f, 0.60f);
             }
+            
+            listing.Gap();
+            listing.GapLine();
+            
+            // ⭐ 常识链设置
+            SettingsUIDrawers.DrawKnowledgeChainingSettings(listing, this);
         }
         
-        /// <summary>
-        /// ⭐ 绘制向量增强设置（SiliconFlow + 高级匹配）
-        /// </summary>
         private void DrawVectorEnhancementSettings(Listing_Standard listing)
         {
             // ⭐ SiliconFlow向量服务设置
             SettingsUIDrawers.DrawSiliconFlowSettings(listing, this);
-            
-            listing.GapLine();
-            
-            // ⭐ 高级匹配设置
-            SettingsUIDrawers.DrawAdvancedMatchingSettings(listing, this);
         }
 
         private void OpenCommonKnowledgeDialog()

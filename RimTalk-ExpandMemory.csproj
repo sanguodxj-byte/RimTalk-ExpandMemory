@@ -106,7 +106,7 @@
         </Reference>
         <!-- ⭐ v3.3.20: 添加Newtonsoft.Json引用（用于向量API） -->
         <Reference Include="Newtonsoft.Json">
-            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Newtonsoft.Json.dll</HintPath>
+            <HintPath>1.6\Assemblies\Newtonsoft.Json.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
@@ -119,6 +119,9 @@
     <!-- Exclude broken RimTalk original source files -->
     <ItemGroup>
         <Compile Remove="..\RimTalk\**\*.cs" />
+        <Compile Remove="backup\**" />
+        <Compile Remove="Backups\**" />
+        <Compile Remove="**\*.backup.cs" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Source\Memory\Debug\" />

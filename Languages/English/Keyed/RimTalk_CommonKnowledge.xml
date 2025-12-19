@@ -79,4 +79,19 @@
     <!-- Memory Type Names -->
     <RimTalk_Type_Action>Action Memory</RimTalk_Type_Action>
     <RimTalk_Type_Conversation>Conversation Memory</RimTalk_Type_Conversation>
+
+    <!-- Knowledge Chaining -->
+    <RimTalk_ExtendedProperties>Extended Properties</RimTalk_ExtendedProperties>
+    <RimTalk_CanBeExtracted>Can Be Extracted: </RimTalk_CanBeExtracted>
+    <RimTalk_CanBeMatched>Can Be Matched: </RimTalk_CanBeMatched>
+    <RimTalk_Yes>Yes (✓)</RimTalk_Yes>
+    <RimTalk_No>No (×)</RimTalk_No>
+    <RimTalk_EnableAllExtract>Enable All Extraction</RimTalk_EnableAllExtract>
+    <RimTalk_DisableAllExtract>Disable All Extraction</RimTalk_DisableAllExtract>
+    <RimTalk_EnableAllMatch>Enable All Matching</RimTalk_EnableAllMatch>
+    <RimTalk_DisableAllMatch>Disable All Matching</RimTalk_DisableAllMatch>
+    <RimTalk_CanBeExtractedEnabled>Content extraction for lore chain enabled (Click to disable)</RimTalk_CanBeExtractedEnabled>
+    <RimTalk_CanBeExtractedDisabled>Content extraction for lore chain disabled (Click to enable)</RimTalk_CanBeExtractedDisabled>
+    <RimTalk_CanBeMatchedEnabled>Keyword matching enabled (Click to disable)</RimTalk_CanBeMatchedEnabled>
+    <RimTalk_CanBeMatchedDisabled>Keyword matching disabled (Click to enable)</RimTalk_CanBeMatchedDisabled>
 </LanguageData>

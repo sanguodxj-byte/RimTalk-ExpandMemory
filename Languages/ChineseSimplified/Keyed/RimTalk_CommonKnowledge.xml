@@ -79,4 +79,19 @@
     <!-- Memory Type Names 记忆类型名称 -->
     <RimTalk_Type_Action>行动记忆</RimTalk_Type_Action>
     <RimTalk_Type_Conversation>对话记忆</RimTalk_Type_Conversation>
+
+    <!-- 常识链 -->
+    <RimTalk_ExtendedProperties>扩展属性</RimTalk_ExtendedProperties>
+    <RimTalk_CanBeExtracted>允许被提取：</RimTalk_CanBeExtracted>
+    <RimTalk_CanBeMatched>允许被匹配：</RimTalk_CanBeMatched>
+    <RimTalk_Yes>是 (✓)</RimTalk_Yes>
+    <RimTalk_No>否 (×)</RimTalk_No>
+    <RimTalk_EnableAllExtract>全部开启提取</RimTalk_EnableAllExtract>
+    <RimTalk_DisableAllExtract>全部关闭提取</RimTalk_DisableAllExtract>
+    <RimTalk_EnableAllMatch>全部开启匹配</RimTalk_EnableAllMatch>
+    <RimTalk_DisableAllMatch>全部关闭匹配</RimTalk_DisableAllMatch>
+    <RimTalk_CanBeExtractedEnabled>允许提取内容用于常识链（点击禁用）</RimTalk_CanBeExtractedEnabled>
+    <RimTalk_CanBeExtractedDisabled>不允许提取内容用于常识链（点击启用）</RimTalk_CanBeExtractedDisabled>
+    <RimTalk_CanBeMatchedEnabled>允许被关键词匹配（点击禁用）</RimTalk_CanBeMatchedEnabled>
+    <RimTalk_CanBeMatchedDisabled>不允许被关键词匹配（点击启用）</RimTalk_CanBeMatchedDisabled>
 </LanguageData>

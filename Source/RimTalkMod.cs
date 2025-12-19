@@ -45,9 +45,6 @@ namespace RimTalk.MemoryPatch
             
             // 重新加载提示词规范化规则
             Memory.PromptNormalizer.UpdateRules(Settings.normalizationRules);
-            
-            // 重新加载常识库权重配置
-            Memory.KnowledgeWeights.LoadFromSettings(Settings);
         }
     }
 }

@@ -429,6 +429,9 @@ namespace RimTalk.Memory.Debug
                     targetPawn
                 );
 
+                // 注意：向量匹配结果不再在此处模拟，而是通过"测试向量匹配"按钮手动触发
+                // 实际游戏中由 Patch_GenerateAndProcessTalkAsync 在后台异步处理
+
                 cachedMemoryCount = memoryScores?.Count ?? 0;
                 cachedKnowledgeCount = knowledgeScores?.Count ?? 0;
                 
@@ -834,6 +837,14 @@ namespace RimTalk.Memory.Debug
             Widgets.Label(new Rect(rect.x, rect.y, 120f, 30f), "上下文输入：");
             GUI.color = Color.white;
             
+            // ⭐ 新增：测试向量匹配按钮
+            Rect vectorTestButtonRect = new Rect(rect.x + rect.width - 310f, rect.y, 150f, 30f);
+            if (Widgets.ButtonText(vectorTestButtonRect, "🧠 测试向量匹配"))
+            {
+                TestVectorMatching();
+            }
+            TooltipHandler.TipRegion(vectorTestButtonRect, "将上下文内容发送到向量库进行匹配测试\n可以在预览中看到向量检索的结果");
+            
             // ⭐ 新增：读取上次RimTalk输入按钮
             Rect loadButtonRect = new Rect(rect.x + rect.width - 150f, rect.y, 140f, 30f);
             if (Widgets.ButtonText(loadButtonRect, "读取上次输入 📥"))
@@ -843,7 +854,7 @@ namespace RimTalk.Memory.Debug
             TooltipHandler.TipRegion(loadButtonRect, "从RimTalk读取最后一次发送给AI的对话内容\n（仅当RimTalk已安装且有对话记录时可用）");
             
             // 输入框 - 使用TextArea支持多行
-            Rect textFieldRect = new Rect(rect.x + 130f, rect.y, rect.width - 290f, 60f);
+            Rect textFieldRect = new Rect(rect.x + 130f, rect.y, rect.width - 470f, 60f);
             
             string newInput = Widgets.TextArea(textFieldRect, contextInput);
             if (newInput != contextInput)
@@ -860,6 +871,83 @@ namespace RimTalk.Memory.Debug
                     "输入对话上下文（例如：最近的对话内容、话题等）\n留空则仅基于重要性和层级评分");
                 GUI.color = Color.white;
             }
+        }
+
+        /// <summary>
+        /// ⭐ 新增：测试向量匹配功能
+        /// </summary>
+        private void TestVectorMatching()
+        {
+            if (string.IsNullOrEmpty(contextInput))
+            {
+                Messages.Message("请先输入上下文内容", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+            
+            var settings = RimTalkMemoryPatchMod.Settings;
+            if (!settings.enableVectorEnhancement)
+            {
+                Messages.Message("向量增强功能未启用，请在设置中开启", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+                try
+                {
+                    string cleanedContext = ContextCleaner.CleanForVectorMatching(contextInput);
+                    var vectorResults = VectorDB.VectorService.Instance.FindBestLoreIdsAsync(
+                        cleanedContext, 
+                        settings.maxVectorResults * 2,
+                        settings.vectorSimilarityThreshold
+                    ).Result;
+                    
+                    // 在主线程显示结果
+                    LongEventHandler.ExecuteWhenFinished(() => {
+                        if (vectorResults == null || vectorResults.Count == 0)
+                        {
+                            Messages.Message($"未找到相似度 >= {settings.vectorSimilarityThreshold:F2} 的常识", 
+                                MessageTypeDefOf.NeutralEvent, false);
+                        }
+                        else
+                        {
+                            Messages.Message($"找到 {vectorResults.Count} 条匹配的常识，刷新预览查看详情", 
+                                MessageTypeDefOf.PositiveEvent, false);
+                            
+                            // 这里我们只是为了演示，实际上预览器目前只显示标签匹配结果
+                            // 如果要显示向量结果，需要修改 RefreshPreview 逻辑来包含这些结果
+                            // 但根据用户要求，预览器不需要实时匹配，所以这里只是提示
+                            // 或者我们可以临时将结果注入到 cachedPreview 中？
+                            // 既然用户说"预览器千万不能实时匹配"，那么点击按钮后显示结果是合理的。
+                            // 我们可以弹出一个对话框显示结果，或者追加到预览文本中。
+                            
+                            ShowVectorResults(vectorResults);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LongEventHandler.ExecuteWhenFinished(() => {
+                        Messages.Message($"向量匹配失败: {ex.Message}", MessageTypeDefOf.RejectInput, false);
+                    });
+                }
+        }
+
+        private void ShowVectorResults(List<(string id, float similarity)> results)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("【向量匹配测试结果】");
+            sb.AppendLine($"找到 {results.Count} 条匹配项：");
+            sb.AppendLine();
+            
+            var library = MemoryManager.GetCommonKnowledge();
+            foreach (var (id, similarity) in results)
+            {
+                var entry = library.Entries.FirstOrDefault(e => e.id == id);
+                if (entry != null)
+                {
+                    sb.AppendLine($"[{similarity:F2}] [{entry.tag}] {entry.content}");
+                }
+            }
+            
+            Find.WindowStack.Add(new Dialog_MessageBox(sb.ToString()));
         }
 
         /// <summary>
