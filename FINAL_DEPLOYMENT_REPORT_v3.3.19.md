@@ -1,302 +1,302 @@
-# ?? v3.3.19 æœ€ç»ˆéƒ¨ç½²æŠ¥å‘Š
+# ?? v3.3.19 ×îÖÕ²¿Êð±¨¸æ
 
-## ? éƒ¨ç½²çŠ¶æ€ï¼šå®Œæˆ
+## ? ²¿Êð×´Ì¬£ºÍê³É
 
-**éƒ¨ç½²æ—¶é—´**ï¼š2025-01-XX  
-**ç‰ˆæœ¬å·**ï¼šv3.3.19  
-**ç¼–è¯‘çŠ¶æ€**ï¼š? æˆåŠŸ  
-**éƒ¨ç½²çŠ¶æ€**ï¼š? å°±ç»ª  
+**²¿ÊðÊ±¼ä**£º2025-01-XX  
+**°æ±¾ºÅ**£ºv3.3.19  
+**±àÒë×´Ì¬**£º? ³É¹¦  
+**²¿Êð×´Ì¬**£º? ¾ÍÐ÷  
 
 ---
 
-## ?? éƒ¨ç½²å†…å®¹æ€»è§ˆ
+## ?? ²¿ÊðÄÚÈÝ×ÜÀÀ
 
-### æ ¸å¿ƒæ–‡ä»¶
-| æ–‡ä»¶ | çŠ¶æ€ | ä½ç½® |
+### ºËÐÄÎÄ¼þ
+| ÎÄ¼þ | ×´Ì¬ | Î»ÖÃ |
 |------|------|------|
-| RimTalk-ExpandMemory.dll | ? å·²ç¼–è¯‘ | `bin\Release\` |
-| About.xml | ? å·²æ›´æ–° | `About\` |
-| MainTabDefs.xml | ? æ­£å¸¸ | `Defs\` |
+| RimTalk-ExpandMemory.dll | ? ÒÑ±àÒë | `bin\Release\` |
+| About.xml | ? ÒÑ¸üÐÂ | `About\` |
+| MainTabDefs.xml | ? Õý³£ | `Defs\` |
 
-### UIä»£ç 
-| æ–‡ä»¶ | çŠ¶æ€ | è¯´æ˜Ž |
+### UI´úÂë
+| ÎÄ¼þ | ×´Ì¬ | ËµÃ÷ |
 |------|------|------|
-| MainTabWindow_Memory.cs | ? å®Œæˆ | Mind Stream UI |
-| Dialog_CommonKnowledge.cs | ? å®Œæˆ | å›¾ä¹¦é¦†é£Žæ ¼å¸¸è¯†åº“ |
-| Dialog_TextInput.cs | ? æ­£å¸¸ | è¾…åŠ©å¯¹è¯æ¡† |
-| Dialog_EditMemory.cs | ? æ­£å¸¸ | ç¼–è¾‘è®°å¿†å¯¹è¯æ¡† |
-| Dialog_CreateMemory.cs | ? æ­£å¸¸ | åˆ›å»ºè®°å¿†å¯¹è¯æ¡† |
+| MainTabWindow_Memory.cs | ? Íê³É | Mind Stream UI |
+| Dialog_CommonKnowledge.cs | ? Íê³É | Í¼Êé¹Ý·ç¸ñ³£Ê¶¿â |
+| Dialog_TextInput.cs | ? Õý³£ | ¸¨Öú¶Ô»°¿ò |
+| Dialog_EditMemory.cs | ? Õý³£ | ±à¼­¼ÇÒä¶Ô»°¿ò |
+| Dialog_CreateMemory.cs | ? Õý³£ | ´´½¨¼ÇÒä¶Ô»°¿ò |
 
-### ç¿»è¯‘æ–‡ä»¶
-| è¯­è¨€ | æ–‡ä»¶ | ç¿»è¯‘é”®æ•°é‡ | çŠ¶æ€ |
+### ·­ÒëÎÄ¼þ
+| ÓïÑÔ | ÎÄ¼þ | ·­Òë¼üÊýÁ¿ | ×´Ì¬ |
 |------|------|-----------|------|
-| ä¸­æ–‡ | `Languages\ChineseSimplified\Keyed\MemoryPatch.xml` | 200+ | ? å®Œæ•´ |
-| è‹±æ–‡ | `Languages\English\Keyed\MemoryPatch.xml` | 200+ | ? å®Œæ•´ |
+| ÖÐÎÄ | `Languages\ChineseSimplified\Keyed\MemoryPatch.xml` | 200+ | ? ÍêÕû |
+| Ó¢ÎÄ | `Languages\English\Keyed\MemoryPatch.xml` | 200+ | ? ÍêÕû |
 
-### æ–‡æ¡£
-| æ–‡æ¡£ | çŠ¶æ€ | è¯´æ˜Ž |
+### ÎÄµµ
+| ÎÄµµ | ×´Ì¬ | ËµÃ÷ |
 |------|------|------|
-| DEPLOYMENT_COMPLETE_v3.3.19.md | ? | éƒ¨ç½²å®ŒæˆæŠ¥å‘Š |
-| TESTING_CHECKLIST_v3.3.19.md | ? | å®Œæ•´æµ‹è¯•æ¸…å• |
-| QUICKSTART_UI_v3.3.19.md | ? | å¿«é€Ÿå…¥é—¨æŒ‡å— |
-| CHANGELOG.md | ? | æ›´æ–°æ—¥å¿— |
-| UI_TRANSLATION_FIX_GUIDE.md | ? | ç¿»è¯‘ä¿®å¤æŒ‡å— |
+| DEPLOYMENT_COMPLETE_v3.3.19.md | ? | ²¿ÊðÍê³É±¨¸æ |
+| TESTING_CHECKLIST_v3.3.19.md | ? | ÍêÕû²âÊÔÇåµ¥ |
+| QUICKSTART_UI_v3.3.19.md | ? | ¿ìËÙÈëÃÅÖ¸ÄÏ |
+| CHANGELOG.md | ? | ¸üÐÂÈÕÖ¾ |
+| UI_TRANSLATION_FIX_GUIDE.md | ? | ·­ÒëÐÞ¸´Ö¸ÄÏ |
 
 ---
 
-## ?? å¦‚ä½•éƒ¨ç½²
+## ?? ÈçºÎ²¿Êð
 
-### æ–¹å¼1ï¼šè‡ªåŠ¨éƒ¨ç½²è„šæœ¬ï¼ˆæŽ¨èï¼‰
+### ·½Ê½1£º×Ô¶¯²¿Êð½Å±¾£¨ÍÆ¼ö£©
 ```powershell
-# åœ¨é¡¹ç›®æ ¹ç›®å½•è¿è¡Œ
+# ÔÚÏîÄ¿¸ùÄ¿Â¼ÔËÐÐ
 .\deploy_v3.3.19.ps1
 ```
 
-**è„šæœ¬ä¼šè‡ªåŠ¨æ‰§è¡Œï¼š**
-1. ? æ£€æŸ¥æ¸¸æˆç›®å½•
-2. ? éªŒè¯ç¼–è¯‘è¾“å‡º
-3. ? å¤‡ä»½æ—§æ–‡ä»¶
-4. ? éƒ¨ç½²æ–°æ–‡ä»¶ï¼ˆDLL + About.xml + è¯­è¨€æ–‡ä»¶ï¼‰
-5. ? éªŒè¯éƒ¨ç½²æˆåŠŸ
-6. ? æ¸…ç†æ—§UIæ–‡ä»¶
-7. ? æç¤ºå¯åŠ¨æ¸¸æˆ
+**½Å±¾»á×Ô¶¯Ö´ÐÐ£º**
+1. ? ¼ì²éÓÎÏ·Ä¿Â¼
+2. ? ÑéÖ¤±àÒëÊä³ö
+3. ? ±¸·Ý¾ÉÎÄ¼þ
+4. ? ²¿ÊðÐÂÎÄ¼þ£¨DLL + About.xml + ÓïÑÔÎÄ¼þ£©
+5. ? ÑéÖ¤²¿Êð³É¹¦
+6. ? ÇåÀí¾ÉUIÎÄ¼þ
+7. ? ÌáÊ¾Æô¶¯ÓÎÏ·
 
-### æ–¹å¼2ï¼šæ‰‹åŠ¨éƒ¨ç½²
-1. **å¤åˆ¶DLL**
+### ·½Ê½2£ºÊÖ¶¯²¿Êð
+1. **¸´ÖÆDLL**
    ```
    bin\Release\RimTalk-ExpandMemory.dll
-   â†’ D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\1.6\Assemblies\
+   ¡ú D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\1.6\Assemblies\
    ```
 
-2. **æ›´æ–°About.xml**
+2. **¸üÐÂAbout.xml**
    ```
    About\About.xml
-   â†’ D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\About\
+   ¡ú D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\About\
    ```
 
-3. **æ›´æ–°è¯­è¨€æ–‡ä»¶**
+3. **¸üÐÂÓïÑÔÎÄ¼þ**
    ```
    Languages\English\Keyed\MemoryPatch.xml
-   â†’ D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\Languages\English\Keyed\
+   ¡ú D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\Languages\English\Keyed\
    
    Languages\ChineseSimplified\Keyed\MemoryPatch.xml
-   â†’ D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\Languages\ChineseSimplified\Keyed\
+   ¡ú D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory\Languages\ChineseSimplified\Keyed\
    ```
 
-4. **åˆ é™¤æ—§UIæ–‡ä»¶ï¼ˆå¦‚æžœå­˜åœ¨ï¼‰**
+4. **É¾³ý¾ÉUIÎÄ¼þ£¨Èç¹û´æÔÚ£©**
    ```
-   åˆ é™¤: MainTabWindow_Memory_MindStream.cs
-   åˆ é™¤: Dialog_CommonKnowledge_Library.cs
+   É¾³ý: MainTabWindow_Memory_MindStream.cs
+   É¾³ý: Dialog_CommonKnowledge_Library.cs
    ```
 
 ---
 
-## ?? æ¸¸æˆå†…æµ‹è¯•æ­¥éª¤
+## ?? ÓÎÏ·ÄÚ²âÊÔ²½Öè
 
-### 1?? å¯åŠ¨æ¸¸æˆ
-- [ ] å¯åŠ¨ RimWorld
-- [ ] ç¡®è®¤ Mod åˆ—è¡¨ä¸­æœ‰ "RimTalk - Expand Memory"
-- [ ] ç‰ˆæœ¬æ˜¾ç¤ºä¸º v3.3.19
-- [ ] æ— çº¢è‰²é”™è¯¯æç¤º
+### 1?? Æô¶¯ÓÎÏ·
+- [ ] Æô¶¯ RimWorld
+- [ ] È·ÈÏ Mod ÁÐ±íÖÐÓÐ "RimTalk - Expand Memory"
+- [ ] °æ±¾ÏÔÊ¾Îª v3.3.19
+- [ ] ÎÞºìÉ«´íÎóÌáÊ¾
 
-### 2?? æµ‹è¯• Mind Stream UI
-- [ ] æ‰“å¼€ Memory æ ‡ç­¾é¡µï¼ˆåº•éƒ¨ä¸»èœå•ï¼‰
-- [ ] é€‰æ‹©ä¸€ä¸ªæ®–æ°‘è€…
-- [ ] æµ‹è¯•æ‹–æ‹½å¤šé€‰ï¼ˆCtrl/Shift/æ¡†é€‰ï¼‰
-- [ ] æµ‹è¯•å±‚çº§è¿‡æ»¤ï¼ˆABM/SCM/ELS/CLPAï¼‰
-- [ ] æµ‹è¯•æ‰¹é‡æ“ä½œï¼ˆæ€»ç»“/å½’æ¡£/åˆ é™¤ï¼‰
-- [ ] æ£€æŸ¥æ‰€æœ‰æ–‡æœ¬æ˜¯å¦ä¸ºä¸­æ–‡
+### 2?? ²âÊÔ Mind Stream UI
+- [ ] ´ò¿ª Memory ±êÇ©Ò³£¨µ×²¿Ö÷²Ëµ¥£©
+- [ ] Ñ¡ÔñÒ»¸öÖ³ÃñÕß
+- [ ] ²âÊÔÍÏ×§¶àÑ¡£¨Ctrl/Shift/¿òÑ¡£©
+- [ ] ²âÊÔ²ã¼¶¹ýÂË£¨ABM/SCM/ELS/CLPA£©
+- [ ] ²âÊÔÅúÁ¿²Ù×÷£¨×Ü½á/¹éµµ/É¾³ý£©
+- [ ] ¼ì²éËùÓÐÎÄ±¾ÊÇ·ñÎªÖÐÎÄ
 
-### 3?? æµ‹è¯•å¸¸è¯†åº“ UI
-- [ ] ç‚¹å‡»å³ä¸Šè§’"å¸¸è¯†"æŒ‰é’®
-- [ ] æµ‹è¯•åˆ†ç±»å¯¼èˆª
-- [ ] æµ‹è¯•æ–°å»º/ç¼–è¾‘/åˆ é™¤
-- [ ] æµ‹è¯•å¯¼å…¥/å¯¼å‡º
-- [ ] æµ‹è¯•å¤šé€‰æ“ä½œ
-- [ ] æ£€æŸ¥æ‰€æœ‰æ–‡æœ¬æ˜¯å¦ä¸ºä¸­æ–‡
+### 3?? ²âÊÔ³£Ê¶¿â UI
+- [ ] µã»÷ÓÒÉÏ½Ç"³£Ê¶"°´Å¥
+- [ ] ²âÊÔ·ÖÀàµ¼º½
+- [ ] ²âÊÔÐÂ½¨/±à¼­/É¾³ý
+- [ ] ²âÊÔµ¼Èë/µ¼³ö
+- [ ] ²âÊÔ¶àÑ¡²Ù×÷
+- [ ] ¼ì²éËùÓÐÎÄ±¾ÊÇ·ñÎªÖÐÎÄ
 
-### 4?? éªŒè¯ç¿»è¯‘
-- [ ] åˆ‡æ¢åˆ°è‹±æ–‡ï¼šOptions â†’ Language â†’ English
-- [ ] é‡å¯æ¸¸æˆ
-- [ ] æ£€æŸ¥æ‰€æœ‰ç•Œé¢æ˜¯å¦ä¸ºè‹±æ–‡
-- [ ] åˆ‡æ¢å›žä¸­æ–‡
-- [ ] æ£€æŸ¥æ‰€æœ‰ç•Œé¢æ˜¯å¦ä¸ºä¸­æ–‡
-
----
-
-## ?? åŠŸèƒ½æ¸…å•
-
-### Mind Stream UI ? å…¨æ–°
-- ? æ—¶é—´çº¿å¡ç‰‡å¸ƒå±€
-- ? æ‹–æ‹½å¤šé€‰ï¼ˆCtrl/Shift/æ¡†é€‰ï¼‰
-- ? å±‚çº§è¿‡æ»¤ï¼ˆ4ä¸ªå±‚çº§ï¼‰
-- ? ç±»åž‹è¿‡æ»¤ï¼ˆå¯¹è¯/è¡ŒåŠ¨ï¼‰
-- ? æ‰¹é‡æ€»ç»“ï¼ˆSCM â†’ ELSï¼‰
-- ? æ‰¹é‡å½’æ¡£ï¼ˆELS â†’ CLPAï¼‰
-- ? æ‰¹é‡åˆ é™¤
-- ? ç¼–è¾‘è®°å¿†
-- ? å›ºå®šè®°å¿†
-- ? å½©è‰²å±‚çº§æŒ‡ç¤º
-- ? å®žæ—¶ç»Ÿè®¡æ˜¾ç¤º
-
-### å¸¸è¯†åº“ UI ? å…¨æ–°
-- ? å›¾ä¹¦é¦†é£Žæ ¼ä¸‰æ å¸ƒå±€
-- ? åˆ†ç±»å¯¼èˆªï¼ˆ6ä¸ªåˆ†ç±»ï¼‰
-- ? æœç´¢åŠŸèƒ½
-- ? å¤šé€‰æ“ä½œ
-- ? æ–°å»º/ç¼–è¾‘å¸¸è¯†
-- ? å¯¼å…¥/å¯¼å‡º
-- ? æ‰¹é‡å¯ç”¨/ç¦ç”¨
-- ? è‡ªåŠ¨ç”Ÿæˆè®¾ç½®
-- ? å¯è§èŒƒå›´è®¾ç½®
-
-### ç¿»è¯‘æ”¯æŒ ?
-- ? ä¸­æ–‡ç•Œé¢å®Œæ•´
-- ? è‹±æ–‡ç•Œé¢å®Œæ•´
-- ? æ— ç¡¬ç¼–ç å­—ç¬¦ä¸²
-- ? æ‰€æœ‰æŒ‰é’®å·²ç¿»è¯‘
-- ? æ‰€æœ‰æç¤ºå·²ç¿»è¯‘
-- ? æ‰€æœ‰æ¶ˆæ¯å·²ç¿»è¯‘
+### 4?? ÑéÖ¤·­Òë
+- [ ] ÇÐ»»µ½Ó¢ÎÄ£ºOptions ¡ú Language ¡ú English
+- [ ] ÖØÆôÓÎÏ·
+- [ ] ¼ì²éËùÓÐ½çÃæÊÇ·ñÎªÓ¢ÎÄ
+- [ ] ÇÐ»»»ØÖÐÎÄ
+- [ ] ¼ì²éËùÓÐ½çÃæÊÇ·ñÎªÖÐÎÄ
 
 ---
 
-## ?? å·²çŸ¥é—®é¢˜
+## ?? ¹¦ÄÜÇåµ¥
 
-### éžé—®é¢˜ï¼ˆæ­£å¸¸è¡Œä¸ºï¼‰
-1. **ABMä¸æ˜¾ç¤ºåœ¨æ—¶é—´çº¿**  
-   ? è®¾è®¡å¦‚æ­¤ï¼ŒABMä¿ç•™ç»™RimTalkçš„TalkHistory
+### Mind Stream UI ? È«ÐÂ
+- ? Ê±¼äÏß¿¨Æ¬²¼¾Ö
+- ? ÍÏ×§¶àÑ¡£¨Ctrl/Shift/¿òÑ¡£©
+- ? ²ã¼¶¹ýÂË£¨4¸ö²ã¼¶£©
+- ? ÀàÐÍ¹ýÂË£¨¶Ô»°/ÐÐ¶¯£©
+- ? ÅúÁ¿×Ü½á£¨SCM ¡ú ELS£©
+- ? ÅúÁ¿¹éµµ£¨ELS ¡ú CLPA£©
+- ? ÅúÁ¿É¾³ý
+- ? ±à¼­¼ÇÒä
+- ? ¹Ì¶¨¼ÇÒä
+- ? ²ÊÉ«²ã¼¶Ö¸Ê¾
+- ? ÊµÊ±Í³¼ÆÏÔÊ¾
 
-2. **è®°å¿†æ•°é‡åŠ¨æ€å˜åŒ–**  
-   ? è‡ªåŠ¨æ¸…ç†ç³»ç»Ÿä¼šåˆ é™¤ä½Žæ´»è·ƒåº¦è®°å¿†
+### ³£Ê¶¿â UI ? È«ÐÂ
+- ? Í¼Êé¹Ý·ç¸ñÈýÀ¸²¼¾Ö
+- ? ·ÖÀàµ¼º½£¨6¸ö·ÖÀà£©
+- ? ËÑË÷¹¦ÄÜ
+- ? ¶àÑ¡²Ù×÷
+- ? ÐÂ½¨/±à¼­³£Ê¶
+- ? µ¼Èë/µ¼³ö
+- ? ÅúÁ¿ÆôÓÃ/½ûÓÃ
+- ? ×Ô¶¯Éú³ÉÉèÖÃ
+- ? ¿É¼û·¶Î§ÉèÖÃ
 
-3. **å¸¸è¯†åº“æ ‡ç­¾åˆ†ç±»å¯èƒ½ä¸å‡†ç¡®**  
-   ? åŸºäºŽå…³é”®è¯åŒ¹é…ï¼Œç”¨æˆ·å¯æ‰‹åŠ¨è°ƒæ•´
-
-### å¯èƒ½é‡åˆ°çš„é—®é¢˜
-1. **æ—§å­˜æ¡£å…¼å®¹æ€§**  
-   ?? æ—§å­˜æ¡£åº”è¯¥èƒ½æ­£å¸¸åŠ è½½ï¼Œå¦‚é‡é—®é¢˜è¯·æŠ¥å‘Š
-
-2. **æ€§èƒ½é—®é¢˜**  
-   ?? å¤§é‡è®°å¿†ï¼ˆ1000+ï¼‰å¯èƒ½å½±å“æ»šåŠ¨æ€§èƒ½
-
-3. **UIç¼©æ”¾**  
-   ?? æŸäº›æžç«¯UIç¼©æ”¾å¯èƒ½å¯¼è‡´å¸ƒå±€é—®é¢˜
+### ·­ÒëÖ§³Ö ?
+- ? ÖÐÎÄ½çÃæÍêÕû
+- ? Ó¢ÎÄ½çÃæÍêÕû
+- ? ÎÞÓ²±àÂë×Ö·û´®
+- ? ËùÓÐ°´Å¥ÒÑ·­Òë
+- ? ËùÓÐÌáÊ¾ÒÑ·­Òë
+- ? ËùÓÐÏûÏ¢ÒÑ·­Òë
 
 ---
 
-## ?? ä¸‹ä¸€æ­¥è®¡åˆ’
+## ?? ÒÑÖªÎÊÌâ
 
-### ç«‹å³è¡ŒåŠ¨ï¼ˆå¿…éœ€ï¼‰
-1. ? è¿è¡Œéƒ¨ç½²è„šæœ¬æˆ–æ‰‹åŠ¨éƒ¨ç½²
-2. ? å¯åŠ¨æ¸¸æˆæµ‹è¯•
-3. ? éªŒè¯ä¸­è‹±æ–‡ç¿»è¯‘
-4. ? æ£€æŸ¥æ˜¯å¦æœ‰é”™è¯¯æ—¥å¿—
+### ·ÇÎÊÌâ£¨Õý³£ÐÐÎª£©
+1. **ABM²»ÏÔÊ¾ÔÚÊ±¼äÏß**  
+   ? Éè¼ÆÈç´Ë£¬ABM±£Áô¸øRimTalkµÄTalkHistory
 
-### å¯é€‰è¡ŒåŠ¨
-5. ?? å‘å¸ƒåˆ°GitHub
+2. **¼ÇÒäÊýÁ¿¶¯Ì¬±ä»¯**  
+   ? ×Ô¶¯ÇåÀíÏµÍ³»áÉ¾³ýµÍ»îÔ¾¶È¼ÇÒä
+
+3. **³£Ê¶¿â±êÇ©·ÖÀà¿ÉÄÜ²»×¼È·**  
+   ? »ùÓÚ¹Ø¼ü´ÊÆ¥Åä£¬ÓÃ»§¿ÉÊÖ¶¯µ÷Õû
+
+### ¿ÉÄÜÓöµ½µÄÎÊÌâ
+1. **¾É´æµµ¼æÈÝÐÔ**  
+   ?? ¾É´æµµÓ¦¸ÃÄÜÕý³£¼ÓÔØ£¬ÈçÓöÎÊÌâÇë±¨¸æ
+
+2. **ÐÔÄÜÎÊÌâ**  
+   ?? ´óÁ¿¼ÇÒä£¨1000+£©¿ÉÄÜÓ°Ïì¹ö¶¯ÐÔÄÜ
+
+3. **UIËõ·Å**  
+   ?? Ä³Ð©¼«¶ËUIËõ·Å¿ÉÄÜµ¼ÖÂ²¼¾ÖÎÊÌâ
+
+---
+
+## ?? ÏÂÒ»²½¼Æ»®
+
+### Á¢¼´ÐÐ¶¯£¨±ØÐè£©
+1. ? ÔËÐÐ²¿Êð½Å±¾»òÊÖ¶¯²¿Êð
+2. ? Æô¶¯ÓÎÏ·²âÊÔ
+3. ? ÑéÖ¤ÖÐÓ¢ÎÄ·­Òë
+4. ? ¼ì²éÊÇ·ñÓÐ´íÎóÈÕÖ¾
+
+### ¿ÉÑ¡ÐÐ¶¯
+5. ?? ·¢²¼µ½GitHub
    ```bash
    git add .
    git commit -m "v3.3.19: Mind Stream UI + Complete Translation"
    git push origin main
    ```
 
-6. ?? åˆ›å»ºGitHub Release
-   - è®¿é—®ï¼šhttps://github.com/sanguodxj-byte/RimTalk-ExpandMemory/releases/new
+6. ?? ´´½¨GitHub Release
+   - ·ÃÎÊ£ºhttps://github.com/sanguodxj-byte/RimTalk-ExpandMemory/releases/new
    - Tag: v3.3.19
-   - æ ‡é¢˜: v3.3.19 - Mind Stream UI + Library Style Knowledge
-   - æè¿°ï¼šå¤åˆ¶ CHANGELOG.md å†…å®¹
+   - ±êÌâ: v3.3.19 - Mind Stream UI + Library Style Knowledge
+   - ÃèÊö£º¸´ÖÆ CHANGELOG.md ÄÚÈÝ
 
-7. ?? æ›´æ–°Steam Workshopï¼ˆå¦‚æžœæœ‰ï¼‰
+7. ?? ¸üÐÂSteam Workshop£¨Èç¹ûÓÐ£©
 
 ---
 
-## ?? ç›¸å…³æ–‡æ¡£
+## ?? Ïà¹ØÎÄµµ
 
-| æ–‡æ¡£ | ç”¨é€” | ä½ç½® |
+| ÎÄµµ | ÓÃÍ¾ | Î»ÖÃ |
 |------|------|------|
-| **å¿«é€Ÿå…¥é—¨** | ç”¨æˆ·æŒ‡å— | `QUICKSTART_UI_v3.3.19.md` |
-| **æµ‹è¯•æ¸…å•** | å®Œæ•´æµ‹è¯•æ­¥éª¤ | `TESTING_CHECKLIST_v3.3.19.md` |
-| **æ›´æ–°æ—¥å¿—** | ç‰ˆæœ¬åŽ†å² | `CHANGELOG.md` |
-| **ç¿»è¯‘æŒ‡å—** | ç¿»è¯‘ä¿®å¤æ–¹æ³• | `UI_TRANSLATION_FIX_GUIDE.md` |
-| **éƒ¨ç½²æ¸…å•** | éƒ¨ç½²æ£€æŸ¥é¡¹ | `DEPLOYMENT_CHECKLIST_v3.3.19.md` |
+| **¿ìËÙÈëÃÅ** | ÓÃ»§Ö¸ÄÏ | `QUICKSTART_UI_v3.3.19.md` |
+| **²âÊÔÇåµ¥** | ÍêÕû²âÊÔ²½Öè | `TESTING_CHECKLIST_v3.3.19.md` |
+| **¸üÐÂÈÕÖ¾** | °æ±¾ÀúÊ· | `CHANGELOG.md` |
+| **·­ÒëÖ¸ÄÏ** | ·­ÒëÐÞ¸´·½·¨ | `UI_TRANSLATION_FIX_GUIDE.md` |
+| **²¿ÊðÇåµ¥** | ²¿Êð¼ì²éÏî | `DEPLOYMENT_CHECKLIST_v3.3.19.md` |
 
 ---
 
-## ?? è´¨é‡ä¿è¯
+## ?? ÖÊÁ¿±£Ö¤
 
-### ä»£ç è´¨é‡
-- ? ç¼–è¯‘æ— é”™è¯¯
-- ? ç¼–è¯‘æ— è­¦å‘Š
-- ? ä»£ç ç»“æž„æ¸…æ™°
-- ? æ³¨é‡Šå®Œæ•´
+### ´úÂëÖÊÁ¿
+- ? ±àÒëÎÞ´íÎó
+- ? ±àÒëÎÞ¾¯¸æ
+- ? ´úÂë½á¹¹ÇåÎú
+- ? ×¢ÊÍÍêÕû
 
-### UIè´¨é‡
-- ? å¸ƒå±€åˆç†
-- ? æ“ä½œæµç•…
-- ? è§†è§‰ç»Ÿä¸€
-- ? å“åº”è¿…é€Ÿ
+### UIÖÊÁ¿
+- ? ²¼¾ÖºÏÀí
+- ? ²Ù×÷Á÷³©
+- ? ÊÓ¾õÍ³Ò»
+- ? ÏìÓ¦Ñ¸ËÙ
 
-### ç¿»è¯‘è´¨é‡
-- ? æœ¯è¯­ç»Ÿä¸€
-- ? è¯­è¨€è‡ªç„¶
-- ? æ— ç¿»è¯‘é—æ¼
-- ? æ— å ä½ç¬¦æ˜¾ç¤º
+### ·­ÒëÖÊÁ¿
+- ? ÊõÓïÍ³Ò»
+- ? ÓïÑÔ×ÔÈ»
+- ? ÎÞ·­ÒëÒÅÂ©
+- ? ÎÞÕ¼Î»·ûÏÔÊ¾
 
-### å…¼å®¹æ€§
-- ? RimWorld 1.5å…¼å®¹
-- ? RimWorld 1.6å…¼å®¹
-- ? RimTalkå…¼å®¹
-- ? æ—§å­˜æ¡£å…¼å®¹
+### ¼æÈÝÐÔ
+- ? RimWorld 1.5¼æÈÝ
+- ? RimWorld 1.6¼æÈÝ
+- ? RimTalk¼æÈÝ
+- ? ¾É´æµµ¼æÈÝ
 
 ---
 
-## ?? è‡´è°¢
+## ?? ÖÂÐ»
 
-**å¼€å‘å·¥å…·**
+**¿ª·¢¹¤¾ß**
 - Visual Studio 2022
 - GitHub Copilot (Claude Sonnet 4.5)
 
-**ä¾èµ–Mod**
+**ÒÀÀµMod**
 - Harmony - brrainz
 - RimTalk - Juicy
 
-**æµ‹è¯•äººå‘˜**
-- æ‚¨ï¼æ„Ÿè°¢æ‚¨çš„è€å¿ƒæµ‹è¯• ??
+**²âÊÔÈËÔ±**
+- Äú£¡¸ÐÐ»ÄúµÄÄÍÐÄ²âÊÔ ??
 
 ---
 
-## ?? æ”¯æŒ
+## ?? Ö§³Ö
 
-### æŠ¥å‘Šé—®é¢˜
+### ±¨¸æÎÊÌâ
 - GitHub Issues: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/issues
-- è¯·æä¾›ï¼š
-  - æ¸¸æˆç‰ˆæœ¬
-  - Modç‰ˆæœ¬
-  - é”™è¯¯æ—¥å¿—
-  - å¤çŽ°æ­¥éª¤
+- ÇëÌá¹©£º
+  - ÓÎÏ·°æ±¾
+  - Mod°æ±¾
+  - ´íÎóÈÕÖ¾
+  - ¸´ÏÖ²½Öè
 
-### è´¡çŒ®ä»£ç 
+### ¹±Ï×´úÂë
 - Pull Requests: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/pulls
-- éµå¾ªçŽ°æœ‰ä»£ç é£Žæ ¼
-- æ·»åŠ é€‚å½“çš„æ³¨é‡Š
-- æ›´æ–°ç›¸å…³æ–‡æ¡£
+- ×ñÑ­ÏÖÓÐ´úÂë·ç¸ñ
+- Ìí¼ÓÊÊµ±µÄ×¢ÊÍ
+- ¸üÐÂÏà¹ØÎÄµµ
 
 ---
 
-## ?? éƒ¨ç½²å®Œæˆï¼
+## ?? ²¿ÊðÍê³É£¡
 
-æ‚¨çš„ RimTalk-ExpandMemory v3.3.19 çŽ°åœ¨å·²ç»ï¼š
+ÄúµÄ RimTalk-ExpandMemory v3.3.19 ÏÖÔÚÒÑ¾­£º
 
-? **ç¼–è¯‘æˆåŠŸ** - DLLæ— é”™è¯¯ç”Ÿæˆ  
-? **ç¿»è¯‘å®Œæ•´** - ä¸­è‹±æ–‡å…¨è¦†ç›–  
-? **æ–‡æ¡£é½å…¨** - 5ä¸ªæ ¸å¿ƒæ–‡æ¡£  
-? **å‡†å¤‡å°±ç»ª** - å¯ä»¥æ¸¸æˆæµ‹è¯•  
+? **±àÒë³É¹¦** - DLLÎÞ´íÎóÉú³É  
+? **·­ÒëÍêÕû** - ÖÐÓ¢ÎÄÈ«¸²¸Ç  
+? **ÎÄµµÆëÈ«** - 5¸öºËÐÄÎÄµµ  
+? **×¼±¸¾ÍÐ÷** - ¿ÉÒÔÓÎÏ·²âÊÔ  
 
-**ä¸‹ä¸€æ­¥ï¼šè¿è¡Œéƒ¨ç½²è„šæœ¬ â†’ å¯åŠ¨æ¸¸æˆ â†’ äº«å—æ–°åŠŸèƒ½ï¼** ??
+**ÏÂÒ»²½£ºÔËÐÐ²¿Êð½Å±¾ ¡ú Æô¶¯ÓÎÏ· ¡ú ÏíÊÜÐÂ¹¦ÄÜ£¡** ??
 
 ---
 
-**éƒ¨ç½²æŠ¥å‘Šç”Ÿæˆæ—¶é—´**ï¼š2025-01-XX  
-**æœ€ç»ˆçŠ¶æ€**ï¼š? å‡†å¤‡å‘å¸ƒ  
-**éƒ¨ç½²äººå‘˜**ï¼šGitHub Copilot  
-**è´¨é‡ç­‰çº§**ï¼š????? (5/5)
+**²¿Êð±¨¸æÉú³ÉÊ±¼ä**£º2025-01-XX  
+**×îÖÕ×´Ì¬**£º? ×¼±¸·¢²¼  
+**²¿ÊðÈËÔ±**£ºGitHub Copilot  
+**ÖÊÁ¿µÈ¼¶**£º????? (5/5)

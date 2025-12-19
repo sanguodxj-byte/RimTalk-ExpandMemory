@@ -7,12 +7,16 @@
   <RimTalk_NoColonists>没有可用的殖民者</RimTalk_NoColonists>
   <RimTalk_NoMemoryComponent>选中的角色没有记忆组件</RimTalk_NoMemoryComponent>
   <RimTalk_ShowAllHumanlikes>显示所有人</RimTalk_ShowAllHumanlikes>
+
+  <!-- ITab Memory -->
+  <RimTalk_Memory_NoMemories>没有可显示的记忆</RimTalk_Memory_NoMemories>
   
   <!-- ==================== Mind Stream UI 标签 ==================== -->
   <RimTalk_MindStream_SelectColonist>选择一个殖民者查看记忆</RimTalk_MindStream_SelectColonist>
   <RimTalk_MindStream_NoMemoryComp>选中的角色没有记忆组件</RimTalk_MindStream_NoMemoryComp>
   <RimTalk_MindStream_Preview>预览</RimTalk_MindStream_Preview>
   <RimTalk_MindStream_Knowledge>常识</RimTalk_MindStream_Knowledge>
+  <RimTalk_MindStream_OperationGuide>操作指南</RimTalk_MindStream_OperationGuide>
   <RimTalk_MindStream_NoColonists>没有殖民者</RimTalk_MindStream_NoColonists>
   
   <!-- 控制面板 -->
@@ -22,16 +26,16 @@
   <RimTalk_MindStream_SCM>SCM (短期)</RimTalk_MindStream_SCM>
   <RimTalk_MindStream_ELS>ELS (事件)</RimTalk_MindStream_ELS>
   <RimTalk_MindStream_CLPA>CLPA (档案)</RimTalk_MindStream_CLPA>
-  
+
   <RimTalk_MindStream_Type>类型</RimTalk_MindStream_Type>
   <RimTalk_MindStream_All>全部</RimTalk_MindStream_All>
   <RimTalk_MindStream_Conversation>对话</RimTalk_MindStream_Conversation>
   <RimTalk_MindStream_Action>行动</RimTalk_MindStream_Action>
-  
+
   <RimTalk_MindStream_Statistics>统计</RimTalk_MindStream_Statistics>
   <RimTalk_MindStream_Selected>已选: {0}</RimTalk_MindStream_Selected>
   <RimTalk_MindStream_TotalMemories>共 {0} 条记忆</RimTalk_MindStream_TotalMemories>
-  
+
   <RimTalk_MindStream_BatchActions>批量操作</RimTalk_MindStream_BatchActions>
   <RimTalk_MindStream_SummarizeN>总结 ({0})</RimTalk_MindStream_SummarizeN>
   <RimTalk_MindStream_SummarizeSelected>总结选中</RimTalk_MindStream_SummarizeSelected>
@@ -39,11 +43,11 @@
   <RimTalk_MindStream_ArchiveSelected>归档选中</RimTalk_MindStream_ArchiveSelected>
   <RimTalk_MindStream_DeleteN>删除 ({0})</RimTalk_MindStream_DeleteN>
   <RimTalk_MindStream_DeleteSelected>删除选中</RimTalk_MindStream_DeleteSelected>
-  
+
   <RimTalk_MindStream_GlobalActions>全局操作</RimTalk_MindStream_GlobalActions>
   <RimTalk_MindStream_SummarizeAll>总结全部</RimTalk_MindStream_SummarizeAll>
   <RimTalk_MindStream_ArchiveAll>归档全部</RimTalk_MindStream_ArchiveAll>
-  
+
   <!-- 时间线 -->
   <RimTalk_MindStream_ShowingN>显示 {0} 条记忆</RimTalk_MindStream_ShowingN>
   <RimTalk_MindStream_Pin>固定</RimTalk_MindStream_Pin>
@@ -52,7 +56,7 @@
   <RimTalk_MindStream_With>与</RimTalk_MindStream_With>
   <RimTalk_MindStream_ImportanceLabel>重要性: {0}</RimTalk_MindStream_ImportanceLabel>
   <RimTalk_MindStream_ActivityLabel>活跃度: {0}</RimTalk_MindStream_ActivityLabel>
-  
+
   <!-- 消息 -->
   <RimTalk_MindStream_NoSCMSelected>没有选中SCM记忆</RimTalk_MindStream_NoSCMSelected>
   <RimTalk_MindStream_SummarizeConfirm>将 {0} 条SCM记忆总结到ELS？</RimTalk_MindStream_SummarizeConfirm>
@@ -67,7 +71,7 @@
   <RimTalk_MindStream_ArchivedForN>已为 {0} 名殖民者归档记忆</RimTalk_MindStream_ArchivedForN>
   <RimTalk_MindStream_MustEnterGame>必须先进入游戏</RimTalk_MindStream_MustEnterGame>
   <RimTalk_MindStream_CannotFindManager>找不到记忆管理器</RimTalk_MindStream_CannotFindManager>
-  
+
   <!-- ==================== 常识库UI ==================== -->
   <RimTalk_Knowledge_Categories>分类</RimTalk_Knowledge_Categories>
   <RimTalk_Knowledge_CategoryAll>全部</RimTalk_Knowledge_CategoryAll>

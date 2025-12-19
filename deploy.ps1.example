@@ -1,15 +1,15 @@
-# RimWorld Mod å¿«é€Ÿéƒ¨ç½²è„šæœ¬ç¤ºä¾‹
-# å¤åˆ¶æ­¤æ–‡ä»¶ä¸º deploy.ps1 å¹¶æ ¹æ®éœ€è¦ä¿®æ”¹
+# RimWorld Mod ¿ìËÙ²¿Êğ½Å±¾Ê¾Àı
+# ¸´ÖÆ´ËÎÄ¼şÎª deploy.ps1 ²¢¸ù¾İĞèÒªĞŞ¸Ä
 
 param(
-    [string]$RimWorldDir = $env:RIMWORLD_DIR,  # ä»ç¯å¢ƒå˜é‡è¯»å–
+    [string]$RimWorldDir = $env:RIMWORLD_DIR,  # ´Ó»·¾³±äÁ¿¶ÁÈ¡
     [string]$ModName = "RimTalk-MemoryPatch",
     [string]$GameVersion = "1.6"
 )
 
 $ErrorActionPreference = "Stop"
 
-# å¦‚æœç¯å¢ƒå˜é‡æœªè®¾ç½®ï¼Œå°è¯•ä»é…ç½®æ–‡ä»¶è¯»å–
+# Èç¹û»·¾³±äÁ¿Î´ÉèÖÃ£¬³¢ÊÔ´ÓÅäÖÃÎÄ¼ş¶ÁÈ¡
 if ([string]::IsNullOrEmpty($RimWorldDir)) {
     $configFile = Join-Path $PSScriptRoot ".rimworld.config"
     if (Test-Path $configFile) {
@@ -18,19 +18,19 @@ if ([string]::IsNullOrEmpty($RimWorldDir)) {
     }
 }
 
-# å¦‚æœä»ç„¶ä¸ºç©ºï¼Œæç¤ºç”¨æˆ·è¾“å…¥
+# Èç¹ûÈÔÈ»Îª¿Õ£¬ÌáÊ¾ÓÃ»§ÊäÈë
 if ([string]::IsNullOrEmpty($RimWorldDir)) {
-    Write-Host "æœªæ‰¾åˆ° RimWorld è·¯å¾„é…ç½®" -ForegroundColor Yellow
+    Write-Host "Î´ÕÒµ½ RimWorld Â·¾¶ÅäÖÃ" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "è¯·é€‰æ‹©ä»¥ä¸‹æ–¹å¼ä¹‹ä¸€ï¼š" -ForegroundColor Cyan
-    Write-Host "1. åˆ›å»º .rimworld.config æ–‡ä»¶å¹¶å¡«å…¥è·¯å¾„ï¼ˆæ¨èï¼‰"
-    Write-Host "2. è®¾ç½®ç¯å¢ƒå˜é‡ï¼šsetx RIMWORLD_DIR 'æ‚¨çš„è·¯å¾„'"
-    Write-Host "3. è¿è¡Œæ—¶æŒ‡å®šè·¯å¾„ï¼š.\deploy.ps1 -RimWorldDir 'æ‚¨çš„è·¯å¾„'"
+    Write-Host "ÇëÑ¡ÔñÒÔÏÂ·½Ê½Ö®Ò»£º" -ForegroundColor Cyan
+    Write-Host "1. ´´½¨ .rimworld.config ÎÄ¼ş²¢ÌîÈëÂ·¾¶£¨ÍÆ¼ö£©"
+    Write-Host "2. ÉèÖÃ»·¾³±äÁ¿£ºsetx RIMWORLD_DIR 'ÄúµÄÂ·¾¶'"
+    Write-Host "3. ÔËĞĞÊ±Ö¸¶¨Â·¾¶£º.\deploy.ps1 -RimWorldDir 'ÄúµÄÂ·¾¶'"
     Write-Host ""
     exit 1
 }
 
-# é¢œè‰²è¾“å‡ºå‡½æ•°
+# ÑÕÉ«Êä³öº¯Êı
 function Write-ColorOutput($ForegroundColor) {
     $fc = $host.UI.RawUI.ForegroundColor
     $host.UI.RawUI.ForegroundColor = $ForegroundColor
@@ -42,36 +42,36 @@ function Write-ColorOutput($ForegroundColor) {
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  RimWorld Mod éƒ¨ç½²å·¥å…·" -ForegroundColor Cyan
+Write-Host "  RimWorld Mod ²¿Êğ¹¤¾ß" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# æ£€æŸ¥ RimWorld ç›®å½•
+# ¼ì²é RimWorld Ä¿Â¼
 if (-not (Test-Path $RimWorldDir)) {
-    Write-Host "? é”™è¯¯ï¼šæ‰¾ä¸åˆ° RimWorld ç›®å½•" -ForegroundColor Red
-    Write-Host "è·¯å¾„ï¼š$RimWorldDir" -ForegroundColor Yellow
+    Write-Host "? ´íÎó£ºÕÒ²»µ½ RimWorld Ä¿Â¼" -ForegroundColor Red
+    Write-Host "Â·¾¶£º$RimWorldDir" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "è¯·æ£€æŸ¥ï¼š" -ForegroundColor Cyan
-    Write-Host "1. .rimworld.config æ–‡ä»¶ä¸­çš„ RIMWORLD_DIR æ˜¯å¦æ­£ç¡®"
-    Write-Host "2. æˆ–è€…ä½¿ç”¨ -RimWorldDir å‚æ•°æŒ‡å®šæ­£ç¡®çš„è·¯å¾„"
+    Write-Host "Çë¼ì²é£º" -ForegroundColor Cyan
+    Write-Host "1. .rimworld.config ÎÄ¼şÖĞµÄ RIMWORLD_DIR ÊÇ·ñÕıÈ·"
+    Write-Host "2. »òÕßÊ¹ÓÃ -RimWorldDir ²ÎÊıÖ¸¶¨ÕıÈ·µÄÂ·¾¶"
     Write-Host ""
     exit 1
 }
 
-Write-Host "? RimWorld ç›®å½•ï¼š$RimWorldDir" -ForegroundColor Green
+Write-Host "? RimWorld Ä¿Â¼£º$RimWorldDir" -ForegroundColor Green
 
-# ç›®æ ‡è·¯å¾„
+# Ä¿±êÂ·¾¶
 $modPath = "$RimWorldDir\Mods\$ModName"
-Write-Host "? Mod ç›®æ ‡è·¯å¾„ï¼š$modPath" -ForegroundColor Green
+Write-Host "? Mod Ä¿±êÂ·¾¶£º$modPath" -ForegroundColor Green
 Write-Host ""
 
-# åˆ›å»º Mod ç›®å½•
+# ´´½¨ Mod Ä¿Â¼
 if (-not (Test-Path $modPath)) {
     New-Item -ItemType Directory -Path $modPath -Force | Out-Null
-    Write-Host "? å·²åˆ›å»º Mod ç›®å½•" -ForegroundColor Green
+    Write-Host "? ÒÑ´´½¨ Mod Ä¿Â¼" -ForegroundColor Green
 }
 
-# å¤åˆ¶æ–‡ä»¶å¤¹
+# ¸´ÖÆÎÄ¼ş¼Ğ
 $folders = @("About", "Defs", "Languages", "Textures", $GameVersion)
 
 foreach ($folder in $folders) {
@@ -79,9 +79,9 @@ foreach ($folder in $folders) {
     $dest = Join-Path $modPath $folder
     
     if (Test-Path $source) {
-        Write-Host "æ­£åœ¨å¤åˆ¶ $folder..." -NoNewline
+        Write-Host "ÕıÔÚ¸´ÖÆ $folder..." -NoNewline
         
-        # ä½¿ç”¨ robocopy é•œåƒåŒæ­¥ï¼ˆWindowsï¼‰
+        # Ê¹ÓÃ robocopy ¾µÏñÍ¬²½£¨Windows£©
         if ($IsWindows -or $env:OS -eq "Windows_NT") {
             $result = robocopy $source $dest /MIR /NJH /NJS /NDL /NFL /NC /NS
             
@@ -91,7 +91,7 @@ foreach ($folder in $folders) {
                 Write-Host " ?" -ForegroundColor Yellow
             }
         }
-        # ä½¿ç”¨ rsyncï¼ˆmacOS/Linuxï¼‰
+        # Ê¹ÓÃ rsync£¨macOS/Linux£©
         else {
             rsync -a --delete --checksum "$source/" "$dest/"
             if ($LASTEXITCODE -eq 0) {
@@ -101,17 +101,17 @@ foreach ($folder in $folders) {
             }
         }
     } else {
-        Write-Host "? è·³è¿‡ $folderï¼ˆä¸å­˜åœ¨ï¼‰" -ForegroundColor Yellow
+        Write-Host "? Ìø¹ı $folder£¨²»´æÔÚ£©" -ForegroundColor Yellow
     }
 }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  éƒ¨ç½²å®Œæˆï¼" -ForegroundColor Green
+Write-Host "  ²¿ÊğÍê³É£¡" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Mod å·²éƒ¨ç½²åˆ°ï¼š" -ForegroundColor Cyan
+Write-Host "Mod ÒÑ²¿Êğµ½£º" -ForegroundColor Cyan
 Write-Host $modPath -ForegroundColor Yellow
 Write-Host ""
-Write-Host "ä¸‹ä¸€æ­¥ï¼šå¯åŠ¨ RimWorld å¹¶åœ¨ Mod åˆ—è¡¨ä¸­å¯ç”¨ '$ModName'" -ForegroundColor Cyan
+Write-Host "ÏÂÒ»²½£ºÆô¶¯ RimWorld ²¢ÔÚ Mod ÁĞ±íÖĞÆôÓÃ '$ModName'" -ForegroundColor Cyan
 Write-Host ""

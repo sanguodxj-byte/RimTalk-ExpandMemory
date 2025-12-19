@@ -1,161 +1,161 @@
-# ?? v3.3.19 æ–‡æ¡£ç´¢å¼•
+# ?? v3.3.19 ÎÄµµË÷Òý
 
-## ?? å¿«é€Ÿå¼€å§‹
+## ?? ¿ìËÙ¿ªÊ¼
 
-**åˆšå¼€å§‹ï¼Ÿä»Žè¿™é‡Œå¼€å§‹ï¼š**
-- **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** - ? 30åˆ†é’Ÿå®Œæˆä¿®å¤æŒ‡å—ï¼ˆæœ€æŽ¨èï¼‰
+**¸Õ¿ªÊ¼£¿´ÓÕâÀï¿ªÊ¼£º**
+- **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** - ? 30·ÖÖÓÍê³ÉÐÞ¸´Ö¸ÄÏ£¨×îÍÆ¼ö£©
 
-## ?? æ ¸å¿ƒæ–‡æ¡£
+## ?? ºËÐÄÎÄµµ
 
-### ä¿®å¤æŒ‡å—
-| æ–‡æ¡£ | ç”¨é€” | é€‚ç”¨å¯¹è±¡ |
+### ÐÞ¸´Ö¸ÄÏ
+| ÎÄµµ | ÓÃÍ¾ | ÊÊÓÃ¶ÔÏó |
 |------|------|----------|
-| **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** | 30åˆ†é’Ÿå¿«é€Ÿå®Œæˆ | æ‰€æœ‰äºº ? |
-| **[HOW_TO_FIX.md](HOW_TO_FIX.md)** | è¯¦ç»†ä¿®å¤è¯´æ˜Ž | éœ€è¦æ·±å…¥äº†è§£çš„å¼€å‘è€… |
-| **[UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)** | æ‰‹åŠ¨ç¿»è¯‘ä¿®å¤ | è‡ªåŠ¨è„šæœ¬å¤±è´¥æ—¶ |
+| **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** | 30·ÖÖÓ¿ìËÙÍê³É | ËùÓÐÈË ? |
+| **[HOW_TO_FIX.md](HOW_TO_FIX.md)** | ÏêÏ¸ÐÞ¸´ËµÃ÷ | ÐèÒªÉîÈëÁË½âµÄ¿ª·¢Õß |
+| **[UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)** | ÊÖ¶¯·­ÒëÐÞ¸´ | ×Ô¶¯½Å±¾Ê§°ÜÊ± |
 
-### å·¥å…·è„šæœ¬
-| æ–‡ä»¶ | ç”¨é€” | ä½¿ç”¨æ–¹æ³• |
+### ¹¤¾ß½Å±¾
+| ÎÄ¼þ | ÓÃÍ¾ | Ê¹ÓÃ·½·¨ |
 |------|------|----------|
-| **[quick_fix_translations.ps1](quick_fix_translations.ps1)** | è‡ªåŠ¨ä¿®å¤ç¿»è¯‘ | `.\quick_fix_translations.ps1` |
+| **[quick_fix_translations.ps1](quick_fix_translations.ps1)** | ×Ô¶¯ÐÞ¸´·­Òë | `.\quick_fix_translations.ps1` |
 
-### éƒ¨ç½²æ–‡æ¡£
-| æ–‡æ¡£ | ç”¨é€” | é€‚ç”¨å¯¹è±¡ |
+### ²¿ÊðÎÄµµ
+| ÎÄµµ | ÓÃÍ¾ | ÊÊÓÃ¶ÔÏó |
 |------|------|----------|
-| **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** | å®Œæ•´éƒ¨ç½²æ€»ç»“ | é¡¹ç›®ç»´æŠ¤è€… |
-| **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)** | éƒ¨ç½²æ£€æŸ¥æ¸…å• | å‘å¸ƒå‰éªŒè¯ |
-| **[TASK_STATUS.md](TASK_STATUS.md)** | ä»»åŠ¡çŠ¶æ€è¿½è¸ª | é¡¹ç›®ç®¡ç† |
+| **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** | ÍêÕû²¿Êð×Ü½á | ÏîÄ¿Î¬»¤Õß |
+| **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)** | ²¿Êð¼ì²éÇåµ¥ | ·¢²¼Ç°ÑéÖ¤ |
+| **[TASK_STATUS.md](TASK_STATUS.md)** | ÈÎÎñ×´Ì¬×·×Ù | ÏîÄ¿¹ÜÀí |
 
-### ç”¨æˆ·æ–‡æ¡£
-| æ–‡æ¡£ | ç”¨é€” | é€‚ç”¨å¯¹è±¡ |
+### ÓÃ»§ÎÄµµ
+| ÎÄµµ | ÓÃÍ¾ | ÊÊÓÃ¶ÔÏó |
 |------|------|----------|
-| **[QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md)** | UIä½¿ç”¨è¯´æ˜Ž | æœ€ç»ˆç”¨æˆ· |
-| **[CHANGELOG.md](CHANGELOG.md)** | æ›´æ–°æ—¥å¿— | æ‰€æœ‰ç”¨æˆ· |
+| **[QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md)** | UIÊ¹ÓÃËµÃ÷ | ×îÖÕÓÃ»§ |
+| **[CHANGELOG.md](CHANGELOG.md)** | ¸üÐÂÈÕÖ¾ | ËùÓÐÓÃ»§ |
 
-## ?? æŒ‰ç›®æ ‡é€‰æ‹©æ–‡æ¡£
+## ?? °´Ä¿±êÑ¡ÔñÎÄµµ
 
-### æˆ‘æƒ³å¿«é€Ÿå®Œæˆä¿®å¤
-1. é˜…è¯» **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** (å¿…è¯»)
-2. è¿è¡Œ `quick_fix_translations.ps1`
-3. æŒ‰ç…§3æ­¥æŒ‡å—æ“ä½œ
-4. **é¢„è®¡æ—¶é—´ï¼š30åˆ†é’Ÿ**
+### ÎÒÏë¿ìËÙÍê³ÉÐÞ¸´
+1. ÔÄ¶Á **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** (±Ø¶Á)
+2. ÔËÐÐ `quick_fix_translations.ps1`
+3. °´ÕÕ3²½Ö¸ÄÏ²Ù×÷
+4. **Ô¤¼ÆÊ±¼ä£º30·ÖÖÓ**
 
-### æˆ‘æƒ³æ‰‹åŠ¨ä¿®å¤
-1. é˜…è¯» **[UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)** (å¿…è¯»)
-2. é€ä¸ªä¿®å¤ç¿»è¯‘é”®
-3. æ·»åŠ æ»šåŠ¨è§†å›¾
-4. **é¢„è®¡æ—¶é—´ï¼š1å°æ—¶**
+### ÎÒÏëÊÖ¶¯ÐÞ¸´
+1. ÔÄ¶Á **[UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)** (±Ø¶Á)
+2. Öð¸öÐÞ¸´·­Òë¼ü
+3. Ìí¼Ó¹ö¶¯ÊÓÍ¼
+4. **Ô¤¼ÆÊ±¼ä£º1Ð¡Ê±**
 
-### æˆ‘æƒ³äº†è§£å®Œæ•´çŠ¶æ€
-1. é˜…è¯» **[TASK_STATUS.md](TASK_STATUS.md)** (å·²å®Œæˆ/å¾…å®Œæˆ)
-2. é˜…è¯» **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** (è¯¦ç»†è¯´æ˜Ž)
-3. **é¢„è®¡æ—¶é—´ï¼š15åˆ†é’Ÿ**
+### ÎÒÏëÁË½âÍêÕû×´Ì¬
+1. ÔÄ¶Á **[TASK_STATUS.md](TASK_STATUS.md)** (ÒÑÍê³É/´ýÍê³É)
+2. ÔÄ¶Á **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** (ÏêÏ¸ËµÃ÷)
+3. **Ô¤¼ÆÊ±¼ä£º15·ÖÖÓ**
 
-### æˆ‘æƒ³å‡†å¤‡å‘å¸ƒ
-1. å®Œæˆæ‰€æœ‰ä¿®å¤ï¼ˆå‚è€ƒä¸Šé¢ï¼‰
-2. ä½¿ç”¨ **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)**
-3. æ›´æ–° **[CHANGELOG.md](CHANGELOG.md)**
-4. **é¢„è®¡æ—¶é—´ï¼š2å°æ—¶**
+### ÎÒÏë×¼±¸·¢²¼
+1. Íê³ÉËùÓÐÐÞ¸´£¨²Î¿¼ÉÏÃæ£©
+2. Ê¹ÓÃ **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)**
+3. ¸üÐÂ **[CHANGELOG.md](CHANGELOG.md)**
+4. **Ô¤¼ÆÊ±¼ä£º2Ð¡Ê±**
 
-### æˆ‘æƒ³å­¦ä¹ æ–°UI
-1. é˜…è¯» **[QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md)**
-2. æ‰“å¼€æ¸¸æˆå®žé™…æ“ä½œ
-3. **é¢„è®¡æ—¶é—´ï¼š15åˆ†é’Ÿ**
+### ÎÒÏëÑ§Ï°ÐÂUI
+1. ÔÄ¶Á **[QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md)**
+2. ´ò¿ªÓÎÏ·Êµ¼Ê²Ù×÷
+3. **Ô¤¼ÆÊ±¼ä£º15·ÖÖÓ**
 
-## ?? æŒ‰é—®é¢˜ç±»åž‹æŸ¥æ‰¾
+## ?? °´ÎÊÌâÀàÐÍ²éÕÒ
 
-### ç¿»è¯‘ç›¸å…³
-- **æ˜¾ç¤ºç¿»è¯‘é”®ï¼Ÿ** â†’ [QUICKSTART_FIX.md](QUICKSTART_FIX.md) ç¬¬1æ­¥
-- **è„šæœ¬å¤±è´¥ï¼Ÿ** â†’ [HOW_TO_FIX.md](HOW_TO_FIX.md) "å¸¸è§é—®é¢˜"
-- **æ‰‹åŠ¨ä¿®å¤ï¼Ÿ** â†’ [UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)
+### ·­ÒëÏà¹Ø
+- **ÏÔÊ¾·­Òë¼ü£¿** ¡ú [QUICKSTART_FIX.md](QUICKSTART_FIX.md) µÚ1²½
+- **½Å±¾Ê§°Ü£¿** ¡ú [HOW_TO_FIX.md](HOW_TO_FIX.md) "³£¼ûÎÊÌâ"
+- **ÊÖ¶¯ÐÞ¸´£¿** ¡ú [UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)
 
-### UIæ˜¾ç¤ºé—®é¢˜
-- **å·¦ä¾§é¢æ¿æ˜¾ç¤ºä¸å…¨ï¼Ÿ** â†’ [QUICKSTART_FIX.md](QUICKSTART_FIX.md) ç¬¬2æ­¥
-- **æŒ‰é’®è¢«é®æŒ¡ï¼Ÿ** â†’ [HOW_TO_FIX.md](HOW_TO_FIX.md) "æŽ§åˆ¶é¢æ¿æ»šåŠ¨"
-- **å¸ƒå±€é”™ä¹±ï¼Ÿ** â†’ [DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md) "å·²çŸ¥é—®é¢˜"
+### UIÏÔÊ¾ÎÊÌâ
+- **×ó²àÃæ°åÏÔÊ¾²»È«£¿** ¡ú [QUICKSTART_FIX.md](QUICKSTART_FIX.md) µÚ2²½
+- **°´Å¥±»ÕÚµ²£¿** ¡ú [HOW_TO_FIX.md](HOW_TO_FIX.md) "¿ØÖÆÃæ°å¹ö¶¯"
+- **²¼¾Ö´íÂÒ£¿** ¡ú [DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md) "ÒÑÖªÎÊÌâ"
 
-### åŠŸèƒ½é—®é¢˜
-- **å›ºå®šæ— æ•ˆï¼Ÿ** â†’ [DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md) "å·²çŸ¥é—®é¢˜ #3"
-- **ç¼–è¾‘æ— æ•ˆï¼Ÿ** â†’ æ£€æŸ¥ `Dialog_EditMemory.cs` æ˜¯å¦å­˜åœ¨
-- **å¤šé€‰ä¸å·¥ä½œï¼Ÿ** â†’ [QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md) "å¤šé€‰æ“ä½œ"
+### ¹¦ÄÜÎÊÌâ
+- **¹Ì¶¨ÎÞÐ§£¿** ¡ú [DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md) "ÒÑÖªÎÊÌâ #3"
+- **±à¼­ÎÞÐ§£¿** ¡ú ¼ì²é `Dialog_EditMemory.cs` ÊÇ·ñ´æÔÚ
+- **¶àÑ¡²»¹¤×÷£¿** ¡ú [QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md) "¶àÑ¡²Ù×÷"
 
-### ç¼–è¯‘é—®é¢˜
-- **ç¼–è¯‘å¤±è´¥ï¼Ÿ** â†’ [QUICKSTART_FIX.md](QUICKSTART_FIX.md) "é‡åˆ°é—®é¢˜ï¼Ÿ"
-- **è¯­æ³•é”™è¯¯ï¼Ÿ** â†’ è¿˜åŽŸå¤‡ä»½é‡è¯•
-- **ç¼ºå°‘å¼•ç”¨ï¼Ÿ** â†’ æ£€æŸ¥ `using` è¯­å¥
+### ±àÒëÎÊÌâ
+- **±àÒëÊ§°Ü£¿** ¡ú [QUICKSTART_FIX.md](QUICKSTART_FIX.md) "Óöµ½ÎÊÌâ£¿"
+- **Óï·¨´íÎó£¿** ¡ú »¹Ô­±¸·ÝÖØÊÔ
+- **È±ÉÙÒýÓÃ£¿** ¡ú ¼ì²é `using` Óï¾ä
 
-### æµ‹è¯•é—®é¢˜
-- **æµ‹è¯•æ¸…å•ï¼Ÿ** â†’ [DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)
-- **æµ‹è¯•æ–¹æ³•ï¼Ÿ** â†’ [DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md) "æµ‹è¯•æ£€æŸ¥æ¸…å•"
+### ²âÊÔÎÊÌâ
+- **²âÊÔÇåµ¥£¿** ¡ú [DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)
+- **²âÊÔ·½·¨£¿** ¡ú [DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md) "²âÊÔ¼ì²éÇåµ¥"
 
-## ?? æ–‡æ¡£çŠ¶æ€
+## ?? ÎÄµµ×´Ì¬
 
-| æ–‡æ¡£ | çŠ¶æ€ | æœ€åŽæ›´æ–° |
+| ÎÄµµ | ×´Ì¬ | ×îºó¸üÐÂ |
 |------|------|----------|
-| QUICKSTART_FIX.md | ? å®Œæˆ | 2025-01-XX |
-| HOW_TO_FIX.md | ? å®Œæˆ | 2025-01-XX |
-| UI_TRANSLATION_FIX_GUIDE.md | ? å®Œæˆ | 2025-01-XX |
-| DEPLOYMENT_SUMMARY_v3.3.19.md | ? å®Œæˆ | 2025-01-XX |
-| DEPLOYMENT_CHECKLIST_v3.3.19.md | ? å®Œæˆ | 2025-01-XX |
-| TASK_STATUS.md | ? å®Œæˆ | 2025-01-XX |
-| QUICKSTART_UI_v3.3.19.md | ? å®Œæˆ | 2025-01-XX |
-| CHANGELOG.md | ? å®Œæˆ | 2025-01-XX |
-| quick_fix_translations.ps1 | ? å®Œæˆ | 2025-01-XX |
+| QUICKSTART_FIX.md | ? Íê³É | 2025-01-XX |
+| HOW_TO_FIX.md | ? Íê³É | 2025-01-XX |
+| UI_TRANSLATION_FIX_GUIDE.md | ? Íê³É | 2025-01-XX |
+| DEPLOYMENT_SUMMARY_v3.3.19.md | ? Íê³É | 2025-01-XX |
+| DEPLOYMENT_CHECKLIST_v3.3.19.md | ? Íê³É | 2025-01-XX |
+| TASK_STATUS.md | ? Íê³É | 2025-01-XX |
+| QUICKSTART_UI_v3.3.19.md | ? Íê³É | 2025-01-XX |
+| CHANGELOG.md | ? Íê³É | 2025-01-XX |
+| quick_fix_translations.ps1 | ? Íê³É | 2025-01-XX |
 
-## ?? æŽ¨èé˜…è¯»é¡ºåº
+## ?? ÍÆ¼öÔÄ¶ÁË³Ðò
 
-### å¼€å‘è€…ï¼ˆä¿®å¤å’Œå‘å¸ƒï¼‰
-1. **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** - å¿«é€Ÿå¼€å§‹
-2. **[TASK_STATUS.md](TASK_STATUS.md)** - äº†è§£çŠ¶æ€
-3. **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)** - å‘å¸ƒæ£€æŸ¥
+### ¿ª·¢Õß£¨ÐÞ¸´ºÍ·¢²¼£©
+1. **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** - ¿ìËÙ¿ªÊ¼
+2. **[TASK_STATUS.md](TASK_STATUS.md)** - ÁË½â×´Ì¬
+3. **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)** - ·¢²¼¼ì²é
 
-### ç»´æŠ¤è€…ï¼ˆæ·±å…¥äº†è§£ï¼‰
-1. **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** - å®Œæ•´æ¦‚è§ˆ
-2. **[HOW_TO_FIX.md](HOW_TO_FIX.md)** - è¯¦ç»†æŒ‡å—
-3. **[UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)** - æŠ€æœ¯ç»†èŠ‚
+### Î¬»¤Õß£¨ÉîÈëÁË½â£©
+1. **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** - ÍêÕû¸ÅÀÀ
+2. **[HOW_TO_FIX.md](HOW_TO_FIX.md)** - ÏêÏ¸Ö¸ÄÏ
+3. **[UI_TRANSLATION_FIX_GUIDE.md](UI_TRANSLATION_FIX_GUIDE.md)** - ¼¼ÊõÏ¸½Ú
 
-### æœ€ç»ˆç”¨æˆ·
-1. **[QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md)** - ä½¿ç”¨æŒ‡å—
-2. **[CHANGELOG.md](CHANGELOG.md)** - æ›´æ–°å†…å®¹
+### ×îÖÕÓÃ»§
+1. **[QUICKSTART_UI_v3.3.19.md](QUICKSTART_UI_v3.3.19.md)** - Ê¹ÓÃÖ¸ÄÏ
+2. **[CHANGELOG.md](CHANGELOG.md)** - ¸üÐÂÄÚÈÝ
 
-## ?? å¿«é€Ÿé“¾æŽ¥
+## ?? ¿ìËÙÁ´½Ó
 
 ### GitHub
 - **Issues**: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/issues
 - **Discussions**: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/discussions
 - **Releases**: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/releases
 
-### å…³é”®æ–‡ä»¶
+### ¹Ø¼üÎÄ¼þ
 - **About.xml**: `About/About.xml`
 - **MainTabWindow_Memory.cs**: `Source/Memory/UI/MainTabWindow_Memory.cs`
 - **Dialog_CommonKnowledge.cs**: `Source/Memory/UI/Dialog_CommonKnowledge.cs`
 - **English Keys**: `Languages/English/Keyed/MemoryPatch.xml`
 - **Chinese Keys**: `Languages/ChineseSimplified/Keyed/MemoryPatch.xml`
 
-## ?? æç¤º
+## ?? ÌáÊ¾
 
-### ç¬¬ä¸€æ¬¡ä½¿ç”¨ï¼Ÿ
-ä»Ž **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** å¼€å§‹ï¼Œå®ƒä¼šæŒ‡å¯¼ä½ å®Œæˆæ‰€æœ‰å¿…éœ€æ­¥éª¤ã€‚
+### µÚÒ»´ÎÊ¹ÓÃ£¿
+´Ó **[QUICKSTART_FIX.md](QUICKSTART_FIX.md)** ¿ªÊ¼£¬Ëü»áÖ¸µ¼ÄãÍê³ÉËùÓÐ±ØÐè²½Öè¡£
 
-### é‡åˆ°é—®é¢˜ï¼Ÿ
-æŸ¥çœ‹ **[HOW_TO_FIX.md](HOW_TO_FIX.md)** çš„"å¸¸è§é—®é¢˜"éƒ¨åˆ†ã€‚
+### Óöµ½ÎÊÌâ£¿
+²é¿´ **[HOW_TO_FIX.md](HOW_TO_FIX.md)** µÄ"³£¼ûÎÊÌâ"²¿·Ö¡£
 
-### æƒ³æ·±å…¥äº†è§£ï¼Ÿ
-é˜…è¯» **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** èŽ·å–å®Œæ•´æŠ€æœ¯ç»†èŠ‚ã€‚
+### ÏëÉîÈëÁË½â£¿
+ÔÄ¶Á **[DEPLOYMENT_SUMMARY_v3.3.19.md](DEPLOYMENT_SUMMARY_v3.3.19.md)** »ñÈ¡ÍêÕû¼¼ÊõÏ¸½Ú¡£
 
-### å‡†å¤‡å‘å¸ƒï¼Ÿ
-ä½¿ç”¨ **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)** ç¡®ä¿ä¸é—æ¼ä»»ä½•æ­¥éª¤ã€‚
+### ×¼±¸·¢²¼£¿
+Ê¹ÓÃ **[DEPLOYMENT_CHECKLIST_v3.3.19.md](DEPLOYMENT_CHECKLIST_v3.3.19.md)** È·±£²»ÒÅÂ©ÈÎºÎ²½Öè¡£
 
-## ?? èŽ·å–å¸®åŠ©
+## ?? »ñÈ¡°ïÖú
 
-å¦‚æžœæ–‡æ¡£æ— æ³•è§£å†³ä½ çš„é—®é¢˜ï¼š
+Èç¹ûÎÄµµÎÞ·¨½â¾öÄãµÄÎÊÌâ£º
 
-1. **æœç´¢å·²æœ‰Issues**: å¯èƒ½æœ‰äººé‡åˆ°åŒæ ·é—®é¢˜
-2. **åˆ›å»ºæ–°Issue**: è¯¦ç»†æè¿°é—®é¢˜å’Œæ­¥éª¤
-3. **å‚ä¸ŽDiscussions**: ä¸Žç¤¾åŒºäº¤æµ
+1. **ËÑË÷ÒÑÓÐIssues**: ¿ÉÄÜÓÐÈËÓöµ½Í¬ÑùÎÊÌâ
+2. **´´½¨ÐÂIssue**: ÏêÏ¸ÃèÊöÎÊÌâºÍ²½Öè
+3. **²ÎÓëDiscussions**: ÓëÉçÇø½»Á÷
 
 ---
 
-**ç¥ä½ ä¿®å¤é¡ºåˆ©ï¼** ??
+**×£ÄãÐÞ¸´Ë³Àû£¡** ??
 
-**å»ºè®®çš„ä¸‹ä¸€æ­¥**: æ‰“å¼€ [QUICKSTART_FIX.md](QUICKSTART_FIX.md) å¹¶å¼€å§‹30åˆ†é’Ÿä¿®å¤ä¹‹æ—…ï¼
+**½¨ÒéµÄÏÂÒ»²½**: ´ò¿ª [QUICKSTART_FIX.md](QUICKSTART_FIX.md) ²¢¿ªÊ¼30·ÖÖÓÐÞ¸´Ö®ÂÃ£¡

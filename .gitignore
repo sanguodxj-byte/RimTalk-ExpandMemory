@@ -12,11 +12,11 @@ Directory.Build.props
 *.sh
 auto_push_github.ps1
 
-# ? æœ¬åœ°é…ç½®æ–‡ä»¶ï¼ˆåŒ…å«ç”¨æˆ·ç‰¹å®šè·¯å¾„ï¼Œä¸åº”æäº¤ï¼‰
+# ? ±¾µØÅäÖÃÎÄ¼ş£¨°üº¬ÓÃ»§ÌØ¶¨Â·¾¶£¬²»Ó¦Ìá½»£©
 .rimworld.config
 deploy.ps1
 
-# ? GitHub Copilot ä¸ªäººé…ç½®ï¼ˆä¸åº”æäº¤ï¼‰
+# ? GitHub Copilot ¸öÈËÅäÖÃ£¨²»Ó¦Ìá½»£©
 .github/
 
 ## Interaction bubble library
@@ -441,4 +441,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-*.onnx
+

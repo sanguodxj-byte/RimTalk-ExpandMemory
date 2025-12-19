@@ -7,69 +7,69 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// è¶…çº§å…³é”®è¯æ£€ç´¢å¼•æ“ v1.0
+    /// ³¬¼¶¹Ø¼ü´Ê¼ìË÷ÒıÇæ v1.0
     /// 
-    /// æŠ€æœ¯æ ˆï¼š
-    /// - TF-IDFæƒé‡
-    /// - BM25æ’åº
-    /// - åœç”¨è¯è¿‡æ»¤
-    /// - é•¿è¯ä¼˜å…ˆ
-    /// - ä½ç½®æƒé‡
-    /// - æ¨¡ç³ŠåŒ¹é…
+    /// ¼¼ÊõÕ»£º
+    /// - TF-IDFÈ¨ÖØ
+    /// - BM25ÅÅĞò
+    /// - Í£ÓÃ´Ê¹ıÂË
+    /// - ³¤´ÊÓÅÏÈ
+    /// - Î»ÖÃÈ¨ÖØ
+    /// - Ä£ºıÆ¥Åä
     /// 
-    /// ç›®æ ‡ï¼šå‡†ç¡®ç‡ä»88% â†’ 95%+
-    /// æ€§èƒ½ï¼š<10msï¼Œå®Œå…¨åŒæ­¥
+    /// Ä¿±ê£º×¼È·ÂÊ´Ó88% ¡ú 95%+
+    /// ĞÔÄÜ£º<10ms£¬ÍêÈ«Í¬²½
     /// </summary>
     public static class SuperKeywordEngine
     {
-        // ? v3.3.15: ä¼˜åŒ–æ­£åˆ™è¡¨è¾¾å¼ - æ”¯æŒå­—æ¯æ•°å­—æ··åˆå•è¯ï¼ˆå¿…é¡»ä»¥å­—æ¯å¼€å¤´ï¼‰
-        // åŒ¹é…ï¼šM16, AK47, T5, V2ï¼ˆå­—æ¯å¼€å¤´ + è‡³å°‘1ä¸ªå­—æ¯æˆ–æ•°å­—ï¼‰
-        // ä¸åŒ¹é…ï¼š123, 2bï¼ˆæ•°å­—å¼€å¤´ï¼‰
+        // ? v3.3.15: ÓÅ»¯ÕıÔò±í´ïÊ½ - Ö§³Ö×ÖÄ¸Êı×Ö»ìºÏµ¥´Ê£¨±ØĞëÒÔ×ÖÄ¸¿ªÍ·£©
+        // Æ¥Åä£ºM16, AK47, T5, V2£¨×ÖÄ¸¿ªÍ· + ÖÁÉÙ1¸ö×ÖÄ¸»òÊı×Ö£©
+        // ²»Æ¥Åä£º123, 2b£¨Êı×Ö¿ªÍ·£©
         private static readonly Regex EnglishWordRegex = new Regex(
             @"\b[a-zA-Z][a-zA-Z0-9]{1,}\b",
             RegexOptions.Compiled
         );
         
-        // ä¸­æ–‡åœç”¨è¯è¡¨ï¼ˆé«˜é¢‘ä½†æ— æ„ä¹‰çš„è¯ï¼‰
+        // ÖĞÎÄÍ£ÓÃ´Ê±í£¨¸ßÆµµ«ÎŞÒâÒåµÄ´Ê£©
         private static readonly HashSet<string> StopWords = new HashSet<string>
         {
-            "çš„", "äº†", "æ˜¯", "åœ¨", "æˆ‘", "æœ‰", "å’Œ", "å°±", "ä¸", "äºº", "éƒ½", "ä¸€", "ä¸ª", "ä¹Ÿ", "ä¸Š",
-            "ä»–", "ä»¬", "åˆ°", "è¯´", "è¦", "å»", "ä½ ", "ä¼š", "ç€", "æ²¡æœ‰", "çœ‹", "å¥½", "è‡ªå·±", "è¿™",
-            "é‚£", "ä¸º", "æ¥", "è€Œ", "èƒ½", "å¯ä»¥", "ä¸", "ä½†", "å¾ˆ", "å—", "å§", "å•Š", "å‘¢", "ä¹ˆ",
-            "ä»€ä¹ˆ", "æ€ä¹ˆ", "ä¸ºä»€ä¹ˆ", "å“ªé‡Œ", "è°", "å¤šå°‘", "å‡ ä¸ª", "ä¸€äº›", "ä¸€ç‚¹", "æœ‰ç‚¹", "å¤ª",
-            "éå¸¸", "æ¯”è¾ƒ", "è¿˜", "æ›´", "æœ€", "å¤§", "å°", "å¤š", "å°‘", "æ–°", "æ—§", "å¥½", "å"
+            "µÄ", "ÁË", "ÊÇ", "ÔÚ", "ÎÒ", "ÓĞ", "ºÍ", "¾Í", "²»", "ÈË", "¶¼", "Ò»", "¸ö", "Ò²", "ÉÏ",
+            "Ëû", "ÃÇ", "µ½", "Ëµ", "Òª", "È¥", "Äã", "»á", "×Å", "Ã»ÓĞ", "¿´", "ºÃ", "×Ô¼º", "Õâ",
+            "ÄÇ", "Îª", "À´", "¶ø", "ÄÜ", "¿ÉÒÔ", "Óë", "µ«", "ºÜ", "Âğ", "°É", "°¡", "ÄØ", "Ã´",
+            "Ê²Ã´", "ÔõÃ´", "ÎªÊ²Ã´", "ÄÄÀï", "Ë­", "¶àÉÙ", "¼¸¸ö", "Ò»Ğ©", "Ò»µã", "ÓĞµã", "Ì«",
+            "·Ç³£", "±È½Ï", "»¹", "¸ü", "×î", "´ó", "Ğ¡", "¶à", "ÉÙ", "ĞÂ", "¾É", "ºÃ", "»µ"
         };
 
-        // é«˜æƒé‡è¯å‰ç¼€ï¼ˆè¿™äº›è¯å¼€å¤´çš„è¯è¯­æ›´é‡è¦ï¼‰
+        // ¸ßÈ¨ÖØ´ÊÇ°×º£¨ÕâĞ©´Ê¿ªÍ·µÄ´ÊÓï¸üÖØÒª£©
         private static readonly HashSet<string> ImportantPrefixes = new HashSet<string>
         {
-            "é¾™ç‹", "ç´¢æ‹‰å…‹", "æ¢…è²æ–¯ç‰¹", "æ®–æ°‘", "æˆ˜æ–—", "å—ä¼¤", "æ­»äº¡", "çˆ±æƒ…", "å‹è°Š", "ä»‡æ¨",
-            "ä»»åŠ¡", "å»ºé€ ", "ç§æ¤", "é‡‡çŸ¿", "ç ”ç©¶", "åŒ»ç–—", "è¢­å‡»", "é˜²å¾¡", "è´¸æ˜“", "è°ˆåˆ¤"
+            "ÁúÍõ", "Ë÷À­¿Ë", "Ã··ÆË¹ÌØ", "Ö³Ãñ", "Õ½¶·", "ÊÜÉË", "ËÀÍö", "°®Çé", "ÓÑÒê", "³ğºŞ",
+            "ÈÎÎñ", "½¨Ôì", "ÖÖÖ²", "²É¿ó", "ÑĞ¾¿", "Ò½ÁÆ", "Ï®»÷", "·ÀÓù", "Ã³Ò×", "Ì¸ÅĞ"
         };
 
         /// <summary>
-        /// è¶…çº§å…³é”®è¯æå–ï¼ˆä¼˜åŒ–ç‰ˆï¼‰
-        /// ? v3.3.2.28: ä¿®å¤è‹±æ–‡å•è¯è¢«åˆ‡å‰²çš„é—®é¢˜ï¼Œä½¿ç”¨æ™ºèƒ½åˆ†è¯
+        /// ³¬¼¶¹Ø¼ü´ÊÌáÈ¡£¨ÓÅ»¯°æ£©
+        /// ? v3.3.2.28: ĞŞ¸´Ó¢ÎÄµ¥´Ê±»ÇĞ¸îµÄÎÊÌâ£¬Ê¹ÓÃÖÇÄÜ·Ö´Ê
         /// </summary>
         public static List<WeightedKeyword> ExtractKeywords(string text, int maxKeywords = 100)
         {
             if (string.IsNullOrEmpty(text))
                 return new List<WeightedKeyword>();
 
-            // æˆªæ–­è¿‡é•¿æ–‡æœ¬
+            // ½Ø¶Ï¹ı³¤ÎÄ±¾
             const int MAX_TEXT_LENGTH = 500;
             if (text.Length > MAX_TEXT_LENGTH)
                 text = text.Substring(0, MAX_TEXT_LENGTH);
 
             var keywordScores = new Dictionary<string, KeywordScore>();
 
-            // ? v3.3.2.28: å…ˆæå–è‹±æ–‡å•è¯ï¼ˆå®Œæ•´å•è¯ï¼Œä¸åˆ‡å‰²ï¼‰
+            // ? v3.3.2.28: ÏÈÌáÈ¡Ó¢ÎÄµ¥´Ê£¨ÍêÕûµ¥´Ê£¬²»ÇĞ¸î£©
             ExtractEnglishWords(text, keywordScores);
 
-            // ? v3.3.2.28: å†æå–ä¸­æ–‡è¯ç»„ï¼ˆ2-6å­—æ»‘åŠ¨çª—å£ï¼‰
+            // ? v3.3.2.28: ÔÙÌáÈ¡ÖĞÎÄ´Ê×é£¨2-6×Ö»¬¶¯´°¿Ú£©
             ExtractChineseWords(text, keywordScores);
 
-            // 2. è®¡ç®—TF-IDFæƒé‡
+            // 2. ¼ÆËãTF-IDFÈ¨ÖØ
             int totalWords = keywordScores.Values.Sum(s => s.Frequency);
             
             foreach (var score in keywordScores.Values)
@@ -77,13 +77,13 @@ namespace RimTalk.Memory
                 // TF (Term Frequency)
                 float tf = (float)score.Frequency / totalWords;
                 
-                // é•¿åº¦æƒé‡ï¼šé•¿è¯æ›´é‡è¦
-                float lengthWeight = 1.0f + (score.Length - 2) * 0.3f; // 2å­—=1.0, 3å­—=1.3, 4å­—=1.6, 5å­—=1.9, 6å­—=2.2
+                // ³¤¶ÈÈ¨ÖØ£º³¤´Ê¸üÖØÒª
+                float lengthWeight = 1.0f + (score.Length - 2) * 0.3f; // 2×Ö=1.0, 3×Ö=1.3, 4×Ö=1.6, 5×Ö=1.9, 6×Ö=2.2
                 
-                // ä½ç½®æƒé‡ï¼šé å‰çš„è¯æ›´é‡è¦
+                // Î»ÖÃÈ¨ÖØ£º¿¿Ç°µÄ´Ê¸üÖØÒª
                 float positionWeight = 1.0f - ((float)score.FirstPosition / text.Length) * 0.3f;
                 
-                // é‡è¦è¯åŠ æˆï¼ˆç‰¹å®šå‰ç¼€ï¼‰
+                // ÖØÒª´Ê¼Ó³É£¨ÌØ¶¨Ç°×º£©
                 float importanceBonus = 1.0f;
                 foreach (var prefix in ImportantPrefixes)
                 {
@@ -94,26 +94,26 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // ç»¼åˆæƒé‡
+                // ×ÛºÏÈ¨ÖØ
                 score.Weight = tf * lengthWeight * positionWeight * importanceBonus;
             }
 
-            // 3. æ’åºå¹¶è¿”å›ï¼Œ? æœ€å¤š100ä¸ª
-            // ? v3.3.2.29: æ·»åŠ ç¡®å®šæ€§ tie-breakerï¼ˆæƒé‡é™åº + è¯è¯­å­—æ¯é¡ºåºå‡åºï¼‰
+            // 3. ÅÅĞò²¢·µ»Ø£¬? ×î¶à100¸ö
+            // ? v3.3.2.29: Ìí¼ÓÈ·¶¨ĞÔ tie-breaker£¨È¨ÖØ½µĞò + ´ÊÓï×ÖÄ¸Ë³ĞòÉıĞò£©
             return keywordScores.Values
                 .OrderByDescending(s => s.Weight)
-                .ThenBy(s => s.Word, StringComparer.Ordinal) // ? ç¡®å®šæ€§ tie-breaker
+                .ThenBy(s => s.Word, StringComparer.Ordinal) // ? È·¶¨ĞÔ tie-breaker
                 .Take(maxKeywords)
                 .Select(s => new WeightedKeyword { Word = s.Word, Weight = s.Weight })
                 .ToList();
         }
 
         /// <summary>
-        /// ? v3.3.2.35: ä¼˜åŒ–ç‰ˆ - ä½¿ç”¨é™æ€ç¼–è¯‘çš„æ­£åˆ™è¡¨è¾¾å¼
+        /// ? v3.3.2.35: ÓÅ»¯°æ - Ê¹ÓÃ¾²Ì¬±àÒëµÄÕıÔò±í´ïÊ½
         /// </summary>
         private static void ExtractEnglishWords(string text, Dictionary<string, KeywordScore> keywordScores)
         {
-            // ? ä½¿ç”¨é¢„ç¼–è¯‘çš„æ­£åˆ™è¡¨è¾¾å¼æå–å®Œæ•´çš„è‹±æ–‡å•è¯ï¼ˆ2ä¸ªå­—æ¯ä»¥ä¸Šï¼‰
+            // ? Ê¹ÓÃÔ¤±àÒëµÄÕıÔò±í´ïÊ½ÌáÈ¡ÍêÕûµÄÓ¢ÎÄµ¥´Ê£¨2¸ö×ÖÄ¸ÒÔÉÏ£©
             var matches = EnglishWordRegex.Matches(text);
             
             foreach (Match match in matches)
@@ -121,11 +121,11 @@ namespace RimTalk.Memory
                 string word = match.Value;
                 int position = match.Index;
                 
-                // è¿‡æ»¤ä½è´¨é‡å…³é”®è¯
+                // ¹ıÂËµÍÖÊÁ¿¹Ø¼ü´Ê
                 if (IsLowQualityKeyword(word))
                     continue;
                 
-                // åœç”¨è¯è¿‡æ»¤
+                // Í£ÓÃ´Ê¹ıÂË
                 if (StopWords.Contains(word.ToLower()))
                     continue;
 
@@ -144,22 +144,22 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ? v3.3.2.28: æå–ä¸­æ–‡è¯ç»„ï¼ˆ2-6å­—æ»‘åŠ¨çª—å£ï¼‰
+        /// ? v3.3.2.28: ÌáÈ¡ÖĞÎÄ´Ê×é£¨2-6×Ö»¬¶¯´°¿Ú£©
         /// </summary>
         private static void ExtractChineseWords(string text, Dictionary<string, KeywordScore> keywordScores)
         {
-            // åªå¯¹ä¸­æ–‡å­—ç¬¦ä½¿ç”¨æ»‘åŠ¨çª—å£
+            // Ö»¶ÔÖĞÎÄ×Ö·ûÊ¹ÓÃ»¬¶¯´°¿Ú
             for (int length = 2; length <= 6; length++)
             {
                 for (int i = 0; i <= text.Length - length; i++)
                 {
                     string word = text.Substring(i, length);
                     
-                    // åªæå–åŒ…å«ä¸­æ–‡å­—ç¬¦çš„è¯ç»„
+                    // Ö»ÌáÈ¡°üº¬ÖĞÎÄ×Ö·ûµÄ´Ê×é
                     if (!ContainsChinese(word))
                         continue;
                     
-                    // åœç”¨è¯è¿‡æ»¤
+                    // Í£ÓÃ´Ê¹ıÂË
                     if (StopWords.Contains(word))
                         continue;
 
@@ -179,7 +179,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ? v3.3.2.28: æ£€æŸ¥å­—ç¬¦ä¸²æ˜¯å¦åŒ…å«ä¸­æ–‡å­—ç¬¦
+        /// ? v3.3.2.28: ¼ì²é×Ö·û´®ÊÇ·ñ°üº¬ÖĞÎÄ×Ö·û
         /// </summary>
         private static bool ContainsChinese(string text)
         {
@@ -188,7 +188,7 @@ namespace RimTalk.Memory
             
             foreach (char c in text)
             {
-                // ä¸­æ–‡å­—ç¬¦UnicodeèŒƒå›´ï¼š\u4e00-\u9fa5
+                // ÖĞÎÄ×Ö·ûUnicode·¶Î§£º\u4e00-\u9fa5
                 if (c >= 0x4e00 && c <= 0x9fa5)
                     return true;
             }
@@ -196,30 +196,30 @@ namespace RimTalk.Memory
             return false;
         }
         /// <summary>
-        /// BM25è¯„åˆ†ï¼ˆè¡Œä¸šæ ‡å‡†çš„ç›¸å…³æ€§æ’åºç®—æ³•ï¼‰
+        /// BM25ÆÀ·Ö£¨ĞĞÒµ±ê×¼µÄÏà¹ØĞÔÅÅĞòËã·¨£©
         /// </summary>
         public static float CalculateBM25Score(
             List<WeightedKeyword> queryKeywords,
             string document,
             List<string> documentKeywords,
-            float k1 = 1.5f,  // TFé¥±å’Œå‚æ•°
-            float b = 0.75f)  // æ–‡æ¡£é•¿åº¦å½’ä¸€åŒ–
+            float k1 = 1.5f,  // TF±¥ºÍ²ÎÊı
+            float b = 0.75f)  // ÎÄµµ³¤¶È¹éÒ»»¯
         {
             if (queryKeywords.Count == 0 || string.IsNullOrEmpty(document))
                 return 0f;
 
             float score = 0f;
             int docLength = document.Length;
-            float avgDocLength = 100f; // å‡è®¾å¹³å‡æ–‡æ¡£é•¿åº¦
+            float avgDocLength = 100f; // ¼ÙÉèÆ½¾ùÎÄµµ³¤¶È
 
             foreach (var queryKw in queryKeywords)
             {
-                // è®¡ç®—è¯é¢‘
+                // ¼ÆËã´ÊÆµ
                 int freq = documentKeywords.Count(kw => kw == queryKw.Word);
                 if (freq == 0)
                     continue;
 
-                // BM25å…¬å¼
+                // BM25¹«Ê½
                 float idf = (float)Math.Log(1.0 + (1.0 / (freq + 0.5)));
                 float tf = (freq * (k1 + 1)) / (freq + k1 * (1 - b + b * docLength / avgDocLength));
                 
@@ -230,14 +230,14 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// æ¨¡ç³ŠåŒ¹é…ï¼ˆå¤„ç†åŒä¹‰è¯ã€æ‹¼å†™å˜ä½“ï¼‰
+        /// Ä£ºıÆ¥Åä£¨´¦ÀíÍ¬Òå´Ê¡¢Æ´Ğ´±äÌå£©
         /// </summary>
         public static bool FuzzyMatch(string word1, string word2, float threshold = 0.8f)
         {
             if (word1 == word2)
                 return true;
 
-            // ç¼–è¾‘è·ç¦»ï¼ˆLevenshteinè·ç¦»ï¼‰
+            // ±à¼­¾àÀë£¨Levenshtein¾àÀë£©
             int distance = LevenshteinDistance(word1, word2);
             int maxLen = Math.Max(word1.Length, word2.Length);
             
@@ -246,7 +246,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ç¼–è¾‘è·ç¦»ç®—æ³•
+        /// ±à¼­¾àÀëËã·¨
         /// </summary>
         private static int LevenshteinDistance(string s, string t)
         {
@@ -275,21 +275,21 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ? v3.3.2.28: æ£€æµ‹ä½è´¨é‡å…³é”®è¯ï¼ˆå¢å¼ºç‰ˆï¼Œè¿‡æ»¤è‹±æ–‡ç¢ç‰‡å’Œåç¼€ï¼‰
+        /// ? v3.3.2.28: ¼ì²âµÍÖÊÁ¿¹Ø¼ü´Ê£¨ÔöÇ¿°æ£¬¹ıÂËÓ¢ÎÄËéÆ¬ºÍºó×º£©
         /// </summary>
         private static bool IsLowQualityKeyword(string word)
         {
             if (string.IsNullOrEmpty(word))
                 return true;
             
-            // è§„åˆ™1ï¼šçº¯æ•°å­—ï¼ˆ1-2ä½ï¼‰è¿‡æ»¤
+            // ¹æÔò1£º´¿Êı×Ö£¨1-2Î»£©¹ıÂË
             if (word.Length <= 2 && word.All(char.IsDigit))
                 return true;
             
-            // è§„åˆ™2ï¼š3å­—æ¯ä»¥ä¸‹çš„çº¯è‹±æ–‡å•è¯è¿‡æ»¤ï¼ˆä¾‹å¦‚ï¼š"the", "is", "of", "to", "and"ç­‰ï¼‰
+            // ¹æÔò2£º3×ÖÄ¸ÒÔÏÂµÄ´¿Ó¢ÎÄµ¥´Ê¹ıÂË£¨ÀıÈç£º"the", "is", "of", "to", "and"µÈ£©
             if (word.Length <= 3 && word.All(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
             {
-                // ä¾‹å¤–ï¼šä¿ç•™å¸¸è§çš„é‡è¦è‹±æ–‡ç¼©å†™
+                // ÀıÍâ£º±£Áô³£¼ûµÄÖØÒªÓ¢ÎÄËõĞ´
                 var importantAbbreviations = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     "AI", "HP", "DPS", "XP", "UI", "API", "CPU", "GPU", "RAM", "SSD"
@@ -299,7 +299,7 @@ namespace RimTalk.Memory
                     return true;
             }
             
-            // ? v3.3.2.28: è§„åˆ™3ï¼šè¿‡æ»¤å¸¸è§çš„æ— æ„ä¹‰è‹±æ–‡åç¼€/å‰ç¼€
+            // ? v3.3.2.28: ¹æÔò3£º¹ıÂË³£¼ûµÄÎŞÒâÒåÓ¢ÎÄºó×º/Ç°×º
             var meaninglessSuffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "tion", "ment", "ing", "ed", "er", "ly", "ness", "ity", "able", "ible",
@@ -309,22 +309,22 @@ namespace RimTalk.Memory
             if (word.Length <= 4 && meaninglessSuffixes.Contains(word))
                 return true;
             
-            // è§„åˆ™4ï¼š2å­—ç¬¦çš„æ— æ„ä¹‰ç»„åˆè¿‡æ»¤ï¼ˆä¾‹å¦‚ï¼š"1a", "x2", "3b"ï¼‰
+            // ¹æÔò4£º2×Ö·ûµÄÎŞÒâÒå×éºÏ¹ıÂË£¨ÀıÈç£º"1a", "x2", "3b"£©
             if (word.Length == 2)
             {
                 bool hasDigit = word.Any(char.IsDigit);
                 bool hasLetter = word.Any(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
                 
-                // æ•°å­—+å­—æ¯çš„2å­—ç¬¦ç»„åˆé€šå¸¸æ— æ„ä¹‰
+                // Êı×Ö+×ÖÄ¸µÄ2×Ö·û×éºÏÍ¨³£ÎŞÒâÒå
                 if (hasDigit && hasLetter)
                     return true;
             }
             
-            // è§„åˆ™5ï¼šçº¯ç¬¦å·ï¼ˆä¸åº”è¯¥å‡ºç°ï¼Œä½†åšå…œåº•æ£€æŸ¥ï¼‰
+            // ¹æÔò5£º´¿·ûºÅ£¨²»Ó¦¸Ã³öÏÖ£¬µ«×ö¶µµ×¼ì²é£©
             if (word.All(c => !char.IsLetterOrDigit(c)))
                 return true;
             
-            // ? v3.3.2.28: è§„åˆ™6ï¼šè¿‡æ»¤åŒ…å«ç©ºæ ¼çš„å•å­—ç¬¦ï¼ˆä¾‹å¦‚ï¼š" c", " r"ï¼‰
+            // ? v3.3.2.28: ¹æÔò6£º¹ıÂË°üº¬¿Õ¸ñµÄµ¥×Ö·û£¨ÀıÈç£º" c", " r"£©
             if (word.Trim().Length == 1)
                 return true;
             
@@ -333,7 +333,7 @@ namespace RimTalk.Memory
     }
 
     /// <summary>
-    /// å…³é”®è¯è¯„åˆ†è¯¦æƒ…
+    /// ¹Ø¼ü´ÊÆÀ·ÖÏêÇé
     /// </summary>
     internal class KeywordScore
     {
@@ -345,7 +345,7 @@ namespace RimTalk.Memory
     }
 
     /// <summary>
-    /// å¸¦æƒé‡çš„å…³é”®è¯
+    /// ´øÈ¨ÖØµÄ¹Ø¼ü´Ê
     /// </summary>
     public class WeightedKeyword
     {

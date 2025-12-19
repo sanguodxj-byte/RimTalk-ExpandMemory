@@ -4,47 +4,45 @@ using System.Linq;
 using System.Text;
 using Verse;
 
-using RimTalk.MemoryPatch;
-
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ä¸»åŠ¨è®°å¿†å¬å›ç³»ç»Ÿ - v3.0å®éªŒæ€§åŠŸèƒ½
-    /// è®©AIä¸»åŠ¨ä»è®°å¿†ä¸­æåŠç›¸å…³å†…å®¹ï¼Œå¢å¼ºå¯¹è¯è¿è´¯æ€§
+    /// Ö÷¶¯¼ÇÒäÕÙ»ØÏµÍ³ - v3.0ÊµÑéĞÔ¹¦ÄÜ
+    /// ÈÃAIÖ÷¶¯´Ó¼ÇÒäÖĞÌá¼°Ïà¹ØÄÚÈİ£¬ÔöÇ¿¶Ô»°Á¬¹áĞÔ
     /// </summary>
     public static class ProactiveMemoryRecall
     {
         /// <summary>
-        /// è§¦å‘æ¦‚ç‡é…ç½®
+        /// ´¥·¢¸ÅÂÊÅäÖÃ
         /// </summary>
         public static class TriggerProbability
         {
-            public static float BaseChance = 0.15f;           // åŸºç¡€è§¦å‘æ¦‚ç‡ 15%
-            public static float HighImportanceBonus = 0.20f;  // é«˜é‡è¦æ€§è®°å¿†åŠ æˆ
-            public static float RecentMemoryBonus = 0.15f;    // è¿‘æœŸè®°å¿†åŠ æˆ
-            public static float EmotionalBonus = 0.10f;       // æƒ…æ„Ÿè®°å¿†åŠ æˆ
+            public static float BaseChance = 0.15f;           // »ù´¡´¥·¢¸ÅÂÊ 15%
+            public static float HighImportanceBonus = 0.20f;  // ¸ßÖØÒªĞÔ¼ÇÒä¼Ó³É
+            public static float RecentMemoryBonus = 0.15f;    // ½üÆÚ¼ÇÒä¼Ó³É
+            public static float EmotionalBonus = 0.10f;       // Çé¸Ğ¼ÇÒä¼Ó³É
         }
 
         /// <summary>
-        /// å°è¯•ä¸»åŠ¨å¬å›è®°å¿†
+        /// ³¢ÊÔÖ÷¶¯ÕÙ»Ø¼ÇÒä
         /// </summary>
-        /// <param name="pawn">è¯´è¯è€…</param>
-        /// <param name="context">å¯¹è¯ä¸Šä¸‹æ–‡</param>
-        /// <param name="listener">å¬ä¼—ï¼ˆå¯é€‰ï¼‰</param>
-        /// <returns>å¬å›çš„è®°å¿†æç¤ºï¼Œå¦‚æœä¸è§¦å‘åˆ™è¿”å›null</returns>
+        /// <param name="pawn">Ëµ»°Õß</param>
+        /// <param name="context">¶Ô»°ÉÏÏÂÎÄ</param>
+        /// <param name="listener">ÌıÖÚ£¨¿ÉÑ¡£©</param>
+        /// <returns>ÕÙ»ØµÄ¼ÇÒäÌáÊ¾£¬Èç¹û²»´¥·¢Ôò·µ»Ønull</returns>
         public static string TryRecallMemory(Pawn pawn, string context, Pawn listener = null)
         {
-            // æ£€æŸ¥æ˜¯å¦å¯ç”¨
-            var settings = RimTalkMemoryPatchMod.Settings;
+            // ¼ì²éÊÇ·ñÆôÓÃ
+            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
             if (settings?.enableProactiveRecall != true)
                 return null;
 
-            // è·å–è®°å¿†ç»„ä»¶
+            // »ñÈ¡¼ÇÒä×é¼ş
             var memoryComp = pawn?.TryGetComp<FourLayerMemoryComp>();
             if (memoryComp == null)
                 return null;
 
-            // æ”¶é›†å€™é€‰è®°å¿†ï¼ˆSCM + ELSï¼Œä¸åŒ…æ‹¬ABMï¼‰
+            // ÊÕ¼¯ºòÑ¡¼ÇÒä£¨SCM + ELS£¬²»°üÀ¨ABM£©
             var candidates = new List<MemoryEntry>();
             candidates.AddRange(memoryComp.SituationalMemories.Take(10));
             candidates.AddRange(memoryComp.EventLogMemories.Take(5));
@@ -52,33 +50,33 @@ namespace RimTalk.Memory
             if (candidates.Count == 0)
                 return null;
 
-            // æå–ä¸Šä¸‹æ–‡å…³é”®è¯
+            // ÌáÈ¡ÉÏÏÂÎÄ¹Ø¼ü´Ê
             var contextKeywords = ExtractKeywords(context);
             if (contextKeywords.Count == 0)
                 return null;
 
-            // è®¡ç®—æ¯ä¸ªè®°å¿†çš„å¬å›åˆ†æ•°
+            // ¼ÆËãÃ¿¸ö¼ÇÒäµÄÕÙ»Ø·ÖÊı
             var scored = candidates
                 .Select(m => new
                 {
                     Memory = m,
                     Score = CalculateRecallScore(m, contextKeywords, listener)
                 })
-                .Where(s => s.Score > 0.3f) // åªè€ƒè™‘ç›¸å…³æ€§è¾ƒé«˜çš„
+                .Where(s => s.Score > 0.3f) // Ö»¿¼ÂÇÏà¹ØĞÔ½Ï¸ßµÄ
                 .OrderByDescending(s => s.Score)
                 .ToList();
 
             if (scored.Count == 0)
                 return null;
 
-            // éšæœºé€‰æ‹©æ˜¯å¦è§¦å‘ï¼ˆåŸºäºæœ€é«˜åˆ†è®°å¿†ï¼‰
+            // Ëæ»úÑ¡ÔñÊÇ·ñ´¥·¢£¨»ùÓÚ×î¸ß·Ö¼ÇÒä£©
             var best = scored.First();
             float triggerChance = CalculateTriggerChance(best.Memory);
 
             if (UnityEngine.Random.value > triggerChance)
-                return null; // ä¸è§¦å‘
+                return null; // ²»´¥·¢
 
-            // è§¦å‘ï¼ç”Ÿæˆå¬å›æç¤º
+            // ´¥·¢£¡Éú³ÉÕÙ»ØÌáÊ¾
             string recallPrompt = GenerateRecallPrompt(best.Memory, context, listener);
 
             if (Prefs.DevMode)
@@ -90,13 +88,13 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è®¡ç®—å¬å›åˆ†æ•°ï¼ˆä¸æ³¨å…¥è¯„åˆ†ä¸åŒï¼Œæ›´æ³¨é‡æƒ…æ„Ÿå’Œé‡è¦æ€§ï¼‰
+        /// ¼ÆËãÕÙ»Ø·ÖÊı£¨Óë×¢ÈëÆÀ·Ö²»Í¬£¬¸ü×¢ÖØÇé¸ĞºÍÖØÒªĞÔ£©
         /// </summary>
         private static float CalculateRecallScore(MemoryEntry memory, List<string> contextKeywords, Pawn listener)
         {
             float score = 0f;
 
-            // 1. å…³é”®è¯åŒ¹é…åº¦ï¼ˆæƒé‡40%ï¼‰
+            // 1. ¹Ø¼ü´ÊÆ¥Åä¶È£¨È¨ÖØ40%£©
             float keywordMatch = 0f;
             if (memory.keywords != null && contextKeywords != null)
             {
@@ -108,15 +106,15 @@ namespace RimTalk.Memory
             }
             score += keywordMatch * 0.4f;
 
-            // 2. é‡è¦æ€§ï¼ˆæƒé‡30%ï¼‰
+            // 2. ÖØÒªĞÔ£¨È¨ÖØ30%£©
             score += memory.importance * 0.3f;
 
-            // 3. æ–°é²œåº¦ï¼ˆæƒé‡20%ï¼‰
+            // 3. ĞÂÏÊ¶È£¨È¨ÖØ20%£©
             int age = Find.TickManager.TicksGame - memory.timestamp;
-            float freshness = UnityEngine.Mathf.Exp(-age / 120000f); // 2å¤©åŠè¡°æœŸ
+            float freshness = UnityEngine.Mathf.Exp(-age / 120000f); // 2Ìì°ëË¥ÆÚ
             score += freshness * 0.2f;
 
-            // 4. å¬ä¼—ç›¸å…³æ€§ï¼ˆæƒé‡10%ï¼‰
+            // 4. ÌıÖÚÏà¹ØĞÔ£¨È¨ÖØ10%£©
             if (listener != null && !string.IsNullOrEmpty(memory.relatedPawnName))
             {
                 if (memory.relatedPawnName == listener.LabelShort)
@@ -125,41 +123,41 @@ namespace RimTalk.Memory
                 }
             }
 
-            // 5. ç‰¹æ®ŠåŠ æˆ
+            // 5. ÌØÊâ¼Ó³É
             if (memory.type == MemoryType.Emotion)
-                score += 0.15f; // æƒ…æ„Ÿè®°å¿†æ›´å®¹æ˜“è¢«ä¸»åŠ¨æåŠ
+                score += 0.15f; // Çé¸Ğ¼ÇÒä¸üÈİÒ×±»Ö÷¶¯Ìá¼°
 
             if (memory.isPinned)
-                score += 0.2f; // å›ºå®šè®°å¿†ä¼˜å…ˆ
+                score += 0.2f; // ¹Ì¶¨¼ÇÒäÓÅÏÈ
 
             return score;
         }
 
         /// <summary>
-        /// è®¡ç®—è§¦å‘æ¦‚ç‡
+        /// ¼ÆËã´¥·¢¸ÅÂÊ
         /// </summary>
         private static float CalculateTriggerChance(MemoryEntry memory)
         {
             float chance = TriggerProbability.BaseChance;
 
-            // é‡è¦æ€§åŠ æˆ
+            // ÖØÒªĞÔ¼Ó³É
             if (memory.importance > 0.7f)
                 chance += TriggerProbability.HighImportanceBonus;
 
-            // è¿‘æœŸè®°å¿†åŠ æˆ
+            // ½üÆÚ¼ÇÒä¼Ó³É
             int age = Find.TickManager.TicksGame - memory.timestamp;
-            if (age < 60000) // 1å¤©å†…
+            if (age < 60000) // 1ÌìÄÚ
                 chance += TriggerProbability.RecentMemoryBonus;
 
-            // æƒ…æ„Ÿè®°å¿†åŠ æˆ
+            // Çé¸Ğ¼ÇÒä¼Ó³É
             if (memory.type == MemoryType.Emotion)
                 chance += TriggerProbability.EmotionalBonus;
 
-            return Math.Min(chance, 0.6f); // æœ€é«˜60%è§¦å‘ç‡
+            return Math.Min(chance, 0.6f); // ×î¸ß60%´¥·¢ÂÊ
         }
 
         /// <summary>
-        /// ç”Ÿæˆå¬å›æç¤ºï¼ˆæ³¨å…¥åˆ°System Ruleï¼‰
+        /// Éú³ÉÕÙ»ØÌáÊ¾£¨×¢Èëµ½System Rule£©
         /// </summary>
         private static string GenerateRecallPrompt(MemoryEntry memory, string context, Pawn listener)
         {
@@ -169,20 +167,20 @@ namespace RimTalk.Memory
             sb.AppendLine("(AI Instruction: The character spontaneously recalls this memory. Naturally mention or reference it in the response.)");
             sb.AppendLine();
 
-            // è®°å¿†å†…å®¹
+            // ¼ÇÒäÄÚÈİ
             string typeTag = GetMemoryTypeTag(memory.type);
             string timeStr = memory.TimeAgoString;
             
             sb.AppendLine($"**Recalled Memory:** [{typeTag}] {memory.content}");
             sb.AppendLine($"**When:** {timeStr}");
 
-            // å¦‚æœæœ‰ç›¸å…³Pawnï¼Œæ ‡æ³¨
+            // Èç¹ûÓĞÏà¹ØPawn£¬±ê×¢
             if (!string.IsNullOrEmpty(memory.relatedPawnName))
             {
                 sb.AppendLine($"**Related to:** {memory.relatedPawnName}");
             }
 
-            // æƒ…æ„Ÿæç¤º
+            // Çé¸ĞÌáÊ¾
             if (memory.type == MemoryType.Emotion)
             {
                 sb.AppendLine($"**Emotional weight:** High (importance: {memory.importance:P0})");
@@ -195,7 +193,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è·å–è®°å¿†ç±»å‹æ ‡ç­¾
+        /// »ñÈ¡¼ÇÒäÀàĞÍ±êÇ©
         /// </summary>
         private static string GetMemoryTypeTag(MemoryType type)
         {
@@ -217,7 +215,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// æå–å…³é”®è¯ï¼ˆç®€åŒ–ç‰ˆï¼‰
+        /// ÌáÈ¡¹Ø¼ü´Ê£¨¼ò»¯°æ£©
         /// </summary>
         private static List<string> ExtractKeywords(string text)
         {
@@ -226,7 +224,7 @@ namespace RimTalk.Memory
 
             var keywords = new HashSet<string>();
 
-            // åˆ†è¯ï¼š2-4å­—
+            // ·Ö´Ê£º2-4×Ö
             for (int length = 2; length <= 4; length++)
             {
                 for (int i = 0; i <= text.Length - length; i++)
@@ -243,14 +241,14 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è·å–è¯Šæ–­ä¿¡æ¯
+        /// »ñÈ¡Õï¶ÏĞÅÏ¢
         /// </summary>
         public static RecallDiagnostics GetDiagnostics(Pawn pawn)
         {
             var diagnostics = new RecallDiagnostics
             {
                 PawnName = pawn?.LabelShort ?? "Unknown",
-                IsEnabled = RimTalkMemoryPatchMod.Settings?.enableProactiveRecall ?? false
+                IsEnabled = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableProactiveRecall ?? false
             };
 
             var memoryComp = pawn?.TryGetComp<FourLayerMemoryComp>();
@@ -258,7 +256,7 @@ namespace RimTalk.Memory
             {
                 diagnostics.CandidateMemories = memoryComp.SituationalMemories.Count + memoryComp.EventLogMemories.Count;
                 
-                // ç»Ÿè®¡é«˜åˆ†è®°å¿†
+                // Í³¼Æ¸ß·Ö¼ÇÒä
                 var highScore = memoryComp.SituationalMemories
                     .Concat(memoryComp.EventLogMemories)
                     .Where(m => m.importance > 0.7f)
@@ -271,7 +269,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è¯Šæ–­ä¿¡æ¯
+        /// Õï¶ÏĞÅÏ¢
         /// </summary>
         public class RecallDiagnostics
         {

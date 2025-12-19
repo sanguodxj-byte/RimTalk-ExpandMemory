@@ -1,52 +1,52 @@
-# ? v3.3.19 å¿«é€Ÿå¯åŠ¨æŒ‡å—
+# ? v3.3.19 ¿ìËÙÆô¶¯Ö¸ÄÏ
 
-## ?? ç›®æ ‡
-åœ¨30åˆ†é’Ÿå†…å®Œæˆv3.3.19çš„æœ€åä¿®å¤å¹¶å‘å¸ƒã€‚
+## ?? Ä¿±ê
+ÔÚ30·ÖÖÓÄÚÍê³Év3.3.19µÄ×îºóĞŞ¸´²¢·¢²¼¡£
 
-## ?? 3æ­¥å¿«é€Ÿå®Œæˆ
+## ?? 3²½¿ìËÙÍê³É
 
-### ç¬¬1æ­¥ï¼šè‡ªåŠ¨ä¿®å¤ç¿»è¯‘ (5åˆ†é’Ÿ)
+### µÚ1²½£º×Ô¶¯ĞŞ¸´·­Òë (5·ÖÖÓ)
 
 ```powershell
-# åœ¨é¡¹ç›®æ ¹ç›®å½•è¿è¡Œ
+# ÔÚÏîÄ¿¸ùÄ¿Â¼ÔËĞĞ
 .\quick_fix_translations.ps1
 
-# è„šæœ¬ä¼šï¼š
-# ? è‡ªåŠ¨å¤‡ä»½æ–‡ä»¶
-# ? æ›¿æ¢æ‰€æœ‰ç¡¬ç¼–ç è‹±æ–‡
-# ? æ˜¾ç¤ºä¿®å¤ç»Ÿè®¡
-# ? æç¤ºä¸‹ä¸€æ­¥æ“ä½œ
+# ½Å±¾»á£º
+# ? ×Ô¶¯±¸·İÎÄ¼ş
+# ? Ìæ»»ËùÓĞÓ²±àÂëÓ¢ÎÄ
+# ? ÏÔÊ¾ĞŞ¸´Í³¼Æ
+# ? ÌáÊ¾ÏÂÒ»²½²Ù×÷
 ```
 
-**é¢„æœŸè¾“å‡ºï¼š**
+**Ô¤ÆÚÊä³ö£º**
 ```
-? å®Œæˆ! å…±ä¿®å¤ 15 å¤„ç¡¬ç¼–ç æ–‡æœ¬
-?? å¤‡ä»½æ–‡ä»¶: Source\Memory\UI\MainTabWindow_Memory.cs.backup
-? æœªå‘ç°æ˜æ˜¾çš„ç¡¬ç¼–ç è‹±æ–‡!
+? Íê³É! ¹²ĞŞ¸´ 15 ´¦Ó²±àÂëÎÄ±¾
+?? ±¸·İÎÄ¼ş: Source\Memory\UI\MainTabWindow_Memory.cs.backup
+? Î´·¢ÏÖÃ÷ÏÔµÄÓ²±àÂëÓ¢ÎÄ!
 ```
 
-**å¦‚æœè„šæœ¬å¤±è´¥ï¼š**
-- æ–¹æ¡ˆAï¼šæ‰‹åŠ¨åº”ç”¨ä¿®å¤ï¼ˆå‚è€ƒ `UI_TRANSLATION_FIX_GUIDE.md`ï¼‰
-- æ–¹æ¡ˆBï¼šè¿˜åŸå¤‡ä»½é‡æ–°è¿è¡Œ
+**Èç¹û½Å±¾Ê§°Ü£º**
+- ·½°¸A£ºÊÖ¶¯Ó¦ÓÃĞŞ¸´£¨²Î¿¼ `UI_TRANSLATION_FIX_GUIDE.md`£©
+- ·½°¸B£º»¹Ô­±¸·İÖØĞÂÔËĞĞ
 
 ---
 
-### ç¬¬2æ­¥ï¼šæ·»åŠ æ»šåŠ¨è§†å›¾ (15åˆ†é’Ÿ)
+### µÚ2²½£ºÌí¼Ó¹ö¶¯ÊÓÍ¼ (15·ÖÖÓ)
 
-#### 2.1 æ‰“å¼€æ–‡ä»¶
+#### 2.1 ´ò¿ªÎÄ¼ş
 ```bash
 code Source/Memory/UI/MainTabWindow_Memory.cs
 ```
 
-#### 2.2 æ·»åŠ æˆå‘˜å˜é‡ï¼ˆçº¦ç¬¬45è¡Œï¼‰
-åœ¨ç±»æˆå‘˜å˜é‡åŒºåŸŸæ·»åŠ ï¼š
+#### 2.2 Ìí¼Ó³ÉÔ±±äÁ¿£¨Ô¼µÚ45ĞĞ£©
+ÔÚÀà³ÉÔ±±äÁ¿ÇøÓòÌí¼Ó£º
 ```csharp
 private Vector2 controlPanelScrollPosition = Vector2.zero;
 ```
 
-#### 2.3 ä¿®æ”¹ DrawControlPanel æ–¹æ³•ï¼ˆçº¦ç¬¬200è¡Œï¼‰
+#### 2.3 ĞŞ¸Ä DrawControlPanel ·½·¨£¨Ô¼µÚ200ĞĞ£©
 
-**åŸå§‹ä»£ç ï¼š**
+**Ô­Ê¼´úÂë£º**
 ```csharp
 private void DrawControlPanel(Rect rect)
 {
@@ -61,120 +61,120 @@ private void DrawControlPanel(Rect rect)
 }
 ```
 
-**ä¿®æ”¹ä¸ºï¼š**
+**ĞŞ¸ÄÎª£º**
 ```csharp
 private void DrawControlPanel(Rect rect)
 {
     Widgets.DrawMenuSection(rect);
     Rect innerRect = rect.ContractedBy(SPACING);
     
-    // ? æ·»åŠ æ»šåŠ¨æ”¯æŒ
+    // ? Ìí¼Ó¹ö¶¯Ö§³Ö
     float contentHeight = 600f;
     Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, contentHeight);
     
     Widgets.BeginScrollView(innerRect, ref controlPanelScrollPosition, viewRect);
     
-    float y = 0f; // ? æ”¹ä¸ºä»0å¼€å§‹
+    float y = 0f; // ? ¸ÄÎª´Ó0¿ªÊ¼
     
     // Title
     Text.Font = GameFont.Medium;
-    Widgets.Label(new Rect(0f, y, viewRect.width, 30f), ...); // ? ä½¿ç”¨ viewRect
+    Widgets.Label(new Rect(0f, y, viewRect.width, 30f), ...); // ? Ê¹ÓÃ viewRect
     Text.Font = GameFont.Small;
     y += 35f;
     
     // Layer Filters
-    Rect filterRect = new Rect(0f, 0f, viewRect.width, viewRect.height); // ? æ–°å¢
-    y = DrawLayerFilters(filterRect, y); // ? ä½¿ç”¨ filterRect
+    Rect filterRect = new Rect(0f, 0f, viewRect.width, viewRect.height); // ? ĞÂÔö
+    y = DrawLayerFilters(filterRect, y); // ? Ê¹ÓÃ filterRect
     y += 10f;
     
     // Type Filters
-    y = DrawTypeFilters(filterRect, y); // ? ä½¿ç”¨ filterRect
+    y = DrawTypeFilters(filterRect, y); // ? Ê¹ÓÃ filterRect
     y += 10f;
     
     // Statistics
-    y = DrawStatistics(filterRect, y); // ? ä½¿ç”¨ filterRect
+    y = DrawStatistics(filterRect, y); // ? Ê¹ÓÃ filterRect
     y += 10f;
     
     // Separator
-    Widgets.DrawLineHorizontal(0f, y, viewRect.width); // ? ä½¿ç”¨ viewRect
+    Widgets.DrawLineHorizontal(0f, y, viewRect.width); // ? Ê¹ÓÃ viewRect
     y += 15f;
     
     // Batch Actions
-    y = DrawBatchActions(filterRect, y); // ? ä½¿ç”¨ filterRect
+    y = DrawBatchActions(filterRect, y); // ? Ê¹ÓÃ filterRect
     y += 10f;
     
     // Global Actions
-    DrawGlobalActions(filterRect, y); // ? ä½¿ç”¨ filterRect
+    DrawGlobalActions(filterRect, y); // ? Ê¹ÓÃ filterRect
     
-    Widgets.EndScrollView(); // ? ç»“æŸæ»šåŠ¨è§†å›¾
+    Widgets.EndScrollView(); // ? ½áÊø¹ö¶¯ÊÓÍ¼
 }
 ```
 
-#### å¿«é€Ÿæ£€æŸ¥
-- [ ] `controlPanelScrollPosition` å·²æ·»åŠ 
-- [ ] `BeginScrollView` å·²æ·»åŠ 
-- [ ] `EndScrollView` å·²æ·»åŠ 
-- [ ] æ‰€æœ‰å­æ–¹æ³•ä½¿ç”¨ `filterRect`
-- [ ] æ‰€æœ‰åæ ‡ä½¿ç”¨ `viewRect.width`
+#### ¿ìËÙ¼ì²é
+- [ ] `controlPanelScrollPosition` ÒÑÌí¼Ó
+- [ ] `BeginScrollView` ÒÑÌí¼Ó
+- [ ] `EndScrollView` ÒÑÌí¼Ó
+- [ ] ËùÓĞ×Ó·½·¨Ê¹ÓÃ `filterRect`
+- [ ] ËùÓĞ×ø±êÊ¹ÓÃ `viewRect.width`
 
 ---
 
-### ç¬¬3æ­¥ï¼šç¼–è¯‘å’Œæµ‹è¯• (10åˆ†é’Ÿ)
+### µÚ3²½£º±àÒëºÍ²âÊÔ (10·ÖÖÓ)
 
-#### 3.1 ç¼–è¯‘
+#### 3.1 ±àÒë
 ```bash
 dotnet clean
 dotnet build
 ```
 
-**é¢„æœŸè¾“å‡ºï¼š**
+**Ô¤ÆÚÊä³ö£º**
 ```
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 ```
 
-#### 3.2 å¿«é€Ÿæµ‹è¯•
-1. å¯åŠ¨ RimWorld
-2. åŠ è½½ä»»æ„å­˜æ¡£
-3. æ‰“å¼€ Memory æ ‡ç­¾é¡µ
-4. æµ‹è¯•å…³é”®åŠŸèƒ½ï¼š
+#### 3.2 ¿ìËÙ²âÊÔ
+1. Æô¶¯ RimWorld
+2. ¼ÓÔØÈÎÒâ´æµµ
+3. ´ò¿ª Memory ±êÇ©Ò³
+4. ²âÊÔ¹Ø¼ü¹¦ÄÜ£º
 
-**å¿…æµ‹é¡¹ç›®ï¼ˆ5åˆ†é’Ÿï¼‰ï¼š**
-- [ ] æ®–æ°‘è€…é€‰æ‹©å™¨å·¥ä½œ
-- [ ] è®°å¿†å¡ç‰‡æ˜¾ç¤º
-- [ ] å·¦ä¾§é¢æ¿å¯æ»šåŠ¨åˆ°åº•éƒ¨
-- [ ] "Summarize All"å’Œ"Archive All"æŒ‰é’®å¯è§
-- [ ] æ— ç¿»è¯‘é”®æ˜¾ç¤ºï¼ˆå¦‚`RimTalk_xxx`ï¼‰
-- [ ] åˆ‡æ¢è¯­è¨€ï¼ˆè‹±æ–‡?ä¸­æ–‡ï¼‰
+**±Ø²âÏîÄ¿£¨5·ÖÖÓ£©£º**
+- [ ] Ö³ÃñÕßÑ¡ÔñÆ÷¹¤×÷
+- [ ] ¼ÇÒä¿¨Æ¬ÏÔÊ¾
+- [ ] ×ó²àÃæ°å¿É¹ö¶¯µ½µ×²¿
+- [ ] "Summarize All"ºÍ"Archive All"°´Å¥¿É¼û
+- [ ] ÎŞ·­Òë¼üÏÔÊ¾£¨Èç`RimTalk_xxx`£©
+- [ ] ÇĞ»»ÓïÑÔ£¨Ó¢ÎÄ?ÖĞÎÄ£©
 
-**å‘ç°é—®é¢˜ï¼Ÿ**
-- ç¼–è¯‘é”™è¯¯ â†’ æ£€æŸ¥è¯­æ³•ï¼Œè¿˜åŸå¤‡ä»½
-- ç¿»è¯‘é”®æ˜¾ç¤º â†’ ç¡®è®¤è„šæœ¬è¿è¡ŒæˆåŠŸ
-- æ»šåŠ¨ä¸å·¥ä½œ â†’ æ£€æŸ¥ `BeginScrollView/EndScrollView` é…å¯¹
-
----
-
-## ? å®Œæˆæ ‡å¿—
-
-å½“ä»¥ä¸‹æ‰€æœ‰é¡¹éƒ½æˆåŠŸæ—¶ï¼Œå³å¯å‘å¸ƒï¼š
-
-- [ ] è„šæœ¬è¿è¡ŒæˆåŠŸ
-- [ ] æ»šåŠ¨è§†å›¾å·²æ·»åŠ 
-- [ ] ç¼–è¯‘æ— é”™è¯¯
-- [ ] æ¸¸æˆå¯åŠ¨æ­£å¸¸
-- [ ] Memory æ ‡ç­¾é¡µæ­£å¸¸
-- [ ] å·¦ä¾§é¢æ¿å®Œæ•´å¯è§
-- [ ] è‹±æ–‡ç•Œé¢æ— é—®é¢˜
-- [ ] ä¸­æ–‡ç•Œé¢æ— é—®é¢˜
+**·¢ÏÖÎÊÌâ£¿**
+- ±àÒë´íÎó ¡ú ¼ì²éÓï·¨£¬»¹Ô­±¸·İ
+- ·­Òë¼üÏÔÊ¾ ¡ú È·ÈÏ½Å±¾ÔËĞĞ³É¹¦
+- ¹ö¶¯²»¹¤×÷ ¡ú ¼ì²é `BeginScrollView/EndScrollView` Åä¶Ô
 
 ---
 
-## ?? å‘å¸ƒæ­¥éª¤ï¼ˆå¯é€‰ï¼‰
+## ? Íê³É±êÖ¾
 
-å¦‚æœæ‰€æœ‰æµ‹è¯•é€šè¿‡ï¼Œå¯ä»¥ç«‹å³å‘å¸ƒï¼š
+µ±ÒÔÏÂËùÓĞÏî¶¼³É¹¦Ê±£¬¼´¿É·¢²¼£º
 
-### 1. Git æäº¤
+- [ ] ½Å±¾ÔËĞĞ³É¹¦
+- [ ] ¹ö¶¯ÊÓÍ¼ÒÑÌí¼Ó
+- [ ] ±àÒëÎŞ´íÎó
+- [ ] ÓÎÏ·Æô¶¯Õı³£
+- [ ] Memory ±êÇ©Ò³Õı³£
+- [ ] ×ó²àÃæ°åÍêÕû¿É¼û
+- [ ] Ó¢ÎÄ½çÃæÎŞÎÊÌâ
+- [ ] ÖĞÎÄ½çÃæÎŞÎÊÌâ
+
+---
+
+## ?? ·¢²¼²½Öè£¨¿ÉÑ¡£©
+
+Èç¹ûËùÓĞ²âÊÔÍ¨¹ı£¬¿ÉÒÔÁ¢¼´·¢²¼£º
+
+### 1. Git Ìá½»
 ```bash
 git add .
 git commit -m "v3.3.19: Mind Stream UI + Complete Translations
@@ -202,106 +202,106 @@ Migration Notes:
 git push origin main
 ```
 
-### 2. åˆ›å»º GitHub Release
+### 2. ´´½¨ GitHub Release
 ```bash
-# åœ¨ GitHub ç½‘é¡µæ“ä½œ
-1. è¿›å…¥ Releases é¡µé¢
-2. ç‚¹å‡» "Draft a new release"
+# ÔÚ GitHub ÍøÒ³²Ù×÷
+1. ½øÈë Releases Ò³Ãæ
+2. µã»÷ "Draft a new release"
 3. Tag version: v3.3.19
 4. Release title: v3.3.19 - Mind Stream & Library UI
-5. å¤åˆ¶ CHANGELOG.md åˆ°æè¿°
-6. ä¸Šä¼ ç¼–è¯‘åçš„ DLL
-7. ç‚¹å‡» "Publish release"
+5. ¸´ÖÆ CHANGELOG.md µ½ÃèÊö
+6. ÉÏ´«±àÒëºóµÄ DLL
+7. µã»÷ "Publish release"
 ```
 
-### 3. æµ‹è¯•å‘å¸ƒç‰ˆæœ¬
+### 3. ²âÊÔ·¢²¼°æ±¾
 ```bash
-1. ä¸‹è½½åˆšå‘å¸ƒçš„ Release
-2. å®‰è£…åˆ°æ¸¸æˆ
-3. å¿«é€Ÿæµ‹è¯•å…³é”®åŠŸèƒ½
-4. ç¡®è®¤æ— é—®é¢˜
+1. ÏÂÔØ¸Õ·¢²¼µÄ Release
+2. °²×°µ½ÓÎÏ·
+3. ¿ìËÙ²âÊÔ¹Ø¼ü¹¦ÄÜ
+4. È·ÈÏÎŞÎÊÌâ
 ```
 
 ---
 
-## ?? é‡åˆ°é—®é¢˜ï¼Ÿ
+## ?? Óöµ½ÎÊÌâ£¿
 
-### è„šæœ¬å¤±è´¥
+### ½Å±¾Ê§°Ü
 ```powershell
-# é—®é¢˜1ï¼šæƒé™ä¸è¶³
+# ÎÊÌâ1£ºÈ¨ÏŞ²»×ã
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
-# é—®é¢˜2ï¼šæ–‡ä»¶ä¸å­˜åœ¨
-# ç¡®è®¤åœ¨é¡¹ç›®æ ¹ç›®å½•è¿è¡Œ
-Get-Location  # åº”è¯¥æ˜¾ç¤ºé¡¹ç›®è·¯å¾„
+# ÎÊÌâ2£ºÎÄ¼ş²»´æÔÚ
+# È·ÈÏÔÚÏîÄ¿¸ùÄ¿Â¼ÔËĞĞ
+Get-Location  # Ó¦¸ÃÏÔÊ¾ÏîÄ¿Â·¾¶
 ```
 
-### ç¼–è¯‘å¤±è´¥
+### ±àÒëÊ§°Ü
 ```bash
-# é—®é¢˜1ï¼šè¯­æ³•é”™è¯¯
-# â†’ è¿˜åŸå¤‡ä»½ï¼Œæ‰‹åŠ¨ä¿®å¤
+# ÎÊÌâ1£ºÓï·¨´íÎó
+# ¡ú »¹Ô­±¸·İ£¬ÊÖ¶¯ĞŞ¸´
 Copy-Item "Source\Memory\UI\MainTabWindow_Memory.cs.backup" "Source\Memory\UI\MainTabWindow_Memory.cs" -Force
 
-# é—®é¢˜2ï¼šç¼ºå°‘å¼•ç”¨
-# â†’ ç¡®è®¤ using è¯­å¥å®Œæ•´
+# ÎÊÌâ2£ºÈ±ÉÙÒıÓÃ
+# ¡ú È·ÈÏ using Óï¾äÍêÕû
 
-# é—®é¢˜3ï¼šç±»å‹ä¸åŒ¹é…
-# â†’ æ£€æŸ¥ .ToString() è°ƒç”¨
+# ÎÊÌâ3£ºÀàĞÍ²»Æ¥Åä
+# ¡ú ¼ì²é .ToString() µ÷ÓÃ
 ```
 
-### æ¸¸æˆå´©æºƒ
+### ÓÎÏ·±ÀÀ£
 ```bash
-# é—®é¢˜1ï¼šModå†²çª
-# â†’ ç¦ç”¨å…¶ä»–Modæµ‹è¯•
+# ÎÊÌâ1£ºMod³åÍ»
+# ¡ú ½ûÓÃÆäËûMod²âÊÔ
 
-# é—®é¢˜2ï¼šå­˜æ¡£æŸå
-# â†’ åŠ è½½å¤‡ä»½å­˜æ¡£
+# ÎÊÌâ2£º´æµµËğ»µ
+# ¡ú ¼ÓÔØ±¸·İ´æµµ
 
-# é—®é¢˜3ï¼šä»£ç é”™è¯¯
-# â†’ æŸ¥çœ‹æ¸¸æˆæ—¥å¿—
-# â†’ è¿˜åŸåˆ°ä¸Šä¸€ä¸ªå¯ç”¨ç‰ˆæœ¬
+# ÎÊÌâ3£º´úÂë´íÎó
+# ¡ú ²é¿´ÓÎÏ·ÈÕÖ¾
+# ¡ú »¹Ô­µ½ÉÏÒ»¸ö¿ÉÓÃ°æ±¾
 ```
 
 ---
 
-## ?? å‚è€ƒæ–‡æ¡£
+## ?? ²Î¿¼ÎÄµµ
 
-å¦‚éœ€è¯¦ç»†è¯´æ˜ï¼Œè¯·æŸ¥çœ‹ï¼š
+ÈçĞèÏêÏ¸ËµÃ÷£¬Çë²é¿´£º
 
-| æ–‡æ¡£ | ç”¨é€” |
+| ÎÄµµ | ÓÃÍ¾ |
 |------|------|
-| `HOW_TO_FIX.md` | è¯¦ç»†ä¿®å¤æŒ‡å— |
-| `UI_TRANSLATION_FIX_GUIDE.md` | æ‰‹åŠ¨ç¿»è¯‘ä¿®å¤ |
-| `DEPLOYMENT_SUMMARY_v3.3.19.md` | å®Œæ•´éƒ¨ç½²æ€»ç»“ |
-| `TASK_STATUS.md` | ä»»åŠ¡çŠ¶æ€è¿½è¸ª |
-| `QUICKSTART_UI_v3.3.19.md` | UIä½¿ç”¨è¯´æ˜ |
+| `HOW_TO_FIX.md` | ÏêÏ¸ĞŞ¸´Ö¸ÄÏ |
+| `UI_TRANSLATION_FIX_GUIDE.md` | ÊÖ¶¯·­ÒëĞŞ¸´ |
+| `DEPLOYMENT_SUMMARY_v3.3.19.md` | ÍêÕû²¿Êğ×Ü½á |
+| `TASK_STATUS.md` | ÈÎÎñ×´Ì¬×·×Ù |
+| `QUICKSTART_UI_v3.3.19.md` | UIÊ¹ÓÃËµÃ÷ |
 
 ---
 
-## ?? æ—¶é—´ä¼°ç®—
+## ?? Ê±¼ä¹ÀËã
 
-| æ­¥éª¤ | é¢„è®¡æ—¶é—´ | å®é™…æ—¶é—´ |
+| ²½Öè | Ô¤¼ÆÊ±¼ä | Êµ¼ÊÊ±¼ä |
 |------|----------|----------|
-| è‡ªåŠ¨ä¿®å¤ç¿»è¯‘ | 5åˆ†é’Ÿ | ___ |
-| æ·»åŠ æ»šåŠ¨è§†å›¾ | 15åˆ†é’Ÿ | ___ |
-| ç¼–è¯‘æµ‹è¯• | 10åˆ†é’Ÿ | ___ |
-| **æ€»è®¡** | **30åˆ†é’Ÿ** | ___ |
+| ×Ô¶¯ĞŞ¸´·­Òë | 5·ÖÖÓ | ___ |
+| Ìí¼Ó¹ö¶¯ÊÓÍ¼ | 15·ÖÖÓ | ___ |
+| ±àÒë²âÊÔ | 10·ÖÖÓ | ___ |
+| **×Ü¼Æ** | **30·ÖÖÓ** | ___ |
 
 ---
 
-## ?? æ­å–œï¼
+## ?? ¹§Ï²£¡
 
-å¦‚æœä½ çœ‹åˆ°è¿™é‡Œï¼Œè¯´æ˜ä½ å·²ç»å®Œæˆäº†v3.3.19çš„æ‰€æœ‰å¿…éœ€ä»»åŠ¡ï¼
+Èç¹ûÄã¿´µ½ÕâÀï£¬ËµÃ÷ÄãÒÑ¾­Íê³ÉÁËv3.3.19µÄËùÓĞ±ØĞèÈÎÎñ£¡
 
-**ä¸‹ä¸€æ­¥ï¼š**
-1. äº«å—ä½ çš„æ–°UI ??
-2. æ”¶é›†ç”¨æˆ·åé¦ˆ
-3. è®¡åˆ’ä¸‹ä¸€ä¸ªç‰ˆæœ¬
+**ÏÂÒ»²½£º**
+1. ÏíÊÜÄãµÄĞÂUI ??
+2. ÊÕ¼¯ÓÃ»§·´À¡
+3. ¼Æ»®ÏÂÒ»¸ö°æ±¾
 
-**æ„Ÿè°¢ä½¿ç”¨ RimTalk - Expand Memoryï¼** ??
+**¸ĞĞ»Ê¹ÓÃ RimTalk - Expand Memory£¡** ??
 
 ---
 
-**æœ€åæ›´æ–°**: 2025-01-XX  
-**ç‰ˆæœ¬**: v3.3.19  
-**çŠ¶æ€**: ? å¾…å®Œæˆæœ€å30åˆ†é’Ÿ
+**×îºó¸üĞÂ**: 2025-01-XX  
+**°æ±¾**: v3.3.19  
+**×´Ì¬**: ? ´ıÍê³É×îºó30·ÖÖÓ

@@ -9,27 +9,27 @@ using RimTalk.MemoryPatch;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// è‡ªåŠ¨ç”ŸæˆPawnçŠ¶æ€å¸¸è¯†ï¼ˆæ®–æ°‘è€…æ ‡è¯†ï¼‰
-    /// æ¯24å°æ—¶æ›´æ–°ä¸€æ¬¡ï¼Œä¸ä¼šè¦†ç›–ç”¨æˆ·æ‰‹åŠ¨ä¿®æ”¹
+    /// ×Ô¶¯Éú³ÉPawn×´Ì¬³£Ê¶£¨Ö³ÃñÕß±êÊ¶£©
+    /// Ã¿24Ğ¡Ê±¸üĞÂÒ»´Î£¬²»»á¸²¸ÇÓÃ»§ÊÖ¶¯ĞŞ¸Ä
     /// 
-    /// ? v3.3.17: é‡æ„ç‰ˆ - ç§»é™¤ç¼“å­˜ï¼Œç›´æ¥ä½¿ç”¨RimWorldåŸç”Ÿè®°å½•
-    /// - ä¿®å¤"ä»Šå¤©åŠ å…¥"bug
-    /// - å®Œå…¨ä¾èµ–pawn.records.TimeAsColonistOrColonyAnimal
-    /// - ç®€åŒ–ä»£ç é€»è¾‘ï¼Œæ¶ˆé™¤åŒæ­¥é—®é¢˜
+    /// ? v3.3.17: ÖØ¹¹°æ - ÒÆ³ı»º´æ£¬Ö±½ÓÊ¹ÓÃRimWorldÔ­Éú¼ÇÂ¼
+    /// - ĞŞ¸´"½ñÌì¼ÓÈë"bug
+    /// - ÍêÈ«ÒÀÀµpawn.records.TimeAsColonistOrColonyAnimal
+    /// - ¼ò»¯´úÂëÂß¼­£¬Ïû³ıÍ¬²½ÎÊÌâ
     /// </summary>
     public static class PawnStatusKnowledgeGenerator
     {
-        // è®°å½•æ¯ä¸ªPawnä¸Šæ¬¡æ›´æ–°æ—¶é—´ï¼ˆä»…ç”¨äºæ§åˆ¶æ›´æ–°é¢‘ç‡ï¼‰
+        // ¼ÇÂ¼Ã¿¸öPawnÉÏ´Î¸üĞÂÊ±¼ä£¨½öÓÃÓÚ¿ØÖÆ¸üĞÂÆµÂÊ£©
         private static Dictionary<int, int> lastUpdateTicks = new Dictionary<int, int>();
-        private const int UPDATE_INTERVAL_TICKS = 60000; // 24å°æ—¶ = 60000 ticks
+        private const int UPDATE_INTERVAL_TICKS = 60000; // 24Ğ¡Ê± = 60000 ticks
         
-        // æè¿°åˆ‡æ¢é˜ˆå€¼ï¼ˆä¸å†åˆ é™¤è®°å½•ï¼‰
+        // ÃèÊöÇĞ»»ãĞÖµ£¨²»ÔÙÉ¾³ı¼ÇÂ¼£©
         private const int NEW_COLONIST_THRESHOLD_DAYS = 7;
         
         /// <summary>
-        /// æ›´æ–°æ‰€æœ‰æ®–æ°‘è€…çš„çŠ¶æ€å¸¸è¯†ï¼ˆæ¯å°æ—¶æ£€æŸ¥ä¸€æ¬¡ï¼‰
-        /// åªæ›´æ–°è·ç¦»ä¸Šæ¬¡æ›´æ–°>=24å°æ—¶çš„Pawn
-        /// ? v3.3.17: ç®€åŒ–é€»è¾‘ï¼Œç§»é™¤colonistJoinTicksä¼ é€’
+        /// ¸üĞÂËùÓĞÖ³ÃñÕßµÄ×´Ì¬³£Ê¶£¨Ã¿Ğ¡Ê±¼ì²éÒ»´Î£©
+        /// Ö»¸üĞÂ¾àÀëÉÏ´Î¸üĞÂ>=24Ğ¡Ê±µÄPawn
+        /// ? v3.3.17: ¼ò»¯Âß¼­£¬ÒÆ³ıcolonistJoinTicks´«µİ
         /// </summary>
         public static void UpdateAllColonistStatus()
         {
@@ -42,10 +42,10 @@ namespace RimTalk.Memory
             int currentTick = Find.TickManager.TicksGame;
             int updatedCount = 0;
             
-            // æ”¶é›†æ‰€æœ‰æ®–æ°‘è€…ï¼ˆæ‰€æœ‰åœ°å›¾ + å•†é˜Ÿï¼‰
+            // ÊÕ¼¯ËùÓĞÖ³ÃñÕß£¨ËùÓĞµØÍ¼ + ÉÌ¶Ó£©
             var allColonists = new List<Pawn>();
             
-            // 1. æ‰€æœ‰åœ°å›¾ä¸Šçš„æ®–æ°‘è€…
+            // 1. ËùÓĞµØÍ¼ÉÏµÄÖ³ÃñÕß
             foreach (var map in Find.Maps)
             {
                 if (map.mapPawns != null)
@@ -54,7 +54,7 @@ namespace RimTalk.Memory
                 }
             }
             
-            // 2. å•†é˜Ÿä¸­çš„æ®–æ°‘è€…
+            // 2. ÉÌ¶ÓÖĞµÄÖ³ÃñÕß
             foreach (var caravan in Find.WorldObjects.Caravans)
             {
                 if (caravan.IsPlayerControlled && caravan.pawns != null)
@@ -75,10 +75,10 @@ namespace RimTalk.Memory
                 {
                     int pawnID = pawn.thingIDNumber;
                     
-                    // æ£€æŸ¥æ˜¯å¦éœ€è¦æ›´æ–°ï¼ˆ24å°æ—¶é—´éš”ï¼‰
+                    // ¼ì²éÊÇ·ñĞèÒª¸üĞÂ£¨24Ğ¡Ê±¼ä¸ô£©
                     if (!lastUpdateTicks.TryGetValue(pawnID, out int lastUpdate))
                     {
-                        lastUpdate = 0; // é¦–æ¬¡æ›´æ–°
+                        lastUpdate = 0; // Ê×´Î¸üĞÂ
                     }
                     
                     int ticksSinceUpdate = currentTick - lastUpdate;
@@ -106,9 +106,9 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ä¸ºå•ä¸ªPawnæ›´æ–°çŠ¶æ€å¸¸è¯†
-        /// ä¸ä¼šè¦†ç›–ç”¨æˆ·æ‰‹åŠ¨ä¿®æ”¹ï¼ˆæ ‡è®°ä¸º"ç”¨æˆ·ç¼–è¾‘"ç­‰ï¼‰
-        /// ? v3.3.17: å®Œå…¨ä¾èµ–RimWorldåŸç”Ÿè®°å½•ï¼Œæ¯æ¬¡å®æ—¶è®¡ç®—
+        /// Îªµ¥¸öPawn¸üĞÂ×´Ì¬³£Ê¶
+        /// ²»»á¸²¸ÇÓÃ»§ÊÖ¶¯ĞŞ¸Ä£¨±ê¼ÇÎª"ÓÃ»§±à¼­"µÈ£©
+        /// ? v3.3.17: ÍêÈ«ÒÀÀµRimWorldÔ­Éú¼ÇÂ¼£¬Ã¿´ÎÊµÊ±¼ÆËã
         /// </summary>
         public static void UpdatePawnStatusKnowledge(Pawn pawn, CommonKnowledgeLibrary library, int currentTick)
         {
@@ -116,7 +116,7 @@ namespace RimTalk.Memory
 
             try
             {
-                // å©´å„¿é˜¶æ®µï¼ˆ<3å²ï¼‰ä¸ç”ŸæˆçŠ¶æ€
+                // Ó¤¶ù½×¶Î£¨<3Ëê£©²»Éú³É×´Ì¬
                 if (pawn.RaceProps != null && pawn.RaceProps.Humanlike)
                 {
                     float ageYears = pawn.ageTracker.AgeBiologicalYearsFloat;
@@ -127,47 +127,47 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // ? v3.3.17: ç›´æ¥ä»RimWorldè®°å½•è®¡ç®—åŠ å…¥æ—¶é—´ï¼ˆæ¯æ¬¡å®æ—¶è®¡ç®—ï¼‰
+                // ? v3.3.17: Ö±½Ó´ÓRimWorld¼ÇÂ¼¼ÆËã¼ÓÈëÊ±¼ä£¨Ã¿´ÎÊµÊ±¼ÆËã£©
                 int joinTick = CalculateJoinTick(pawn, currentTick);
                 int daysInColony = CalculateDaysInColony(joinTick, currentTick);
                 
-                // å¼€å‘æ¨¡å¼æ—¥å¿—
+                // ¿ª·¢Ä£Ê½ÈÕÖ¾
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.05f)
                 {
                     Log.Message($"[PawnStatus] {pawn.LabelShort}: joinTick={joinTick}, currentTick={currentTick}, daysInColony={daysInColony}");
                 }
 
-                // ä½¿ç”¨å”¯ä¸€æ ‡ç­¾
-                string statusTag = $"æ®–æ°‘è€…çŠ¶æ€,{pawn.LabelShort}";
+                // Ê¹ÓÃÎ¨Ò»±êÇ©
+                string statusTag = $"Ö³ÃñÕß×´Ì¬,{pawn.LabelShort}";
                 
-                // ? v3.3.3: æ”¹è¿›æŸ¥æ‰¾é€»è¾‘ï¼Œä¼˜å…ˆä½¿ç”¨ targetPawnId é˜²æ­¢æ”¹ååé‡å¤ç”Ÿæˆ
+                // ? v3.3.3: ¸Ä½ø²éÕÒÂß¼­£¬ÓÅÏÈÊ¹ÓÃ targetPawnId ·ÀÖ¹¸ÄÃûºóÖØ¸´Éú³É
                 var existingEntry = library.Entries.FirstOrDefault(e => 
-                    (e.targetPawnId == pawn.thingIDNumber && e.tag.Contains("æ®–æ°‘è€…çŠ¶æ€")) ||
-                    (e.tag.Contains(pawn.LabelShort) && e.tag.Contains("æ®–æ°‘è€…çŠ¶æ€"))
+                    (e.targetPawnId == pawn.thingIDNumber && e.tag.Contains("Ö³ÃñÕß×´Ì¬")) ||
+                    (e.tag.Contains(pawn.LabelShort) && e.tag.Contains("Ö³ÃñÕß×´Ì¬"))
                 );
 
-                // ç”Ÿæˆæ–°å†…å®¹
+                // Éú³ÉĞÂÄÚÈİ
                 string newContent = GenerateStatusContent(pawn, daysInColony, joinTick);
                 float defaultImportance = 0.5f;
 
                 if (existingEntry != null)
                 {
-                    // æ£€æŸ¥æ˜¯å¦ä¸ºç”¨æˆ·ç¼–è¾‘ï¼ˆç»å¯¹ä¸è¦†ç›–ï¼‰
+                    // ¼ì²éÊÇ·ñÎªÓÃ»§±à¼­£¨¾ø¶Ô²»¸²¸Ç£©
                     if (existingEntry.isUserEdited)
                     {
                         return;
                     }
                     
-                    // å†æ¬¡æ£€æŸ¥å†…å®¹ç‰¹å¾ï¼ˆåŒé‡ä¿é™©ï¼‰
+                    // ÔÙ´Î¼ì²éÄÚÈİÌØÕ÷£¨Ë«ÖØ±£ÏÕ£©
                     bool isAutoGenerated = IsAutoGeneratedContent(existingEntry.content);
                     
                     if (isAutoGenerated)
                     {
-                        // åªæ›´æ–°è‡ªåŠ¨ç”Ÿæˆçš„å†…å®¹
+                        // Ö»¸üĞÂ×Ô¶¯Éú³ÉµÄÄÚÈİ
                         existingEntry.content = newContent;
                         existingEntry.importance = defaultImportance;
                         existingEntry.targetPawnId = pawn.thingIDNumber;
-                        // ç¡®ä¿æ ‡ç­¾ä¹Ÿæ˜¯æœ€æ–°çš„ï¼ˆå¦‚æœåå­—å˜äº†ï¼‰
+                        // È·±£±êÇ©Ò²ÊÇ×îĞÂµÄ£¨Èç¹ûÃû×Ö±äÁË£©
                         if (!existingEntry.tag.Contains(pawn.LabelShort))
                         {
                              existingEntry.tag = statusTag;
@@ -181,7 +181,7 @@ namespace RimTalk.Memory
                 }
                 else
                 {
-                    // åˆ›å»ºæ–°å¸¸è¯†
+                    // ´´½¨ĞÂ³£Ê¶
                     var newEntry = new CommonKnowledgeEntry(statusTag, newContent)
                     {
                         importance = defaultImportance,
@@ -205,21 +205,21 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// â˜… v3.3.18: è®¡ç®—Pawnçš„åŠ å…¥æ—¶é—´ï¼ˆç›´æ¥ä½¿ç”¨RimWorldåŸç”Ÿè®°å½•ï¼‰
-        /// ä¿®å¤ï¼šä½¿ç”¨å¼ºå¼•ç”¨ RecordDefOf æ›¿ä»£å­—ç¬¦ä¸²æŸ¥æ‰¾
+        /// ¡ï v3.3.18: ¼ÆËãPawnµÄ¼ÓÈëÊ±¼ä£¨Ö±½ÓÊ¹ÓÃRimWorldÔ­Éú¼ÇÂ¼£©
+        /// ĞŞ¸´£ºÊ¹ÓÃÇ¿ÒıÓÃ RecordDefOf Ìæ´ú×Ö·û´®²éÕÒ
         /// </summary>
         private static int CalculateJoinTick(Pawn pawn, int currentTick)
         {
             try
             {
                 if (pawn.records == null)
-                    return currentTick; // æ— è®°å½•ç³»ç»Ÿï¼Œè§†ä¸ºåˆšåŠ å…¥
+                    return currentTick; // ÎŞ¼ÇÂ¼ÏµÍ³£¬ÊÓÎª¸Õ¼ÓÈë
                 
-                // â˜… v3.3.18: ä¿®å¤ - ä½¿ç”¨å¼ºå¼•ç”¨æ›¿ä»£å­—ç¬¦ä¸²æŸ¥æ‰¾
-                // æ—§ä»£ç ï¼ˆä¸å¯é ï¼‰ï¼š
+                // ¡ï v3.3.18: ĞŞ¸´ - Ê¹ÓÃÇ¿ÒıÓÃÌæ´ú×Ö·û´®²éÕÒ
+                // ¾É´úÂë£¨²»¿É¿¿£©£º
                 // var recordDef = DefDatabase<RecordDef>.GetNamed("TimeAsColonistOrColonyAnimal", false);
                 
-                // æ–°ä»£ç ï¼ˆå¼ºå¼•ç”¨ï¼‰ï¼š
+                // ĞÂ´úÂë£¨Ç¿ÒıÓÃ£©£º
                 var recordDef = RecordDefOf.TimeAsColonistOrColonyAnimal;
                 
                 if (recordDef == null)
@@ -229,22 +229,22 @@ namespace RimTalk.Memory
                     return currentTick;
                 }
                 
-                // è·å–ä½œä¸ºæ®–æ°‘è€…çš„æ—¶é—´ï¼ˆå•ä½ï¼šticksï¼‰
+                // »ñÈ¡×÷ÎªÖ³ÃñÕßµÄÊ±¼ä£¨µ¥Î»£ºticks£©
                 float timeAsColonist = pawn.records.GetValue(recordDef);
                 
                 if (timeAsColonist <= 0)
                 {
-                    // åˆšåŠ å…¥çš„æ®–æ°‘è€…ï¼Œè®°å½•ä¸º0
+                    // ¸Õ¼ÓÈëµÄÖ³ÃñÕß£¬¼ÇÂ¼Îª0
                     return currentTick;
                 }
                 
-                // åŠ å…¥çš„æ—¶é—´ = å½“å‰æ—¶é—´ - ä½œä¸ºæ®–æ°‘è€…çš„æ—¶é—´
+                // ¼ÓÈëµÄÊ±¼ä = µ±Ç°Ê±¼ä - ×÷ÎªÖ³ÃñÕßµÄÊ±¼ä
                 int joinTick = currentTick - (int)timeAsColonist;
                 
-                // å®‰å…¨æ£€æŸ¥ï¼šåŠ å…¥æ—¶é—´ä¸èƒ½æ—©äºæ¸¸æˆå¼€å§‹ï¼ˆåˆå§‹æ®–æ°‘è€…ï¼‰
+                // °²È«¼ì²é£º¼ÓÈëÊ±¼ä²»ÄÜÔçÓÚÓÎÏ·¿ªÊ¼£¨³õÊ¼Ö³ÃñÕß£©
                 if (joinTick < 0)
                 {
-                    joinTick = 0; // æ¸¸æˆå¼€å§‹æ—¶å°±å­˜åœ¨
+                    joinTick = 0; // ÓÎÏ·¿ªÊ¼Ê±¾Í´æÔÚ
                 }
                 
                 return joinTick;
@@ -252,19 +252,19 @@ namespace RimTalk.Memory
             catch (Exception ex)
             {
                 Log.Error($"[PawnStatus] Error calculating join tick for {pawn?.LabelShort}: {ex.Message}");
-                return currentTick; // å‡ºé”™æ—¶è§†ä¸ºåˆšåŠ å…¥
+                return currentTick; // ³ö´íÊ±ÊÓÎª¸Õ¼ÓÈë
             }
         }
         
         /// <summary>
-        /// ? v3.3.17: è®¡ç®—æ®–æ°‘åœ°å¤©æ•°
+        /// ? v3.3.17: ¼ÆËãÖ³ÃñµØÌìÊı
         /// </summary>
         private static int CalculateDaysInColony(int joinTick, int currentTick)
         {
             int ticksInColony = currentTick - joinTick;
             int daysInColony = ticksInColony / GenDate.TicksPerDay;
             
-            // é˜²æ­¢è´Ÿæ•°
+            // ·ÀÖ¹¸ºÊı
             if (daysInColony < 0)
             {
                 Log.Warning($"[PawnStatus] Negative days detected: {daysInColony}, resetting to 0");
@@ -275,63 +275,63 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ç”ŸæˆçŠ¶æ€æè¿°æ–‡æœ¬ï¼ˆä¼˜åŒ–ä¸ºè‡ªç„¶äººç§°è§†è§’ï¼‰
-        /// ? v3.3.17: ä½¿ç”¨å®æ—¶è®¡ç®—çš„joinTick
+        /// Éú³É×´Ì¬ÃèÊöÎÄ±¾£¨ÓÅ»¯Îª×ÔÈ»ÈË³ÆÊÓ½Ç£©
+        /// ? v3.3.17: Ê¹ÓÃÊµÊ±¼ÆËãµÄjoinTick
         /// </summary>
         private static string GenerateStatusContent(Pawn pawn, int daysInColony, int joinTick)
         {
             string name = pawn.LabelShort;
             
-            // è®¡ç®—åŠ å…¥æ—¥æœŸï¼ˆæ¸¸æˆå†…æ—¥æœŸï¼‰
+            // ¼ÆËã¼ÓÈëÈÕÆÚ£¨ÓÎÏ·ÄÚÈÕÆÚ£©
             int tile = pawn.Map?.Tile ?? (Find.AnyPlayerHomeMap?.Tile ?? 0);
             float longitude = Find.WorldGrid.LongLatOf(tile).x;
 
-            // ä½¿ç”¨ DayOfQuadrum (0-14) å¹¶ +1
+            // Ê¹ÓÃ DayOfQuadrum (0-14) ²¢ +1
             int joinDay = GenDate.DayOfQuadrum(joinTick, longitude) + 1;
             Quadrum joinQuadrum = GenDate.Quadrum(joinTick, longitude);
             int joinYear = GenDate.Year(joinTick, longitude);
             
-            // æ ¼å¼åŒ–æ—¥æœŸï¼ˆä¾‹å¦‚ï¼šå†¬å­£ 5æ—¥, 5500å¹´ï¼‰
-            string joinDate = $"{joinQuadrum.Label()} {joinDay}æ—¥, {joinYear}å¹´";
+            // ¸ñÊ½»¯ÈÕÆÚ£¨ÀıÈç£º¶¬¼¾ 5ÈÕ, 5500Äê£©
+            string joinDate = $"{joinQuadrum.Label()} {joinDay}ÈÕ, {joinYear}Äê";
             
-            // è·å–å®Œæ•´ç§æ—ä¿¡æ¯ï¼ˆç§æ—+äºšç§ï¼‰
+            // »ñÈ¡ÍêÕûÖÖ×åĞÅÏ¢£¨ÖÖ×å+ÑÇÖÖ£©
             string raceInfo = GetCompleteRaceInfo(pawn);
             
-            // æ ¹æ®å¤©æ•°ç”Ÿæˆä¸åŒæè¿°
+            // ¸ù¾İÌìÊıÉú³É²»Í¬ÃèÊö
             string baseDescription = "";
             
             if (daysInColony < 7)
             {
-                // < 7å¤©ï¼šæ–°æˆå‘˜æè¿°
+                // < 7Ìì£ºĞÂ³ÉÔ±ÃèÊö
                 if (daysInColony == 0)
                 {
-                    baseDescription = $"{name}æ˜¯æ®–æ°‘åœ°çš„æ–°æˆå‘˜ï¼Œä»Šå¤©({joinDate})åˆšåŠ å…¥";
+                    baseDescription = $"{name}ÊÇÖ³ÃñµØµÄĞÂ³ÉÔ±£¬½ñÌì({joinDate})¸Õ¼ÓÈë";
                 }
                 else if (daysInColony == 1)
                 {
-                    baseDescription = $"{name}æ˜¯æ®–æ°‘åœ°çš„æ–°æˆå‘˜ï¼Œæ˜¨å¤©({joinDate})åŠ å…¥";
+                    baseDescription = $"{name}ÊÇÖ³ÃñµØµÄĞÂ³ÉÔ±£¬×òÌì({joinDate})¼ÓÈë";
                 }
                 else
                 {
-                    baseDescription = $"{name}æ˜¯æ®–æ°‘åœ°çš„æ–°æˆå‘˜ï¼Œ{daysInColony}å¤©å‰({joinDate})åŠ å…¥";
+                    baseDescription = $"{name}ÊÇÖ³ÃñµØµÄĞÂ³ÉÔ±£¬{daysInColony}ÌìÇ°({joinDate})¼ÓÈë";
                 }
             }
             else
             {
-                // >= 7å¤©ï¼šèµ„æ·±æˆå‘˜æè¿°
-                baseDescription = $"{name}æ˜¯æ®–æ°‘åœ°çš„èµ„æ·±æˆå‘˜ï¼Œå·²åŠ å…¥æ®–æ°‘åœ° {daysInColony} å¤©ï¼ˆåŠ å…¥äº{joinDate}ï¼‰ï¼Œå¯¹æ®–æ°‘åœ°çš„å†å²å’Œæˆå‘˜å…³ç³»è¾ƒä¸ºç†Ÿæ‚‰";
+                // >= 7Ìì£º×ÊÉî³ÉÔ±ÃèÊö
+                baseDescription = $"{name}ÊÇÖ³ÃñµØµÄ×ÊÉî³ÉÔ±£¬ÒÑ¼ÓÈëÖ³ÃñµØ {daysInColony} Ìì£¨¼ÓÈëÓÚ{joinDate}£©£¬¶ÔÖ³ÃñµØµÄÀúÊ·ºÍ³ÉÔ±¹ØÏµ½ÏÎªÊìÏ¤";
             }
             
-            // é™„åŠ ç§æ—ä¿¡æ¯å’Œæç¤ºä¿¡æ¯
+            // ¸½¼ÓÖÖ×åĞÅÏ¢ºÍÌáÊ¾ĞÅÏ¢
             if (!string.IsNullOrEmpty(raceInfo))
             {
                 if (daysInColony < 7)
                 {
-                    return $"{baseDescription}ã€‚{raceInfo}ã€‚å¯¹æ®–æ°‘åœ°çš„å†å²å’Œæˆå‘˜å…³ç³»å°šä¸ç†Ÿæ‚‰";
+                    return $"{baseDescription}¡£{raceInfo}¡£¶ÔÖ³ÃñµØµÄÀúÊ·ºÍ³ÉÔ±¹ØÏµÉĞ²»ÊìÏ¤";
                 }
                 else
                 {
-                    return $"{baseDescription}ã€‚{raceInfo}";
+                    return $"{baseDescription}¡£{raceInfo}";
                 }
             }
             else
@@ -341,7 +341,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// è·å–å®Œæ•´ç§æ—ä¿¡æ¯ï¼ˆç§æ—+äºšç§ï¼‰
+        /// »ñÈ¡ÍêÕûÖÖ×åĞÅÏ¢£¨ÖÖ×å+ÑÇÖÖ£©
         /// </summary>
         private static string GetCompleteRaceInfo(Pawn pawn)
         {
@@ -352,19 +352,19 @@ namespace RimTalk.Memory
             {
                 string pawnName = pawn.LabelShort;
                 
-                // 1. è·å–ä¸»ç§æ—åç§°
+                // 1. »ñÈ¡Ö÷ÖÖ×åÃû³Æ
                 string raceName = pawn.def.label ?? pawn.def.defName;
                 
-                // 2. å°è¯•è·å–äºšç§ä¿¡æ¯ï¼ˆä¼˜å…ˆä»åŸºå› è·å¾—ï¼‰
+                // 2. ³¢ÊÔ»ñÈ¡ÑÇÖÖĞÅÏ¢£¨ÓÅÏÈ´Ó»ùÒò»ñµÃ£©
                 string xenotypeName = "";
                 
-                // æ–¹æ³•Aï¼šæ£€æŸ¥pawn.genes.Xenotypeï¼ˆæ ‡å‡†Biotech DLCï¼‰
+                // ·½·¨A£º¼ì²épawn.genes.Xenotype£¨±ê×¼Biotech DLC£©
                 if (pawn.genes != null && pawn.genes.Xenotype != null)
                 {
                     xenotypeName = pawn.genes.Xenotype.label ?? pawn.genes.Xenotype.defName;
                 }
                 
-                // æ–¹æ³•Bï¼šæ£€æŸ¥pawn.story.xenotypeï¼ˆæ—§ç‰ˆAPIï¼‰
+                // ·½·¨B£º¼ì²épawn.story.xenotype£¨¾É°æAPI£©
                 if (string.IsNullOrEmpty(xenotypeName) && pawn.story != null)
                 {
                     var xenotypeField = pawn.story.GetType().GetField("xenotype");
@@ -382,7 +382,7 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // æ–¹æ³•Cï¼šæ£€æŸ¥CustomXenotypeï¼ˆè‡ªå®šä¹‰åå­—ï¼‰
+                // ·½·¨C£º¼ì²éCustomXenotype£¨×Ô¶¨ÒåÃû×Ö£©
                 if (string.IsNullOrEmpty(xenotypeName) && pawn.genes != null)
                 {
                     var customXenotypeField = pawn.genes.GetType().GetField("xenotypeName");
@@ -392,56 +392,56 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // 3. ç»„åˆç§æ—å’Œäºšç§æè¿°
+                // 3. ×éºÏÖÖ×åºÍÑÇÖÖÃèÊö
                 if (!string.IsNullOrEmpty(xenotypeName))
                 {
-                    // é¿å…é‡å¤ï¼ˆå¦‚"äººç±»-äººç±»"ï¼‰
+                    // ±ÜÃâÖØ¸´£¨Èç"ÈËÀà-ÈËÀà"£©
                     if (xenotypeName.Equals(raceName, StringComparison.OrdinalIgnoreCase))
                     {
-                        return $"{pawnName}çš„ç§æ—æ˜¯{raceName}";
+                        return $"{pawnName}µÄÖÖ×åÊÇ{raceName}";
                     }
                     else
                     {
-                        return $"{pawnName}çš„ç§æ—æ˜¯{raceName}-{xenotypeName}";
+                        return $"{pawnName}µÄÖÖ×åÊÇ{raceName}-{xenotypeName}";
                     }
                 }
                 else
                 {
-                    // åªæœ‰ä¸»ç§æ—
-                    return $"{pawnName}çš„ç§æ—æ˜¯{raceName}";
+                    // Ö»ÓĞÖ÷ÖÖ×å
+                    return $"{pawnName}µÄÖÖ×åÊÇ{raceName}";
                 }
             }
             catch (Exception ex)
             {
-                // å®¹é”™ï¼šå¦‚æœç§æ—ä¿¡æ¯è·å–å¤±è´¥æ—¶ï¼Œè¿”å›åŸºç¡€ä¿¡æ¯
+                // Èİ´í£ºÈç¹ûÖÖ×åĞÅÏ¢»ñÈ¡Ê§°ÜÊ±£¬·µ»Ø»ù´¡ĞÅÏ¢
                 if (Prefs.DevMode)
                 {
                     Log.Warning($"[PawnStatus] Failed to extract race info for {pawn.LabelShort}: {ex.Message}");
                 }
                 
-                return $"{pawn.LabelShort}çš„ç§æ—æ˜¯{pawn.def?.label ?? "æœªçŸ¥"}";
+                return $"{pawn.LabelShort}µÄÖÖ×åÊÇ{pawn.def?.label ?? "Î´Öª"}";
             }
         }
         
         /// <summary>
-        /// æ£€æŸ¥å†…å®¹æ˜¯å¦ä¸ºè‡ªåŠ¨ç”Ÿæˆçš„ï¼ˆæ²¡æœ‰è¢«ç”¨æˆ·ç¼–è¾‘ï¼‰
+        /// ¼ì²éÄÚÈİÊÇ·ñÎª×Ô¶¯Éú³ÉµÄ£¨Ã»ÓĞ±»ÓÃ»§±à¼­£©
         /// </summary>
         private static bool IsAutoGeneratedContent(string content)
         {
             if (string.IsNullOrEmpty(content))
                 return false;
             
-            // æ£€æŸ¥æ˜¯å¦åŒ…å«è‡ªåŠ¨ç”Ÿæˆçš„å…³é”®è¯
+            // ¼ì²éÊÇ·ñ°üº¬×Ô¶¯Éú³ÉµÄ¹Ø¼ü´Ê
             var autoKeywords = new[] 
             { 
-                "åˆšåŠ å…¥", "æ–°æˆå‘˜", "èµ„æ·±æˆå‘˜", "å·²åŠ å…¥æ®–æ°‘åœ°" 
+                "¸Õ¼ÓÈë", "ĞÂ³ÉÔ±", "×ÊÉî³ÉÔ±", "ÒÑ¼ÓÈëÖ³ÃñµØ" 
             };
             
             return autoKeywords.Any(k => content.Contains(k));
         }
         
         /// <summary>
-        /// æ¸…é™¤å·²ä¸å­˜åœ¨çš„çŠ¶æ€å¸¸è¯†ï¼ˆPawnç¦»å¼€æˆ–æ­»äº¡ï¼‰
+        /// Çå³ıÒÑ²»´æÔÚµÄ×´Ì¬³£Ê¶£¨PawnÀë¿ª»òËÀÍö£©
         /// </summary>
         public static void CleanupPawnStatusKnowledge(Pawn pawn, CommonKnowledgeLibrary library)
         {
@@ -449,14 +449,14 @@ namespace RimTalk.Memory
 
             var entry = library.Entries.FirstOrDefault(e => 
                 e.tag.Contains(pawn.LabelShort) && 
-                e.tag.Contains("æ®–æ°‘è€…çŠ¶æ€")
+                e.tag.Contains("Ö³ÃñÕß×´Ì¬")
             );
             
             if (entry != null)
             {
                 library.RemoveEntry(entry);
                 
-                // æ¸…é™¤æ›´æ–°è®°å½•
+                // Çå³ı¸üĞÂ¼ÇÂ¼
                 lastUpdateTicks.Remove(pawn.thingIDNumber);
                 
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
@@ -467,15 +467,15 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.17: ç®€åŒ–æ¸…ç†é€»è¾‘ - åªæ¸…ç†lastUpdateTicks
-        /// ä¸å†éœ€è¦ç®¡ç†colonistJoinTicks
+        /// ? v3.3.17: ¼ò»¯ÇåÀíÂß¼­ - Ö»ÇåÀílastUpdateTicks
+        /// ²»ÔÙĞèÒª¹ÜÀícolonistJoinTicks
         /// </summary>
         public static void CleanupUpdateRecords()
         {
-            // æ”¶é›†æ‰€æœ‰å­˜æ´»çš„æ®–æ°‘è€…ID
+            // ÊÕ¼¯ËùÓĞ´æ»îµÄÖ³ÃñÕßID
             var allLivingColonists = new List<Pawn>();
             
-            // æ‰€æœ‰åœ°å›¾ä¸Šçš„æ®–æ°‘è€…
+            // ËùÓĞµØÍ¼ÉÏµÄÖ³ÃñÕß
             foreach (var map in Find.Maps)
             {
                 if (map.mapPawns != null)
@@ -484,7 +484,7 @@ namespace RimTalk.Memory
                 }
             }
             
-            // å•†é˜Ÿä¸­çš„æ®–æ°‘è€…
+            // ÉÌ¶ÓÖĞµÄÖ³ÃñÕß
             foreach (var caravan in Find.WorldObjects.Caravans)
             {
                 if (caravan.IsPlayerControlled && caravan.pawns != null)
@@ -501,42 +501,42 @@ namespace RimTalk.Memory
             
             var allColonistIDs = new HashSet<int>(allLivingColonists.Select(p => p.thingIDNumber));
             
-            // æ¸…ç†ä¸å­˜åœ¨çš„Pawnçš„æ›´æ–°è®°å½•
+            // ÇåÀí²»´æÔÚµÄPawnµÄ¸üĞÂ¼ÇÂ¼
             var toRemove = new List<int>();
             
             foreach (var pawnID in lastUpdateTicks.Keys.ToList())
             {
-                // å¦‚æœåœ¨å­˜æ´»åˆ—è¡¨ä¸­ï¼Œè·³è¿‡
+                // Èç¹ûÔÚ´æ»îÁĞ±íÖĞ£¬Ìø¹ı
                 if (allColonistIDs.Contains(pawnID))
                     continue;
                 
-                // å°è¯•æŸ¥æ‰¾è¿™ä¸ªPawn
+                // ³¢ÊÔ²éÕÒÕâ¸öPawn
                 Pawn pawn = null;
                 
-                // æ£€æŸ¥æ‰€æœ‰åœ°å›¾ä¸­çš„æ‰€æœ‰Pawnï¼ˆåŒ…æ‹¬æ­»äº¡çš„ï¼‰
+                // ¼ì²éËùÓĞµØÍ¼ÖĞµÄËùÓĞPawn£¨°üÀ¨ËÀÍöµÄ£©
                 foreach (var map in Find.Maps)
                 {
                     pawn = map.mapPawns.AllPawns.FirstOrDefault(p => p.thingIDNumber == pawnID);
                     if (pawn != null) break;
                 }
                 
-                // æ£€æŸ¥ä¸–ç•ŒPawns
+                // ¼ì²éÊÀ½çPawns
                 if (pawn == null && Find.WorldPawns != null)
                 {
                     pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == pawnID);
                 }
                 
-                // å†³å®šæ˜¯å¦åˆ é™¤è®°å½•
+                // ¾ö¶¨ÊÇ·ñÉ¾³ı¼ÇÂ¼
                 bool shouldRemove = false;
                 
                 if (pawn == null)
                 {
-                    // æ‰¾ä¸åˆ°Pawn - å¯èƒ½å·²ç»å®Œå…¨æ¶ˆå¤±
+                    // ÕÒ²»µ½Pawn - ¿ÉÄÜÒÑ¾­ÍêÈ«ÏûÊ§
                     shouldRemove = true;
                 }
                 else
                 {
-                    // æ‰¾åˆ°Pawn - æ£€æŸ¥æ˜¯å¦çœŸçš„åº”è¯¥åˆ é™¤
+                    // ÕÒµ½Pawn - ¼ì²éÊÇ·ñÕæµÄÓ¦¸ÃÉ¾³ı
                     if (pawn.Dead)
                     {
                         shouldRemove = true;
@@ -557,13 +557,13 @@ namespace RimTalk.Memory
                 }
             }
             
-            // æ‰§è¡Œåˆ é™¤
+            // Ö´ĞĞÉ¾³ı
             foreach (var id in toRemove)
             {
                 lastUpdateTicks.Remove(id);
             }
             
-            // æ—¥å¿—è¾“å‡º
+            // ÈÕÖ¾Êä³ö
             if (toRemove.Count > 0 && Prefs.DevMode)
             {
                 Log.Message($"[PawnStatus] Cleaned up {toRemove.Count} update records");

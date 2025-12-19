@@ -11,6 +11,9 @@
     <RimTalk_Filter_Event>Event</RimTalk_Filter_Event>
     <RimTalk_Filter_Emotion>Emotion</RimTalk_Filter_Emotion>
     <RimTalk_Filter_Relationship>Relationship</RimTalk_Filter_Relationship>
+
+    <!-- ITab Memory -->
+    <RimTalk_Memory_NoMemories>No memories to display</RimTalk_Memory_NoMemories>
     
     <!-- Memory Stats -->
     <RimTalk_MemoryStats>Short-term: {0}/{1} | Long-term: {2}/{3}</RimTalk_MemoryStats>
@@ -447,10 +450,11 @@
     
     <!-- Mind Stream Core Labels -->
     <RimTalk_MindStream_SelectColonist>Select a colonist to view memories</RimTalk_MindStream_SelectColonist>
-    <RimTalk_MindStream_NoColonists>No colonists</RimTalk_MindStream_NoColonists>
+    <RimTalk_MindStream_NoMemoryComp>Selected pawn has no memory component</RimTalk_MindStream_NoMemoryComp>
     <RimTalk_MindStream_Preview>Preview</RimTalk_MindStream_Preview>
     <RimTalk_MindStream_Knowledge>Knowledge</RimTalk_MindStream_Knowledge>
-    <RimTalk_MindStream_MemoryFilters>Memory Filters</RimTalk_MindStream_MemoryFilters>
+    <RimTalk_MindStream_OperationGuide>Operation Guide</RimTalk_MindStream_OperationGuide>
+    <RimTalk_MindStream_NoColonists>No colonists available</RimTalk_MindStream_NoColonists>
     <RimTalk_MindStream_Layers>LAYERS</RimTalk_MindStream_Layers>
     <RimTalk_MindStream_ABM>ABM (Active)</RimTalk_MindStream_ABM>
     <RimTalk_MindStream_SCM>SCM (Short)</RimTalk_MindStream_SCM>

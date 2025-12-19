@@ -7,22 +7,22 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// è¯­ä¹‰å¢å¼ºè¯„åˆ†ç³»ç»Ÿ v3.1.0
+    /// ÓïÒåÔöÇ¿ÆÀ·ÖÏµÍ³ v3.1.0
     /// 
-    /// æ··åˆæ–¹æ¡ˆï¼š
-    /// - ç¬¬1æ­¥ï¼šå¿«é€Ÿå…³é”®è¯è¿‡æ»¤ï¼ˆ0æˆæœ¬ï¼Œ<5msï¼‰
-    /// - ç¬¬2æ­¥ï¼šè¯­ä¹‰ç›¸ä¼¼åº¦ç²¾ç‚¼ï¼ˆå¯é€‰ï¼Œä½¿ç”¨Embeddingï¼‰
+    /// »ìºÏ·½°¸£º
+    /// - µÚ1²½£º¿ìËÙ¹Ø¼ü´Ê¹ıÂË£¨0³É±¾£¬<5ms£©
+    /// - µÚ2²½£ºÓïÒåÏàËÆ¶È¾«Á¶£¨¿ÉÑ¡£¬Ê¹ÓÃEmbedding£©
     /// 
-    /// ä¼˜åŠ¿ï¼š
-    /// - å‡†ç¡®æ€§æå‡50%ï¼ˆæ¥è¿‘é…’é¦†æ°´å¹³ï¼‰
-    /// - æˆæœ¬æ§åˆ¶ï¼šæœˆæˆæœ¬<$0.01
-    /// - å‘åå…¼å®¹ï¼šå¯éšæ—¶ç¦ç”¨Embedding
+    /// ÓÅÊÆ£º
+    /// - ×¼È·ĞÔÌáÉı50%£¨½Ó½ü¾Æ¹İË®Æ½£©
+    /// - ³É±¾¿ØÖÆ£ºÔÂ³É±¾<$0.01
+    /// - Ïòºó¼æÈİ£º¿ÉËæÊ±½ûÓÃEmbedding
     /// </summary>
     public static class SemanticScoringSystem
     {
         /// <summary>
-        /// æ™ºèƒ½è¯„åˆ†è®°å¿†ï¼ˆæ··åˆæ–¹æ¡ˆï¼‰
-        /// ? v3.3.2: ä¼˜åŒ–è¶…æ—¶å¤„ç†ï¼Œå‡å°‘è­¦å‘Š
+        /// ÖÇÄÜÆÀ·Ö¼ÇÒä£¨»ìºÏ·½°¸£©
+        /// ? v3.3.2: ÓÅ»¯³¬Ê±´¦Àí£¬¼õÉÙ¾¯¸æ
         /// </summary>
         public static List<ScoredItem<MemoryEntry>> ScoreMemoriesWithSemantics(
             List<MemoryEntry> memories,
@@ -33,33 +33,33 @@ namespace RimTalk.Memory
             if (memories == null || memories.Count == 0)
                 return new List<ScoredItem<MemoryEntry>>();
             
-            // ç¬¬1æ­¥ï¼šä½¿ç”¨é«˜çº§è¯„åˆ†ç³»ç»Ÿå¿«é€Ÿè¿‡æ»¤ï¼ˆä¿ç•™Top 50%ï¼‰
+            // µÚ1²½£ºÊ¹ÓÃ¸ß¼¶ÆÀ·ÖÏµÍ³¿ìËÙ¹ıÂË£¨±£ÁôTop 50%£©
             var quickScored = AdvancedScoringSystem.ScoreMemories(memories, context, speaker, listener);
             
-            int keepCount = Math.Max(10, quickScored.Count / 2); // è‡³å°‘ä¿ç•™10ä¸ª
+            int keepCount = Math.Max(10, quickScored.Count / 2); // ÖÁÉÙ±£Áô10¸ö
             var topCandidates = quickScored.Take(keepCount).ToList();
             
-            // ç¬¬2æ­¥ï¼šæ£€æŸ¥æ˜¯å¦å¯ç”¨è¯­ä¹‰å¢å¼º
-            // ? v3.3.2.27: enableSemanticEmbeddingå·²ç§»é™¤ï¼Œå§‹ç»ˆä½¿ç”¨å…³é”®è¯åŒ¹é…
+            // µÚ2²½£º¼ì²éÊÇ·ñÆôÓÃÓïÒåÔöÇ¿
+            // ? v3.3.2.27: enableSemanticEmbeddingÒÑÒÆ³ı£¬Ê¼ÖÕÊ¹ÓÃ¹Ø¼ü´ÊÆ¥Åä
             bool useSemantics = false;
             
             if (!useSemantics || !AI.EmbeddingService.IsAvailable())
             {
-                // ä¸ä½¿ç”¨è¯­ä¹‰å¢å¼ºï¼Œç›´æ¥è¿”å›å…³é”®è¯è¯„åˆ†ç»“æœ
+                // ²»Ê¹ÓÃÓïÒåÔöÇ¿£¬Ö±½Ó·µ»Ø¹Ø¼ü´ÊÆÀ·Ö½á¹û
                 return topCandidates;
             }
             
-            // ç¬¬3æ­¥ï¼šå¯¹Topå€™é€‰ä½¿ç”¨è¯­ä¹‰è¯„åˆ†ï¼ˆå¼‚æ­¥ï¼‰
+            // µÚ3²½£º¶ÔTopºòÑ¡Ê¹ÓÃÓïÒåÆÀ·Ö£¨Òì²½£©
             var semanticTask = Task.Run(async () => await ApplySemanticScoringAsync(topCandidates, context));
             
-            // ? å¢åŠ è¶…æ—¶æ—¶é—´ï¼š500ms â†’ 800ms
+            // ? Ôö¼Ó³¬Ê±Ê±¼ä£º500ms ¡ú 800ms
             if (semanticTask.Wait(800))
             {
                 var semanticScored = semanticTask.Result;
                 
                 if (semanticScored != null && semanticScored.Count > 0)
                 {
-                    // ? å‡å°‘æˆåŠŸæ—¥å¿—
+                    // ? ¼õÉÙ³É¹¦ÈÕÖ¾
                     if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                     {
                         Log.Message($"[Semantic Scoring] Success: {semanticScored.Count} memories");
@@ -70,19 +70,19 @@ namespace RimTalk.Memory
             }
             else
             {
-                // ? å‡å°‘è¶…æ—¶è­¦å‘Šï¼šä»…10%æ¦‚ç‡è¾“å‡º
+                // ? ¼õÉÙ³¬Ê±¾¯¸æ£º½ö10%¸ÅÂÊÊä³ö
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                 {
                     Log.Warning("[Semantic Scoring] Timeout, using keyword fallback");
                 }
             }
             
-            // è¶…æ—¶æˆ–å¤±è´¥ï¼Œè¿”å›å…³é”®è¯è¯„åˆ†ç»“æœ
+            // ³¬Ê±»òÊ§°Ü£¬·µ»Ø¹Ø¼ü´ÊÆÀ·Ö½á¹û
             return topCandidates;
         }
         
         /// <summary>
-        /// åº”ç”¨è¯­ä¹‰è¯„åˆ†ï¼ˆå¼‚æ­¥ï¼‰
+        /// Ó¦ÓÃÓïÒåÆÀ·Ö£¨Òì²½£©
         /// </summary>
         private static async Task<List<ScoredItem<MemoryEntry>>> ApplySemanticScoringAsync(
             List<ScoredItem<MemoryEntry>> candidates,
@@ -90,7 +90,7 @@ namespace RimTalk.Memory
         {
             try
             {
-                // è·å–ä¸Šä¸‹æ–‡çš„åµŒå…¥å‘é‡
+                // »ñÈ¡ÉÏÏÂÎÄµÄÇ¶ÈëÏòÁ¿
                 float[] contextEmbedding = await AI.EmbeddingService.GetEmbeddingAsync(context);
                 
                 if (contextEmbedding == null)
@@ -99,7 +99,7 @@ namespace RimTalk.Memory
                     return candidates;
                 }
                 
-                // ä¸ºæ¯ä¸ªå€™é€‰è®°å¿†è®¡ç®—è¯­ä¹‰ç›¸ä¼¼åº¦
+                // ÎªÃ¿¸öºòÑ¡¼ÇÒä¼ÆËãÓïÒåÏàËÆ¶È
                 foreach (var scored in candidates)
                 {
                     try
@@ -108,19 +108,19 @@ namespace RimTalk.Memory
                         
                         if (memoryEmbedding != null)
                         {
-                            // è®¡ç®—ä½™å¼¦ç›¸ä¼¼åº¦
+                            // ¼ÆËãÓàÏÒÏàËÆ¶È
                             float semanticSimilarity = AI.EmbeddingService.CosineSimilarity(contextEmbedding, memoryEmbedding);
                             
-                            // æ··åˆè¯„åˆ†ï¼š70%å…³é”®è¯ + 30%è¯­ä¹‰
+                            // »ìºÏÆÀ·Ö£º70%¹Ø¼ü´Ê + 30%ÓïÒå
                             float keywordScore = scored.Score;
                             float hybridScore = (keywordScore * 0.7f) + (semanticSimilarity * 0.3f);
                             
                             scored.Score = hybridScore;
                             
-                            // æ›´æ–°Breakdown
+                            // ¸üĞÂBreakdown
                             if (scored.Breakdown != null)
                             {
-                                scored.Breakdown.TypeBoost = semanticSimilarity; // å€Ÿç”¨TypeBoostå­—æ®µæ˜¾ç¤ºè¯­ä¹‰åˆ†
+                                scored.Breakdown.TypeBoost = semanticSimilarity; // ½èÓÃTypeBoost×Ö¶ÎÏÔÊ¾ÓïÒå·Ö
                             }
                         }
                     }
@@ -130,7 +130,7 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // é‡æ–°æ’åº
+                // ÖØĞÂÅÅĞò
                 return candidates.OrderByDescending(s => s.Score).ToList();
             }
             catch (Exception ex)
@@ -141,8 +141,8 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// æ™ºèƒ½è¯„åˆ†å¸¸è¯†ï¼ˆæ··åˆæ–¹æ¡ˆï¼‰
-        /// ? v3.3.2: ä¼˜åŒ–è¶…æ—¶å¤„ç†
+        /// ÖÇÄÜÆÀ·Ö³£Ê¶£¨»ìºÏ·½°¸£©
+        /// ? v3.3.2: ÓÅ»¯³¬Ê±´¦Àí
         /// </summary>
         public static List<ScoredItem<CommonKnowledgeEntry>> ScoreKnowledgeWithSemantics(
             List<CommonKnowledgeEntry> knowledge,
@@ -153,14 +153,14 @@ namespace RimTalk.Memory
             if (knowledge == null || knowledge.Count == 0)
                 return new List<ScoredItem<CommonKnowledgeEntry>>();
             
-            // ç¬¬1æ­¥ï¼šå…³é”®è¯å¿«é€Ÿè¿‡æ»¤
+            // µÚ1²½£º¹Ø¼ü´Ê¿ìËÙ¹ıÂË
             var quickScored = AdvancedScoringSystem.ScoreKnowledge(knowledge, context, speaker, listener);
             
             int keepCount = Math.Max(5, quickScored.Count / 2);
             var topCandidates = quickScored.Take(keepCount).ToList();
             
-            // ç¬¬2æ­¥ï¼šæ£€æŸ¥æ˜¯å¦å¯ç”¨è¯­ä¹‰å¢å¼º
-            // ? v3.3.2.27: enableSemanticEmbeddingå·²ç§»é™¤ï¼Œå§‹ç»ˆä½¿ç”¨å…³é”®è¯åŒ¹é…
+            // µÚ2²½£º¼ì²éÊÇ·ñÆôÓÃÓïÒåÔöÇ¿
+            // ? v3.3.2.27: enableSemanticEmbeddingÒÑÒÆ³ı£¬Ê¼ÖÕÊ¹ÓÃ¹Ø¼ü´ÊÆ¥Åä
             bool useSemantics = false;
             
             if (!useSemantics || !AI.EmbeddingService.IsAvailable())
@@ -168,17 +168,17 @@ namespace RimTalk.Memory
                 return topCandidates;
             }
             
-            // ç¬¬3æ­¥ï¼šè¯­ä¹‰è¯„åˆ†
+            // µÚ3²½£ºÓïÒåÆÀ·Ö
             var semanticTask = Task.Run(async () => await ApplySemanticScoringToKnowledgeAsync(topCandidates, context));
             
-            // ? å¢åŠ è¶…æ—¶ï¼š500ms â†’ 800ms
+            // ? Ôö¼Ó³¬Ê±£º500ms ¡ú 800ms
             if (semanticTask.Wait(800))
             {
                 var semanticScored = semanticTask.Result;
                 
                 if (semanticScored != null && semanticScored.Count > 0)
                 {
-                    // ? å‡å°‘æ—¥å¿—
+                    // ? ¼õÉÙÈÕÖ¾
                     if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                     {
                         Log.Message($"[Semantic Scoring] Success: {semanticScored.Count} knowledge");
@@ -189,7 +189,7 @@ namespace RimTalk.Memory
             }
             else
             {
-                // ? å‡å°‘è­¦å‘Šï¼š10%æ¦‚ç‡
+                // ? ¼õÉÙ¾¯¸æ£º10%¸ÅÂÊ
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                 {
                     Log.Warning("[Semantic Scoring] Timeout, using keyword fallback");
@@ -200,7 +200,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// åº”ç”¨è¯­ä¹‰è¯„åˆ†åˆ°å¸¸è¯†ï¼ˆå¼‚æ­¥ï¼‰
+        /// Ó¦ÓÃÓïÒåÆÀ·Öµ½³£Ê¶£¨Òì²½£©
         /// </summary>
         private static async Task<List<ScoredItem<CommonKnowledgeEntry>>> ApplySemanticScoringToKnowledgeAsync(
             List<ScoredItem<CommonKnowledgeEntry>> candidates,
@@ -223,7 +223,7 @@ namespace RimTalk.Memory
                         {
                             float semanticSimilarity = AI.EmbeddingService.CosineSimilarity(contextEmbedding, knowledgeEmbedding);
                             
-                            // æ··åˆè¯„åˆ†ï¼š60%å…³é”®è¯ + 40%è¯­ä¹‰ï¼ˆå¸¸è¯†åº“æ›´ä¾èµ–è¯­ä¹‰ï¼‰
+                            // »ìºÏÆÀ·Ö£º60%¹Ø¼ü´Ê + 40%ÓïÒå£¨³£Ê¶¿â¸üÒÀÀµÓïÒå£©
                             float keywordScore = scored.Score;
                             float hybridScore = (keywordScore * 0.6f) + (semanticSimilarity * 0.4f);
                             
@@ -246,8 +246,8 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// é¢„çƒ­ç¼“å­˜ï¼šä¸ºé‡è¦è®°å¿†é¢„å…ˆç”ŸæˆåµŒå…¥å‘é‡
-        /// åœ¨æ¸¸æˆç©ºé—²æ—¶è°ƒç”¨ï¼Œé¿å…å¯¹è¯æ—¶å»¶è¿Ÿ
+        /// Ô¤ÈÈ»º´æ£ºÎªÖØÒª¼ÇÒäÔ¤ÏÈÉú³ÉÇ¶ÈëÏòÁ¿
+        /// ÔÚÓÎÏ·¿ÕÏĞÊ±µ÷ÓÃ£¬±ÜÃâ¶Ô»°Ê±ÑÓ³Ù
         /// </summary>
         public static async Task PrewarmEmbeddingCacheAsync(FourLayerMemoryComp memoryComp)
         {
@@ -256,7 +256,7 @@ namespace RimTalk.Memory
             
             try
             {
-                // åªä¸ºé‡è¦è®°å¿†ï¼ˆimportance > 0.7ï¼‰ç”Ÿæˆç¼“å­˜
+                // Ö»ÎªÖØÒª¼ÇÒä£¨importance > 0.7£©Éú³É»º´æ
                 var importantMemories = new List<MemoryEntry>();
                 
                 importantMemories.AddRange(memoryComp.SituationalMemories.Where(m => m.importance > 0.7f));
@@ -266,7 +266,7 @@ namespace RimTalk.Memory
                 if (importantMemories.Count == 0)
                     return;
                 
-                // æ‰¹é‡ç”ŸæˆåµŒå…¥ï¼ˆé™åˆ¶æ•°é‡ï¼‰
+                // ÅúÁ¿Éú³ÉÇ¶Èë£¨ÏŞÖÆÊıÁ¿£©
                 var toBatch = importantMemories.Take(20).Select(m => m.content).ToList();
                 
                 if (Prefs.DevMode)

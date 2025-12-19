@@ -1,41 +1,41 @@
-# RimTalk-ExpandMemory Mod éƒ¨ç½²æŒ‡å—
+# RimTalk-ExpandMemory Mod ²¿ÊðÖ¸ÄÏ
 
-## ?? å¿«é€Ÿå¼€å§‹
+## ?? ¿ìËÙ¿ªÊ¼
 
-### ç¬¬ä¸€æ¬¡ä½¿ç”¨ï¼Ÿè¯·å…ˆé…ç½®è·¯å¾„
+### µÚÒ»´ÎÊ¹ÓÃ£¿ÇëÏÈÅäÖÃÂ·¾¶
 
-**æ­¥éª¤1ï¼šåˆ›å»ºé…ç½®æ–‡ä»¶**
+**²½Öè1£º´´½¨ÅäÖÃÎÄ¼þ**
 
 ```powershell
-# å¤åˆ¶ç¤ºä¾‹é…ç½®æ–‡ä»¶
+# ¸´ÖÆÊ¾ÀýÅäÖÃÎÄ¼þ
 Copy-Item .rimworld.config.example .rimworld.config
 Copy-Item deploy.ps1.example deploy.ps1
 ```
 
-**æ­¥éª¤2ï¼šç¼–è¾‘é…ç½®æ–‡ä»¶**
+**²½Öè2£º±à¼­ÅäÖÃÎÄ¼þ**
 
-æ‰“å¼€ `.rimworld.config`ï¼Œå°† `YOUR_RIMWORLD_PATH_HERE` æ›¿æ¢ä¸ºæ‚¨çš„ RimWorld è·¯å¾„ã€‚
+´ò¿ª `.rimworld.config`£¬½« `YOUR_RIMWORLD_PATH_HERE` Ìæ»»ÎªÄúµÄ RimWorld Â·¾¶¡£
 
-å¸¸è§è·¯å¾„ç¤ºä¾‹ï¼š
-- **Steam (Windows)**ï¼š`C:\Program Files (x86)\Steam\steamapps\common\RimWorld`
-- **Steam (è‡ªå®šä¹‰)**ï¼š`D:\steam\steamapps\common\RimWorld`
-- **GOG**ï¼š`C:\GOG Games\RimWorld`
-- **Linux**ï¼š`~/.steam/steam/steamapps/common/RimWorld`
-- **macOS**ï¼š`~/Library/Application Support/Steam/steamapps/common/RimWorld`
+³£¼ûÂ·¾¶Ê¾Àý£º
+- **Steam (Windows)**£º`C:\Program Files (x86)\Steam\steamapps\common\RimWorld`
+- **Steam (×Ô¶¨Òå)**£º`D:\steam\steamapps\common\RimWorld`
+- **GOG**£º`C:\GOG Games\RimWorld`
+- **Linux**£º`~/.steam/steam/steamapps/common/RimWorld`
+- **macOS**£º`~/Library/Application Support/Steam/steamapps/common/RimWorld`
 
-**æ­¥éª¤3ï¼šï¼ˆå¯é€‰ï¼‰è®¾ç½®çŽ¯å¢ƒå˜é‡**
+**²½Öè3£º£¨¿ÉÑ¡£©ÉèÖÃ»·¾³±äÁ¿**
 
 ```powershell
 # Windows
-setx RIMWORLD_DIR "æ‚¨çš„RimWorldè·¯å¾„"
+setx RIMWORLD_DIR "ÄúµÄRimWorldÂ·¾¶"
 
-# Linux/macOSï¼ˆæ·»åŠ åˆ° ~/.bashrc æˆ– ~/.zshrcï¼‰
-export RIMWORLD_DIR="æ‚¨çš„RimWorldè·¯å¾„"
+# Linux/macOS£¨Ìí¼Óµ½ ~/.bashrc »ò ~/.zshrc£©
+export RIMWORLD_DIR="ÄúµÄRimWorldÂ·¾¶"
 ```
 
-### å¿«é€Ÿéƒ¨ç½²
+### ¿ìËÙ²¿Êð
 
-é…ç½®å®ŒæˆåŽï¼Œæ¯æ¬¡éƒ¨ç½²åªéœ€ï¼š
+ÅäÖÃÍê³Éºó£¬Ã¿´Î²¿ÊðÖ»Ðè£º
 
 ```powershell
 .\deploy.ps1
@@ -43,188 +43,188 @@ export RIMWORLD_DIR="æ‚¨çš„RimWorldè·¯å¾„"
 
 ---
 
-## ?? é…ç½®æ–¹å¼å¯¹æ¯”
+## ?? ÅäÖÃ·½Ê½¶Ô±È
 
-| æ–¹å¼ | ä¼˜ç‚¹ | ç¼ºç‚¹ | æŽ¨èåº¦ |
+| ·½Ê½ | ÓÅµã | È±µã | ÍÆ¼ö¶È |
 |------|------|------|--------|
-| **é…ç½®æ–‡ä»¶** `.rimworld.config` | ? é¡¹ç›®çº§é…ç½®<br>? ä¸å½±å“å…¶ä»–é¡¹ç›®<br>? ä¸ä¸Šä¼ åˆ° Git | éœ€è¦æ¯ä¸ªé¡¹ç›®é…ç½® | ????? |
-| **çŽ¯å¢ƒå˜é‡** `RIMWORLD_DIR` | ? å…¨å±€ç”Ÿæ•ˆ<br>? Visual Studio è‡ªåŠ¨éƒ¨ç½² | éœ€è¦é‡å¯ VS | ???? |
-| **å‘½ä»¤è¡Œå‚æ•°** `-RimWorldDir` | ? çµæ´»ä¸´æ—¶ä½¿ç”¨ | æ¯æ¬¡éƒ½è¦è¾“å…¥ | ??? |
+| **ÅäÖÃÎÄ¼þ** `.rimworld.config` | ? ÏîÄ¿¼¶ÅäÖÃ<br>? ²»Ó°ÏìÆäËûÏîÄ¿<br>? ²»ÉÏ´«µ½ Git | ÐèÒªÃ¿¸öÏîÄ¿ÅäÖÃ | ????? |
+| **»·¾³±äÁ¿** `RIMWORLD_DIR` | ? È«¾ÖÉúÐ§<br>? Visual Studio ×Ô¶¯²¿Êð | ÐèÒªÖØÆô VS | ???? |
+| **ÃüÁîÐÐ²ÎÊý** `-RimWorldDir` | ? Áé»îÁÙÊ±Ê¹ÓÃ | Ã¿´Î¶¼ÒªÊäÈë | ??? |
 
 ---
 
-## ?? å®‰å…¨æç¤º
+## ?? °²È«ÌáÊ¾
 
-> **?? é‡è¦ï¼šæœ¬åœ°é…ç½®æ–‡ä»¶å·²æ·»åŠ åˆ° `.gitignore`**
+> **?? ÖØÒª£º±¾µØÅäÖÃÎÄ¼þÒÑÌí¼Óµ½ `.gitignore`**
 >
-> - `.rimworld.config` - æ‚¨çš„æœ¬åœ°è·¯å¾„é…ç½®
-> - `deploy.ps1` - æ‚¨çš„è‡ªå®šä¹‰éƒ¨ç½²è„šæœ¬
+> - `.rimworld.config` - ÄúµÄ±¾µØÂ·¾¶ÅäÖÃ
+> - `deploy.ps1` - ÄúµÄ×Ô¶¨Òå²¿Êð½Å±¾
 >
-> è¿™äº›æ–‡ä»¶**ä¸ä¼š**è¢«æäº¤åˆ° Git ä»“åº“ï¼Œä¿æŠ¤æ‚¨çš„éšç§ã€‚
+> ÕâÐ©ÎÄ¼þ**²»»á**±»Ìá½»µ½ Git ²Ö¿â£¬±£»¤ÄúµÄÒþË½¡£
 >
-> å…¶ä»–ç”¨æˆ·éœ€è¦ï¼š
-> 1. å¤åˆ¶ `.rimworld.config.example` â†’ `.rimworld.config`
-> 2. å¤åˆ¶ `deploy.ps1.example` â†’ `deploy.ps1`
-> 3. å¡«å…¥è‡ªå·±çš„è·¯å¾„
+> ÆäËûÓÃ»§ÐèÒª£º
+> 1. ¸´ÖÆ `.rimworld.config.example` ¡ú `.rimworld.config`
+> 2. ¸´ÖÆ `deploy.ps1.example` ¡ú `deploy.ps1`
+> 3. ÌîÈë×Ô¼ºµÄÂ·¾¶
 
 ---
 
-## ?? Mod æ–‡ä»¶ç»“æž„
+## ?? Mod ÎÄ¼þ½á¹¹
 
-éƒ¨ç½²åŽçš„ç›®å½•ç»“æž„ï¼š
+²¿ÊðºóµÄÄ¿Â¼½á¹¹£º
 ```
-<RimWorldè·¯å¾„>\Mods\RimTalk-MemoryPatch\
-â”œâ”€â”€ About\              # Mod ä¿¡æ¯å’Œé¢„è§ˆå›¾
-â”œâ”€â”€ Defs\               # æ¸¸æˆå®šä¹‰æ–‡ä»¶
-â”œâ”€â”€ Languages\          # å¤šè¯­è¨€ç¿»è¯‘
-â”œâ”€â”€ Textures\           # çº¹ç†èµ„æº
-â””â”€â”€ 1.6\                # æ¸¸æˆç‰ˆæœ¬ä¸“å±žæ–‡ä»¶
-    â””â”€â”€ Assemblies\     # ç¼–è¯‘åŽçš„ DLL
+<RimWorldÂ·¾¶>\Mods\RimTalk-MemoryPatch\
+©À©¤©¤ About\              # Mod ÐÅÏ¢ºÍÔ¤ÀÀÍ¼
+©À©¤©¤ Defs\               # ÓÎÏ·¶¨ÒåÎÄ¼þ
+©À©¤©¤ Languages\          # ¶àÓïÑÔ·­Òë
+©À©¤©¤ Textures\           # ÎÆÀí×ÊÔ´
+©¸©¤©¤ 1.6\                # ÓÎÏ·°æ±¾×¨ÊôÎÄ¼þ
+    ©¸©¤©¤ Assemblies\     # ±àÒëºóµÄ DLL
 ```
 
 ---
 
-## ?? å¼€å‘æµç¨‹
+## ?? ¿ª·¢Á÷³Ì
 
-### 1. ä¿®æ”¹ä»£ç 
+### 1. ÐÞ¸Ä´úÂë
 
-åœ¨ `Source\` ç›®å½•ä¸‹ç¼–è¾‘ C# æºç ã€‚
+ÔÚ `Source\` Ä¿Â¼ÏÂ±à¼­ C# Ô´Âë¡£
 
-### 2. æž„å»ºé¡¹ç›®
+### 2. ¹¹½¨ÏîÄ¿
 
-**Visual Studioï¼š**
-- æŒ‰ `Ctrl+Shift+B` æˆ– èœå• â†’ **ç”Ÿæˆ** â†’ **ç”Ÿæˆè§£å†³æ–¹æ¡ˆ**
+**Visual Studio£º**
+- °´ `Ctrl+Shift+B` »ò ²Ëµ¥ ¡ú **Éú³É** ¡ú **Éú³É½â¾ö·½°¸**
 
-**å‘½ä»¤è¡Œï¼š**
+**ÃüÁîÐÐ£º**
 ```powershell
 dotnet build
 ```
 
-### 3. éƒ¨ç½²åˆ°æ¸¸æˆ
+### 3. ²¿Êðµ½ÓÎÏ·
 
 ```powershell
 .\deploy.ps1
 ```
 
-**æˆ–è€…ä½¿ç”¨è‡ªå®šä¹‰è·¯å¾„ï¼š**
+**»òÕßÊ¹ÓÃ×Ô¶¨ÒåÂ·¾¶£º**
 ```powershell
 .\deploy.ps1 -RimWorldDir "C:\Games\RimWorld"
 ```
 
-### 4. æµ‹è¯•
+### 4. ²âÊÔ
 
-1. å¯åŠ¨ RimWorld
-2. ä¸»èœå• â†’ **Mods**
-3. å¯ç”¨ `RimTalk-MemoryPatch`
-4. é‡å¯æ¸¸æˆ
+1. Æô¶¯ RimWorld
+2. Ö÷²Ëµ¥ ¡ú **Mods**
+3. ÆôÓÃ `RimTalk-MemoryPatch`
+4. ÖØÆôÓÎÏ·
 
 ---
 
-## ?? é…ç½®æ–‡ä»¶è¯´æ˜Ž
+## ?? ÅäÖÃÎÄ¼þËµÃ÷
 
-### `.rimworld.config`ï¼ˆæœ¬åœ°é…ç½®ï¼Œä¸æäº¤ï¼‰
+### `.rimworld.config`£¨±¾µØÅäÖÃ£¬²»Ìá½»£©
 
 ```ini
-# æ‚¨çš„ RimWorld è·¯å¾„ï¼ˆæ ¹æ®å®žé™…æƒ…å†µä¿®æ”¹ï¼‰
+# ÄúµÄ RimWorld Â·¾¶£¨¸ù¾ÝÊµ¼ÊÇé¿öÐÞ¸Ä£©
 RIMWORLD_DIR=D:\steam\steamapps\common\RimWorld
 
-# Mod åç§°ï¼ˆé€šå¸¸ä¸éœ€è¦ä¿®æ”¹ï¼‰
+# Mod Ãû³Æ£¨Í¨³£²»ÐèÒªÐÞ¸Ä£©
 MOD_FOLDER_NAME=RimTalk-MemoryPatch
 
-# æ¸¸æˆç‰ˆæœ¬ï¼ˆé€šå¸¸ä¸éœ€è¦ä¿®æ”¹ï¼‰
+# ÓÎÏ·°æ±¾£¨Í¨³£²»ÐèÒªÐÞ¸Ä£©
 GAME_VERSION=1.6
 ```
 
-### `.rimworld.config.example`ï¼ˆç¤ºä¾‹æ¨¡æ¿ï¼Œä¼šæäº¤ï¼‰
+### `.rimworld.config.example`£¨Ê¾ÀýÄ£°å£¬»áÌá½»£©
 
-å…¶ä»–ç”¨æˆ·çš„å‚è€ƒæ¨¡æ¿ï¼ŒåŒ…å«å¸¸è§è·¯å¾„ç¤ºä¾‹ã€‚
+ÆäËûÓÃ»§µÄ²Î¿¼Ä£°å£¬°üº¬³£¼ûÂ·¾¶Ê¾Àý¡£
 
-### `deploy.ps1`ï¼ˆæœ¬åœ°è„šæœ¬ï¼Œä¸æäº¤ï¼‰
+### `deploy.ps1`£¨±¾µØ½Å±¾£¬²»Ìá½»£©
 
-æ‚¨çš„è‡ªå®šä¹‰éƒ¨ç½²è„šæœ¬ï¼Œå¯æ ¹æ®éœ€è¦ä¿®æ”¹ã€‚
+ÄúµÄ×Ô¶¨Òå²¿Êð½Å±¾£¬¿É¸ù¾ÝÐèÒªÐÞ¸Ä¡£
 
-### `deploy.ps1.example`ï¼ˆç¤ºä¾‹æ¨¡æ¿ï¼Œä¼šæäº¤ï¼‰
+### `deploy.ps1.example`£¨Ê¾ÀýÄ£°å£¬»áÌá½»£©
 
-å…¶ä»–ç”¨æˆ·çš„å‚è€ƒæ¨¡æ¿ï¼Œæ”¯æŒå¤šç§é…ç½®æ–¹å¼ã€‚
+ÆäËûÓÃ»§µÄ²Î¿¼Ä£°å£¬Ö§³Ö¶àÖÖÅäÖÃ·½Ê½¡£
 
 ---
 
-## ? å¸¸è§é—®é¢˜
+## ? ³£¼ûÎÊÌâ
 
-### Q: ä¸ºä»€ä¹ˆæ‰¾ä¸åˆ° .rimworld.config æ–‡ä»¶ï¼Ÿ
+### Q: ÎªÊ²Ã´ÕÒ²»µ½ .rimworld.config ÎÄ¼þ£¿
 
-**A:** è¿™æ˜¯æ­£å¸¸çš„ï¼é¦–æ¬¡ä½¿ç”¨éœ€è¦æ‚¨åˆ›å»ºï¼š
+**A:** ÕâÊÇÕý³£µÄ£¡Ê×´ÎÊ¹ÓÃÐèÒªÄú´´½¨£º
 
 ```powershell
 Copy-Item .rimworld.config.example .rimworld.config
 ```
 
-ç„¶åŽç¼–è¾‘ `.rimworld.config` å¡«å…¥æ‚¨çš„è·¯å¾„ã€‚
+È»ºó±à¼­ `.rimworld.config` ÌîÈëÄúµÄÂ·¾¶¡£
 
-### Q: æˆ‘çš„é…ç½®ä¼šè¢«æŽ¨é€åˆ° GitHub å—ï¼Ÿ
+### Q: ÎÒµÄÅäÖÃ»á±»ÍÆËÍµ½ GitHub Âð£¿
 
-**A:** ä¸ä¼šï¼`.rimworld.config` å’Œ `deploy.ps1` å·²æ·»åŠ åˆ° `.gitignore`ï¼Œæ‚¨çš„æœ¬åœ°è·¯å¾„æ˜¯å®‰å…¨çš„ã€‚
+**A:** ²»»á£¡`.rimworld.config` ºÍ `deploy.ps1` ÒÑÌí¼Óµ½ `.gitignore`£¬ÄúµÄ±¾µØÂ·¾¶ÊÇ°²È«µÄ¡£
 
-### Q: çŽ¯å¢ƒå˜é‡æœªç”Ÿæ•ˆï¼Ÿ
+### Q: »·¾³±äÁ¿Î´ÉúÐ§£¿
 
-**A:** è®¾ç½®çŽ¯å¢ƒå˜é‡åŽéœ€è¦**é‡å¯ Visual Studio** æˆ–**é‡æ–°æ‰“å¼€ PowerShell**ã€‚
+**A:** ÉèÖÃ»·¾³±äÁ¿ºóÐèÒª**ÖØÆô Visual Studio** »ò**ÖØÐÂ´ò¿ª PowerShell**¡£
 
-### Q: éƒ¨ç½²å¤±è´¥ï¼Œæç¤ºæƒé™ä¸è¶³ï¼Ÿ
+### Q: ²¿ÊðÊ§°Ü£¬ÌáÊ¾È¨ÏÞ²»×ã£¿
 
-**A:** ä»¥**ç®¡ç†å‘˜èº«ä»½**è¿è¡Œ PowerShellï¼š
+**A:** ÒÔ**¹ÜÀíÔ±Éí·Ý**ÔËÐÐ PowerShell£º
 
 ```powershell
-# å³é”®ç‚¹å‡» PowerShell å›¾æ ‡ â†’ ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œ
-cd "æ‚¨çš„é¡¹ç›®è·¯å¾„"
+# ÓÒ¼üµã»÷ PowerShell Í¼±ê ¡ú ÒÔ¹ÜÀíÔ±Éí·ÝÔËÐÐ
+cd "ÄúµÄÏîÄ¿Â·¾¶"
 .\deploy.ps1
 ```
 
-### Q: robocopy è¿”å›žé”™è¯¯ç ï¼Ÿ
+### Q: robocopy ·µ»Ø´íÎóÂë£¿
 
-**A:** robocopy è¿”å›žç  0-7 éƒ½æ˜¯æˆåŠŸï¼Œ8+ æ‰æ˜¯é”™è¯¯ã€‚è„šæœ¬å·²å¤„ç†ã€‚
+**A:** robocopy ·µ»ØÂë 0-7 ¶¼ÊÇ³É¹¦£¬8+ ²ÅÊÇ´íÎó¡£½Å±¾ÒÑ´¦Àí¡£
 
-### Q: å¦‚ä½•æŸ¥çœ‹å½“å‰çŽ¯å¢ƒå˜é‡ï¼Ÿ
+### Q: ÈçºÎ²é¿´µ±Ç°»·¾³±äÁ¿£¿
 
 ```powershell
 echo $env:RIMWORLD_DIR
 ```
 
-### Q: macOS/Linux å¦‚ä½•éƒ¨ç½²ï¼Ÿ
+### Q: macOS/Linux ÈçºÎ²¿Êð£¿
 
-**A:** ä½¿ç”¨ç¤ºä¾‹è„šæœ¬çš„ rsync éƒ¨åˆ†ï¼ˆå·²åŒ…å«åœ¨ `deploy.ps1.example` ä¸­ï¼‰ã€‚
-
----
-
-## ?? GitHub Copilot é…ç½®
-
-é¡¹ç›®å·²åŒ…å« `.github/copilot-instructions.md`ï¼ŒGitHub Copilot ä¼šè‡ªåŠ¨è¯»å–å¹¶è®°ä½å¸¸ç”¨è·¯å¾„å’Œé…ç½®ã€‚
-
-**ä½†è¯·æ³¨æ„ï¼š** Copilot æŒ‡ä»¤æ–‡ä»¶ä¸­ä¸åº”åŒ…å«æ‚¨çš„ä¸ªäººè·¯å¾„ï¼Œå®ƒåªåŒ…å«é€šç”¨çš„é¡¹ç›®ç»“æž„è¯´æ˜Žã€‚
+**A:** Ê¹ÓÃÊ¾Àý½Å±¾µÄ rsync ²¿·Ö£¨ÒÑ°üº¬ÔÚ `deploy.ps1.example` ÖÐ£©¡£
 
 ---
 
-## ?? ç›¸å…³èµ„æº
+## ?? GitHub Copilot ÅäÖÃ
+
+ÏîÄ¿ÒÑ°üº¬ `.github/copilot-instructions.md`£¬GitHub Copilot »á×Ô¶¯¶ÁÈ¡²¢¼Ç×¡³£ÓÃÂ·¾¶ºÍÅäÖÃ¡£
+
+**µ«Çë×¢Òâ£º** Copilot Ö¸ÁîÎÄ¼þÖÐ²»Ó¦°üº¬ÄúµÄ¸öÈËÂ·¾¶£¬ËüÖ»°üº¬Í¨ÓÃµÄÏîÄ¿½á¹¹ËµÃ÷¡£
+
+---
+
+## ?? Ïà¹Ø×ÊÔ´
 
 - [RimWorld Modding Wiki](https://rimworldwiki.com/wiki/Modding_Tutorials)
 - [Harmony Documentation](https://harmony.pardeike.net/)
-- [é¡¹ç›® GitHub](https://github.com/sanguodxj-byte/RimTalk-ExpandMemory)
+- [ÏîÄ¿ GitHub](https://github.com/sanguodxj-byte/RimTalk-ExpandMemory)
 
 ---
 
-## ? æ£€æŸ¥æ¸…å•
+## ? ¼ì²éÇåµ¥
 
-**é¦–æ¬¡é…ç½®ï¼š**
-- [ ] å¤åˆ¶ `.rimworld.config.example` â†’ `.rimworld.config`
-- [ ] å¤åˆ¶ `deploy.ps1.example` â†’ `deploy.ps1`
-- [ ] ç¼–è¾‘ `.rimworld.config` å¡«å…¥æ‚¨çš„ RimWorld è·¯å¾„
-- [ ] ï¼ˆå¯é€‰ï¼‰è®¾ç½®çŽ¯å¢ƒå˜é‡ `RIMWORLD_DIR`
+**Ê×´ÎÅäÖÃ£º**
+- [ ] ¸´ÖÆ `.rimworld.config.example` ¡ú `.rimworld.config`
+- [ ] ¸´ÖÆ `deploy.ps1.example` ¡ú `deploy.ps1`
+- [ ] ±à¼­ `.rimworld.config` ÌîÈëÄúµÄ RimWorld Â·¾¶
+- [ ] £¨¿ÉÑ¡£©ÉèÖÃ»·¾³±äÁ¿ `RIMWORLD_DIR`
 
-**æ¯æ¬¡éƒ¨ç½²ï¼š**
-- [ ] æž„å»ºé¡¹ç›®ï¼ˆ`dotnet build` æˆ– `Ctrl+Shift+B`ï¼‰
-- [ ] è¿è¡Œéƒ¨ç½²è„šæœ¬ï¼ˆ`.\deploy.ps1`ï¼‰
-- [ ] æ£€æŸ¥ Mod æ–‡ä»¶å¤¹æ˜¯å¦å­˜åœ¨
-- [ ] å¯åŠ¨ RimWorld å¹¶å¯ç”¨ Mod
+**Ã¿´Î²¿Êð£º**
+- [ ] ¹¹½¨ÏîÄ¿£¨`dotnet build` »ò `Ctrl+Shift+B`£©
+- [ ] ÔËÐÐ²¿Êð½Å±¾£¨`.\deploy.ps1`£©
+- [ ] ¼ì²é Mod ÎÄ¼þ¼ÐÊÇ·ñ´æÔÚ
+- [ ] Æô¶¯ RimWorld ²¢ÆôÓÃ Mod
 
 ---
 
-**?? ç¥æ‚¨å¼€å‘æ„‰å¿«ï¼**
+**?? ×£Äú¿ª·¢Óä¿ì£¡**

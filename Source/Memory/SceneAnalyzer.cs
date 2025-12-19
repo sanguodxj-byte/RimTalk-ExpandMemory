@@ -6,126 +6,126 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// åœºæ™¯ç±»å‹æšä¸¾
+    /// ³¡¾°ÀàĞÍÃ¶¾Ù
     /// </summary>
     public enum SceneType
     {
-        Combat,         // æˆ˜æ–—/ç´§æ€¥ï¼ˆè¢­å‡»ã€å—ä¼¤ã€æ­»äº¡ï¼‰
-        Social,         // ç¤¾äº¤/æƒ…æ„Ÿï¼ˆèŠå¤©ã€å…³ç³»ã€å¿ƒæƒ…ï¼‰
-        Work,           // å·¥ä½œ/æ—¥å¸¸ï¼ˆå»ºé€ ã€ç§æ¤ã€æ¬è¿ï¼‰
-        Medical,        // åŒ»ç–—/å¥åº·ï¼ˆæ²»ç–—ã€æ‰‹æœ¯ã€ç–¾ç—…ï¼‰
-        Research,       // ç ”ç©¶/å­¦ä¹ ï¼ˆç§‘æŠ€ã€æŠ€èƒ½æå‡ï¼‰
-        Event,          // ç‰¹æ®Šäº‹ä»¶ï¼ˆå©šç¤¼ã€ç”Ÿæ—¥ã€ä»ªå¼ï¼‰
-        Neutral         // ä¸­æ€§/æœªè¯†åˆ«
+        Combat,         // Õ½¶·/½ô¼±£¨Ï®»÷¡¢ÊÜÉË¡¢ËÀÍö£©
+        Social,         // Éç½»/Çé¸Ğ£¨ÁÄÌì¡¢¹ØÏµ¡¢ĞÄÇé£©
+        Work,           // ¹¤×÷/ÈÕ³££¨½¨Ôì¡¢ÖÖÖ²¡¢°áÔË£©
+        Medical,        // Ò½ÁÆ/½¡¿µ£¨ÖÎÁÆ¡¢ÊÖÊõ¡¢¼²²¡£©
+        Research,       // ÑĞ¾¿/Ñ§Ï°£¨¿Æ¼¼¡¢¼¼ÄÜÌáÉı£©
+        Event,          // ÌØÊâÊÂ¼ş£¨»éÀñ¡¢ÉúÈÕ¡¢ÒÇÊ½£©
+        Neutral         // ÖĞĞÔ/Î´Ê¶±ğ
     }
     
     /// <summary>
-    /// åœºæ™¯åˆ†æå™¨ - è¯†åˆ«å½“å‰å¯¹è¯/æŸ¥è¯¢çš„åœºæ™¯ç±»å‹
-    /// ? v3.3.11: åŠ¨æ€åœºæ™¯æ„ŸçŸ¥æƒé‡ç³»ç»Ÿæ ¸å¿ƒç»„ä»¶
+    /// ³¡¾°·ÖÎöÆ÷ - Ê¶±ğµ±Ç°¶Ô»°/²éÑ¯µÄ³¡¾°ÀàĞÍ
+    /// ? v3.3.11: ¶¯Ì¬³¡¾°¸ĞÖªÈ¨ÖØÏµÍ³ºËĞÄ×é¼ş
     /// </summary>
     public static class SceneAnalyzer
     {
-        // åœºæ™¯å…³é”®è¯æ˜ å°„ï¼ˆä¸­è‹±æ–‡æ”¯æŒï¼‰
+        // ³¡¾°¹Ø¼ü´ÊÓ³Éä£¨ÖĞÓ¢ÎÄÖ§³Ö£©
         private static readonly Dictionary<SceneType, List<string>> SceneKeywords = new Dictionary<SceneType, List<string>>
         {
             {
                 SceneType.Combat, new List<string>
                 {
-                    // æˆ˜æ–—æ ¸å¿ƒ
-                    "è¢­å‡»", "raid", "æ”»å‡»", "attack", "æˆ˜æ–—", "combat", "fight",
-                    "æ•Œäºº", "enemy", "å…¥ä¾µ", "invasion", "é˜²å¾¡", "defense",
-                    // ä¼¤äº¡
-                    "å—ä¼¤", "injured", "ä¼¤åŠ¿", "wound", "æ­»äº¡", "death", "died", "killed",
-                    "æµè¡€", "bleeding", "å€’ä¸‹", "downed", "æ˜è¿·", "unconscious",
-                    // æ­¦å™¨/æˆ˜æœ¯
-                    "æ­¦å™¨", "weapon", "æª", "gun", "å°„å‡»", "shoot", "çˆ†ç‚¸", "explosion",
-                    "æ©ä½“", "cover", "æ’¤é€€", "retreat", "å¢æ´", "reinforcement"
+                    // Õ½¶·ºËĞÄ
+                    "Ï®»÷", "raid", "¹¥»÷", "attack", "Õ½¶·", "combat", "fight",
+                    "µĞÈË", "enemy", "ÈëÇÖ", "invasion", "·ÀÓù", "defense",
+                    // ÉËÍö
+                    "ÊÜÉË", "injured", "ÉËÊÆ", "wound", "ËÀÍö", "death", "died", "killed",
+                    "Á÷Ñª", "bleeding", "µ¹ÏÂ", "downed", "»èÃÔ", "unconscious",
+                    // ÎäÆ÷/Õ½Êõ
+                    "ÎäÆ÷", "weapon", "Ç¹", "gun", "Éä»÷", "shoot", "±¬Õ¨", "explosion",
+                    "ÑÚÌå", "cover", "³·ÍË", "retreat", "ÔöÔ®", "reinforcement"
                 }
             },
             {
                 SceneType.Social, new List<string>
                 {
-                    // å¯¹è¯/ç¤¾äº¤
-                    "èŠå¤©", "chat", "talk", "å¯¹è¯", "conversation", "è¯´", "said",
-                    "å‘Šè¯‰", "told", "è¯¢é—®", "asked", "å›ç­”", "replied",
-                    // å…³ç³»
-                    "å–œæ¬¢", "like", "çˆ±", "love", "è®¨åŒ", "hate", "æœ‹å‹", "friend",
-                    "æ‹äºº", "lover", "é…å¶", "spouse", "å…³ç³»", "relationship",
-                    "å‹è°Š", "friendship", "äº‰åµ", "argument", "å’Œè§£", "reconcile",
-                    // æƒ…ç»ª
-                    "å¼€å¿ƒ", "happy", "å¿«ä¹", "joyful", "æ‚²ä¼¤", "sad", "éš¾è¿‡", "upset",
-                    "æ„¤æ€’", "angry", "ç”Ÿæ°”", "mad", "ç„¦è™‘", "anxious", "å¿ƒæƒ…", "mood",
-                    "æ„Ÿè§‰", "feel", "æƒ…ç»ª", "emotion"
+                    // ¶Ô»°/Éç½»
+                    "ÁÄÌì", "chat", "talk", "¶Ô»°", "conversation", "Ëµ", "said",
+                    "¸æËß", "told", "Ñ¯ÎÊ", "asked", "»Ø´ğ", "replied",
+                    // ¹ØÏµ
+                    "Ï²»¶", "like", "°®", "love", "ÌÖÑá", "hate", "ÅóÓÑ", "friend",
+                    "ÁµÈË", "lover", "ÅäÅ¼", "spouse", "¹ØÏµ", "relationship",
+                    "ÓÑÒê", "friendship", "Õù³³", "argument", "ºÍ½â", "reconcile",
+                    // ÇéĞ÷
+                    "¿ªĞÄ", "happy", "¿ìÀÖ", "joyful", "±¯ÉË", "sad", "ÄÑ¹ı", "upset",
+                    "·ßÅ­", "angry", "ÉúÆø", "mad", "½¹ÂÇ", "anxious", "ĞÄÇé", "mood",
+                    "¸Ğ¾õ", "feel", "ÇéĞ÷", "emotion"
                 }
             },
             {
                 SceneType.Work, new List<string>
                 {
-                    // å»ºé€ /åˆ¶é€ 
-                    "å»ºé€ ", "construct", "å»ºç­‘", "building", "åˆ¶ä½œ", "craft", "åˆ¶é€ ", "manufacture",
-                    "ä¿®ç†", "repair", "æ‹†é™¤", "deconstruct",
-                    // å†œä¸š
-                    "ç§æ¤", "plant", "æ”¶è·", "harvest", "å†œä½œç‰©", "crop", "ç”°åœ°", "field",
-                    // é‡‡çŸ¿/æ¬è¿
-                    "é‡‡çŸ¿", "mining", "æŒ–æ˜", "dig", "æ¬è¿", "haul", "è¿è¾“", "transport",
-                    "ä»“åº“", "storage", "æ¸…æ´", "clean",
-                    // çƒ¹é¥ª
-                    "çƒ¹é¥ª", "cook", "cooking", "åšé¥­", "meal", "é£Ÿç‰©", "food"
+                    // ½¨Ôì/ÖÆÔì
+                    "½¨Ôì", "construct", "½¨Öş", "building", "ÖÆ×÷", "craft", "ÖÆÔì", "manufacture",
+                    "ĞŞÀí", "repair", "²ğ³ı", "deconstruct",
+                    // Å©Òµ
+                    "ÖÖÖ²", "plant", "ÊÕ»ñ", "harvest", "Å©×÷Îï", "crop", "ÌïµØ", "field",
+                    // ²É¿ó/°áÔË
+                    "²É¿ó", "mining", "ÍÚ¾ò", "dig", "°áÔË", "haul", "ÔËÊä", "transport",
+                    "²Ö¿â", "storage", "Çå½à", "clean",
+                    // Åëâ¿
+                    "Åëâ¿", "cook", "cooking", "×ö·¹", "meal", "Ê³Îï", "food"
                 }
             },
             {
                 SceneType.Medical, new List<string>
                 {
-                    // æ²»ç–—
-                    "æ²»ç–—", "treat", "åŒ»ç–—", "medical", "æ‰‹æœ¯", "surgery", "æ“ä½œ", "operation",
-                    "åŒ…æ‰", "bandage", "ç…§é¡¾", "tend", "æŠ¤ç†", "care",
-                    // ç–¾ç—…/çŠ¶æ€
-                    "ç–¾ç—…", "disease", "illness", "æ„ŸæŸ“", "infection", "å‘çƒ§", "fever",
-                    "ç–¼ç—›", "pain", "æ®‹ç–¾", "disability", "å¥åº·", "health",
-                    "æ¢å¤", "recover", "ç—Šæ„ˆ", "heal", "åº·å¤", "rehabilitation"
+                    // ÖÎÁÆ
+                    "ÖÎÁÆ", "treat", "Ò½ÁÆ", "medical", "ÊÖÊõ", "surgery", "²Ù×÷", "operation",
+                    "°üÔú", "bandage", "ÕÕ¹Ë", "tend", "»¤Àí", "care",
+                    // ¼²²¡/×´Ì¬
+                    "¼²²¡", "disease", "illness", "¸ĞÈ¾", "infection", "·¢ÉÕ", "fever",
+                    "ÌÛÍ´", "pain", "²Ğ¼²", "disability", "½¡¿µ", "health",
+                    "»Ö¸´", "recover", "È¬Óú", "heal", "¿µ¸´", "rehabilitation"
                 }
             },
             {
                 SceneType.Research, new List<string>
                 {
-                    // ç ”ç©¶
-                    "ç ”ç©¶", "research", "ç§‘æŠ€", "technology", "å‘æ˜", "invention",
-                    "çªç ´", "breakthrough", "å‘ç°", "discovery", "å®éªŒ", "experiment",
-                    // å­¦ä¹ /æŠ€èƒ½
-                    "å­¦ä¹ ", "learn", "è®­ç»ƒ", "train", "ç»ƒä¹ ", "practice",
-                    "æŠ€èƒ½", "skill", "æå‡", "improve", "æŒæ¡", "master",
-                    "çŸ¥è¯†", "knowledge", "æ•™å¯¼", "teach"
+                    // ÑĞ¾¿
+                    "ÑĞ¾¿", "research", "¿Æ¼¼", "technology", "·¢Ã÷", "invention",
+                    "Í»ÆÆ", "breakthrough", "·¢ÏÖ", "discovery", "ÊµÑé", "experiment",
+                    // Ñ§Ï°/¼¼ÄÜ
+                    "Ñ§Ï°", "learn", "ÑµÁ·", "train", "Á·Ï°", "practice",
+                    "¼¼ÄÜ", "skill", "ÌáÉı", "improve", "ÕÆÎÕ", "master",
+                    "ÖªÊ¶", "knowledge", "½Ìµ¼", "teach"
                 }
             },
             {
                 SceneType.Event, new List<string>
                 {
-                    // ç‰¹æ®Šäº‹ä»¶
-                    "å©šç¤¼", "wedding", "ç»“å©š", "marry", "è®¢å©š", "engaged",
-                    "ç”Ÿæ—¥", "birthday", "åº†ç¥", "celebrate", "æ´¾å¯¹", "party",
-                    "è‘¬ç¤¼", "funeral", "åŸ‹è‘¬", "burial", "çºªå¿µ", "memorial",
-                    "ä»ªå¼", "ceremony", "èŠ‚æ—¥", "festival", "æ´»åŠ¨", "event"
+                    // ÌØÊâÊÂ¼ş
+                    "»éÀñ", "wedding", "½á»é", "marry", "¶©»é", "engaged",
+                    "ÉúÈÕ", "birthday", "Çì×£", "celebrate", "ÅÉ¶Ô", "party",
+                    "ÔáÀñ", "funeral", "ÂñÔá", "burial", "¼ÍÄî", "memorial",
+                    "ÒÇÊ½", "ceremony", "½ÚÈÕ", "festival", "»î¶¯", "event"
                 }
             }
         };
         
-        // åœºæ™¯æƒé‡ï¼ˆç”¨äºå¤šåœºæ™¯æ··åˆæ—¶çš„ä¼˜å…ˆçº§ï¼‰
+        // ³¡¾°È¨ÖØ£¨ÓÃÓÚ¶à³¡¾°»ìºÏÊ±µÄÓÅÏÈ¼¶£©
         private static readonly Dictionary<SceneType, float> ScenePriority = new Dictionary<SceneType, float>
         {
-            { SceneType.Combat, 1.0f },      // æˆ˜æ–—æœ€é«˜ä¼˜å…ˆçº§
-            { SceneType.Medical, 0.9f },     // åŒ»ç–—ç´§æ€¥åº¦é«˜
-            { SceneType.Event, 0.85f },      // ç‰¹æ®Šäº‹ä»¶é‡è¦
-            { SceneType.Social, 0.7f },      // ç¤¾äº¤æ¬¡ä¹‹
-            { SceneType.Research, 0.6f },    // ç ”ç©¶é•¿æœŸ
-            { SceneType.Work, 0.5f },        // å·¥ä½œæ—¥å¸¸
-            { SceneType.Neutral, 0.3f }      // ä¸­æ€§æœ€ä½
+            { SceneType.Combat, 1.0f },      // Õ½¶·×î¸ßÓÅÏÈ¼¶
+            { SceneType.Medical, 0.9f },     // Ò½ÁÆ½ô¼±¶È¸ß
+            { SceneType.Event, 0.85f },      // ÌØÊâÊÂ¼şÖØÒª
+            { SceneType.Social, 0.7f },      // Éç½»´ÎÖ®
+            { SceneType.Research, 0.6f },    // ÑĞ¾¿³¤ÆÚ
+            { SceneType.Work, 0.5f },        // ¹¤×÷ÈÕ³£
+            { SceneType.Neutral, 0.3f }      // ÖĞĞÔ×îµÍ
         };
         
         /// <summary>
-        /// åˆ†ææ–‡æœ¬ï¼Œè¯†åˆ«åœºæ™¯ç±»å‹ï¼ˆæ”¯æŒå¤šåœºæ™¯æ··åˆï¼‰
+        /// ·ÖÎöÎÄ±¾£¬Ê¶±ğ³¡¾°ÀàĞÍ£¨Ö§³Ö¶à³¡¾°»ìºÏ£©
         /// </summary>
-        /// <param name="context">ä¸Šä¸‹æ–‡æ–‡æœ¬ï¼ˆprompt/queryï¼‰</param>
-        /// <returns>ä¸»è¦åœºæ™¯ç±»å‹å’Œæ··åˆåœºæ™¯ä¿¡æ¯</returns>
+        /// <param name="context">ÉÏÏÂÎÄÎÄ±¾£¨prompt/query£©</param>
+        /// <returns>Ö÷Òª³¡¾°ÀàĞÍºÍ»ìºÏ³¡¾°ĞÅÏ¢</returns>
         public static SceneAnalysisResult AnalyzeScene(string context)
         {
             if (string.IsNullOrEmpty(context))
@@ -138,10 +138,10 @@ namespace RimTalk.Memory
                 };
             }
             
-            // è½¬æ¢ä¸ºå°å†™ï¼Œæ–¹ä¾¿åŒ¹é…
+            // ×ª»»ÎªĞ¡Ğ´£¬·½±ãÆ¥Åä
             string lowerContext = context.ToLower();
             
-            // è®¡ç®—æ¯ä¸ªåœºæ™¯çš„åŒ¹é…åˆ†æ•°
+            // ¼ÆËãÃ¿¸ö³¡¾°µÄÆ¥Åä·ÖÊı
             var sceneScores = new Dictionary<SceneType, float>();
             
             foreach (var sceneKvp in SceneKeywords)
@@ -149,13 +149,13 @@ namespace RimTalk.Memory
                 SceneType scene = sceneKvp.Key;
                 List<string> keywords = sceneKvp.Value;
                 
-                // ç»Ÿè®¡å…³é”®è¯åŒ¹é…æ•°
+                // Í³¼Æ¹Ø¼ü´ÊÆ¥ÅäÊı
                 int matchCount = keywords.Count(kw => lowerContext.Contains(kw.ToLower()));
                 
-                // è®¡ç®—å½’ä¸€åŒ–åˆ†æ•°ï¼ˆ0-1ï¼‰
+                // ¼ÆËã¹éÒ»»¯·ÖÊı£¨0-1£©
                 float score = matchCount > 0 ? (float)matchCount / keywords.Count : 0f;
                 
-                // åº”ç”¨åœºæ™¯ä¼˜å…ˆçº§æƒé‡
+                // Ó¦ÓÃ³¡¾°ÓÅÏÈ¼¶È¨ÖØ
                 score *= ScenePriority[scene];
                 
                 if (score > 0)
@@ -164,7 +164,7 @@ namespace RimTalk.Memory
                 }
             }
             
-            // å¦‚æœæ²¡æœ‰åŒ¹é…åˆ°ä»»ä½•åœºæ™¯ï¼Œè¿”å›ä¸­æ€§
+            // Èç¹ûÃ»ÓĞÆ¥Åäµ½ÈÎºÎ³¡¾°£¬·µ»ØÖĞĞÔ
             if (sceneScores.Count == 0)
             {
                 return new SceneAnalysisResult
@@ -175,17 +175,17 @@ namespace RimTalk.Memory
                 };
             }
             
-            // å½’ä¸€åŒ–åˆ†æ•°
+            // ¹éÒ»»¯·ÖÊı
             float totalScore = sceneScores.Values.Sum();
             var normalizedScores = sceneScores.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value / totalScore
             );
             
-            // ç¡®å®šä¸»åœºæ™¯ï¼ˆåˆ†æ•°æœ€é«˜ï¼‰
+            // È·¶¨Ö÷³¡¾°£¨·ÖÊı×î¸ß£©
             var primaryScene = normalizedScores.OrderByDescending(kvp => kvp.Value).First();
             
-            // è®¡ç®—ç½®ä¿¡åº¦ï¼ˆä¸»åœºæ™¯åˆ†æ•°å æ¯”ï¼‰
+            // ¼ÆËãÖÃĞÅ¶È£¨Ö÷³¡¾°·ÖÊıÕ¼±È£©
             float confidence = primaryScene.Value;
             
             return new SceneAnalysisResult
@@ -197,7 +197,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// æ ¹æ®åœºæ™¯ç±»å‹è·å–åŠ¨æ€æƒé‡é…ç½®
+        /// ¸ù¾İ³¡¾°ÀàĞÍ»ñÈ¡¶¯Ì¬È¨ÖØÅäÖÃ
         /// </summary>
         public static DynamicWeights GetDynamicWeights(SceneType scene, float confidence = 1.0f)
         {
@@ -206,71 +206,71 @@ namespace RimTalk.Memory
             switch (scene)
             {
                 case SceneType.Combat:
-                    // æˆ˜æ–—åœºæ™¯ï¼šå¼ºè°ƒæ—¶æ•ˆæ€§å’Œé‡è¦æ€§
-                    weights.TimeDecay = 0.8f;          // æé«˜è¡°å‡ï¼Œåªçœ‹æœ€è¿‘
-                    weights.Importance = 0.5f;         // åªå…³æ³¨å¤§äº‹
-                    weights.KeywordMatch = 0.4f;       // ç²¾å‡†åŒ¹é…
-                    weights.RelationshipBonus = 0.1f;  // å…³ç³»ä¸é‡è¦
-                    weights.RecencyWindow = 15000;     // åªçœ‹æœ€è¿‘6å°æ—¶
+                    // Õ½¶·³¡¾°£ºÇ¿µ÷Ê±Ğ§ĞÔºÍÖØÒªĞÔ
+                    weights.TimeDecay = 0.8f;          // ¼«¸ßË¥¼õ£¬Ö»¿´×î½ü
+                    weights.Importance = 0.5f;         // Ö»¹Ø×¢´óÊÂ
+                    weights.KeywordMatch = 0.4f;       // ¾«×¼Æ¥Åä
+                    weights.RelationshipBonus = 0.1f;  // ¹ØÏµ²»ÖØÒª
+                    weights.RecencyWindow = 15000;     // Ö»¿´×î½ü6Ğ¡Ê±
                     break;
                 
                 case SceneType.Social:
-                    // ç¤¾äº¤åœºæ™¯ï¼šå…è®¸å”¤é†’æ—§è®°å¿†ï¼Œå¼ºè°ƒå…³ç³»
-                    weights.TimeDecay = 0.05f;         // æä½è¡°å‡ï¼Œå¯ä»¥å›å¿†å¾€äº‹
-                    weights.Importance = 0.2f;         // å°äº‹ä¹Ÿèƒ½èŠ
-                    weights.KeywordMatch = 0.25f;      // å®½æ¾åŒ¹é…
-                    weights.RelationshipBonus = 0.6f;  // å¤§å¹…æå‡å…±åŒè®°å¿†
-                    weights.RecencyWindow = 1800000;   // å¯å›æº¯30å¤©
+                    // Éç½»³¡¾°£ºÔÊĞí»½ĞÑ¾É¼ÇÒä£¬Ç¿µ÷¹ØÏµ
+                    weights.TimeDecay = 0.05f;         // ¼«µÍË¥¼õ£¬¿ÉÒÔ»ØÒäÍùÊÂ
+                    weights.Importance = 0.2f;         // Ğ¡ÊÂÒ²ÄÜÁÄ
+                    weights.KeywordMatch = 0.25f;      // ¿íËÉÆ¥Åä
+                    weights.RelationshipBonus = 0.6f;  // ´ó·ùÌáÉı¹²Í¬¼ÇÒä
+                    weights.RecencyWindow = 1800000;   // ¿É»ØËİ30Ìì
                     break;
                 
                 case SceneType.Work:
-                    // å·¥ä½œåœºæ™¯ï¼šå¹³è¡¡æ—¶æ•ˆå’Œç›¸å…³æ€§
+                    // ¹¤×÷³¡¾°£ºÆ½ºâÊ±Ğ§ºÍÏà¹ØĞÔ
                     weights.TimeDecay = 0.3f;
                     weights.Importance = 0.3f;
                     weights.KeywordMatch = 0.35f;
                     weights.RelationshipBonus = 0.15f;
-                    weights.RecencyWindow = 180000;    // 7å¤©å†…
+                    weights.RecencyWindow = 180000;    // 7ÌìÄÚ
                     break;
                 
                 case SceneType.Medical:
-                    // åŒ»ç–—åœºæ™¯ï¼šå¼ºè°ƒå†å²å¥åº·è®°å½•
-                    weights.TimeDecay = 0.15f;         // ä½è¡°å‡ï¼ŒåŒ»ç–—å²é‡è¦
+                    // Ò½ÁÆ³¡¾°£ºÇ¿µ÷ÀúÊ·½¡¿µ¼ÇÂ¼
+                    weights.TimeDecay = 0.15f;         // µÍË¥¼õ£¬Ò½ÁÆÊ·ÖØÒª
                     weights.Importance = 0.45f;
                     weights.KeywordMatch = 0.35f;
                     weights.RelationshipBonus = 0.2f;
-                    weights.RecencyWindow = 420000;    // 14å¤©å†…
+                    weights.RecencyWindow = 420000;    // 14ÌìÄÚ
                     break;
                 
                 case SceneType.Research:
-                    // ç ”ç©¶åœºæ™¯ï¼šé•¿æœŸè®°å¿†ï¼ŒçŸ¥è¯†ç§¯ç´¯
-                    weights.TimeDecay = 0.02f;         // æä½è¡°å‡
+                    // ÑĞ¾¿³¡¾°£º³¤ÆÚ¼ÇÒä£¬ÖªÊ¶»ıÀÛ
+                    weights.TimeDecay = 0.02f;         // ¼«µÍË¥¼õ
                     weights.Importance = 0.4f;
                     weights.KeywordMatch = 0.4f;
                     weights.RelationshipBonus = 0.1f;
-                    weights.RecencyWindow = 3600000;   // 60å¤©å†…
+                    weights.RecencyWindow = 3600000;   // 60ÌìÄÚ
                     break;
                 
                 case SceneType.Event:
-                    // äº‹ä»¶åœºæ™¯ï¼šå¼ºè°ƒç‰¹æ®Šæ—¶åˆ»
-                    weights.TimeDecay = 0.1f;          // ä½è¡°å‡ï¼Œé‡è¦æ—¶åˆ»æ°¸ä¹…è®°å¿†
+                    // ÊÂ¼ş³¡¾°£ºÇ¿µ÷ÌØÊâÊ±¿Ì
+                    weights.TimeDecay = 0.1f;          // µÍË¥¼õ£¬ÖØÒªÊ±¿ÌÓÀ¾Ã¼ÇÒä
                     weights.Importance = 0.5f;
                     weights.KeywordMatch = 0.3f;
                     weights.RelationshipBonus = 0.4f;
-                    weights.RecencyWindow = 900000;    // 15å¤©å†…
+                    weights.RecencyWindow = 900000;    // 15ÌìÄÚ
                     break;
                 
                 case SceneType.Neutral:
                 default:
-                    // ä¸­æ€§åœºæ™¯ï¼šé»˜è®¤å¹³è¡¡é…ç½®
+                    // ÖĞĞÔ³¡¾°£ºÄ¬ÈÏÆ½ºâÅäÖÃ
                     weights.TimeDecay = 0.25f;
                     weights.Importance = 0.3f;
                     weights.KeywordMatch = 0.3f;
                     weights.RelationshipBonus = 0.25f;
-                    weights.RecencyWindow = 240000;    // 10å¤©å†…
+                    weights.RecencyWindow = 240000;    // 10ÌìÄÚ
                     break;
             }
             
-            // æ ¹æ®ç½®ä¿¡åº¦è°ƒæ•´æƒé‡ï¼ˆä½ç½®ä¿¡åº¦æ—¶å›é€€åˆ°ä¸­æ€§ï¼‰
+            // ¸ù¾İÖÃĞÅ¶Èµ÷ÕûÈ¨ÖØ£¨µÍÖÃĞÅ¶ÈÊ±»ØÍËµ½ÖĞĞÔ£©
             if (confidence < 0.6f)
             {
                 float neutralBlend = 1.0f - confidence;
@@ -291,50 +291,50 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// è·å–åœºæ™¯çš„ä¸­æ–‡æ˜¾ç¤ºåç§°
+        /// »ñÈ¡³¡¾°µÄÖĞÎÄÏÔÊ¾Ãû³Æ
         /// </summary>
         public static string GetSceneDisplayName(SceneType scene)
         {
             switch (scene)
             {
-                case SceneType.Combat: return "æˆ˜æ–—/ç´§æ€¥";
-                case SceneType.Social: return "ç¤¾äº¤/æƒ…æ„Ÿ";
-                case SceneType.Work: return "å·¥ä½œ/æ—¥å¸¸";
-                case SceneType.Medical: return "åŒ»ç–—/å¥åº·";
-                case SceneType.Research: return "ç ”ç©¶/å­¦ä¹ ";
-                case SceneType.Event: return "ç‰¹æ®Šäº‹ä»¶";
-                case SceneType.Neutral: return "ä¸­æ€§/é€šç”¨";
-                default: return "æœªçŸ¥";
+                case SceneType.Combat: return "Õ½¶·/½ô¼±";
+                case SceneType.Social: return "Éç½»/Çé¸Ğ";
+                case SceneType.Work: return "¹¤×÷/ÈÕ³£";
+                case SceneType.Medical: return "Ò½ÁÆ/½¡¿µ";
+                case SceneType.Research: return "ÑĞ¾¿/Ñ§Ï°";
+                case SceneType.Event: return "ÌØÊâÊÂ¼ş";
+                case SceneType.Neutral: return "ÖĞĞÔ/Í¨ÓÃ";
+                default: return "Î´Öª";
             }
         }
     }
     
     /// <summary>
-    /// åœºæ™¯åˆ†æç»“æœ
+    /// ³¡¾°·ÖÎö½á¹û
     /// </summary>
     public class SceneAnalysisResult
     {
-        public SceneType PrimaryScene { get; set; }                  // ä¸»è¦åœºæ™¯
-        public Dictionary<SceneType, float> SceneScores { get; set; } // æ‰€æœ‰åœºæ™¯å¾—åˆ†ï¼ˆå½’ä¸€åŒ–ï¼‰
-        public float Confidence { get; set; }                        // è¯†åˆ«ç½®ä¿¡åº¦
+        public SceneType PrimaryScene { get; set; }                  // Ö÷Òª³¡¾°
+        public Dictionary<SceneType, float> SceneScores { get; set; } // ËùÓĞ³¡¾°µÃ·Ö£¨¹éÒ»»¯£©
+        public float Confidence { get; set; }                        // Ê¶±ğÖÃĞÅ¶È
         
         public override string ToString()
         {
-            return $"{SceneAnalyzer.GetSceneDisplayName(PrimaryScene)} (ç½®ä¿¡åº¦: {Confidence:P0})";
+            return $"{SceneAnalyzer.GetSceneDisplayName(PrimaryScene)} (ÖÃĞÅ¶È: {Confidence:P0})";
         }
     }
     
     /// <summary>
-    /// åŠ¨æ€æƒé‡é…ç½®
-    /// ? v3.3.11: æ ¹æ®åœºæ™¯åŠ¨æ€è°ƒæ•´çš„è®°å¿†æ£€ç´¢æƒé‡
+    /// ¶¯Ì¬È¨ÖØÅäÖÃ
+    /// ? v3.3.11: ¸ù¾İ³¡¾°¶¯Ì¬µ÷ÕûµÄ¼ÇÒä¼ìË÷È¨ÖØ
     /// </summary>
     public class DynamicWeights
     {
-        public float TimeDecay { get; set; }          // æ—¶é—´è¡°å‡å› å­ï¼ˆè¶Šé«˜è¶Šé‡è§†æœ€è¿‘è®°å¿†ï¼‰
-        public float Importance { get; set; }         // é‡è¦æ€§æƒé‡
-        public float KeywordMatch { get; set; }       // å…³é”®è¯åŒ¹é…æƒé‡
-        public float RelationshipBonus { get; set; }  // å…³ç³»åŠ æˆæƒé‡
-        public int RecencyWindow { get; set; }        // æ—¶é—´çª—å£ï¼ˆticksï¼Œè¶…è¿‡æ­¤æ—¶é—´çš„è®°å¿†å¤§å¹…è¡°å‡ï¼‰
+        public float TimeDecay { get; set; }          // Ê±¼äË¥¼õÒò×Ó£¨Ô½¸ßÔ½ÖØÊÓ×î½ü¼ÇÒä£©
+        public float Importance { get; set; }         // ÖØÒªĞÔÈ¨ÖØ
+        public float KeywordMatch { get; set; }       // ¹Ø¼ü´ÊÆ¥ÅäÈ¨ÖØ
+        public float RelationshipBonus { get; set; }  // ¹ØÏµ¼Ó³ÉÈ¨ÖØ
+        public int RecencyWindow { get; set; }        // Ê±¼ä´°¿Ú£¨ticks£¬³¬¹ı´ËÊ±¼äµÄ¼ÇÒä´ó·ùË¥¼õ£©
         
         public override string ToString()
         {

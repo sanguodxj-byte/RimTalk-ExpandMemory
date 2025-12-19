@@ -1,10 +1,10 @@
-# Prompt Caching å®ç°è¡¥ä¸
+# Prompt Caching ÊµÏÖ²¹¶¡
 
-## ç®€åŒ–å®ç°ï¼ˆä»…éœ€ä¿®æ”¹BuildJsonRequestæ–¹æ³•ï¼‰
+## ¼ò»¯ÊµÏÖ£¨½öĞèĞŞ¸ÄBuildJsonRequest·½·¨£©
 
-æ‰¾åˆ°æ–‡ä»¶ï¼š`Source/Memory/AI/IndependentAISummarizer.cs`
+ÕÒµ½ÎÄ¼ş£º`Source/Memory/AI/IndependentAISummarizer.cs`
 
-æ‰¾åˆ°`BuildJsonRequest`æ–¹æ³•ï¼ˆçº¦ç¬¬477è¡Œï¼‰ï¼Œæ›¿æ¢ä¸ºä»¥ä¸‹ä»£ç ï¼š
+ÕÒµ½`BuildJsonRequest`·½·¨£¨Ô¼µÚ477ĞĞ£©£¬Ìæ»»ÎªÒÔÏÂ´úÂë£º
 
 ```csharp
 private static string BuildJsonRequest(string prompt)
@@ -14,7 +14,7 @@ private static string BuildJsonRequest(string prompt)
     
     if (isGoogle)
     {
-        // Google Gemini: ä¿æŒåŸæœ‰æ ¼å¼
+        // Google Gemini: ±£³ÖÔ­ÓĞ¸ñÊ½
         string str = prompt.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "").Replace("\t", "\\t");
         
         stringBuilder.Append("{");
@@ -37,23 +37,23 @@ private static string BuildJsonRequest(string prompt)
     }
     else
     {
-        // ? v3.3.4: OpenAI/DeepSeek - å®ç°Prompt Caching
+        // ? v3.3.4: OpenAI/DeepSeek - ÊµÏÖPrompt Caching
         var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
         bool enableCaching = settings != null && settings.enablePromptCaching;
         
-        // å›ºå®šçš„ç³»ç»ŸæŒ‡ä»¤ï¼ˆå¯ç¼“å­˜ï¼‰
-        string systemPrompt = "ä½ æ˜¯ä¸€ä¸ªRimWorldæ®–æ°‘åœ°çš„è®°å¿†æ€»ç»“åŠ©æ‰‹ã€‚\\n" +
-                            "è¯·ç”¨æç®€çš„è¯­è¨€æ€»ç»“è®°å¿†å†…å®¹ã€‚\\n" +
-                            "åªè¾“å‡ºæ€»ç»“æ–‡å­—ï¼Œä¸è¦å…¶ä»–æ ¼å¼ã€‚";
+        // ¹Ì¶¨µÄÏµÍ³Ö¸Áî£¨¿É»º´æ£©
+        string systemPrompt = "ÄãÊÇÒ»¸öRimWorldÖ³ÃñµØµÄ¼ÇÒä×Ü½áÖúÊÖ¡£\\n" +
+                            "ÇëÓÃ¼«¼òµÄÓïÑÔ×Ü½á¼ÇÒäÄÚÈİ¡£\\n" +
+                            "Ö»Êä³ö×Ü½áÎÄ×Ö£¬²»ÒªÆäËû¸ñÊ½¡£";
         
-        // ç”¨æˆ·æ•°æ®ï¼ˆè®°å¿†åˆ—è¡¨ï¼‰
+        // ÓÃ»§Êı¾İ£¨¼ÇÒäÁĞ±í£©
         string userPrompt = prompt.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "").Replace("\t", "\\t");
         
         stringBuilder.Append("{");
         stringBuilder.Append("\"model\":\"" + model + "\",");
         stringBuilder.Append("\"messages\":[");
         
-        // systemæ¶ˆæ¯ï¼ˆå¸¦ç¼“å­˜æ§åˆ¶ï¼‰
+        // systemÏûÏ¢£¨´ø»º´æ¿ØÖÆ£©
         stringBuilder.Append("{\"role\":\"system\",");
         stringBuilder.Append("\"content\":\"" + systemPrompt + "\"");
         
@@ -66,14 +66,14 @@ private static string BuildJsonRequest(string prompt)
             }
             else if (provider == "DeepSeek")
             {
-                // DeepSeekç¼“å­˜æ§åˆ¶
+                // DeepSeek»º´æ¿ØÖÆ
                 stringBuilder.Append(",\"cache\":true");
             }
         }
         
         stringBuilder.Append("},");
         
-        // useræ¶ˆæ¯ï¼ˆå˜åŒ–çš„å†…å®¹ï¼‰
+        // userÏûÏ¢£¨±ä»¯µÄÄÚÈİ£©
         stringBuilder.Append("{\"role\":\"user\",");
         stringBuilder.Append("\"content\":\"" + userPrompt + "\"");
         stringBuilder.Append("}],");
@@ -93,17 +93,17 @@ private static string BuildJsonRequest(string prompt)
 }
 ```
 
-## æ•ˆæœ
+## Ğ§¹û
 
-- ? è‡ªåŠ¨å°†å›ºå®šæŒ‡ä»¤æ ‡è®°ä¸ºå¯ç¼“å­˜
-- ? OpenAI/DeepSeek APIè‡ªåŠ¨å¯ç”¨Prompt Caching
-- ? é¦–æ¬¡è°ƒç”¨æ­£å¸¸è®¡è´¹ï¼Œåç»­5-10åˆ†é’Ÿå†…ç¼“å­˜å‘½ä¸­é™ä½50%è´¹ç”¨
-- ? ç”¨æˆ·å¯é€šè¿‡Modè®¾ç½®ä¸­çš„`enablePromptCaching`å¼€å…³æ§åˆ¶
+- ? ×Ô¶¯½«¹Ì¶¨Ö¸Áî±ê¼ÇÎª¿É»º´æ
+- ? OpenAI/DeepSeek API×Ô¶¯ÆôÓÃPrompt Caching
+- ? Ê×´Îµ÷ÓÃÕı³£¼Æ·Ñ£¬ºóĞø5-10·ÖÖÓÄÚ»º´æÃüÖĞ½µµÍ50%·ÑÓÃ
+- ? ÓÃ»§¿ÉÍ¨¹ıModÉèÖÃÖĞµÄ`enablePromptCaching`¿ª¹Ø¿ØÖÆ
 
-## æµ‹è¯•
+## ²âÊÔ
 
-1. ç¼–è¯‘Mod
-2. åœ¨DevModeæŸ¥çœ‹JSONè¯·æ±‚æ ¼å¼
-3. è§‚å¯ŸAPIå“åº”ä¸­çš„ç¼“å­˜ç»Ÿè®¡ï¼ˆå¦‚æœæä¾›å•†æ”¯æŒï¼‰
+1. ±àÒëMod
+2. ÔÚDevMode²é¿´JSONÇëÇó¸ñÊ½
+3. ¹Û²ìAPIÏìÓ¦ÖĞµÄ»º´æÍ³¼Æ£¨Èç¹ûÌá¹©ÉÌÖ§³Ö£©
 
-å®Œæˆï¼
+Íê³É£¡

@@ -173,6 +173,7 @@ namespace RimTalk.MemoryPatch
         private static bool expandMemoryTypes = false;
         private static bool expandExperimentalFeatures = true;
         private static bool expandVectorEnhancement = true;
+        private static bool expandPromptNormalization = true;
         
         private static Vector2 scrollPosition = Vector2.zero;
 
@@ -272,84 +273,110 @@ namespace RimTalk.MemoryPatch
         public void DoSettingsWindowContents(Rect inRect)
         {
             Listing_Standard listingStandard = new Listing_Standard();
-            
-            Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2400f); // ? 增加高度以容纳新内容
+            Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 1400f);
             Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
             listingStandard.Begin(viewRect);
 
-            // ? 新增：提示词规范化设置
-            Text.Font = GameFont.Medium;
-            listingStandard.Label("提示词规范化");
-            Text.Font = GameFont.Small;
-            
-            GUI.color = Color.gray;
-            listingStandard.Label("自定义替换规则，在发送给 AI 前自动处理提示词");
-            GUI.color = Color.white;
-            
-            listingStandard.Gap(6f);
-            
-            DrawPromptNormalizationSettings(listingStandard);
-            
+            DrawPresetConfiguration(listingStandard);
             listingStandard.Gap();
+            DrawQuickActionButtons(listingStandard);
             listingStandard.GapLine();
 
-            // 常识库管理
             Text.Font = GameFont.Medium;
-            listingStandard.Label("常识库管理");
+            listingStandard.Label("API 配置");
             Text.Font = GameFont.Small;
-            
-            GUI.color = Color.gray;
-            listingStandard.Label("管理全局常识库，为AI对话提供背景知识");
-            GUI.color = Color.white;
-            
-            listingStandard.Gap(6f);
-            
-            Rect knowledgeButtonRect = listingStandard.GetRect(35f);
-            if (Widgets.ButtonText(knowledgeButtonRect, "打开常识库"))
-            {
-                OpenCommonKnowledgeDialog();
-            }
-            
-            listingStandard.Gap();
+            DrawAIConfigSettings(listingStandard);
+
             listingStandard.GapLine();
-
-            // 动态注入设置
-            DrawCollapsibleSection(listingStandard, "动态注入设置", ref expandDynamicInjection, () => DrawDynamicInjectionSettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "?? 向量增强设置", ref expandVectorEnhancement, () => DrawVectorEnhancementSettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "记忆容量配置", ref expandMemoryCapacity, () => DrawMemoryCapacitySettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "记忆衰减配置", ref expandDecayRates, () => DrawDecaySettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "记忆总结设置", ref expandSummarization, () => DrawSummarizationSettings(listingStandard));
-
-            if (useAISummarization)
+            Rect advancedButtonRect = listingStandard.GetRect(40f);
+            if (Widgets.ButtonText(advancedButtonRect, "高级设置..."))
             {
-                DrawCollapsibleSection(listingStandard, "AI 配置", ref expandAIConfig, () => DrawAIConfigSettings(listingStandard));
+                Find.WindowStack.Add(new AdvancedSettingsWindow(this));
             }
-
-            DrawCollapsibleSection(listingStandard, "记忆类型开关", ref expandMemoryTypes, () => DrawMemoryTypesSettings(listingStandard));
-            DrawCollapsibleSection(listingStandard, "?? 实验性功能", ref expandExperimentalFeatures, () => DrawExperimentalFeaturesSettings(listingStandard));
-
-            // 调试工具
-            listingStandard.Gap();
-            Text.Font = GameFont.Small;
-            GUI.color = new Color(1f, 0.9f, 0.7f);
-            listingStandard.Label("调试工具");
-            GUI.color = Color.white;
-            
-            Rect previewButtonRect = listingStandard.GetRect(35f);
-            if (Widgets.ButtonText(previewButtonRect, "注入预览器"))
-            {
-                Find.WindowStack.Add(new Memory.Debug.Dialog_InjectionPreview());
-            }
-            
-            GUI.color = Color.gray;
-            listingStandard.Label("实时预览记忆/常识注入效果");
-            GUI.color = Color.white;
 
             listingStandard.End();
             Widgets.EndScrollView();
-            
-            // ? v3.3.2.37: 在设置窗口每帧更新时更新规则（用户修改后立即生效）
-            PromptNormalizer.UpdateRules(normalizationRules);
+        }
+
+        private void DrawPresetConfiguration(Listing_Standard listing)
+        {
+            Text.Font = GameFont.Medium;
+            listing.Label("预设配置");
+            Text.Font = GameFont.Small;
+            GUI.color = Color.gray;
+            listing.Label("从记忆/常识注入数量少到多快速切换，并预估 token 消耗");
+            GUI.color = Color.white;
+            listing.Gap(6f);
+
+            Rect rowRect = listing.GetRect(95f);
+            float spacing = 10f;
+            float cardWidth = (rowRect.width - spacing * 2f) / 3f;
+            float cardHeight = rowRect.height;
+
+            DrawPresetCard(new Rect(rowRect.x, rowRect.y, cardWidth, cardHeight), "轻量", 3, 2, 250);
+            DrawPresetCard(new Rect(rowRect.x + cardWidth + spacing, rowRect.y, cardWidth, cardHeight), "平衡", 6, 4, 520);
+            DrawPresetCard(new Rect(rowRect.x + 2f * (cardWidth + spacing), rowRect.y, cardWidth, cardHeight), "强化", 10, 6, 850);
+
+            listing.GapLine();
+        }
+
+        private void DrawPresetCard(Rect rect, string title, int memoryCount, int knowledgeCount, int tokenEstimate)
+        {
+            Widgets.DrawBoxSolid(rect, new Color(0.18f, 0.18f, 0.18f, 0.6f));
+            Widgets.DrawHighlightIfMouseover(rect);
+
+            Text.Anchor = TextAnchor.MiddleCenter;
+            GUI.color = new Color(0.8f, 0.9f, 1f);
+            Widgets.Label(rect, $"{title}\n记忆 {memoryCount} | 常识 {knowledgeCount}\n~{tokenEstimate} tokens");
+            GUI.color = Color.white;
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            TooltipHandler.TipRegion(rect, $"记忆 {memoryCount} 条 + 常识 {knowledgeCount} 条\n预计消耗 ~{tokenEstimate} tokens");
+
+            if (Widgets.ButtonInvisible(rect))
+            {
+                useDynamicInjection = true;
+                maxInjectedMemories = memoryCount;
+                maxInjectedKnowledge = knowledgeCount;
+                Messages.Message($"已应用预设: {title} (记忆 {memoryCount}, 常识 {knowledgeCount})", MessageTypeDefOf.PositiveEvent);
+            }
+        }
+
+        private void DrawQuickActionButtons(Listing_Standard listing)
+        {
+            Text.Font = GameFont.Medium;
+            listing.Label("功能入口");
+            Text.Font = GameFont.Small;
+            listing.Gap(4f);
+
+            Rect rowRect = listing.GetRect(60f);
+            float spacing = 10f;
+            float buttonWidth = (rowRect.width - spacing * 2f) / 3f;
+            float buttonHeight = rowRect.height;
+
+            DrawActionButton(new Rect(rowRect.x, rowRect.y, buttonWidth, buttonHeight), "常识库", "打开并管理全局常识库", delegate
+            {
+                OpenCommonKnowledgeDialog();
+            });
+
+            DrawActionButton(new Rect(rowRect.x + buttonWidth + spacing, rowRect.y, buttonWidth, buttonHeight), "提示词替换", "编辑提示词替换/规范化规则", delegate
+            {
+                Find.WindowStack.Add(new PromptNormalizationWindow(this));
+            });
+
+            DrawActionButton(new Rect(rowRect.x + 2f * (buttonWidth + spacing), rowRect.y, buttonWidth, buttonHeight), "注入预览器", "实时查看记忆/常识注入效果", delegate
+            {
+                Find.WindowStack.Add(new Memory.Debug.Dialog_InjectionPreview());
+            });
+        }
+
+        private void DrawActionButton(Rect rect, string label, string tip, System.Action onClick)
+        {
+            if (Widgets.ButtonText(rect, label))
+            {
+                onClick?.Invoke();
+            }
+            TooltipHandler.TipRegion(rect, tip);
         }
 
         private void DrawCollapsibleSection(Listing_Standard listing, string title, ref bool expanded, System.Action drawContent)
@@ -874,6 +901,99 @@ namespace RimTalk.MemoryPatch
             GUI.color = Color.white;
             
             inner.End();
+        }
+
+        private class AdvancedSettingsWindow : Window
+        {
+            private readonly RimTalkMemoryPatchSettings settings;
+            private Vector2 scrollPos;
+
+            public override Vector2 InitialSize => new Vector2(900f, 760f);
+
+            public AdvancedSettingsWindow(RimTalkMemoryPatchSettings settings)
+            {
+                this.settings = settings;
+                doCloseX = true;
+                doCloseButton = true;
+                absorbInputAroundWindow = true;
+                closeOnClickedOutside = false;
+            }
+
+            public override void DoWindowContents(Rect inRect)
+            {
+                Listing_Standard listing = new Listing_Standard();
+                Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2400f);
+                Widgets.BeginScrollView(inRect, ref scrollPos, viewRect);
+                listing.Begin(viewRect);
+
+                Text.Font = GameFont.Medium;
+                listing.Label("高级设置");
+                Text.Font = GameFont.Small;
+                GUI.color = Color.gray;
+                listing.Label("包含注入、记忆容量、衰减等详细配置");
+                GUI.color = Color.white;
+                listing.GapLine();
+
+                settings.DrawCollapsibleSection(listing, "提示词规范化", ref expandPromptNormalization, delegate { settings.DrawPromptNormalizationSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "动态注入设置", ref expandDynamicInjection, delegate { settings.DrawDynamicInjectionSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "?? 向量增强设置", ref expandVectorEnhancement, delegate { settings.DrawVectorEnhancementSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "记忆容量配置", ref expandMemoryCapacity, delegate { settings.DrawMemoryCapacitySettings(listing); });
+                settings.DrawCollapsibleSection(listing, "记忆衰减配置", ref expandDecayRates, delegate { settings.DrawDecaySettings(listing); });
+                settings.DrawCollapsibleSection(listing, "记忆总结设置", ref expandSummarization, delegate { settings.DrawSummarizationSettings(listing); });
+
+                if (settings.useAISummarization)
+                {
+                    settings.DrawCollapsibleSection(listing, "AI 配置", ref expandAIConfig, delegate { settings.DrawAIConfigSettings(listing); });
+                }
+
+                settings.DrawCollapsibleSection(listing, "记忆类型开关", ref expandMemoryTypes, delegate { settings.DrawMemoryTypesSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "?? 实验性功能", ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
+
+                listing.End();
+                Widgets.EndScrollView();
+
+                PromptNormalizer.UpdateRules(settings.normalizationRules);
+            }
+        }
+
+        private class PromptNormalizationWindow : Window
+        {
+            private readonly RimTalkMemoryPatchSettings settings;
+            private Vector2 scrollPos;
+
+            public override Vector2 InitialSize => new Vector2(750f, 520f);
+
+            public PromptNormalizationWindow(RimTalkMemoryPatchSettings settings)
+            {
+                this.settings = settings;
+                doCloseX = true;
+                doCloseButton = true;
+                absorbInputAroundWindow = true;
+                closeOnClickedOutside = false;
+            }
+
+            public override void DoWindowContents(Rect inRect)
+            {
+                Listing_Standard listing = new Listing_Standard();
+                Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 420f);
+                Widgets.BeginScrollView(inRect, ref scrollPos, viewRect);
+                listing.Begin(viewRect);
+
+                Text.Font = GameFont.Medium;
+                listing.Label("提示词替换");
+                Text.Font = GameFont.Small;
+                GUI.color = Color.gray;
+                listing.Label("在发送给 AI 前自动规范化提示词");
+                GUI.color = Color.white;
+                listing.Gap(6f);
+
+                settings.DrawPromptNormalizationSettings(listing);
+
+                listing.End();
+                Widgets.EndScrollView();
+
+                PromptNormalizer.UpdateRules(settings.normalizationRules);
+            }
         }
     }
 }

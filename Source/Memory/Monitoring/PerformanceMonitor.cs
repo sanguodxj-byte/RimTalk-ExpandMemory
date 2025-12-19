@@ -8,43 +8,43 @@ using RimWorld;
 namespace RimTalk.Memory.Monitoring
 {
     /// <summary>
-    /// æ€§èƒ½ç›‘æ§ç³»ç»Ÿ
+    /// ĞÔÄÜ¼à¿ØÏµÍ³
     /// v3.3.1
     /// 
-    /// åŠŸèƒ½ï¼š
-    /// - è®°å½•å„æ¨¡å—æ€§èƒ½æŒ‡æ ‡
-    /// - ç»Ÿè®¡APIè°ƒç”¨æ¬¡æ•°å’Œæˆæœ¬
-    /// - ç›‘æ§å†…å­˜ä½¿ç”¨
-    /// - æä¾›è¯Šæ–­æŠ¥å‘Š
+    /// ¹¦ÄÜ£º
+    /// - ¼ÇÂ¼¸÷Ä£¿éĞÔÄÜÖ¸±ê
+    /// - Í³¼ÆAPIµ÷ÓÃ´ÎÊıºÍ³É±¾
+    /// - ¼à¿ØÄÚ´æÊ¹ÓÃ
+    /// - Ìá¹©Õï¶Ï±¨¸æ
     /// </summary>
     public static class PerformanceMonitor
     {
-        // ç»Ÿè®¡æ•°æ®
+        // Í³¼ÆÊı¾İ
         private static Dictionary<string, ModuleStats> moduleStats = new Dictionary<string, ModuleStats>();
         private static int sessionStartTick = 0;
         
-        // APIç»Ÿè®¡
+        // APIÍ³¼Æ
         private static int totalAPIRequests = 0;
         private static int successfulRequests = 0;
         private static int failedRequests = 0;
         private static double estimatedCostYuan = 0.0;
         
-        // æ€§èƒ½ç»Ÿè®¡
+        // ĞÔÄÜÍ³¼Æ
         private static Dictionary<string, PerformanceMetric> performanceMetrics = new Dictionary<string, PerformanceMetric>();
         
         /// <summary>
-        /// åˆå§‹åŒ–ç›‘æ§
+        /// ³õÊ¼»¯¼à¿Ø
         /// </summary>
         public static void Initialize()
         {
             sessionStartTick = Find.TickManager?.TicksGame ?? 0;
             
-            // æ³¨å†Œå„æ¨¡å—
-            RegisterModule("Embedding", "è¯­ä¹‰åµŒå…¥");
-            RegisterModule("VectorDB", "å‘é‡æ•°æ®åº“");
-            RegisterModule("RAG", "RAGæ£€ç´¢");
-            RegisterModule("AIDatabase", "AIæ•°æ®åº“");
-            RegisterModule("Injection", "åŠ¨æ€æ³¨å…¥");
+            // ×¢²á¸÷Ä£¿é
+            RegisterModule("Embedding", "ÓïÒåÇ¶Èë");
+            RegisterModule("VectorDB", "ÏòÁ¿Êı¾İ¿â");
+            RegisterModule("RAG", "RAG¼ìË÷");
+            RegisterModule("AIDatabase", "AIÊı¾İ¿â");
+            RegisterModule("Injection", "¶¯Ì¬×¢Èë");
             
             if (Prefs.DevMode)
             {
@@ -53,7 +53,7 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// æ³¨å†Œæ¨¡å—
+        /// ×¢²áÄ£¿é
         /// </summary>
         private static void RegisterModule(string id, string name)
         {
@@ -68,7 +68,7 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// è®°å½•APIè¯·æ±‚
+        /// ¼ÇÂ¼APIÇëÇó
         /// </summary>
         public static void RecordAPIRequest(string module, bool success, double costYuan = 0.0)
         {
@@ -85,7 +85,7 @@ namespace RimTalk.Memory.Monitoring
             
             estimatedCostYuan += costYuan;
             
-            // æ›´æ–°æ¨¡å—ç»Ÿè®¡
+            // ¸üĞÂÄ£¿éÍ³¼Æ
             if (moduleStats.TryGetValue(module, out ModuleStats stats))
             {
                 stats.APIRequests++;
@@ -102,7 +102,7 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// è®°å½•æ€§èƒ½æŒ‡æ ‡
+        /// ¼ÇÂ¼ĞÔÄÜÖ¸±ê
         /// </summary>
         public static void RecordPerformance(string operation, long durationMs)
         {
@@ -127,7 +127,7 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// è®°å½•ç¼“å­˜å‘½ä¸­
+        /// ¼ÇÂ¼»º´æÃüÖĞ
         /// </summary>
         public static void RecordCacheHit(string module, bool hit)
         {
@@ -142,88 +142,88 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// è·å–å®Œæ•´æŠ¥å‘Š
+        /// »ñÈ¡ÍêÕû±¨¸æ
         /// </summary>
         public static string GetFullReport()
         {
             var sb = new StringBuilder();
             
-            sb.AppendLine("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-            sb.AppendLine("  RimTalk ExpandMemory æ€§èƒ½æŠ¥å‘Š");
-            sb.AppendLine("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+            sb.AppendLine("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+            sb.AppendLine("  RimTalk ExpandMemory ĞÔÄÜ±¨¸æ");
+            sb.AppendLine("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
             sb.AppendLine();
             
-            // ä¼šè¯ä¿¡æ¯
+            // »á»°ĞÅÏ¢
             int sessionDuration = (Find.TickManager?.TicksGame ?? 0) - sessionStartTick;
             int sessionDays = sessionDuration / GenDate.TicksPerDay;
-            sb.AppendLine($"ä¼šè¯æ—¶é•¿: {sessionDays}å¤© ({sessionDuration} ticks)");
+            sb.AppendLine($"»á»°Ê±³¤: {sessionDays}Ìì ({sessionDuration} ticks)");
             sb.AppendLine();
             
-            // APIç»Ÿè®¡
-            sb.AppendLine("â”€â”€â”€ APIè°ƒç”¨ç»Ÿè®¡ â”€â”€â”€");
-            sb.AppendLine($"æ€»è¯·æ±‚æ•°: {totalAPIRequests}");
-            sb.AppendLine($"  æˆåŠŸ: {successfulRequests} ({GetPercentage(successfulRequests, totalAPIRequests)})");
-            sb.AppendLine($"  å¤±è´¥: {failedRequests} ({GetPercentage(failedRequests, totalAPIRequests)})");
-            sb.AppendLine($"ä¼°ç®—æˆæœ¬: ?{estimatedCostYuan:F4}");
+            // APIÍ³¼Æ
+            sb.AppendLine("©¤©¤©¤ APIµ÷ÓÃÍ³¼Æ ©¤©¤©¤");
+            sb.AppendLine($"×ÜÇëÇóÊı: {totalAPIRequests}");
+            sb.AppendLine($"  ³É¹¦: {successfulRequests} ({GetPercentage(successfulRequests, totalAPIRequests)})");
+            sb.AppendLine($"  Ê§°Ü: {failedRequests} ({GetPercentage(failedRequests, totalAPIRequests)})");
+            sb.AppendLine($"¹ÀËã³É±¾: ?{estimatedCostYuan:F4}");
             sb.AppendLine();
             
-            // æ¨¡å—ç»Ÿè®¡
-            sb.AppendLine("â”€â”€â”€ æ¨¡å—ç»Ÿè®¡ â”€â”€â”€");
+            // Ä£¿éÍ³¼Æ
+            sb.AppendLine("©¤©¤©¤ Ä£¿éÍ³¼Æ ©¤©¤©¤");
             foreach (var kvp in moduleStats.OrderByDescending(k => k.Value.APIRequests))
             {
                 var stats = kvp.Value;
-                sb.AppendLine($"\nã€{stats.ModuleName}ã€‘");
-                sb.AppendLine($"  APIè¯·æ±‚: {stats.APIRequests}æ¬¡");
+                sb.AppendLine($"\n¡¾{stats.ModuleName}¡¿");
+                sb.AppendLine($"  APIÇëÇó: {stats.APIRequests}´Î");
                 
                 if (stats.APIRequests > 0)
                 {
-                    sb.AppendLine($"    æˆåŠŸç‡: {GetPercentage(stats.SuccessfulRequests, stats.APIRequests)}");
-                    sb.AppendLine($"    æˆæœ¬: ?{stats.TotalCostYuan:F4}");
+                    sb.AppendLine($"    ³É¹¦ÂÊ: {GetPercentage(stats.SuccessfulRequests, stats.APIRequests)}");
+                    sb.AppendLine($"    ³É±¾: ?{stats.TotalCostYuan:F4}");
                 }
                 
                 if (stats.CacheRequests > 0)
                 {
-                    sb.AppendLine($"  ç¼“å­˜è¯·æ±‚: {stats.CacheRequests}æ¬¡");
-                    sb.AppendLine($"    å‘½ä¸­ç‡: {GetPercentage(stats.CacheHits, stats.CacheRequests)}");
+                    sb.AppendLine($"  »º´æÇëÇó: {stats.CacheRequests}´Î");
+                    sb.AppendLine($"    ÃüÖĞÂÊ: {GetPercentage(stats.CacheHits, stats.CacheRequests)}");
                 }
             }
             sb.AppendLine();
             
-            // æ€§èƒ½æŒ‡æ ‡
+            // ĞÔÄÜÖ¸±ê
             if (performanceMetrics.Count > 0)
             {
-                sb.AppendLine("â”€â”€â”€ æ€§èƒ½æŒ‡æ ‡ â”€â”€â”€");
+                sb.AppendLine("©¤©¤©¤ ĞÔÄÜÖ¸±ê ©¤©¤©¤");
                 foreach (var kvp in performanceMetrics.OrderByDescending(k => k.Value.TotalDurationMs))
                 {
                     var metric = kvp.Value;
                     long avgMs = metric.ExecutionCount > 0 ? metric.TotalDurationMs / metric.ExecutionCount : 0;
                     
                     sb.AppendLine($"\n{metric.OperationName}:");
-                    sb.AppendLine($"  æ‰§è¡Œæ¬¡æ•°: {metric.ExecutionCount}");
-                    sb.AppendLine($"  å¹³å‡è€—æ—¶: {avgMs}ms");
-                    sb.AppendLine($"  æœ€å°/æœ€å¤§: {metric.MinDurationMs}ms / {metric.MaxDurationMs}ms");
+                    sb.AppendLine($"  Ö´ĞĞ´ÎÊı: {metric.ExecutionCount}");
+                    sb.AppendLine($"  Æ½¾ùºÄÊ±: {avgMs}ms");
+                    sb.AppendLine($"  ×îĞ¡/×î´ó: {metric.MinDurationMs}ms / {metric.MaxDurationMs}ms");
                 }
             }
             
             sb.AppendLine();
-            sb.AppendLine("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+            sb.AppendLine("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
             
             return sb.ToString();
         }
         
         /// <summary>
-        /// è·å–ç®€è¦æŠ¥å‘Š
+        /// »ñÈ¡¼òÒª±¨¸æ
         /// </summary>
         public static string GetSummary()
         {
             double successRate = totalAPIRequests > 0 ? 
                 (double)successfulRequests / totalAPIRequests * 100 : 0;
             
-            return $"API: {totalAPIRequests}æ¬¡ ({successRate:F1}%æˆåŠŸ) | æˆæœ¬: ?{estimatedCostYuan:F4}";
+            return $"API: {totalAPIRequests}´Î ({successRate:F1}%³É¹¦) | ³É±¾: ?{estimatedCostYuan:F4}";
         }
         
         /// <summary>
-        /// é‡ç½®ç»Ÿè®¡
+        /// ÖØÖÃÍ³¼Æ
         /// </summary>
         public static void Reset()
         {
@@ -241,7 +241,7 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// å¯¼å‡ºæŠ¥å‘Šåˆ°æ–‡ä»¶
+        /// µ¼³ö±¨¸æµ½ÎÄ¼ş
         /// </summary>
         public static void ExportReport(string filePath = null)
         {
@@ -258,7 +258,7 @@ namespace RimTalk.Memory.Monitoring
                 string report = GetFullReport();
                 System.IO.File.WriteAllText(filePath, report);
                 
-                Messages.Message($"æ€§èƒ½æŠ¥å‘Šå·²å¯¼å‡º: {filePath}", MessageTypeDefOf.PositiveEvent);
+                Messages.Message($"ĞÔÄÜ±¨¸æÒÑµ¼³ö: {filePath}", MessageTypeDefOf.PositiveEvent);
                 Log.Message($"[Performance Monitor] Report exported to: {filePath}");
             }
             catch (Exception ex)
@@ -268,7 +268,7 @@ namespace RimTalk.Memory.Monitoring
         }
         
         /// <summary>
-        /// è¾…åŠ©æ–¹æ³•ï¼šè®¡ç®—ç™¾åˆ†æ¯”
+        /// ¸¨Öú·½·¨£º¼ÆËã°Ù·Ö±È
         /// </summary>
         private static string GetPercentage(int count, int total)
         {
@@ -278,29 +278,29 @@ namespace RimTalk.Memory.Monitoring
         }
     }
     
-    #region æ•°æ®ç»“æ„
+    #region Êı¾İ½á¹¹
     
     /// <summary>
-    /// æ¨¡å—ç»Ÿè®¡
+    /// Ä£¿éÍ³¼Æ
     /// </summary>
     public class ModuleStats
     {
         public string ModuleId;
         public string ModuleName;
         
-        // APIç»Ÿè®¡
+        // APIÍ³¼Æ
         public int APIRequests;
         public int SuccessfulRequests;
         public int FailedRequests;
         public double TotalCostYuan;
         
-        // ç¼“å­˜ç»Ÿè®¡
+        // »º´æÍ³¼Æ
         public int CacheRequests;
         public int CacheHits;
     }
     
     /// <summary>
-    /// æ€§èƒ½æŒ‡æ ‡
+    /// ĞÔÄÜÖ¸±ê
     /// </summary>
     public class PerformanceMetric
     {

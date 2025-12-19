@@ -5,8 +5,8 @@ using RimWorld.Planet;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// å‘åå…¼å®¹æ€§ä¿®å¤ - ç¡®ä¿WorldComponentç±»å‹åœ¨æ¸¸æˆå¯åŠ¨æ—¶æ³¨å†Œ
-    /// v3.3.2.5+: ä¿®å¤æ—§å­˜æ¡£åŠ è½½"Could not find class"é”™è¯¯
+    /// Ïòºó¼æÈİĞÔĞŞ¸´ - È·±£WorldComponentÀàĞÍÔÚÓÎÏ·Æô¶¯Ê±×¢²á
+    /// v3.3.2.5+: ĞŞ¸´¾É´æµµ¼ÓÔØ"Could not find class"´íÎó
     /// </summary>
     [StaticConstructorOnStartup]
     public static class BackCompatibilityFix
@@ -17,20 +17,20 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? å¼ºåˆ¶åˆå§‹åŒ– - ç”±Modæ„é€ å‡½æ•°è°ƒç”¨
+        /// ? Ç¿ÖÆ³õÊ¼»¯ - ÓÉMod¹¹Ôìº¯Êıµ÷ÓÃ
         /// </summary>
         public static void ForceInitialize()
         {
             try
             {
-                // ? å¼ºåˆ¶è§¦å‘WorldComponentå­ç±»çš„é™æ€æ„é€ å‡½æ•°
-                // è¿™ç¡®ä¿RimWorldåœ¨è§£æå­˜æ¡£æ—¶èƒ½æ‰¾åˆ°è¿™äº›ç±»å‹
+                // ? Ç¿ÖÆ´¥·¢WorldComponent×ÓÀàµÄ¾²Ì¬¹¹Ôìº¯Êı
+                // ÕâÈ·±£RimWorldÔÚ½âÎö´æµµÊ±ÄÜÕÒµ½ÕâĞ©ÀàĞÍ
                 
                 var memoryManagerType = typeof(MemoryManager);
                 var aiRequestManagerType = typeof(AI.AIRequestManager);
                 var mainTabWindowType = typeof(UI.MainTabWindow_Memory);
                 
-                // è§¦å‘é™æ€åˆå§‹åŒ–
+                // ´¥·¢¾²Ì¬³õÊ¼»¯
                 System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(memoryManagerType.TypeHandle);
                 System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(aiRequestManagerType.TypeHandle);
                 System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(mainTabWindowType.TypeHandle);
@@ -40,11 +40,11 @@ namespace RimTalk.Memory
                 Log.Message($"  - {aiRequestManagerType.FullName}");
                 Log.Message($"  - {mainTabWindowType.FullName}");
                 
-                // ? éªŒè¯ç±»å‹å¯ä»¥è¢«åå°„æŸ¥æ‰¾
+                // ? ÑéÖ¤ÀàĞÍ¿ÉÒÔ±»·´Éä²éÕÒ
                 var world = Current.Game?.World;
                 if (world != null)
                 {
-                    // å°è¯•è·å–ç»„ä»¶ï¼Œå¦‚æœä¸å­˜åœ¨ä¼šè‡ªåŠ¨åˆ›å»º
+                    // ³¢ÊÔ»ñÈ¡×é¼ş£¬Èç¹û²»´æÔÚ»á×Ô¶¯´´½¨
                     var memoryManager = world.GetComponent<MemoryManager>();
                     var aiRequestManager = world.GetComponent<AI.AIRequestManager>();
                     

@@ -10,7 +10,7 @@ namespace RimTalk.Memory.UI
 {
     /// <summary>
     /// 常识库管理窗口 - Library Style with Drag Multi-Select
-    /// ★ v3.3.19: 完全重构 - 图书馆风格布局 + 拖拽多选支持
+    /// ★ v3.3.19: 完全重构 - 图书馆风格布局 + 拖拽多选支持 + 代码拆分
     /// </summary>
     public class Dialog_CommonKnowledge : Window
     {
@@ -19,7 +19,7 @@ namespace RimTalk.Memory.UI
         
         // Multi-select support
         private HashSet<CommonKnowledgeEntry> selectedEntries = new HashSet<CommonKnowledgeEntry>();
-        private CommonKnowledgeEntry lastSelectedEntry = null; // For detail view
+        private CommonKnowledgeEntry lastSelectedEntry = null;
         
         // Drag selection
         private bool isDragging = false;
@@ -39,13 +39,14 @@ namespace RimTalk.Memory.UI
         // Auto-generate settings (collapsed in sidebar)
         private bool showAutoGenerateSettings = false;
         
+        // ⭐ 虚拟化列表
+        private VirtualListView<CommonKnowledgeEntry> virtualList;
+        
         // Edit fields
         private string editTag = "";
         private string editContent = "";
         private float editImportance = 0.5f;
         private int editTargetPawnId = -1;
-        private string editExcludeKeywords = "";
-        private KeywordMatchMode editMatchMode = KeywordMatchMode.Any;
         
         // Layout constants
         private const float TOOLBAR_HEIGHT = 45f;
@@ -65,6 +66,14 @@ namespace RimTalk.Memory.UI
             this.closeOnClickedOutside = false;
             this.absorbInputAroundWindow = true;
             this.forcePause = false;
+            
+            // ⭐ 初始化虚拟化列表
+            virtualList = new VirtualListView<CommonKnowledgeEntry>(
+                getItemHeight: (entry) => ENTRY_HEIGHT,
+                drawItem: (rect, entry, index) => DrawEntryRow(rect, entry)
+            );
+            // 设置空列表提示
+            virtualList.EmptyLabel = CommonKnowledgeTranslationKeys.SelectOrCreate.Translate();
         }
 
         // ==================== Main Layout ====================
@@ -129,7 +138,8 @@ namespace RimTalk.Memory.UI
             
             // Clear All button
             rightX -= buttonWidth;
-            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), "RimTalk_Knowledge_ClearAll".Translate()))
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.ClearAll.Translate()))
             {
                 ClearAllEntries();
             }
@@ -137,7 +147,8 @@ namespace RimTalk.Memory.UI
             // Delete Selected button
             rightX -= buttonWidth + spacing;
             GUI.enabled = selectedEntries.Count > 0;
-            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), "RimTalk_Knowledge_DeleteCount".Translate(selectedEntries.Count)))
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.DeleteCount.Translate(selectedEntries.Count)))
             {
                 DeleteSelectedEntries();
             }
@@ -145,7 +156,9 @@ namespace RimTalk.Memory.UI
             
             // Export button
             rightX -= buttonWidth + spacing;
-            string exportLabel = selectedEntries.Count > 0 ? "RimTalk_Knowledge_ExportCount".Translate(selectedEntries.Count) : "RimTalk_Knowledge_ExportAll".Translate();
+            string exportLabel = selectedEntries.Count > 0 
+                ? CommonKnowledgeTranslationKeys.ExportCount.Translate(selectedEntries.Count) 
+                : CommonKnowledgeTranslationKeys.ExportAll.Translate();
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), exportLabel))
             {
                 ExportToFile();
@@ -153,14 +166,16 @@ namespace RimTalk.Memory.UI
             
             // Import button
             rightX -= buttonWidth + spacing;
-            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), "RimTalk_Knowledge_Import".Translate()))
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.Import.Translate()))
             {
                 ShowImportDialog();
             }
             
             // New button
             rightX -= buttonWidth + spacing;
-            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), "RimTalk_Knowledge_New".Translate()))
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.New.Translate()))
             {
                 CreateNewEntry();
             }
@@ -185,7 +200,8 @@ namespace RimTalk.Memory.UI
             
             // Title
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 30f), "RimTalk_Knowledge_Categories".Translate());
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 30f), 
+                CommonKnowledgeTranslationKeys.Categories.Translate());
             Text.Font = GameFont.Small;
             y += 35f;
             
@@ -196,22 +212,10 @@ namespace RimTalk.Memory.UI
                 bool isSelected = currentCategory == category;
                 
                 Rect categoryRect = new Rect(innerRect.x, y, innerRect.width, categoryHeight);
-                string categoryLabel = GetCategoryLabel(category);
                 int categoryCount = GetCategoryCount(category);
-                string label = $"{categoryLabel} ({categoryCount})";
                 
-                // ⭐ 修复：使用正确的高亮逻辑
-                if (isSelected)
-                {
-                    Widgets.DrawHighlightSelected(categoryRect);
-                }
-                else if (Mouse.IsOver(categoryRect))
-                {
-                    Widgets.DrawHighlight(categoryRect);
-                }
-                
-                // ⭐ 修复：确保ButtonText能正常响应点击
-                if (Widgets.ButtonText(categoryRect, label, drawBackground: false))
+                // ⭐ 使用辅助方法绘制分类按钮
+                if (CommonKnowledgeUIHelpers.DrawCategoryButton(categoryRect, category, isSelected, categoryCount))
                 {
                     currentCategory = category;
                     selectedEntries.Clear();
@@ -225,7 +229,8 @@ namespace RimTalk.Memory.UI
             // Auto-Generate Settings (collapsible)
             Rect autoGenHeaderRect = new Rect(innerRect.x, y, innerRect.width, 30f);
             string autoGenIcon = showAutoGenerateSettings ? "▼" : "▶";
-            if (Widgets.ButtonText(autoGenHeaderRect, $"{autoGenIcon} {"RimTalk_Knowledge_AutoGenerate".Translate()}"))
+            if (Widgets.ButtonText(autoGenHeaderRect, 
+                $"{autoGenIcon} {CommonKnowledgeTranslationKeys.AutoGenerate.Translate()}"))
             {
                 showAutoGenerateSettings = !showAutoGenerateSettings;
             }
@@ -234,7 +239,12 @@ namespace RimTalk.Memory.UI
             if (showAutoGenerateSettings)
             {
                 Rect autoGenContentRect = new Rect(innerRect.x, y, innerRect.width, 120f);
-                DrawAutoGenerateSettings(autoGenContentRect);
+                // ⭐ 使用辅助方法绘制自动生成设置
+                CommonKnowledgeUIHelpers.DrawAutoGenerateSettings(
+                    autoGenContentRect, 
+                    GeneratePawnStatusKnowledge, 
+                    GenerateEventRecordKnowledge
+                );
                 y += 125f;
             }
             
@@ -248,9 +258,12 @@ namespace RimTalk.Memory.UI
             int enabledCount = library.Entries.Count(e => e.isEnabled);
             int selectedCount = selectedEntries.Count;
             
-            Widgets.Label(new Rect(innerRect.x, statsY, innerRect.width, 20f), "RimTalk_Knowledge_Total".Translate(totalCount));
-            Widgets.Label(new Rect(innerRect.x, statsY + 20f, innerRect.width, 20f), "RimTalk_Knowledge_Enabled".Translate(enabledCount));
-            Widgets.Label(new Rect(innerRect.x, statsY + 40f, innerRect.width, 20f), "RimTalk_Knowledge_Selected".Translate(selectedCount));
+            Widgets.Label(new Rect(innerRect.x, statsY, innerRect.width, 20f), 
+                CommonKnowledgeTranslationKeys.Total.Translate(totalCount));
+            Widgets.Label(new Rect(innerRect.x, statsY + 20f, innerRect.width, 20f), 
+                CommonKnowledgeTranslationKeys.Enabled.Translate(enabledCount));
+            Widgets.Label(new Rect(innerRect.x, statsY + 40f, innerRect.width, 20f), 
+                CommonKnowledgeTranslationKeys.Selected.Translate(selectedCount));
             
             GUI.color = Color.white;
             Text.Font = GameFont.Small;
@@ -299,19 +312,21 @@ namespace RimTalk.Memory.UI
             // Filter entries
             var filteredEntries = GetFilteredEntries();
             
-            // Calculate view rect
-            float totalHeight = filteredEntries.Count * ENTRY_HEIGHT;
-            Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, totalHeight);
+            // ⭐ 更新虚拟列表数据
+            virtualList.SetItems(filteredEntries);
+            virtualList.ScrollPosition = listScrollPosition;
             
-            // Store list rect for drag selection
-            Rect listRect = innerRect;
+            // ⭐ 修复：不在这里处理拖拽，改为手动处理并在ScrollView内绘制选择框
             
-            // Handle drag selection input
-            HandleDragSelection(listRect, viewRect);
+            // ⭐ 使用虚拟化渲染
+            Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, filteredEntries.Count * ENTRY_HEIGHT);
             
-            // Begin scroll view
+            // 处理拖拽事件（在BeginScrollView之前）
+            HandleDragSelectionEvents(innerRect, viewRect);
+            
             Widgets.BeginScrollView(innerRect, ref listScrollPosition, viewRect, true);
             
+            // 绘制条目
             float y = 0f;
             foreach (var entry in filteredEntries)
             {
@@ -320,7 +335,7 @@ namespace RimTalk.Memory.UI
                 y += ENTRY_HEIGHT;
             }
             
-            // Draw drag selection box
+            // ⭐ 修复：在EndScrollView之前绘制选择框
             if (isDragging)
             {
                 DrawSelectionBox();
@@ -328,13 +343,20 @@ namespace RimTalk.Memory.UI
             
             Widgets.EndScrollView();
             
+            // 同步滚动位置
+            virtualList.ScrollPosition = listScrollPosition;
+            
             // Show filter status
             if (!string.IsNullOrEmpty(searchFilter) || currentCategory != KnowledgeCategory.All)
             {
                 Rect statusRect = new Rect(innerRect.x, innerRect.yMax - 25f, innerRect.width, 20f);
                 Text.Font = GameFont.Tiny;
                 GUI.color = new Color(0.7f, 0.7f, 0.7f);
-                Widgets.Label(statusRect, "RimTalk_Knowledge_Showing".Translate(filteredEntries.Count, library.Entries.Count));
+                
+                // 显示过滤状态
+                Widgets.Label(statusRect, 
+                    CommonKnowledgeTranslationKeys.Showing.Translate(filteredEntries.Count, library.Entries.Count));
+                
                 GUI.color = Color.white;
                 Text.Font = GameFont.Small;
             }
@@ -372,7 +394,8 @@ namespace RimTalk.Memory.UI
             // Tag
             Rect tagRect = new Rect(x, innerRect.y, 150f, 20f);
             Text.Font = GameFont.Small;
-            GUI.color = GetCategoryColor(entry);
+            // ⭐ 使用辅助方法获取分类颜色
+            GUI.color = CommonKnowledgeUIHelpers.GetCategoryColor(entry);
             Widgets.Label(tagRect, $"[{entry.tag}]");
             GUI.color = Color.white;
             x += 155f;
@@ -382,57 +405,12 @@ namespace RimTalk.Memory.UI
             Widgets.Label(importanceRect, entry.importance.ToString("F1"));
             x += 55f;
             
-            // Content preview (multi-line) - 为右侧复选框留出空间
-            Rect contentRect = new Rect(innerRect.x + 30f, innerRect.y + 22f, innerRect.width - 95f, 40f);
+            // Content preview (multi-line)
+            Rect contentRect = new Rect(innerRect.x + 30f, innerRect.y + 22f, innerRect.width - 35f, 40f);
             Text.Font = GameFont.Tiny;
             string preview = entry.content.Length > 120 ? entry.content.Substring(0, 120) + "..." : entry.content;
             Widgets.Label(contentRect, preview);
             Text.Font = GameFont.Small;
-            
-            // Extended properties checkboxes (right side)
-            const float BUTTON_SIZE = 20f;
-            const float BUTTON_SPACING = 5f;
-            float rightX = rect.xMax - BUTTON_SIZE * 2 - BUTTON_SPACING - 10f;
-            float centerY = rect.y + (rect.height - BUTTON_SIZE) / 2f;
-
-            // Checkbox 1: Can Be Extracted
-            bool canBeExtracted = ExtendedKnowledgeEntry.CanBeExtracted(entry);
-            Rect extractCheckboxRect = new Rect(rightX, centerY, BUTTON_SIZE, BUTTON_SIZE);
-            
-            if (Mouse.IsOver(extractCheckboxRect))
-            {
-                string tooltip = canBeExtracted 
-                    ? "RimTalk_CanBeExtractedEnabled".Translate() 
-                    : "RimTalk_CanBeExtractedDisabled".Translate();
-                TooltipHandler.TipRegion(extractCheckboxRect, tooltip);
-            }
-            
-            bool newExtractValue = canBeExtracted;
-            Widgets.Checkbox(extractCheckboxRect.position, ref newExtractValue, BUTTON_SIZE);
-            if (newExtractValue != canBeExtracted)
-            {
-                ExtendedKnowledgeEntry.SetCanBeExtracted(entry, newExtractValue);
-            }
-
-            // Checkbox 2: Can Be Matched
-            rightX += BUTTON_SIZE + BUTTON_SPACING;
-            bool canBeMatched = ExtendedKnowledgeEntry.CanBeMatched(entry);
-            Rect matchCheckboxRect = new Rect(rightX, centerY, BUTTON_SIZE, BUTTON_SIZE);
-            
-            if (Mouse.IsOver(matchCheckboxRect))
-            {
-                string tooltip = canBeMatched 
-                    ? "RimTalk_CanBeMatchedEnabled".Translate() 
-                    : "RimTalk_CanBeMatchedDisabled".Translate();
-                TooltipHandler.TipRegion(matchCheckboxRect, tooltip);
-            }
-            
-            bool newMatchValue = canBeMatched;
-            Widgets.Checkbox(matchCheckboxRect.position, ref newMatchValue, BUTTON_SIZE);
-            if (newMatchValue != canBeMatched)
-            {
-                ExtendedKnowledgeEntry.SetCanBeMatched(entry, newMatchValue);
-            }
             
             // Selection indicator
             if (isSelected)
@@ -487,51 +465,6 @@ namespace RimTalk.Memory.UI
             }
         }
         
-        private void HandleDragSelection(Rect listRect, Rect viewRect)
-        {
-            Event e = Event.current;
-            
-            if (e.type == EventType.MouseDown && e.button == 0 && listRect.Contains(e.mousePosition))
-            {
-                isDragging = true;
-                dragStartPos = e.mousePosition - listRect.position + listScrollPosition;
-                dragCurrentPos = dragStartPos;
-                e.Use();
-            }
-            
-            if (isDragging && e.type == EventType.MouseDrag)
-            {
-                dragCurrentPos = e.mousePosition - listRect.position + listScrollPosition;
-                
-                // Select entries that intersect with drag box
-                Rect selectionBox = GetSelectionBox();
-                var filteredEntries = GetFilteredEntries();
-                
-                bool ctrl = Event.current.control;
-                if (!ctrl)
-                {
-                    selectedEntries.Clear();
-                }
-                
-                for (int i = 0; i < filteredEntries.Count; i++)
-                {
-                    Rect entryRect = new Rect(0f, i * ENTRY_HEIGHT, viewRect.width, ENTRY_HEIGHT);
-                    if (selectionBox.Overlaps(entryRect))
-                    {
-                        selectedEntries.Add(filteredEntries[i]);
-                    }
-                }
-                
-                e.Use();
-            }
-            
-            if (e.type == EventType.MouseUp && e.button == 0 && isDragging)
-            {
-                isDragging = false;
-                e.Use();
-            }
-        }
-        
         private void DrawSelectionBox()
         {
             Rect selectionBox = GetSelectionBox();
@@ -547,6 +480,61 @@ namespace RimTalk.Memory.UI
             float maxY = Mathf.Max(dragStartPos.y, dragCurrentPos.y);
             
             return new Rect(minX, minY, maxX - minX, maxY - minY);
+        }
+        
+        // ⭐ 新方法：处理拖拽事件（不绘制选择框）
+        private void HandleDragSelectionEvents(Rect listRect, Rect viewRect)
+        {
+            Event e = Event.current;
+            
+            // 开始拖拽
+            if (e.type == EventType.MouseDown && e.button == 0 && listRect.Contains(e.mousePosition))
+            {
+                isDragging = true;
+                // 转换为viewport坐标
+                dragStartPos = e.mousePosition - listRect.position;
+                dragCurrentPos = dragStartPos;
+                e.Use();
+            }
+            
+            // 拖拽中
+            if (isDragging && e.type == EventType.MouseDrag)
+            {
+                dragCurrentPos = e.mousePosition - listRect.position;
+                
+                // 转换为content坐标
+                Rect selectionBoxViewport = GetSelectionBox();
+                Rect selectionBoxContent = new Rect(
+                    selectionBoxViewport.x,
+                    selectionBoxViewport.y + listScrollPosition.y,
+                    selectionBoxViewport.width,
+                    selectionBoxViewport.height
+                );
+                
+                var filteredEntries = GetFilteredEntries();
+                
+                bool ctrl = Event.current.control;
+                if (!ctrl)
+                {
+                    selectedEntries.Clear();
+                }
+                
+                // 检查哪些条目在选择框内
+                float y = 0f;
+                foreach (var entry in filteredEntries)
+                {
+                    Rect entryRect = new Rect(0f, y, viewRect.width, ENTRY_HEIGHT);
+                    
+                    if (selectionBoxContent.Overlaps(entryRect))
+                    {
+                        selectedEntries.Add(entry);
+                    }
+                    
+                    y += ENTRY_HEIGHT;
+                }
+                
+                e.Use();
+            }
         }
 
         // ==================== Right Panel ====================
@@ -579,7 +567,7 @@ namespace RimTalk.Memory.UI
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             GUI.color = new Color(0.6f, 0.6f, 0.6f);
-            Widgets.Label(rect, "RimTalk_Knowledge_SelectOrCreate".Translate());
+            Widgets.Label(rect, CommonKnowledgeTranslationKeys.SelectOrCreate.Translate());
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
         }
@@ -589,7 +577,8 @@ namespace RimTalk.Memory.UI
             float y = rect.y;
             
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(rect.x, y, rect.width, 30f), "RimTalk_Knowledge_ItemsSelected".Translate(selectedEntries.Count));
+            Widgets.Label(new Rect(rect.x, y, rect.width, 30f), 
+                CommonKnowledgeTranslationKeys.ItemsSelected.Translate(selectedEntries.Count));
             Text.Font = GameFont.Small;
             y += 40f;
             
@@ -598,80 +587,47 @@ namespace RimTalk.Memory.UI
             int disabledCount = selectedEntries.Count - enabledCount;
             float avgImportance = selectedEntries.Average(e => e.importance);
             
-            Widgets.Label(new Rect(rect.x, y, rect.width, 25f), "RimTalk_Knowledge_EnabledCount".Translate(enabledCount));
+            Widgets.Label(new Rect(rect.x, y, rect.width, 25f), 
+                CommonKnowledgeTranslationKeys.EnabledCount.Translate(enabledCount));
             y += 25f;
-            Widgets.Label(new Rect(rect.x, y, rect.width, 25f), "RimTalk_Knowledge_DisabledCount".Translate(disabledCount));
+            Widgets.Label(new Rect(rect.x, y, rect.width, 25f), 
+                CommonKnowledgeTranslationKeys.DisabledCount.Translate(disabledCount));
             y += 25f;
-            Widgets.Label(new Rect(rect.x, y, rect.width, 25f), "RimTalk_Knowledge_AvgImportance".Translate(avgImportance.ToString("F2")));
+            Widgets.Label(new Rect(rect.x, y, rect.width, 25f), 
+                CommonKnowledgeTranslationKeys.AvgImportance.Translate(avgImportance.ToString("F2")));
             y += 40f;
             
             // Batch actions
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_Knowledge_EnableAll".Translate()))
+            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.EnableAll.Translate()))
             {
                 foreach (var entry in selectedEntries)
                     entry.isEnabled = true;
             }
             y += BUTTON_HEIGHT + 5f;
             
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_Knowledge_DisableAll".Translate()))
+            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.DisableAll.Translate()))
             {
                 foreach (var entry in selectedEntries)
                     entry.isEnabled = false;
             }
             y += BUTTON_HEIGHT + 5f;
             
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_Knowledge_ExportItems".Translate(selectedEntries.Count)))
+            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.ExportItems.Translate(selectedEntries.Count)))
             {
                 ExportToFile();
             }
             y += BUTTON_HEIGHT + 5f;
             
             GUI.color = new Color(1f, 0.4f, 0.4f);
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_Knowledge_DeleteItems".Translate(selectedEntries.Count)))
+            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.DeleteItems.Translate(selectedEntries.Count)))
             {
                 DeleteSelectedEntries();
             }
             GUI.color = Color.white;
-            y += BUTTON_HEIGHT + 10f;
-            
-            // Extended properties batch operations
-            Widgets.DrawLineHorizontal(rect.x, y, rect.width);
-            y += 10f;
-            
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_EnableAllExtract".Translate()))
-            {
-                foreach (var entry in selectedEntries)
-                {
-                    ExtendedKnowledgeEntry.SetCanBeExtracted(entry, true);
-                }
-            }
-            y += BUTTON_HEIGHT + 5f;
-
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_DisableAllExtract".Translate()))
-            {
-                foreach (var entry in selectedEntries)
-                {
-                    ExtendedKnowledgeEntry.SetCanBeExtracted(entry, false);
-                }
-            }
-            y += BUTTON_HEIGHT + 5f;
-
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_EnableAllMatch".Translate()))
-            {
-                foreach (var entry in selectedEntries)
-                {
-                    ExtendedKnowledgeEntry.SetCanBeMatched(entry, true);
-                }
-            }
-            y += BUTTON_HEIGHT + 5f;
-
-            if (Widgets.ButtonText(new Rect(rect.x, y, rect.width, BUTTON_HEIGHT), "RimTalk_DisableAllMatch".Translate()))
-            {
-                foreach (var entry in selectedEntries)
-                {
-                    ExtendedKnowledgeEntry.SetCanBeMatched(entry, false);
-                }
-            }
         }
         
         private void DrawDetailPanel(Rect rect, CommonKnowledgeEntry entry)
@@ -680,11 +636,13 @@ namespace RimTalk.Memory.UI
             
             // Title
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(rect.x, y, rect.width - 100f, 30f), "RimTalk_Knowledge_Details".Translate());
+            Widgets.Label(new Rect(rect.x, y, rect.width - 100f, 30f), 
+                CommonKnowledgeTranslationKeys.Details.Translate());
             Text.Font = GameFont.Small;
             
             // Edit button
-            if (Widgets.ButtonText(new Rect(rect.xMax - 90f, y, 90f, 28f), "RimTalk_Knowledge_Edit".Translate()))
+            if (Widgets.ButtonText(new Rect(rect.xMax - 90f, y, 90f, 28f), 
+                CommonKnowledgeTranslationKeys.Edit.Translate()))
             {
                 StartEdit();
             }
@@ -692,7 +650,7 @@ namespace RimTalk.Memory.UI
             
             // Scrollable content
             Rect scrollOuterRect = new Rect(rect.x, y, rect.width, rect.height - y - 50f);
-            float scrollHeight = 500f; // Estimate
+            float scrollHeight = 500f;
             Rect scrollViewRect = new Rect(0f, 0f, rect.width - 16f, scrollHeight);
             
             Widgets.BeginScrollView(scrollOuterRect, ref detailScrollPosition, scrollViewRect);
@@ -700,33 +658,44 @@ namespace RimTalk.Memory.UI
             float scrollY = 0f;
             
             // Tag
-            DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 50f), "RimTalk_Knowledge_Tag".Translate(), entry.tag);
+            CommonKnowledgeUIHelpers.DrawDetailField(
+                new Rect(0f, scrollY, scrollViewRect.width, 50f), 
+                CommonKnowledgeTranslationKeys.Tag.Translate(), 
+                entry.tag
+            );
             scrollY += 55f;
             
             // Importance
-            DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 25f), "RimTalk_Knowledge_Importance".Translate(), entry.importance.ToString("F1"));
+            CommonKnowledgeUIHelpers.DrawDetailField(
+                new Rect(0f, scrollY, scrollViewRect.width, 25f), 
+                CommonKnowledgeTranslationKeys.Importance.Translate(), 
+                entry.importance.ToString("F1")
+            );
             scrollY += 30f;
             
             // Status
-            string status = entry.isEnabled ? "RimTalk_Knowledge_StatusEnabled".Translate() : "RimTalk_Knowledge_StatusDisabled".Translate();
-            DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 25f), "RimTalk_Knowledge_Status".Translate(), status);
+            string status = entry.isEnabled 
+                ? CommonKnowledgeTranslationKeys.StatusEnabled.Translate() 
+                : CommonKnowledgeTranslationKeys.StatusDisabled.Translate();
+            CommonKnowledgeUIHelpers.DrawDetailField(
+                new Rect(0f, scrollY, scrollViewRect.width, 25f), 
+                CommonKnowledgeTranslationKeys.Status.Translate(), 
+                status
+            );
             scrollY += 30f;
             
             // Visibility
-            string visibility = GetVisibilityText(entry);
-            DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 50f), "RimTalk_Knowledge_Visibility".Translate(), visibility);
+            string visibility = CommonKnowledgeUIHelpers.GetVisibilityText(entry);
+            CommonKnowledgeUIHelpers.DrawDetailField(
+                new Rect(0f, scrollY, scrollViewRect.width, 50f), 
+                CommonKnowledgeTranslationKeys.Visibility.Translate(), 
+                visibility
+            );
             scrollY += 55f;
             
-            // Exclude Keywords
-            if (entry.excludeKeywords != null && entry.excludeKeywords.Count > 0)
-            {
-                string excludes = string.Join(", ", entry.excludeKeywords);
-                DrawDetailField(new Rect(0f, scrollY, scrollViewRect.width, 50f), "排除词", excludes);
-                scrollY += 55f;
-            }
-            
             // Content
-            Widgets.Label(new Rect(0f, scrollY, scrollViewRect.width, 20f), "RimTalk_Knowledge_Content".Translate() + ":");
+            Widgets.Label(new Rect(0f, scrollY, scrollViewRect.width, 20f), 
+                CommonKnowledgeTranslationKeys.Content.Translate() + ":");
             scrollY += 22f;
             
             Rect contentRect = new Rect(0f, scrollY, scrollViewRect.width, 200f);
@@ -735,62 +704,15 @@ namespace RimTalk.Memory.UI
             Widgets.Label(contentInnerRect, entry.content);
             scrollY += 205f;
             
-            // Extended properties display
-            Widgets.DrawLineHorizontal(0f, scrollY, scrollViewRect.width);
-            scrollY += 10f;
-
-            Text.Font = GameFont.Small;
-            GUI.color = new Color(0.8f, 0.8f, 0.8f);
-            Widgets.Label(new Rect(0f, scrollY, scrollViewRect.width, 25f), "RimTalk_ExtendedProperties".Translate());
-            GUI.color = Color.white;
-            scrollY += 25f;
-
-            bool canBeExtracted = ExtendedKnowledgeEntry.CanBeExtracted(entry);
-            DrawPropertyRow(new Rect(0f, scrollY, scrollViewRect.width, 25f), "RimTalk_CanBeExtracted".Translate(), canBeExtracted);
-            scrollY += 25f;
-
-            bool canBeMatched = ExtendedKnowledgeEntry.CanBeMatched(entry);
-            DrawPropertyRow(new Rect(0f, scrollY, scrollViewRect.width, 25f), "RimTalk_CanBeMatched".Translate(), canBeMatched);
-            scrollY += 25f;
-            
             Widgets.EndScrollView();
             
             // Delete button at bottom
             Rect deleteRect = new Rect(rect.x, rect.yMax - 40f, rect.width, BUTTON_HEIGHT);
             GUI.color = new Color(1f, 0.4f, 0.4f);
-            if (Widgets.ButtonText(deleteRect, "RimTalk_Knowledge_Delete".Translate()))
+            if (Widgets.ButtonText(deleteRect, CommonKnowledgeTranslationKeys.Delete.Translate()))
             {
                 DeleteSelectedEntries();
             }
-            GUI.color = Color.white;
-        }
-        
-        private void DrawDetailField(Rect rect, string label, string value)
-        {
-            float labelWidth = 100f;
-            
-            Text.Font = GameFont.Tiny;
-            GUI.color = new Color(0.7f, 0.7f, 0.7f);
-            Widgets.Label(new Rect(rect.x, rect.y, labelWidth, rect.height), label + ":");
-            GUI.color = Color.white;
-            Text.Font = GameFont.Small;
-            
-            Widgets.Label(new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, rect.height), value);
-        }
-        
-        private void DrawPropertyRow(Rect rect, string label, bool value)
-        {
-            Text.Font = GameFont.Tiny;
-            GUI.color = new Color(0.7f, 0.7f, 0.7f);
-            Widgets.Label(new Rect(rect.x, rect.y, 120f, rect.height), label);
-            GUI.color = Color.white;
-            Text.Font = GameFont.Small;
-
-            string valueText = value ? "RimTalk_Yes".Translate() : "RimTalk_No".Translate();
-            Color valueColor = value ? new Color(0.3f, 0.8f, 0.3f) : new Color(0.8f, 0.3f, 0.3f);
-            
-            GUI.color = valueColor;
-            Widgets.Label(new Rect(rect.x + 120f, rect.y, rect.width - 120f, rect.height), valueText);
             GUI.color = Color.white;
         }
         
@@ -800,50 +722,45 @@ namespace RimTalk.Memory.UI
             
             // Title
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(rect.x, y, rect.width, 30f), lastSelectedEntry == null ? "RimTalk_Knowledge_NewEntry".Translate() : "RimTalk_Knowledge_EditEntry".Translate());
+            Widgets.Label(new Rect(rect.x, y, rect.width, 30f), 
+                lastSelectedEntry == null 
+                    ? CommonKnowledgeTranslationKeys.NewEntry.Translate() 
+                    : CommonKnowledgeTranslationKeys.EditEntry.Translate());
             Text.Font = GameFont.Small;
             y += 40f;
             
             // Tag
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "RimTalk_Knowledge_Tag".Translate() + ":");
+            Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
+                CommonKnowledgeTranslationKeys.Tag.Translate() + ":");
             editTag = Widgets.TextField(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), editTag);
             y += 30f;
             
             // Importance
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "RimTalk_Knowledge_Importance".Translate() + ":");
-            editImportance = Widgets.HorizontalSlider(new Rect(rect.x + 100f, y, rect.width - 150f, 25f), editImportance, 0f, 1f);
+            Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
+                CommonKnowledgeTranslationKeys.Importance.Translate() + ":");
+            editImportance = Widgets.HorizontalSlider(
+                new Rect(rect.x + 100f, y, rect.width - 150f, 25f), 
+                editImportance, 0f, 1f
+            );
             Widgets.Label(new Rect(rect.xMax - 40f, y, 40f, 25f), editImportance.ToString("F1"));
             y += 30f;
             
             // Pawn selection (simplified)
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "RimTalk_Knowledge_Visibility".Translate() + ":");
-            string pawnLabel = editTargetPawnId == -1 ? "RimTalk_Knowledge_Global".Translate().ToString() : $"Pawn #{editTargetPawnId}";
+            Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
+                CommonKnowledgeTranslationKeys.Visibility.Translate() + ":");
+            string pawnLabel = editTargetPawnId == -1 
+                ? CommonKnowledgeTranslationKeys.Global.Translate().ToString() 
+                : $"Pawn #{editTargetPawnId}";
             if (Widgets.ButtonText(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), pawnLabel))
             {
-                ShowPawnSelectionMenu();
-            }
-            y += 35f;
-            
-            // Exclude Keywords
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "排除词:");
-            editExcludeKeywords = Widgets.TextField(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), editExcludeKeywords);
-            y += 35f;
-
-            // Match Mode
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "匹配模式:");
-            if (Widgets.ButtonText(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), editMatchMode.ToString()))
-            {
-                List<FloatMenuOption> options = new List<FloatMenuOption>();
-                foreach (KeywordMatchMode mode in Enum.GetValues(typeof(KeywordMatchMode)))
-                {
-                    options.Add(new FloatMenuOption(mode.ToString(), delegate { editMatchMode = mode; }));
-                }
-                Find.WindowStack.Add(new FloatMenu(options));
+                // ⭐ 使用辅助方法显示Pawn选择菜单
+                CommonKnowledgeUIHelpers.ShowPawnSelectionMenu(pawnId => editTargetPawnId = pawnId);
             }
             y += 35f;
             
             // Content
-            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "RimTalk_Knowledge_Content".Translate() + ":");
+            Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
+                CommonKnowledgeTranslationKeys.Content.Translate() + ":");
             y += 27f;
             
             float contentHeight = rect.yMax - y - 80f;
@@ -855,12 +772,14 @@ namespace RimTalk.Memory.UI
             
             // Buttons
             float buttonY = rect.yMax - 65f;
-            if (Widgets.ButtonText(new Rect(rect.x, buttonY, (rect.width - 5f) / 2f, BUTTON_HEIGHT), "RimTalk_Knowledge_Save".Translate()))
+            if (Widgets.ButtonText(new Rect(rect.x, buttonY, (rect.width - 5f) / 2f, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.Save.Translate()))
             {
                 SaveEntry();
             }
             
-            if (Widgets.ButtonText(new Rect(rect.x + (rect.width + 5f) / 2f, buttonY, (rect.width - 5f) / 2f, BUTTON_HEIGHT), "RimTalk_Knowledge_Cancel".Translate()))
+            if (Widgets.ButtonText(new Rect(rect.x + (rect.width + 5f) / 2f, buttonY, (rect.width - 5f) / 2f, BUTTON_HEIGHT), 
+                CommonKnowledgeTranslationKeys.Cancel.Translate()))
             {
                 editMode = false;
             }
@@ -875,7 +794,7 @@ namespace RimTalk.Memory.UI
             // Category filter
             if (currentCategory != KnowledgeCategory.All)
             {
-                entries = entries.Where(e => GetEntryCategory(e) == currentCategory);
+                entries = entries.Where(e => CommonKnowledgeUIHelpers.GetEntryCategory(e) == currentCategory);
             }
             
             // Search filter
@@ -923,12 +842,12 @@ namespace RimTalk.Memory.UI
             if (category == KnowledgeCategory.All)
                 return library.Entries.Count;
             
-            return library.Entries.Count(e => GetEntryCategory(e) == category);
+            return library.Entries.Count(e => CommonKnowledgeUIHelpers.GetEntryCategory(e) == category);
         }
         
         private Color GetCategoryColor(CommonKnowledgeEntry entry)
         {
-            var category = GetEntryCategory(entry);
+            var category = CommonKnowledgeUIHelpers.GetEntryCategory(entry);
             switch (category)
             {
                 case KnowledgeCategory.Instructions: return new Color(0.3f, 0.8f, 0.3f);
@@ -939,28 +858,12 @@ namespace RimTalk.Memory.UI
             }
         }
         
-        private string GetVisibilityText(CommonKnowledgeEntry entry)
-        {
-            if (entry.targetPawnId == -1)
-                return "RimTalk_Knowledge_VisibilityGlobal".Translate();
-            
-            var pawn = Find.Maps?
-                .SelectMany(m => m.mapPawns.FreeColonists)
-                .FirstOrDefault(p => p.thingIDNumber == entry.targetPawnId);
-            
-            return pawn != null ? "RimTalk_Knowledge_VisibilityExclusive".Translate(pawn.LabelShort) : "RimTalk_Knowledge_VisibilityDeleted".Translate(entry.targetPawnId);
-        }
-
-        // ==================== Actions ====================
-        
         private void CreateNewEntry()
         {
             editTag = "";
             editContent = "";
             editImportance = 0.5f;
             editTargetPawnId = -1;
-            editExcludeKeywords = "";
-            editMatchMode = KeywordMatchMode.Any;
             lastSelectedEntry = null;
             selectedEntries.Clear();
             editMode = true;
@@ -975,8 +878,6 @@ namespace RimTalk.Memory.UI
                 editContent = entry.content;
                 editImportance = entry.importance;
                 editTargetPawnId = entry.targetPawnId;
-                editExcludeKeywords = entry.excludeKeywords != null ? string.Join(", ", entry.excludeKeywords) : "";
-                editMatchMode = entry.matchMode;
                 lastSelectedEntry = entry;
                 editMode = true;
             }
@@ -986,14 +887,10 @@ namespace RimTalk.Memory.UI
         {
             if (string.IsNullOrEmpty(editTag) || string.IsNullOrEmpty(editContent))
             {
-                Messages.Message("RimTalk_Knowledge_TagContentEmpty".Translate(), MessageTypeDefOf.RejectInput, false);
+                Messages.Message(CommonKnowledgeTranslationKeys.TagContentEmpty.Translate(), 
+                    MessageTypeDefOf.RejectInput, false);
                 return;
             }
-            
-            List<string> excludes = editExcludeKeywords.Split(new[] { ',', '，', '、', ';', '；' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(k => k.Trim())
-                .Where(k => !string.IsNullOrEmpty(k))
-                .ToList();
             
             if (lastSelectedEntry == null)
             {
@@ -1002,17 +899,12 @@ namespace RimTalk.Memory.UI
                 {
                     importance = editImportance,
                     targetPawnId = editTargetPawnId,
-                    isUserEdited = true,
-                    excludeKeywords = excludes,
-                    matchMode = editMatchMode
+                    isUserEdited = true
                 };
                 library.AddEntry(newEntry);
                 selectedEntries.Clear();
                 selectedEntries.Add(newEntry);
                 lastSelectedEntry = newEntry;
-                
-                // ⭐ 调试信息：新建条目的向量同步
-                LogVectorSyncDebugInfo(newEntry);
             }
             else
             {
@@ -1022,92 +914,11 @@ namespace RimTalk.Memory.UI
                 lastSelectedEntry.importance = editImportance;
                 lastSelectedEntry.targetPawnId = editTargetPawnId;
                 lastSelectedEntry.isUserEdited = true;
-                lastSelectedEntry.excludeKeywords = excludes;
-                lastSelectedEntry.matchMode = editMatchMode;
-                
-                // ⭐ 清除缓存，确保新标签生效
-                lastSelectedEntry.InvalidateCache();
-                
-                // ⭐ 调试信息：编辑条目的向量同步
-                if (RimTalkMemoryPatchMod.Settings.enableVectorEnhancement && lastSelectedEntry.isEnabled)
-                {
-                    try
-                    {
-                        VectorDB.VectorService.Instance.UpdateKnowledgeVector(lastSelectedEntry.id, lastSelectedEntry.content);
-                        LogVectorSyncDebugInfo(lastSelectedEntry);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error($"[RimTalk-ExpandMemory] Failed to update vector for entry {lastSelectedEntry.id}: {ex}");
-                    }
-                }
             }
             
             editMode = false;
-            Messages.Message("RimTalk_Knowledge_EntrySaved".Translate(), MessageTypeDefOf.PositiveEvent, false);
-        }
-        
-        /// <summary>
-        /// ⭐ 调试信息：记录向量同步的详细信息
-        /// </summary>
-        private void LogVectorSyncDebugInfo(CommonKnowledgeEntry entry)
-        {
-            if (!RimTalkMemoryPatchMod.Settings.enableVectorEnhancement)
-            {
-                Log.Message($"[RimTalk-ExpandMemory] Vector enhancement is DISABLED. Entry '{entry.tag}' will NOT be vectorized.");
-                return;
-            }
-            
-            if (!entry.isEnabled)
-            {
-                Log.Message($"[RimTalk-ExpandMemory] Entry '{entry.tag}' is DISABLED. Will NOT be vectorized.");
-                return;
-            }
-            
-            try
-            {
-                // 1. 显示原始内容
-                string contentPreview = entry.content.Length > 100 ? entry.content.Substring(0, 100) + "..." : entry.content;
-                Log.Message($"[RimTalk-ExpandMemory] ========== Vector Sync Debug ==========");
-                Log.Message($"[RimTalk-ExpandMemory] Entry ID: {entry.id}");
-                Log.Message($"[RimTalk-ExpandMemory] Entry Tag: {entry.tag}");
-                Log.Message($"[RimTalk-ExpandMemory] Content Preview: {contentPreview}");
-                
-                // 2. 模拟分词过程（调用 VectorService 的私有方法需要反射，这里简化显示）
-                // 显示内容长度和基本信息
-                Log.Message($"[RimTalk-ExpandMemory] Content Length: {entry.content.Length} characters");
-                Log.Message($"[RimTalk-ExpandMemory] Content (lowercase): {entry.content.ToLowerInvariant().Substring(0, Math.Min(100, entry.content.Length))}");
-                
-                // 3. 尝试查找向量（验证是否成功存储）
-                var vectorResults = VectorDB.VectorService.Instance.FindBestLoreIds(entry.content, 1, 0.99f);
-                
-                if (vectorResults != null && vectorResults.Count > 0 && vectorResults[0].id == entry.id)
-                {
-                    Log.Message($"[RimTalk-ExpandMemory] ✓ Vector FOUND in database! Similarity: {vectorResults[0].similarity:F4}");
-                    Log.Message($"[RimTalk-ExpandMemory] ✓ Model is working correctly!");
-                }
-                else
-                {
-                    Log.Warning($"[RimTalk-ExpandMemory] ✗ Vector NOT FOUND in database!");
-                    Log.Warning($"[RimTalk-ExpandMemory] ✗ This may indicate a problem with the vector model or tokenization.");
-                    
-                    // 显示实际找到的结果（如果有）
-                    if (vectorResults != null && vectorResults.Count > 0)
-                    {
-                        Log.Message($"[RimTalk-ExpandMemory] Instead found: ID={vectorResults[0].id}, Similarity={vectorResults[0].similarity:F4}");
-                    }
-                    else
-                    {
-                        Log.Message($"[RimTalk-ExpandMemory] No similar vectors found at all.");
-                    }
-                }
-                
-                Log.Message($"[RimTalk-ExpandMemory] ========================================");
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[RimTalk-ExpandMemory] Error in vector sync debug: {ex}");
-            }
+            Messages.Message(CommonKnowledgeTranslationKeys.EntrySaved.Translate(), 
+                MessageTypeDefOf.PositiveEvent, false);
         }
         
         private void DeleteSelectedEntries()
@@ -1116,7 +927,7 @@ namespace RimTalk.Memory.UI
             
             int count = selectedEntries.Count;
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                "RimTalk_Knowledge_DeleteConfirm".Translate(count),
+                CommonKnowledgeTranslationKeys.DeleteConfirm.Translate(count),
                 delegate
                 {
                     foreach (var entry in selectedEntries.ToList())
@@ -1125,7 +936,8 @@ namespace RimTalk.Memory.UI
                     }
                     selectedEntries.Clear();
                     lastSelectedEntry = null;
-                    Messages.Message("RimTalk_Knowledge_Deleted".Translate(count), MessageTypeDefOf.PositiveEvent, false);
+                    Messages.Message(CommonKnowledgeTranslationKeys.Deleted.Translate(count), 
+                        MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
         }
@@ -1150,19 +962,22 @@ namespace RimTalk.Memory.UI
             }
             
             GUIUtility.systemCopyBuffer = content;
-            Messages.Message("RimTalk_Knowledge_ExportedToClipboard".Translate(selectedEntries.Count > 0 ? selectedEntries.Count : library.Entries.Count), MessageTypeDefOf.PositiveEvent, false);
+            int exportCount = selectedEntries.Count > 0 ? selectedEntries.Count : library.Entries.Count;
+            Messages.Message(CommonKnowledgeTranslationKeys.ExportedToClipboard.Translate(exportCount), 
+                MessageTypeDefOf.PositiveEvent, false);
         }
         
         private void ShowImportDialog()
         {
             Find.WindowStack.Add(new Dialog_TextInput(
-                "RimTalk_Knowledge_ImportTitle".Translate(),
-                "RimTalk_Knowledge_ImportDescription".Translate(),
+                CommonKnowledgeTranslationKeys.ImportTitle.Translate(),
+                CommonKnowledgeTranslationKeys.ImportDescription.Translate(),
                 "",
                 delegate(string text)
                 {
                     int count = library.ImportFromText(text);
-                    Messages.Message("RimTalk_Knowledge_Imported".Translate(count), MessageTypeDefOf.PositiveEvent, false);
+                    Messages.Message(CommonKnowledgeTranslationKeys.Imported.Translate(count), 
+                        MessageTypeDefOf.PositiveEvent, false);
                 },
                 null,
                 true
@@ -1172,34 +987,16 @@ namespace RimTalk.Memory.UI
         private void ClearAllEntries()
         {
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                "RimTalk_Knowledge_ClearConfirm".Translate(),
+                CommonKnowledgeTranslationKeys.ClearConfirm.Translate(),
                 delegate
                 {
                     library.Clear();
                     selectedEntries.Clear();
                     lastSelectedEntry = null;
-                    Messages.Message("RimTalk_Knowledge_AllCleared".Translate(), MessageTypeDefOf.PositiveEvent, false);
+                    Messages.Message(CommonKnowledgeTranslationKeys.AllCleared.Translate(), 
+                        MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
-        }
-        
-        private void ShowPawnSelectionMenu()
-        {
-            List<FloatMenuOption> options = new List<FloatMenuOption>();
-            
-            options.Add(new FloatMenuOption("RimTalk_Knowledge_GlobalAll".Translate(), delegate { editTargetPawnId = -1; }));
-            
-            var colonists = Find.Maps?.SelectMany(m => m.mapPawns.FreeColonists).ToList();
-            if (colonists != null && colonists.Count > 0)
-            {
-                foreach (var pawn in colonists.OrderBy(p => p.LabelShort))
-                {
-                    int pawnId = pawn.thingIDNumber;
-                    options.Add(new FloatMenuOption("RimTalk_Knowledge_ExclusiveTo".Translate(pawn.LabelShort), delegate { editTargetPawnId = pawnId; }));
-                }
-            }
-            
-            Find.WindowStack.Add(new FloatMenu(options));
         }
         
         private void GeneratePawnStatusKnowledge()
@@ -1209,7 +1006,8 @@ namespace RimTalk.Memory.UI
                 var colonists = Find.CurrentMap?.mapPawns?.FreeColonists;
                 if (colonists == null || colonists.Count() == 0)
                 {
-                    Messages.Message("RimTalk_Knowledge_NoColonists".Translate(), MessageTypeDefOf.RejectInput, false);
+                    Messages.Message(CommonKnowledgeTranslationKeys.NoColonists.Translate(), 
+                        MessageTypeDefOf.RejectInput, false);
                     return;
                 }
                 
@@ -1229,11 +1027,13 @@ namespace RimTalk.Memory.UI
                     }
                 }
                 
-                Messages.Message("RimTalk_Knowledge_GeneratedPawnStatus".Translate(generated), MessageTypeDefOf.PositiveEvent, false);
+                Messages.Message(CommonKnowledgeTranslationKeys.GeneratedPawnStatus.Translate(generated), 
+                    MessageTypeDefOf.PositiveEvent, false);
             }
             catch (Exception ex)
             {
-                Messages.Message("RimTalk_Knowledge_GenerationFailed".Translate(ex.Message), MessageTypeDefOf.RejectInput, false);
+                Messages.Message(CommonKnowledgeTranslationKeys.GenerationFailed.Translate(ex.Message), 
+                    MessageTypeDefOf.RejectInput, false);
             }
         }
         
@@ -1242,11 +1042,13 @@ namespace RimTalk.Memory.UI
             try
             {
                 EventRecordKnowledgeGenerator.ScanRecentPlayLog();
-                Messages.Message("RimTalk_Knowledge_EventScanTriggered".Translate(), MessageTypeDefOf.PositiveEvent, false);
+                Messages.Message(CommonKnowledgeTranslationKeys.EventScanTriggered.Translate(), 
+                    MessageTypeDefOf.PositiveEvent, false);
             }
             catch (Exception ex)
             {
-                Messages.Message("RimTalk_Knowledge_GenerationFailed".Translate(ex.Message), MessageTypeDefOf.RejectInput, false);
+                Messages.Message(CommonKnowledgeTranslationKeys.GenerationFailed.Translate(ex.Message), 
+                    MessageTypeDefOf.RejectInput, false);
             }
         }
     }
@@ -1263,3 +1065,4 @@ namespace RimTalk.Memory.UI
         Other
     }
 }
+

@@ -8,67 +8,67 @@ using RimTalk.MemoryPatch;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// äº‹ä»¶è®°å½•å¸¸è¯†ç”Ÿæˆå™¨ (PlayLogæ‰«æ - è¡¥å……ç›‘å¬)
-    /// ? èŒè´£ï¼šæ•è·IncidentPatchæ— æ³•ç›‘å¬çš„äº‹ä»¶
-    /// - æ­»äº¡é€šçŸ¥ï¼ˆéIncidentè§¦å‘çš„æ­»äº¡ï¼‰
-    /// - å…³ç³»å˜åŒ–ç»†èŠ‚ï¼ˆåŒ…å«å‚ä¸è€…åå­—ï¼‰
-    /// - å…¶ä»–é‡è¦æ—¥å¿—ï¼ˆå…œåº•æœºåˆ¶ï¼‰
+    /// ÊÂ¼ş¼ÇÂ¼³£Ê¶Éú³ÉÆ÷ (PlayLogÉ¨Ãè - ²¹³ä¼àÌı)
+    /// ? Ö°Ôğ£º²¶»ñIncidentPatchÎŞ·¨¼àÌıµÄÊÂ¼ş
+    /// - ËÀÍöÍ¨Öª£¨·ÇIncident´¥·¢µÄËÀÍö£©
+    /// - ¹ØÏµ±ä»¯Ï¸½Ú£¨°üº¬²ÎÓëÕßÃû×Ö£©
+    /// - ÆäËûÖØÒªÈÕÖ¾£¨¶µµ×»úÖÆ£©
     /// </summary>
     public static class EventRecordKnowledgeGenerator
     {
-        // å·²å¤„ç†çš„è®°å½•IDï¼ˆé˜²æ­¢é‡å¤ï¼‰
+        // ÒÑ´¦ÀíµÄ¼ÇÂ¼ID£¨·ÀÖ¹ÖØ¸´£©
         private static HashSet<int> processedLogIDs = new HashSet<int>();
         
-        // é‡è¦äº‹ä»¶å…³é”®è¯ï¼ˆä¼˜å…ˆçº§ï¼‰
+        // ÖØÒªÊÂ¼ş¹Ø¼ü´Ê£¨ÓÅÏÈ¼¶£©
         private static readonly Dictionary<string, float> ImportantKeywords = new Dictionary<string, float>
         {
-            // æ­»äº¡ç›¸å…³ï¼ˆæœ€é‡è¦1.0ï¼‰
-            { "æ­»äº¡", 1.0f }, { "å€’ä¸‹", 1.0f }, { "è¢«æ€", 1.0f }, { "å‡»æ€", 1.0f }, { "ç‰ºç‰²", 1.0f },
+            // ËÀÍöÏà¹Ø£¨×îÖØÒª1.0£©
+            { "ËÀÍö", 1.0f }, { "µ¹ÏÂ", 1.0f }, { "±»É±", 1.0f }, { "»÷É±", 1.0f }, { "ÎşÉü", 1.0f },
             { "died", 1.0f }, { "killed", 1.0f }, { "death", 1.0f }, { "dead", 1.0f },
             
-            // æˆ˜æ–—ç›¸å…³ï¼ˆé‡è¦æ€§0.9ï¼‰
-            { "è¢­å‡»", 0.9f }, { "è¿›æ”»", 0.9f }, { "é˜²å¾¡", 0.9f }, { "raid", 0.9f }, { "attack", 0.9f },
-            { "å‡»é€€", 0.85f }, { "æˆ˜èƒœ", 0.85f }, { "defeated", 0.85f },
+            // Õ½¶·Ïà¹Ø£¨ÖØÒªĞÔ0.9£©
+            { "Ï®»÷", 0.9f }, { "½ø¹¥", 0.9f }, { "·ÀÓù", 0.9f }, { "raid", 0.9f }, { "attack", 0.9f },
+            { "»÷ÍË", 0.85f }, { "Õ½Ê¤", 0.85f }, { "defeated", 0.85f },
             
-            // ? æ–°å¢ï¼šè‘¬ç¤¼ç›¸å…³ï¼ˆé‡è¦æ€§0.9ï¼‰
-            { "è‘¬ç¤¼", 0.9f }, { "è‘¬", 0.9f }, { "åŸ‹è‘¬", 0.9f }, { "funeral", 0.9f }, { "burial", 0.9f },
-            { "ä¸¾è¡Œè‘¬ç¤¼", 0.9f }, { "å®‰è‘¬", 0.9f },
+            // ? ĞÂÔö£ºÔáÀñÏà¹Ø£¨ÖØÒªĞÔ0.9£©
+            { "ÔáÀñ", 0.9f }, { "Ôá", 0.9f }, { "ÂñÔá", 0.9f }, { "funeral", 0.9f }, { "burial", 0.9f },
+            { "¾ÙĞĞÔáÀñ", 0.9f }, { "°²Ôá", 0.9f },
             
-            // å…³ç³»ç›¸å…³ï¼ˆé‡è¦æ€§0.85ï¼‰
-            { "ç»“å©š", 0.85f }, { "è®¢å©š", 0.85f }, { "married", 0.85f }, { "engaged", 0.85f },
-            { "å©šç¤¼", 0.85f }, { "wedding", 0.85f }, { "ä¸¾è¡Œå©šç¤¼", 0.85f },
-            { "åˆ†æ‰‹", 0.75f }, { "ç¦»å©š", 0.75f }, { "breakup", 0.75f },
+            // ¹ØÏµÏà¹Ø£¨ÖØÒªĞÔ0.85£©
+            { "½á»é", 0.85f }, { "¶©»é", 0.85f }, { "married", 0.85f }, { "engaged", 0.85f },
+            { "»éÀñ", 0.85f }, { "wedding", 0.85f }, { "¾ÙĞĞ»éÀñ", 0.85f },
+            { "·ÖÊÖ", 0.75f }, { "Àë»é", 0.75f }, { "breakup", 0.75f },
             
-            // ? æ–°å¢ï¼šç”Ÿæ—¥ç›¸å…³ï¼ˆé‡è¦æ€§0.7ï¼‰
-            { "ç”Ÿæ—¥", 0.7f }, { "birthday", 0.7f }, { "åº†ç¥", 0.6f }, { "celebration", 0.6f },
-            { "è¿‡ç”Ÿæ—¥", 0.7f }, { "åº†ç¥ç”Ÿæ—¥", 0.7f },
+            // ? ĞÂÔö£ºÉúÈÕÏà¹Ø£¨ÖØÒªĞÔ0.7£©
+            { "ÉúÈÕ", 0.7f }, { "birthday", 0.7f }, { "Çì×£", 0.6f }, { "celebration", 0.6f },
+            { "¹ıÉúÈÕ", 0.7f }, { "Çì×£ÉúÈÕ", 0.7f },
             
-            // ? æ–°å¢ï¼šç ”ç©¶çªç ´ï¼ˆé‡è¦æ€§0.8ï¼‰
-            { "çªç ´", 0.8f }, { "breakthrough", 0.8f }, { "å®Œæˆç ”ç©¶", 0.8f }, { "research complete", 0.8f },
-            { "ç ”ç©¶å®Œæˆ", 0.8f }, { "å‘æ˜", 0.8f }, { "invention", 0.8f },
+            // ? ĞÂÔö£ºÑĞ¾¿Í»ÆÆ£¨ÖØÒªĞÔ0.8£©
+            { "Í»ÆÆ", 0.8f }, { "breakthrough", 0.8f }, { "Íê³ÉÑĞ¾¿", 0.8f }, { "research complete", 0.8f },
+            { "ÑĞ¾¿Íê³É", 0.8f }, { "·¢Ã÷", 0.8f }, { "invention", 0.8f },
             
-            // ? æ–°å¢ï¼šå‘¨å¹´çºªå¿µï¼ˆé‡è¦æ€§0.7ï¼‰
-            { "å‘¨å¹´", 0.7f }, { "anniversary", 0.7f }, { "å‘¨å¹´çºªå¿µ", 0.7f },
+            // ? ĞÂÔö£ºÖÜÄê¼ÍÄî£¨ÖØÒªĞÔ0.7£©
+            { "ÖÜÄê", 0.7f }, { "anniversary", 0.7f }, { "ÖÜÄê¼ÍÄî", 0.7f },
             
-            // æˆå‘˜å˜åŠ¨ï¼ˆé‡è¦æ€§0.8ï¼‰
-            { "åŠ å…¥", 0.8f }, { "é€ƒè·‘", 0.8f }, { "ç¦»å¼€", 0.8f }, { "joined", 0.8f }, { "fled", 0.8f },
-            { "æ‹›å‹Ÿ", 0.75f }, { "recruited", 0.75f }, { "æ–°æˆå‘˜", 0.8f },
+            // ³ÉÔ±±ä¶¯£¨ÖØÒªĞÔ0.8£©
+            { "¼ÓÈë", 0.8f }, { "ÌÓÅÜ", 0.8f }, { "Àë¿ª", 0.8f }, { "joined", 0.8f }, { "fled", 0.8f },
+            { "ÕĞÄ¼", 0.75f }, { "recruited", 0.75f }, { "ĞÂ³ÉÔ±", 0.8f },
             
-            // ç¾å®³ç›¸å…³ï¼ˆé‡è¦æ€§0.85ï¼‰
-            { "çˆ†ç‚¸", 0.85f }, { "çƒŸé›¾", 0.85f }, { "ç«ç¾", 0.85f }, { "explosion", 0.85f }, { "fire", 0.85f },
-            { "æ¯’èˆ¹", 0.85f }, { "é¾™å·é£", 0.85f }, { "tornado", 0.85f },
-            { "ç–¾ç—…", 0.85f }, { "é¥¥è’", 0.8f }, { "é¥¿æ­»", 0.8f }, { "starvation", 0.8f },
+            // ÔÖº¦Ïà¹Ø£¨ÖØÒªĞÔ0.85£©
+            { "±¬Õ¨", 0.85f }, { "ÑÌÎí", 0.85f }, { "»ğÔÖ", 0.85f }, { "explosion", 0.85f }, { "fire", 0.85f },
+            { "¶¾´¬", 0.85f }, { "Áú¾í·ç", 0.85f }, { "tornado", 0.85f },
+            { "¼²²¡", 0.85f }, { "¼¢»Ä", 0.8f }, { "¶öËÀ", 0.8f }, { "starvation", 0.8f },
             
-            // ? æ–°å¢ï¼šå…¶ä»–é‡è¦äº‹ä»¶
-            { "æ—¥é£Ÿ", 0.75f }, { "eclipse", 0.75f },
-            { "è™«æ—", 0.85f }, { "infestation", 0.85f },
-            { "è´¸æ˜“", 0.6f }, { "caravan", 0.6f }, { "visitor", 0.6f },
-            { "ä»»åŠ¡", 0.65f }, { "quest", 0.65f },
+            // ? ĞÂÔö£ºÆäËûÖØÒªÊÂ¼ş
+            { "ÈÕÊ³", 0.75f }, { "eclipse", 0.75f },
+            { "³æ×å", 0.85f }, { "infestation", 0.85f },
+            { "Ã³Ò×", 0.6f }, { "caravan", 0.6f }, { "visitor", 0.6f },
+            { "ÈÎÎñ", 0.65f }, { "quest", 0.65f },
         };
         
         /// <summary>
-        /// æ¯å°æ—¶æ‰«æPlayLogäº‹ä»¶
-        /// ç”Ÿæˆå…¨å±€å…¬å…±æ®–æ°‘åœ°å†å²å¸¸è¯†
+        /// Ã¿Ğ¡Ê±É¨ÃèPlayLogÊÂ¼ş
+        /// Éú³ÉÈ«¾Ö¹«¹²Ö³ÃñµØÀúÊ·³£Ê¶
         /// </summary>
         public static void ScanRecentPlayLog()
         {
@@ -85,25 +85,25 @@ namespace RimTalk.Memory
                 if (library == null)
                     return;
                 
-                // ? v3.3.3: å…ˆæ›´æ–°å·²æœ‰äº‹ä»¶å¸¸è¯†çš„æ—¶é—´å‰ç¼€
+                // ? v3.3.3: ÏÈ¸üĞÂÒÑÓĞÊÂ¼ş³£Ê¶µÄÊ±¼äÇ°×º
                 UpdateEventKnowledgeTimePrefix(library);
                 
                 int processedCount = 0;
                 int currentTick = Find.TickManager.TicksGame;
                 
-                // ? v3.3.3 ä¿®å¤ï¼šæ­£ç¡®ç­›é€‰æœ€è¿‘1å°æ—¶çš„äº‹ä»¶
-                // PlayLog.Age æ˜¯äº‹ä»¶å‘ç”Ÿæ—¶çš„æ¸¸æˆtickï¼ˆç»å¯¹æ—¶é—´ï¼‰
-                // æ‰€ä»¥åº”è¯¥æ˜¯ï¼šcurrentTick - Age <= GenDate.TicksPerHour
+                // ? v3.3.3 ĞŞ¸´£ºÕıÈ·É¸Ñ¡×î½ü1Ğ¡Ê±µÄÊÂ¼ş
+                // PlayLog.Age ÊÇÊÂ¼ş·¢ÉúÊ±µÄÓÎÏ·tick£¨¾ø¶ÔÊ±¼ä£©
+                // ËùÒÔÓ¦¸ÃÊÇ£ºcurrentTick - Age <= GenDate.TicksPerHour
                 var recentEntries = gameHistory.AllEntries
-                    .Where(e => e != null && (currentTick - e.Age) <= GenDate.TicksPerHour) // ? ä¿®å¤æ—¶é—´åˆ¤æ–­
-                    .OrderByDescending(e => e.Age) // æŒ‰æ—¶é—´å€’åºï¼ˆæœ€æ–°çš„ä¼˜å…ˆï¼‰
+                    .Where(e => e != null && (currentTick - e.Age) <= GenDate.TicksPerHour) // ? ĞŞ¸´Ê±¼äÅĞ¶Ï
+                    .OrderByDescending(e => e.Age) // °´Ê±¼äµ¹Ğò£¨×îĞÂµÄÓÅÏÈ£©
                     .Take(50);
                 
                 foreach (var logEntry in recentEntries)
                 {
                     try
                     {
-                        // ä½¿ç”¨LogEntryçš„IDå»é‡
+                        // Ê¹ÓÃLogEntryµÄIDÈ¥ÖØ
                         int logID = logEntry.GetHashCode();
                         
                         if (processedLogIDs.Contains(logID))
@@ -111,7 +111,7 @@ namespace RimTalk.Memory
                         
                         processedLogIDs.Add(logID);
                         
-                        // æ§åˆ¶é›†åˆå¤§å°
+                        // ¿ØÖÆ¼¯ºÏ´óĞ¡
                         if (processedLogIDs.Count > 2000)
                         {
                             var toRemove = processedLogIDs.Take(1000).ToList();
@@ -121,39 +121,39 @@ namespace RimTalk.Memory
                             }
                         }
                         
-                        // è·å–äº‹ä»¶ä¿¡æ¯
+                        // »ñÈ¡ÊÂ¼şĞÅÏ¢
                         string eventText = ExtractEventInfo(logEntry);
                         
                         if (!string.IsNullOrEmpty(eventText))
                         {
-                            // æ£€æŸ¥æ˜¯å¦å·²å­˜åœ¨
+                            // ¼ì²éÊÇ·ñÒÑ´æÔÚ
                             bool exists = library.Entries.Any(e => 
                                 e.content.Contains(eventText.Substring(0, Math.Min(15, eventText.Length)))
                             );
                             
                             if (!exists)
                             {
-                                // è®¡ç®—é‡è¦æ€§
+                                // ¼ÆËãÖØÒªĞÔ
                                 float importance = CalculateImportance(eventText);
                                 
-                                // ? v3.3.3: æå–åŸå§‹äº‹ä»¶æ–‡æœ¬ï¼ˆç§»é™¤æ—¶é—´å‰ç¼€ï¼‰
+                                // ? v3.3.3: ÌáÈ¡Ô­Ê¼ÊÂ¼şÎÄ±¾£¨ÒÆ³ıÊ±¼äÇ°×º£©
                                 string originalText = ExtractOriginalEventText(eventText);
                                 
-                                // ? v3.3.3: åˆ›å»ºäº‹ä»¶å¸¸è¯†ï¼Œä¿å­˜åˆ›å»ºæ—¶é—´å’ŒåŸå§‹æ–‡æœ¬
-                                var entry = new CommonKnowledgeEntry("äº‹ä»¶,å†å²", eventText)
+                                // ? v3.3.3: ´´½¨ÊÂ¼ş³£Ê¶£¬±£´æ´´½¨Ê±¼äºÍÔ­Ê¼ÎÄ±¾
+                                var entry = new CommonKnowledgeEntry("ÊÂ¼ş,ÀúÊ·", eventText)
                                 {
                                     importance = importance,
                                     isEnabled = true,
                                     isUserEdited = false,
-                                    creationTick = currentTick,           // ? è®¾ç½®åˆ›å»ºæ—¶é—´æˆ³
-                                    originalEventText = originalText      // ? ä¿å­˜åŸå§‹æ–‡æœ¬
-                                    // targetPawnId = -1 (é»˜è®¤å…¨å±€)
+                                    creationTick = currentTick,           // ? ÉèÖÃ´´½¨Ê±¼ä´Á
+                                    originalEventText = originalText      // ? ±£´æÔ­Ê¼ÎÄ±¾
+                                    // targetPawnId = -1 (Ä¬ÈÏÈ«¾Ö)
                                 };
                                 
                                 library.AddEntry(entry);
                                 processedCount++;
                                 
-                                // ? v3.3.2: å‡å°‘æ—¥å¿—é‡ - ä»…DevModeä¸”10%æ¦‚ç‡
+                                // ? v3.3.2: ¼õÉÙÈÕÖ¾Á¿ - ½öDevModeÇÒ10%¸ÅÂÊ
                                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                                 {
                                     Log.Message($"[EventRecord] Created event knowledge: {eventText.Substring(0, Math.Min(50, eventText.Length))}...");
@@ -163,7 +163,7 @@ namespace RimTalk.Memory
                     }
                     catch (Exception ex)
                     {
-                        // ? v3.3.2: ä»…åœ¨DevModeä¸”éšæœºè¾“å‡º
+                        // ? v3.3.2: ½öÔÚDevModeÇÒËæ»úÊä³ö
                         if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
                         {
                             Log.Warning($"[EventRecord] Error processing log entry: {ex.Message}");
@@ -171,7 +171,7 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // ? v3.3.2: å‡å°‘æ—¥å¿—é‡ - ä»…DevModeä¸”10%æ¦‚ç‡
+                // ? v3.3.2: ¼õÉÙÈÕÖ¾Á¿ - ½öDevModeÇÒ10%¸ÅÂÊ
                 if (processedCount > 0 && Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                 {
                     Log.Message($"[EventRecord] Processed {processedCount} new PlayLog events");
@@ -179,7 +179,7 @@ namespace RimTalk.Memory
             }
             catch (Exception ex)
             {
-                // ? v3.3.2: å‡å°‘æ—¥å¿—é‡ï¼Œé™ä½é”™è¯¯é¢‘ç‡
+                // ? v3.3.2: ¼õÉÙÈÕÖ¾Á¿£¬½µµÍ´íÎóÆµÂÊ
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
                 {
                     Log.Error($"[EventRecord] Error scanning PlayLog: {ex.Message}");
@@ -188,8 +188,8 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ä»LogEntryæå–äº‹ä»¶ä¿¡æ¯
-        /// ? v3.3.4: ä¼˜åŒ–ä¸ºæå–å…³é”®ä¿¡æ¯ï¼Œå‡å°‘tokenæ¶ˆè€—
+        /// ´ÓLogEntryÌáÈ¡ÊÂ¼şĞÅÏ¢
+        /// ? v3.3.4: ÓÅ»¯ÎªÌáÈ¡¹Ø¼üĞÅÏ¢£¬¼õÉÙtokenÏûºÄ
         /// </summary>
         private static string ExtractEventInfo(LogEntry logEntry)
         {
@@ -198,34 +198,34 @@ namespace RimTalk.Memory
             
             try
             {
-                // è·³è¿‡å¯¹è¯ç±»å‹çš„æ—¥å¿—ï¼ˆå·²ç”±RimTalkå¯¹è¯è®°å¿†å¤„ç†ï¼‰
+                // Ìø¹ı¶Ô»°ÀàĞÍµÄÈÕÖ¾£¨ÒÑÓÉRimTalk¶Ô»°¼ÇÒä´¦Àí£©
                 if (logEntry.GetType().Name == "PlayLogEntry_Interaction")
                 {
                     return null;
                 }
                 
-                // ? ä¿®æ”¹ï¼šå…è®¸å¤„ç†ä¸€äº›é‡è¦çš„éIncidentäº‹ä»¶ï¼Œç‰¹åˆ«æ˜¯æ­»äº¡å’Œè‘¬ç¤¼
+                // ? ĞŞ¸Ä£ºÔÊĞí´¦ÀíÒ»Ğ©ÖØÒªµÄ·ÇIncidentÊÂ¼ş£¬ÌØ±ğÊÇËÀÍöºÍÔáÀñ
                 if (logEntry.GetType().Name == "PlayLogEntry_Incident")
                 {
-                    // å¯¹äºIncidentäº‹ä»¶ï¼Œæ£€æŸ¥æ˜¯å¦æ˜¯éœ€è¦è¡¥å……çš„äº‹ä»¶ç±»å‹
+                    // ¶ÔÓÚIncidentÊÂ¼ş£¬¼ì²éÊÇ·ñÊÇĞèÒª²¹³äµÄÊÂ¼şÀàĞÍ
                     string previewText = logEntry.ToGameStringFromPOV(null, false);
                     if (!string.IsNullOrEmpty(previewText))
                     {
-                        // å…è®¸å¤„ç†ï¼šæ­»äº¡ã€è‘¬ç¤¼ã€ç»“å©šç­‰é‡è¦äº‹ä»¶ï¼ˆä½œä¸ºIncidentPatchçš„è¡¥å……ï¼‰
+                        // ÔÊĞí´¦Àí£ºËÀÍö¡¢ÔáÀñ¡¢½á»éµÈÖØÒªÊÂ¼ş£¨×÷ÎªIncidentPatchµÄ²¹³ä£©
                         bool isImportantEvent = 
-                            previewText.Contains("æ­»äº¡") || previewText.Contains("died") || previewText.Contains("killed") || 
+                            previewText.Contains("ËÀÍö") || previewText.Contains("died") || previewText.Contains("killed") || 
                             previewText.Contains("dead") || previewText.Contains("death") ||
-                            previewText.Contains("è‘¬ç¤¼") || previewText.Contains("è‘¬") || previewText.Contains("åŸ‹è‘¬") ||
-                            previewText.Contains("ç»“å©š") || previewText.Contains("å©šç¤¼") || previewText.Contains("married") ||
-                            previewText.Contains("ç”Ÿæ—¥") || previewText.Contains("birthday") ||
-                            previewText.Contains("çªç ´") || previewText.Contains("breakthrough");
+                            previewText.Contains("ÔáÀñ") || previewText.Contains("Ôá") || previewText.Contains("ÂñÔá") ||
+                            previewText.Contains("½á»é") || previewText.Contains("»éÀñ") || previewText.Contains("married") ||
+                            previewText.Contains("ÉúÈÕ") || previewText.Contains("birthday") ||
+                            previewText.Contains("Í»ÆÆ") || previewText.Contains("breakthrough");
                         
                         if (!isImportantEvent)
                         {
-                            // å…¶ä»–Incidentäº‹ä»¶ï¼šè·³è¿‡ï¼Œé¿å…é‡å¤ï¼ˆIncidentPatchå·²å¤„ç†ï¼‰
+                            // ÆäËûIncidentÊÂ¼ş£ºÌø¹ı£¬±ÜÃâÖØ¸´£¨IncidentPatchÒÑ´¦Àí£©
                             return null;
                         }
-                        // é‡è¦äº‹ä»¶ï¼šç»§ç»­å¤„ç†
+                        // ÖØÒªÊÂ¼ş£º¼ÌĞø´¦Àí
                     }
                     else
                     {
@@ -238,81 +238,81 @@ namespace RimTalk.Memory
                 if (string.IsNullOrEmpty(text))
                     return null;
                 
-                // è¿‡æ»¤é•¿åº¦
+                // ¹ıÂË³¤¶È
                 if (text.Length < 10 || text.Length > 200)
                     return null;
                 
-                // è¿‡æ»¤æ— èŠäº‹ä»¶
+                // ¹ıÂËÎŞÁÄÊÂ¼ş
                 if (IsBoringMessage(text))
                     return null;
                 
-                // ? å¢å¼ºå…³é”®è¯æ£€æµ‹ï¼šæ£€æŸ¥æ˜¯å¦åŒ…å«é‡è¦å…³é”®è¯
+                // ? ÔöÇ¿¹Ø¼ü´Ê¼ì²â£º¼ì²éÊÇ·ñ°üº¬ÖØÒª¹Ø¼ü´Ê
                 bool hasImportantKeyword = ImportantKeywords.Keys.Any(k => text.Contains(k));
                 
                 if (!hasImportantKeyword)
                 {
-                    // ? æ–°å¢ï¼šå¦‚æœæ²¡æœ‰åŒ¹é…é‡è¦å…³é”®è¯ï¼Œä½†è¿™æ˜¯Incidentäº‹ä»¶ï¼Œä¹Ÿè®°å½•ï¼ˆå®½æ¾æ¨¡å¼ï¼‰
+                    // ? ĞÂÔö£ºÈç¹ûÃ»ÓĞÆ¥ÅäÖØÒª¹Ø¼ü´Ê£¬µ«ÕâÊÇIncidentÊÂ¼ş£¬Ò²¼ÇÂ¼£¨¿íËÉÄ£Ê½£©
                     if (logEntry.GetType().Name == "PlayLogEntry_Incident")
                     {
-                        // ç§»é™¤è°ƒè¯•æ—¥å¿—
-                        // å¯¹äºIncidentäº‹ä»¶ï¼Œå³ä½¿å…³é”®è¯ä¸åŒ¹é…ä¹Ÿè®°å½•ï¼ˆä½†é™ä½é‡è¦æ€§ï¼‰
+                        // ÒÆ³ıµ÷ÊÔÈÕÖ¾
+                        // ¶ÔÓÚIncidentÊÂ¼ş£¬¼´Ê¹¹Ø¼ü´Ê²»Æ¥ÅäÒ²¼ÇÂ¼£¨µ«½µµÍÖØÒªĞÔ£©
                     }
                     else
                     {
-                        return null; // éIncidentäº‹ä»¶å¿…é¡»æœ‰å…³é”®è¯åŒ¹é…
+                        return null; // ·ÇIncidentÊÂ¼ş±ØĞëÓĞ¹Ø¼ü´ÊÆ¥Åä
                     }
                 }
                 
-                // ? è¿‡æ»¤å¯¹è¯å†…å®¹ï¼šå¦‚æœåŒ…å«å¯¹è¯æ ‡è®°ï¼Œè·³è¿‡
+                // ? ¹ıÂË¶Ô»°ÄÚÈİ£ºÈç¹û°üº¬¶Ô»°±ê¼Ç£¬Ìø¹ı
                 if (IsConversationContent(text))
                     return null;
                 
-                // ? v3.3.4: æå–å…³é”®ä¿¡æ¯ï¼ˆå‹ç¼©åŸæ–‡ï¼‰
+                // ? v3.3.4: ÌáÈ¡¹Ø¼üĞÅÏ¢£¨Ñ¹ËõÔ­ÎÄ£©
                 string compressedText = ExtractKeyInformation(text);
                 
                 if (string.IsNullOrEmpty(compressedText))
                     return null;
                 
-                // æ·»åŠ æ—¶é—´å‰ç¼€
+                // Ìí¼ÓÊ±¼äÇ°×º
                 int ticksAgo = Find.TickManager.TicksGame - logEntry.Age;
                 int daysAgo = ticksAgo / GenDate.TicksPerDay;
                 
                 string timePrefix = "";
                 if (daysAgo < 1)
                 {
-                    timePrefix = "ä»Šå¤©";
+                    timePrefix = "½ñÌì";
                 }
                 else if (daysAgo < 3)
                 {
-                    timePrefix = $"{daysAgo}å¤©å‰";
+                    timePrefix = $"{daysAgo}ÌìÇ°";
                 }
                 else if (daysAgo < 7)
                 {
-                    timePrefix = $"çº¦{daysAgo}å¤©å‰";
+                    timePrefix = $"Ô¼{daysAgo}ÌìÇ°";
                 }
                 else
                 {
-                    return null; // è¶…è¿‡7å¤©çš„äº‹ä»¶ä¸è®°å½•
+                    return null; // ³¬¹ı7ÌìµÄÊÂ¼ş²»¼ÇÂ¼
                 }
                 
                 return $"{timePrefix}{compressedText}";
             }
             catch (Exception ex)
             {
-                // ? v3.3.2: ç§»é™¤è°ƒè¯•æ—¥å¿—
+                // ? v3.3.2: ÒÆ³ıµ÷ÊÔÈÕÖ¾
                 // if (Prefs.DevMode) { ... }
                 return null;
             }
         }
         
         /// <summary>
-        /// ? v3.3.10: æå–å…³é”®ä¿¡æ¯ï¼Œå‹ç¼©äº‹ä»¶æ–‡æœ¬ï¼ˆä¿®å¤åˆ¶é€ æ¸…å•é—®é¢˜ï¼‰
-        /// ç›®æ ‡ï¼šå°†è¯¦ç»†äº‹ä»¶æè¿°å‹ç¼©ä¸ºæœ€é‡è¦çš„éƒ¨åˆ†ï¼Œå‡å°‘tokenæµªè´¹
-        /// ç¤ºä¾‹ï¼š
-        /// - "å°æ˜åœ¨æœºæ¢°åŠ å·¥å°ä¸Šç§æ¤äº†12æ ªç‰ç±³" â†’ "å°æ˜ç§æ¤ç‰ç±³x12"
-        /// - "å¼ ä¸‰å‡»æ€äº†è¢­å‡»è€…ï¼ˆæœºæ¢°è™«ï¼‰" â†’ "å¼ ä¸‰å‡»æ€æœºæ¢°è™«"
-        /// - "æå››è¿è¾“ç‰©èµ„é€åˆ°ä»“åº“" â†’ "æå››è¿è¾“ç‰©èµ„"
-        /// - "ç‹äº”å®Œæˆtarget.Aæ¸…å•-æ‰‹å·¥åˆ¶ä½œå°" â†’ "ç‹äº”åœ¨æ‰‹å·¥åˆ¶ä½œå°åˆ¶é€ ç‰©å“"
+        /// ? v3.3.10: ÌáÈ¡¹Ø¼üĞÅÏ¢£¬Ñ¹ËõÊÂ¼şÎÄ±¾£¨ĞŞ¸´ÖÆÔìÇåµ¥ÎÊÌâ£©
+        /// Ä¿±ê£º½«ÏêÏ¸ÊÂ¼şÃèÊöÑ¹ËõÎª×îÖØÒªµÄ²¿·Ö£¬¼õÉÙtokenÀË·Ñ
+        /// Ê¾Àı£º
+        /// - "Ğ¡Ã÷ÔÚ»úĞµ¼Ó¹¤Ì¨ÉÏÖÖÖ²ÁË12ÖêÓñÃ×" ¡ú "Ğ¡Ã÷ÖÖÖ²ÓñÃ×x12"
+        /// - "ÕÅÈı»÷É±ÁËÏ®»÷Õß£¨»úĞµ³æ£©" ¡ú "ÕÅÈı»÷É±»úĞµ³æ"
+        /// - "ÀîËÄÔËÊäÎï×ÊËÍµ½²Ö¿â" ¡ú "ÀîËÄÔËÊäÎï×Ê"
+        /// - "ÍõÎåÍê³Étarget.AÇåµ¥-ÊÖ¹¤ÖÆ×÷Ì¨" ¡ú "ÍõÎåÔÚÊÖ¹¤ÖÆ×÷Ì¨ÖÆÔìÎïÆ·"
         /// </summary>
         private static string ExtractKeyInformation(string fullText)
         {
@@ -321,22 +321,22 @@ namespace RimTalk.Memory
             
             try
             {
-                // ? v3.3.10: ä¿®å¤1 - å…ˆæ£€æµ‹å¹¶æ¸…ç† "å®Œæˆ...æ¸…å•" æ¨¡å¼
+                // ? v3.3.10: ĞŞ¸´1 - ÏÈ¼ì²â²¢ÇåÀí "Íê³É...Çåµ¥" Ä£Ê½
                 fullText = CleanBillText(fullText);
                 
-                // 1. æå–ä¸»è¦äººç‰©ï¼ˆç¬¬ä¸€ä¸ªå‡ºç°çš„äººåï¼Œé€šå¸¸æ˜¯ä¸»è¯­ï¼‰
+                // 1. ÌáÈ¡Ö÷ÒªÈËÎï£¨µÚÒ»¸ö³öÏÖµÄÈËÃû£¬Í¨³£ÊÇÖ÷Óï£©
                 string mainPerson = ExtractMainPerson(fullText);
                 
-                // 2. æå–æ ¸å¿ƒåŠ¨ä½œï¼ˆæœ€é‡è¦çš„å…³é”®è¯ï¼‰
+                // 2. ÌáÈ¡ºËĞÄ¶¯×÷£¨×îÖØÒªµÄ¹Ø¼ü´Ê£©
                 string action = ExtractMainAction(fullText);
                 
-                // 3. æå–ç›®æ ‡/å¯¹è±¡ï¼ˆç¬¬äºŒä¸ªäººåæˆ–è€…é‡è¦åè¯ï¼‰
+                // 3. ÌáÈ¡Ä¿±ê/¶ÔÏó£¨µÚ¶ş¸öÈËÃû»òÕßÖØÒªÃû´Ê£©
                 string target = ExtractTarget(fullText, mainPerson);
                 
-                // 4. æå–æ•°é‡ä¿¡æ¯ï¼ˆå¦‚ "x12"ï¼‰
+                // 4. ÌáÈ¡ÊıÁ¿ĞÅÏ¢£¨Èç "x12"£©
                 string quantity = ExtractQuantity(fullText);
                 
-                // 5. ç»„åˆå‹ç¼©æ–‡æœ¬
+                // 5. ×éºÏÑ¹ËõÎÄ±¾
                 var parts = new List<string>();
                 
                 if (!string.IsNullOrEmpty(mainPerson))
@@ -351,10 +351,10 @@ namespace RimTalk.Memory
                 if (!string.IsNullOrEmpty(quantity))
                     parts.Add(quantity);
                 
-                // å¦‚æœæå–å¤±è´¥ï¼Œè¿”å›åŸæ–‡çš„æˆªæ–­
+                // Èç¹ûÌáÈ¡Ê§°Ü£¬·µ»ØÔ­ÎÄµÄ½Ø¶Ï
                 if (parts.Count < 2)
                 {
-                    // è‡³å°‘ä¿è¯ä¸»è¯­å’ŒåŠ¨ä½œï¼Œå¦åˆ™ä½¿ç”¨åŸæ–‡ï¼ˆæˆªæ–­ï¼‰
+                    // ÖÁÉÙ±£Ö¤Ö÷ÓïºÍ¶¯×÷£¬·ñÔòÊ¹ÓÃÔ­ÎÄ£¨½Ø¶Ï£©
                     return fullText.Length > 40 ? fullText.Substring(0, 40) : fullText;
                 }
                 
@@ -362,7 +362,7 @@ namespace RimTalk.Memory
             }
             catch (Exception ex)
             {
-                // æå–å¤±è´¥ï¼Œè¿”å›åŸæ–‡æˆªæ–­
+                // ÌáÈ¡Ê§°Ü£¬·µ»ØÔ­ÎÄ½Ø¶Ï
                 if (Prefs.DevMode)
                     Log.Warning($"[EventRecord] Key info extraction failed: {ex.Message}");
                 
@@ -371,8 +371,8 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.10: æ¸…ç†åˆ¶é€ æ¸…å•ç›¸å…³çš„æ— ç”¨æ–‡æœ¬
-        /// "å®Œæˆtarget.Aæ¸…å•-æ‰‹å·¥åˆ¶ä½œå°" â†’ "åœ¨æ‰‹å·¥åˆ¶ä½œå°åˆ¶é€ ç‰©å“"
+        /// ? v3.3.10: ÇåÀíÖÆÔìÇåµ¥Ïà¹ØµÄÎŞÓÃÎÄ±¾
+        /// "Íê³Étarget.AÇåµ¥-ÊÖ¹¤ÖÆ×÷Ì¨" ¡ú "ÔÚÊÖ¹¤ÖÆ×÷Ì¨ÖÆÔìÎïÆ·"
         /// </summary>
         private static string CleanBillText(string text)
         {
@@ -381,10 +381,10 @@ namespace RimTalk.Memory
             
             try
             {
-                // åŒ¹é…æ¨¡å¼ï¼š"å®Œæˆ...æ¸…å•-å·¥ä½œå°åç§°"
+                // Æ¥ÅäÄ£Ê½£º"Íê³É...Çåµ¥-¹¤×÷Ì¨Ãû³Æ"
                 var billPattern = System.Text.RegularExpressions.Regex.Match(
                     text, 
-                    @"å®Œæˆ(target\.[A-Za-z0-9]+|.+?)æ¸…å•[ï¼\-](.+?)(?:[ï¼Œã€‚ã€\s]|$)",
+                    @"Íê³É(target\.[A-Za-z0-9]+|.+?)Çåµ¥[£­\-](.+?)(?:[£¬¡£¡¢\s]|$)",
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase
                 );
                 
@@ -392,29 +392,29 @@ namespace RimTalk.Memory
                 {
                     string workbenchName = billPattern.Groups[2].Value.Trim();
                     
-                    // æ¸…ç†å·¥ä½œå°åç§°ä¸­çš„æ— ç”¨å­—ç¬¦
+                    // ÇåÀí¹¤×÷Ì¨Ãû³ÆÖĞµÄÎŞÓÃ×Ö·û
                     workbenchName = System.Text.RegularExpressions.Regex.Replace(
                         workbenchName, 
-                        @"[ï¼ˆ\(].*?[ï¼‰\)]", 
+                        @"[£¨\(].*?[£©\)]", 
                         ""
                     ).Trim();
                     
-                    // æå–ä¸»è¯­ï¼ˆäººåï¼‰
-                    string[] words = text.Split(new[] { 'å®Œ', 'æˆ', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    // ÌáÈ¡Ö÷Óï£¨ÈËÃû£©
+                    string[] words = text.Split(new[] { 'Íê', '³É', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     string person = words.Length > 0 ? words[0].Trim() : "";
                     
-                    // é‡æ„ä¸ºï¼š"äººååœ¨å·¥ä½œå°åˆ¶é€ ç‰©å“"
+                    // ÖØ¹¹Îª£º"ÈËÃûÔÚ¹¤×÷Ì¨ÖÆÔìÎïÆ·"
                     if (!string.IsNullOrEmpty(person) && !string.IsNullOrEmpty(workbenchName))
                     {
-                        return $"{person}åœ¨{workbenchName}åˆ¶é€ ç‰©å“";
+                        return $"{person}ÔÚ{workbenchName}ÖÆÔìÎïÆ·";
                     }
                     else if (!string.IsNullOrEmpty(workbenchName))
                     {
-                        return $"åœ¨{workbenchName}åˆ¶é€ ç‰©å“";
+                        return $"ÔÚ{workbenchName}ÖÆÔìÎïÆ·";
                     }
                 }
                 
-                // å¦‚æœæ²¡æœ‰åŒ¹é…ï¼Œæ£€æŸ¥æ˜¯å¦åŒ…å« target.* æ¨¡å¼ï¼Œç›´æ¥åˆ é™¤
+                // Èç¹ûÃ»ÓĞÆ¥Åä£¬¼ì²éÊÇ·ñ°üº¬ target.* Ä£Ê½£¬Ö±½ÓÉ¾³ı
                 text = System.Text.RegularExpressions.Regex.Replace(
                     text,
                     @"target\.[A-Za-z0-9]+",
@@ -434,21 +434,21 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// æå–ä¸»è¦äººç‰©ï¼ˆé€šå¸¸æ˜¯äº‹ä»¶çš„ä¸»ä½“ï¼‰
+        /// ÌáÈ¡Ö÷ÒªÈËÎï£¨Í¨³£ÊÇÊÂ¼şµÄÖ÷Ìå£©
         /// </summary>
         private static string ExtractMainPerson(string text)
         {
-            // æ–¹æ³•1ï¼šæŸ¥æ‰¾å¸¸è§åå­—åˆ†éš”ç¬¦å‰çš„æ–‡æœ¬
-            var separators = new[] { "åœ¨", "çš„", "å°†", "è¢«", "å‘", "ä¸", "å’Œ", "å¯¹", " " };
+            // ·½·¨1£º²éÕÒ³£¼ûÃû×Ö·Ö¸ô·ûÇ°µÄÎÄ±¾
+            var separators = new[] { "ÔÚ", "µÄ", "½«", "±»", "Ïò", "Óë", "ºÍ", "¶Ô", " " };
             
             foreach (var sep in separators)
             {
                 int index = text.IndexOf(sep);
-                if (index > 0 && index < 15) // åå­—é€šå¸¸åœ¨å‰15å­—ç¬¦å†…
+                if (index > 0 && index < 15) // Ãû×ÖÍ¨³£ÔÚÇ°15×Ö·ûÄÚ
                 {
                     string candidate = text.Substring(0, index).Trim();
                     
-                    // éªŒè¯æ˜¯å¦åƒåå­—ï¼ˆ2-8å­—ç¬¦ï¼Œæ— æ ‡ç‚¹ï¼‰
+                    // ÑéÖ¤ÊÇ·ñÏñÃû×Ö£¨2-8×Ö·û£¬ÎŞ±êµã£©
                     if (candidate.Length >= 2 && candidate.Length <= 8 && 
                         !candidate.Any(c => char.IsPunctuation(c) || char.IsDigit(c)))
                     {
@@ -457,7 +457,7 @@ namespace RimTalk.Memory
                 }
             }
             
-            // æ–¹æ³•2ï¼šå¦‚æœæ‰¾ä¸åˆ°ï¼Œå–å‰5ä¸ªå­—ç¬¦ï¼ˆå¯èƒ½æ˜¯åå­—ï¼‰
+            // ·½·¨2£ºÈç¹ûÕÒ²»µ½£¬È¡Ç°5¸ö×Ö·û£¨¿ÉÄÜÊÇÃû×Ö£©
             if (text.Length >= 2)
             {
                 string candidate = text.Substring(0, Math.Min(5, text.Length)).Trim();
@@ -469,26 +469,26 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// æå–æ ¸å¿ƒåŠ¨ä½œï¼ˆåŸºäºé‡è¦å…³é”®è¯ï¼‰
+        /// ÌáÈ¡ºËĞÄ¶¯×÷£¨»ùÓÚÖØÒª¹Ø¼ü´Ê£©
         /// </summary>
         private static string ExtractMainAction(string text)
         {
-            // æŸ¥æ‰¾æ–‡æœ¬ä¸­çš„é‡è¦å…³é”®è¯
+            // ²éÕÒÎÄ±¾ÖĞµÄÖØÒª¹Ø¼ü´Ê
             var matchedKeywords = ImportantKeywords.Keys
                 .Where(k => text.Contains(k))
-                .OrderByDescending(k => ImportantKeywords[k]) // æŒ‰é‡è¦æ€§æ’åº
-                .ThenByDescending(k => k.Length) // ä¼˜å…ˆé•¿å…³é”®è¯
+                .OrderByDescending(k => ImportantKeywords[k]) // °´ÖØÒªĞÔÅÅĞò
+                .ThenByDescending(k => k.Length) // ÓÅÏÈ³¤¹Ø¼ü´Ê
                 .ToList();
             
             if (matchedKeywords.Any())
             {
-                // è¿”å›æœ€é‡è¦çš„å…³é”®è¯ä½œä¸ºæ ¸å¿ƒåŠ¨ä½œ
+                // ·µ»Ø×îÖØÒªµÄ¹Ø¼ü´Ê×÷ÎªºËĞÄ¶¯×÷
                 return matchedKeywords.First();
             }
             
-            // å¦‚æœæ²¡æœ‰åŒ¹é…å…³é”®è¯ï¼Œå°è¯•æå–åŠ¨è¯ï¼ˆç®€å•å¯å‘å¼ï¼‰
-            var commonActions = new[] { "ç§æ¤", "å»ºé€ ", "å®Œæˆ", "å‡»æ€", "æ”»å‡»", "é˜²å¾¡", "åˆ¶ä½œ", "çƒ¹é¥ª", 
-                                         "ç ”ç©¶", "æ²»ç–—", "åŠ å…¥", "ç¦»å¼€", "æ­»äº¡", "å—ä¼¤" };
+            // Èç¹ûÃ»ÓĞÆ¥Åä¹Ø¼ü´Ê£¬³¢ÊÔÌáÈ¡¶¯´Ê£¨¼òµ¥Æô·¢Ê½£©
+            var commonActions = new[] { "ÖÖÖ²", "½¨Ôì", "Íê³É", "»÷É±", "¹¥»÷", "·ÀÓù", "ÖÆ×÷", "Åëâ¿", 
+                                         "ÑĞ¾¿", "ÖÎÁÆ", "¼ÓÈë", "Àë¿ª", "ËÀÍö", "ÊÜÉË" };
             
             foreach (var action in commonActions)
             {
@@ -500,11 +500,11 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// æå–ç›®æ ‡/å¯¹è±¡ï¼ˆé€šå¸¸æ˜¯åŠ¨ä½œçš„æ¥å—è€…ï¼‰
+        /// ÌáÈ¡Ä¿±ê/¶ÔÏó£¨Í¨³£ÊÇ¶¯×÷µÄ½ÓÊÜÕß£©
         /// </summary>
         private static string ExtractTarget(string text, string mainPerson)
         {
-            // ç§»é™¤ä¸»è¦äººç‰©åï¼ŒæŸ¥æ‰¾ç¬¬äºŒä¸ªåå­—æˆ–é‡è¦åè¯
+            // ÒÆ³ıÖ÷ÒªÈËÎïºó£¬²éÕÒµÚ¶ş¸öÃû×Ö»òÖØÒªÃû´Ê
             string remaining = text;
             if (!string.IsNullOrEmpty(mainPerson))
             {
@@ -515,22 +515,22 @@ namespace RimTalk.Memory
                 }
             }
             
-            // æŸ¥æ‰¾å¸¸è§ç›®æ ‡æ ‡è®°è¯åçš„å†…å®¹
-            var targetMarkers = new[] { "å‡»æ€", "æ”»å‡»", "ç§æ¤", "å»ºé€ ", "åˆ¶ä½œ", "å®Œæˆ", "æ²»ç–—", "äº†" };
+            // ²éÕÒ³£¼ûÄ¿±ê±ê¼Ç´ÊºóµÄÄÚÈİ
+            var targetMarkers = new[] { "»÷É±", "¹¥»÷", "ÖÖÖ²", "½¨Ôì", "ÖÆ×÷", "Íê³É", "ÖÎÁÆ", "ÁË" };
             
             foreach (var marker in targetMarkers)
             {
                 int markerIndex = remaining.IndexOf(marker);
                 if (markerIndex >= 0)
                 {
-                    // æå–æ ‡è®°è¯åçš„10å­—ç¬¦
+                    // ÌáÈ¡±ê¼Ç´ÊºóµÄ10×Ö·û
                     int start = markerIndex + marker.Length;
                     if (start < remaining.Length)
                     {
                         string targetText = remaining.Substring(start, Math.Min(15, remaining.Length - start));
                         
-                        // æ¸…ç†æ ‡ç‚¹å’Œå¤šä½™æ–‡å­—
-                        targetText = targetText.Split(new[] { 'ï¼Œ', 'ã€‚', 'ã€', 'ï¼›', 'çš„', 'åœ¨', 'å’Œ', ' ' })[0].Trim();
+                        // ÇåÀí±êµãºÍ¶àÓàÎÄ×Ö
+                        targetText = targetText.Split(new[] { '£¬', '¡£', '¡¢', '£»', 'µÄ', 'ÔÚ', 'ºÍ', ' ' })[0].Trim();
                         
                         if (targetText.Length >= 2 && targetText.Length <= 10)
                         {
@@ -544,21 +544,21 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// æå–æ•°é‡ä¿¡æ¯ï¼ˆå¦‚ "Ã—12"ï¼‰
+        /// ÌáÈ¡ÊıÁ¿ĞÅÏ¢£¨Èç "¡Á12"£©
         /// </summary>
         private static string ExtractQuantity(string text)
         {
-            // æŸ¥æ‰¾æ•°å­—
+            // ²éÕÒÊı×Ö
             var match = System.Text.RegularExpressions.Regex.Match(text, @"\d+");
             
             if (match.Success)
             {
                 int number = int.Parse(match.Value);
                 
-                // åªä¿ç•™æœ‰æ„ä¹‰çš„æ•°é‡ï¼ˆ>1)
+                // Ö»±£ÁôÓĞÒâÒåµÄÊıÁ¿£¨>1)
                 if (number > 1 && number < 10000)
                 {
-                    return $"Ã—{number}";
+                    return $"¡Á{number}";
                 }
             }
             
@@ -566,11 +566,11 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ç”¨äºæ¸…ç†è®°å½•å’Œç»´æŠ¤æ€§èƒ½
+        /// ÓÃÓÚÇåÀí¼ÇÂ¼ºÍÎ¬»¤ĞÔÄÜ
         /// </summary>
         public static void CleanupProcessedRecords()
         {
-            // æ§åˆ¶é›†åˆå¤§å°
+            // ¿ØÖÆ¼¯ºÏ´óĞ¡
             if (processedLogIDs.Count > 2000)
             {
                 var toRemove = processedLogIDs.Take(1000).ToList();
@@ -582,7 +582,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.3: æ›´æ–°äº‹ä»¶å¸¸è¯†çš„æ—¶é—´å‰ç¼€ï¼ˆåŠ¨æ€æ›´æ–°"ä»Šå¤©" â†’ "3å¤©å‰"ï¼‰
+        /// ? v3.3.3: ¸üĞÂÊÂ¼ş³£Ê¶µÄÊ±¼äÇ°×º£¨¶¯Ì¬¸üĞÂ"½ñÌì" ¡ú "3ÌìÇ°"£©
         /// </summary>
         private static void UpdateEventKnowledgeTimePrefix(CommonKnowledgeLibrary library)
         {
@@ -594,20 +594,20 @@ namespace RimTalk.Memory
                 int currentTick = Find.TickManager.TicksGame;
                 int updatedCount = 0;
                 
-                // æŸ¥æ‰¾æ‰€æœ‰äº‹ä»¶å¸¸è¯†
+                // ²éÕÒËùÓĞÊÂ¼ş³£Ê¶
                 var eventEntries = library.Entries
-                    .Where(e => e.tag != null && (e.tag.Contains("äº‹ä»¶") || e.tag.Contains("å†å²")))
-                    .Where(e => e.creationTick >= 0) // åªæ›´æ–°æœ‰æ—¶é—´æˆ³çš„
+                    .Where(e => e.tag != null && (e.tag.Contains("ÊÂ¼ş") || e.tag.Contains("ÀúÊ·")))
+                    .Where(e => e.creationTick >= 0) // Ö»¸üĞÂÓĞÊ±¼ä´ÁµÄ
                     .ToList();
                 
                 foreach (var entry in eventEntries)
                 {
-                    // æ›´æ–°æ—¶é—´å‰ç¼€
+                    // ¸üĞÂÊ±¼äÇ°×º
                     entry.UpdateEventTimePrefix(currentTick);
                     updatedCount++;
                 }
                 
-                // ? æ—¥å¿—ï¼šè®°å½•æ›´æ–°æ“ä½œï¼ˆä»…DevModeä¸”ä½é¢‘ç‡ï¼‰
+                // ? ÈÕÖ¾£º¼ÇÂ¼¸üĞÂ²Ù×÷£¨½öDevModeÇÒµÍÆµÂÊ£©
                 if (updatedCount > 0 && Prefs.DevMode && UnityEngine.Random.value < 0.05f)
                 {
                     Log.Message($"[EventRecord] Updated time prefix for {updatedCount} event knowledge entries");
@@ -620,16 +620,16 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.3: ä»å¸¦æ—¶é—´å‰ç¼€çš„äº‹ä»¶æ–‡æœ¬ä¸­æå–åŸå§‹æ–‡æœ¬
+        /// ? v3.3.3: ´Ó´øÊ±¼äÇ°×ºµÄÊÂ¼şÎÄ±¾ÖĞÌáÈ¡Ô­Ê¼ÎÄ±¾
         /// </summary>
         private static string ExtractOriginalEventText(string eventText)
         {
             if (string.IsNullOrEmpty(eventText))
                 return eventText;
             
-            // ç§»é™¤å¸¸è§çš„æ—¶é—´å‰ç¼€
-            string[] timePrefixes = { "ä»Šå¤©", "1å¤©å‰", "2å¤©å‰", "3å¤©å‰", "4å¤©å‰", "5å¤©å‰", "6å¤©å‰",
-                                     "çº¦3å¤©å‰", "çº¦4å¤©å‰", "çº¦5å¤©å‰", "çº¦6å¤©å‰", "çº¦7å¤©å‰" };
+            // ÒÆ³ı³£¼ûµÄÊ±¼äÇ°×º
+            string[] timePrefixes = { "½ñÌì", "1ÌìÇ°", "2ÌìÇ°", "3ÌìÇ°", "4ÌìÇ°", "5ÌìÇ°", "6ÌìÇ°",
+                                     "Ô¼3ÌìÇ°", "Ô¼4ÌìÇ°", "Ô¼5ÌìÇ°", "Ô¼6ÌìÇ°", "Ô¼7ÌìÇ°" };
             
             foreach (var prefix in timePrefixes)
             {
@@ -643,26 +643,26 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? æ–°å¢ï¼šæ£€æµ‹æ˜¯å¦æ˜¯å¯¹è¯å†…å®¹ï¼ˆé¿å…è®°å½•å¯¹è¯ï¼‰
+        /// ? ĞÂÔö£º¼ì²âÊÇ·ñÊÇ¶Ô»°ÄÚÈİ£¨±ÜÃâ¼ÇÂ¼¶Ô»°£©
         /// </summary>
         private static bool IsConversationContent(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return false;
             
-            // æ£€æµ‹å¯¹è¯æ ‡è®°
+            // ¼ì²â¶Ô»°±ê¼Ç
             string[] conversationMarkers = { 
-                "è¯´:", "said:", "è¯´ï¼š", "è¯´é“:", "è¯´é“ï¼š",
-                "é—®:", "asked:", "é—®ï¼š", "é—®é“:", "é—®é“ï¼š",
-                "å›ç­”:", "replied:", "å›ç­”ï¼š", "ç­”é“:", "ç­”é“ï¼š",
-                "å«é“:", "shouted:", "å«é“ï¼š", "å–Šé“:", "å–Šé“ï¼š"
+                "Ëµ:", "said:", "Ëµ£º", "ËµµÀ:", "ËµµÀ£º",
+                "ÎÊ:", "asked:", "ÎÊ£º", "ÎÊµÀ:", "ÎÊµÀ£º",
+                "»Ø´ğ:", "replied:", "»Ø´ğ£º", "´ğµÀ:", "´ğµÀ£º",
+                "½ĞµÀ:", "shouted:", "½ĞµÀ£º", "º°µÀ:", "º°µÀ£º"
             };
             
             return conversationMarkers.Any(marker => text.Contains(marker));
         }
         
         /// <summary>
-        /// è¿‡æ»¤æ— èŠäº‹ä»¶
+        /// ¹ıÂËÎŞÁÄÊÂ¼ş
         /// </summary>
         private static bool IsBoringMessage(string text)
         {
@@ -671,7 +671,7 @@ namespace RimTalk.Memory
             
             var boringKeywords = new[] 
             { 
-                "èµ°è·¯", "åƒé¥­", "ç¡è§‰", "å¨±ä¹", "é—²é€›", "ä¼‘æ¯",
+                "×ßÂ·", "³Ô·¹", "Ë¯¾õ", "ÓéÀÖ", "ÏĞ¹ä", "ĞİÏ¢",
                 "walking", "eating", "sleeping", "recreation", "wandering"
             };
             
@@ -679,14 +679,14 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// è®¡ç®—äº‹ä»¶é‡è¦æ€§
+        /// ¼ÆËãÊÂ¼şÖØÒªĞÔ
         /// </summary>
         private static float CalculateImportance(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return 0.5f;
             
-            // æ‰¾åˆ°åŒ¹é…çš„å…³é”®è¯
+            // ÕÒµ½Æ¥ÅäµÄ¹Ø¼ü´Ê
             var matched = ImportantKeywords
                 .Where(kv => text.Contains(kv.Key))
                 .OrderByDescending(kv => kv.Value)
@@ -697,8 +697,8 @@ namespace RimTalk.Memory
                 return matched.Value;
             }
             
-            // ? æ–°å¢ï¼šæ²¡æœ‰å…³é”®è¯åŒ¹é…ä½†å¯èƒ½æ˜¯Incidentäº‹ä»¶ï¼Œç»™è¾ƒä½é»˜è®¤é‡è¦æ€§
-            return 0.4f; // æ¯”æ™®é€šäº‹ä»¶ä½ï¼Œä½†ä»ä¼šè¢«è®°å½•
+            // ? ĞÂÔö£ºÃ»ÓĞ¹Ø¼ü´ÊÆ¥Åäµ«¿ÉÄÜÊÇIncidentÊÂ¼ş£¬¸ø½ÏµÍÄ¬ÈÏÖØÒªĞÔ
+            return 0.4f; // ±ÈÆÕÍ¨ÊÂ¼şµÍ£¬µ«ÈÔ»á±»¼ÇÂ¼
         }
     }
 }

@@ -8,13 +8,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Verse;
 using UnityEngine;
-using RimWorld;  // ? v3.3.6: æ·»åŠ  RimWorld å‘½åç©ºé—´
-
-using RimTalk.MemoryPatch;
+using RimWorld;  // ? v3.3.6: Ìí¼Ó RimWorld ÃüÃû¿Õ¼ä
 
 namespace RimTalk.Memory.AI
 {
-    // ? v3.3.2.34: DTO ç±»å®šä¹‰ - OpenAI å…¼å®¹æ ¼å¼
+    // ? v3.3.2.34: DTO Àà¶¨Òå - OpenAI ¼æÈİ¸ñÊ½
     [Serializable]
     public class OpenAIRequest
     {
@@ -40,7 +38,7 @@ namespace RimTalk.Memory.AI
         public string type;
     }
     
-    // ? v3.3.2.34: DTO ç±»å®šä¹‰ - Google Gemini æ ¼å¼
+    // ? v3.3.2.34: DTO Àà¶¨Òå - Google Gemini ¸ñÊ½
     [Serializable]
     public class GeminiRequest
     {
@@ -65,7 +63,7 @@ namespace RimTalk.Memory.AI
     {
         public float temperature;
         public int maxOutputTokens;
-        public GeminiThinkingConfig thinkingConfig; // å¯é€‰
+        public GeminiThinkingConfig thinkingConfig; // ¿ÉÑ¡
     }
     
     [Serializable]
@@ -76,7 +74,7 @@ namespace RimTalk.Memory.AI
     
     public static class IndependentAISummarizer
     {
-        // ? v3.3.2.35: ä¼˜åŒ–æ­£åˆ™è¡¨è¾¾å¼ - æå‡ä¸ºé™æ€ç¼–è¯‘å­—æ®µ
+        // ? v3.3.2.35: ÓÅ»¯ÕıÔò±í´ïÊ½ - ÌáÉıÎª¾²Ì¬±àÒë×Ö¶Î
         private static readonly Regex GoogleResponseRegex = new Regex(
             @"""text""\s*:\s*""(.*?)""",
             RegexOptions.Compiled | RegexOptions.Singleline
@@ -95,9 +93,9 @@ namespace RimTalk.Memory.AI
         private static bool isInitialized = false;
         private static string apiKey, apiUrl, model, provider;
         
-        // ? ä¿®å¤1: æ·»åŠ ç¼“å­˜å¤§å°é™åˆ¶ï¼Œé˜²æ­¢å†…å­˜æ³„æ¼
-        private const int MAX_CACHE_SIZE = 100; // æœ€å¤šç¼“å­˜100ä¸ªæ€»ç»“
-        private const int CACHE_CLEANUP_THRESHOLD = 120; // è¾¾åˆ°120ä¸ªæ—¶æ¸…ç†
+        // ? ĞŞ¸´1: Ìí¼Ó»º´æ´óĞ¡ÏŞÖÆ£¬·ÀÖ¹ÄÚ´æĞ¹Â©
+        private const int MAX_CACHE_SIZE = 100; // ×î¶à»º´æ100¸ö×Ü½á
+        private const int CACHE_CLEANUP_THRESHOLD = 120; // ´ïµ½120¸öÊ±ÇåÀí
         
         private static readonly Dictionary<string, string> completedSummaries = new Dictionary<string, string>();
         private static readonly HashSet<string> pendingSummaries = new HashSet<string>();
@@ -145,7 +143,7 @@ namespace RimTalk.Memory.AI
         }
 
         /// <summary>
-        /// ? ä¿®å¤ï¼šæ·»åŠ å¼ºåˆ¶é‡æ–°åˆå§‹åŒ–æ–¹æ³•
+        /// ? ĞŞ¸´£ºÌí¼ÓÇ¿ÖÆÖØĞÂ³õÊ¼»¯·½·¨
         /// </summary>
         public static void ForceReinitialize()
         {
@@ -154,18 +152,18 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// ? v3.3.3: æ¸…é™¤æ‰€æœ‰APIé…ç½®å’Œç¼“å­˜
+        /// ? v3.3.3: Çå³ıËùÓĞAPIÅäÖÃºÍ»º´æ
         /// </summary>
         public static void ClearAllConfiguration()
         {
-            // æ¸…é™¤é™æ€å˜é‡
+            // Çå³ı¾²Ì¬±äÁ¿
             apiKey = "";
             apiUrl = "";
             model = "";
             provider = "";
             isInitialized = false;
             
-            // æ¸…é™¤æ‰€æœ‰ç¼“å­˜
+            // Çå³ıËùÓĞ»º´æ
             lock (completedSummaries)
             {
                 completedSummaries.Clear();
@@ -193,9 +191,9 @@ namespace RimTalk.Memory.AI
         {
             try
             {
-                var settings = RimTalkMemoryPatchMod.Settings;
+                var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
                 
-                // ? ä¿®å¤ï¼šä¸¥æ ¼æŒ‰ç…§ç”¨æˆ·è®¾ç½®å†³å®šæ˜¯å¦è·ŸéšRimTalk
+                // ? ĞŞ¸´£ºÑÏ¸ñ°´ÕÕÓÃ»§ÉèÖÃ¾ö¶¨ÊÇ·ñ¸úËæRimTalk
                 if (settings.useRimTalkAIConfig)
                 {
                     if (TryLoadFromRimTalk())
@@ -217,37 +215,37 @@ namespace RimTalk.Memory.AI
                     }
                 }
                 
-                // ä½¿ç”¨ç‹¬ç«‹é…ç½®
+                // Ê¹ÓÃ¶ÀÁ¢ÅäÖÃ
                 apiKey = settings.independentApiKey;
                 apiUrl = settings.independentApiUrl;
                 model = settings.independentModel;
                 provider = settings.independentProvider;
                 
-                // ? v3.3.6: Player2 ç‰¹æ®Šå¤„ç† - ä¼˜å…ˆä½¿ç”¨æœ¬åœ°åº”ç”¨
+                // ? v3.3.6: Player2 ÌØÊâ´¦Àí - ÓÅÏÈÊ¹ÓÃ±¾µØÓ¦ÓÃ
                 if (provider == "Player2")
                 {
                     if (isPlayer2Local && !string.IsNullOrEmpty(player2LocalKey))
                     {
-                        // ä½¿ç”¨æœ¬åœ° Player2 åº”ç”¨
+                        // Ê¹ÓÃ±¾µØ Player2 Ó¦ÓÃ
                         apiKey = player2LocalKey;
                         apiUrl = $"{Player2LocalUrl}/chat/completions";
                         Log.Message("[AI] ?? Using Player2 local app connection");
                     }
                     else if (!string.IsNullOrEmpty(apiKey))
                     {
-                        // ä½¿ç”¨æ‰‹åŠ¨è¾“å…¥çš„ Key + è¿œç¨‹ API
+                        // Ê¹ÓÃÊÖ¶¯ÊäÈëµÄ Key + Ô¶³Ì API
                         apiUrl = $"{Player2RemoteUrl}/chat/completions";
                         Log.Message("[AI] ?? Using Player2 remote API with manual key");
                     }
                     else
                     {
-                        // å°è¯•æ£€æµ‹æœ¬åœ°åº”ç”¨
+                        // ³¢ÊÔ¼ì²â±¾µØÓ¦ÓÃ
                         Log.Message("[AI] ?? Player2 selected but no key, trying to detect local app...");
                         TryDetectPlayer2LocalApp();
                     }
                 }
                 
-                // å¦‚æœ URL ä¸ºç©ºï¼Œæ ¹æ®æä¾›å•†è®¾ç½®é»˜è®¤å€¼
+                // Èç¹û URL Îª¿Õ£¬¸ù¾İÌá¹©ÉÌÉèÖÃÄ¬ÈÏÖµ
                 if (string.IsNullOrEmpty(apiUrl))
                 {
                     if (provider == "OpenAI")
@@ -268,7 +266,7 @@ namespace RimTalk.Memory.AI
                     }
                 }
                 
-                // ? è¯¦ç»†éªŒè¯é…ç½®
+                // ? ÏêÏ¸ÑéÖ¤ÅäÖÃ
                 if (!ValidateConfiguration())
                 {
                     isInitialized = false;
@@ -288,19 +286,19 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// ? v3.3.3: éªŒè¯APIé…ç½®
+        /// ? v3.3.3: ÑéÖ¤APIÅäÖÃ
         /// </summary>
         private static bool ValidateConfiguration()
         {
-            // æ£€æŸ¥API Key
+            // ¼ì²éAPI Key
             if (string.IsNullOrEmpty(apiKey))
             {
                 Log.Error("[AI] ? API Key is empty!");
-                Log.Error("[AI]    Please configure in: Options â†’ Mod Settings â†’ RimTalk-Expand Memory â†’ AIé…ç½®");
+                Log.Error("[AI]    Please configure in: Options ¡ú Mod Settings ¡ú RimTalk-Expand Memory ¡ú AIÅäÖÃ");
                 return false;
             }
             
-            // æ£€æŸ¥API Keyé•¿åº¦
+            // ¼ì²éAPI Key³¤¶È
             if (apiKey.Length < 10)
             {
                 Log.Error($"[AI] ? API Key too short (length: {apiKey.Length})!");
@@ -309,10 +307,10 @@ namespace RimTalk.Memory.AI
                 return false;
             }
             
-            // ? v3.3.6: Player2/Customæ¨¡å¼ä¸å¼ºåˆ¶æ£€æŸ¥æ ¼å¼
+            // ? v3.3.6: Player2/CustomÄ£Ê½²»Ç¿ÖÆ¼ì²é¸ñÊ½
             if (provider != "Custom" && provider != "Player2" && provider != "Google")
             {
-                // æ£€æŸ¥API Keyæ ¼å¼ï¼ˆOpenAI/DeepSeekå»ºè®®ä»¥sk-å¼€å¤´ï¼Œä½†åªæ˜¯è­¦å‘Šï¼‰
+                // ¼ì²éAPI Key¸ñÊ½£¨OpenAI/DeepSeek½¨ÒéÒÔsk-¿ªÍ·£¬µ«Ö»ÊÇ¾¯¸æ£©
                 if ((provider == "OpenAI" || provider == "DeepSeek") && !apiKey.StartsWith("sk-"))
                 {
                     Log.Warning($"[AI] ?? API Key doesn't start with 'sk-' for {provider}");
@@ -321,14 +319,14 @@ namespace RimTalk.Memory.AI
                 }
             }
             
-            // æ£€æŸ¥API URL
+            // ¼ì²éAPI URL
             if (string.IsNullOrEmpty(apiUrl))
             {
                 Log.Error("[AI] ? API URL is empty!");
                 return false;
             }
             
-            // æ£€æŸ¥Model
+            // ¼ì²éModel
             if (string.IsNullOrEmpty(model))
             {
                 Log.Warning("[AI] ?? Model name is empty, using default");
@@ -339,7 +337,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// ? v3.3.3: å®‰å…¨æ˜¾ç¤ºAPI Keyï¼ˆåªæ˜¾ç¤ºå‰åç¼€ï¼‰
+        /// ? v3.3.3: °²È«ÏÔÊ¾API Key£¨Ö»ÏÔÊ¾Ç°ºó×º£©
         /// </summary>
         private static string SanitizeApiKey(string key)
         {
@@ -353,7 +351,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// å°è¯•ä» RimTalk åŠ è½½é…ç½®ï¼ˆå…¼å®¹æ¨¡å¼ï¼‰
+        /// ³¢ÊÔ´Ó RimTalk ¼ÓÔØÅäÖÃ£¨¼æÈİÄ£Ê½£©
         /// </summary>
         private static bool TryLoadFromRimTalk()
         {
@@ -490,13 +488,13 @@ namespace RimTalk.Memory.AI
                     {
                         lock (completedSummaries)
                         {
-                            // ? ä¿®æ”¹1: å¢åŠ ç¼“å­˜ä¸Šé™ï¼Œé˜²æ­¢å†…å­˜æ³„æ¼
+                            // ? ĞŞ¸Ä1: Ôö¼Ó»º´æÉÏÏŞ£¬·ÀÖ¹ÄÚ´æĞ¹Â©
                             if (completedSummaries.Count >= CACHE_CLEANUP_THRESHOLD)
                             {
-                                // ? v3.3.2.29: ç¡®å®šæ€§æ¸…ç† - æŒ‰ key å­—æ¯é¡ºåºå‡åºæ’åºååˆ é™¤å‰50%
-                                // ä½¿ç”¨å­—æ¯é¡ºåºæ’åºä»£æ›¿éšæœº Take()ï¼Œç¡®ä¿ç›¸åŒçš„ç¼“å­˜çŠ¶æ€æ€»æ˜¯åˆ é™¤ç›¸åŒçš„æ¡ç›®
+                                // ? v3.3.2.29: È·¶¨ĞÔÇåÀí - °´ key ×ÖÄ¸Ë³ĞòÉıĞòÅÅĞòºóÉ¾³ıÇ°50%
+                                // Ê¹ÓÃ×ÖÄ¸Ë³ĞòÅÅĞò´úÌæËæ»ú Take()£¬È·±£ÏàÍ¬µÄ»º´æ×´Ì¬×ÜÊÇÉ¾³ıÏàÍ¬µÄÌõÄ¿
                                 var toRemove = completedSummaries.Keys
-                                    .OrderBy(k => k, StringComparer.Ordinal) // å­—æ¯é¡ºåºå‡åº
+                                    .OrderBy(k => k, StringComparer.Ordinal) // ×ÖÄ¸Ë³ĞòÉıĞò
                                     .Take(MAX_CACHE_SIZE / 2)
                                     .ToList();
                                 
@@ -550,13 +548,13 @@ namespace RimTalk.Memory.AI
         {
             var sb = new StringBuilder();
             
-            // ç»Ÿä¸€æç®€æ ¼å¼
+            // Í³Ò»¼«¼ò¸ñÊ½
             if (template == "deep_archive")
             {
-                // æ·±åº¦å½’æ¡£
-                sb.AppendLine($"æ®–æ°‘è€…{pawn.LabelShort}çš„è®°å¿†å½’æ¡£");
+                // Éî¶È¹éµµ
+                sb.AppendLine($"Ö³ÃñÕß{pawn.LabelShort}µÄ¼ÇÒä¹éµµ");
                 sb.AppendLine();
-                sb.AppendLine("è®°å¿†åˆ—è¡¨");
+                sb.AppendLine("¼ÇÒäÁĞ±í");
                 int i = 1;
                 foreach (var m in memories.Take(15))
                 {
@@ -564,17 +562,17 @@ namespace RimTalk.Memory.AI
                     i++;
                 }
                 sb.AppendLine();
-                sb.AppendLine("è¦æ±‚æç‚¼æ ¸å¿ƒç‰¹å¾å’Œé‡Œç¨‹ç¢‘äº‹ä»¶");
-                sb.AppendLine("åˆå¹¶ç›¸ä¼¼ç»å†çªå‡ºé•¿æœŸè¶‹åŠ¿");
-                sb.AppendLine("æç®€è¡¨è¾¾ä¸è¶…è¿‡60å­—");
-                sb.AppendLine("åªè¾“å‡ºæ€»ç»“æ–‡å­—ä¸è¦å…¶ä»–æ ¼å¼");
+                sb.AppendLine("ÒªÇóÌáÁ¶ºËĞÄÌØÕ÷ºÍÀï³Ì±®ÊÂ¼ş");
+                sb.AppendLine("ºÏ²¢ÏàËÆ¾­ÀúÍ»³ö³¤ÆÚÇ÷ÊÆ");
+                sb.AppendLine("¼«¼ò±í´ï²»³¬¹ı60×Ö");
+                sb.AppendLine("Ö»Êä³ö×Ü½áÎÄ×Ö²»ÒªÆäËû¸ñÊ½");
             }
             else
             {
-                // æ¯æ—¥æ€»ç»“
-                sb.AppendLine($"æ®–æ°‘è€…{pawn.LabelShort}çš„è®°å¿†æ€»ç»“");
+                // Ã¿ÈÕ×Ü½á
+                sb.AppendLine($"Ö³ÃñÕß{pawn.LabelShort}µÄ¼ÇÒä×Ü½á");
                 sb.AppendLine();
-                sb.AppendLine("è®°å¿†åˆ—è¡¨");
+                sb.AppendLine("¼ÇÒäÁĞ±í");
                 int i = 1;
                 foreach (var m in memories.Take(20))
                 {
@@ -582,28 +580,28 @@ namespace RimTalk.Memory.AI
                     i++;
                 }
                 sb.AppendLine();
-                sb.AppendLine("è¦æ±‚æç‚¼åœ°ç‚¹äººç‰©äº‹ä»¶");
-                sb.AppendLine("ç›¸ä¼¼äº‹ä»¶åˆå¹¶æ ‡æ³¨é¢‘ç‡");
-                sb.AppendLine("æç®€è¡¨è¾¾ä¸è¶…è¿‡80å­—");
-                sb.AppendLine("åªè¾“å‡ºæ€»ç»“æ–‡å­—ä¸è¦å…¶ä»–æ ¼å¼");
+                sb.AppendLine("ÒªÇóÌáÁ¶µØµãÈËÎïÊÂ¼ş");
+                sb.AppendLine("ÏàËÆÊÂ¼şºÏ²¢±ê×¢ÆµÂÊ");
+                sb.AppendLine("¼«¼ò±í´ï²»³¬¹ı80×Ö");
+                sb.AppendLine("Ö»Êä³ö×Ü½áÎÄ×Ö²»ÒªÆäËû¸ñÊ½");
             }
             
             return sb.ToString();
         }
 
         /// <summary>
-        /// ? v3.3.2.34: é‡æ„ç‰ˆ - ä½¿ç”¨ DTO ç±»å’Œæ‰‹åŠ¨åºåˆ—åŒ–ï¼ˆå®‰å…¨ï¼‰
-        /// å½»åº•ä¿®å¤ç‰¹æ®Šå­—ç¬¦å¯¼è‡´çš„ JSON æ ¼å¼é”™è¯¯
+        /// ? v3.3.2.34: ÖØ¹¹°æ - Ê¹ÓÃ DTO ÀàºÍÊÖ¶¯ĞòÁĞ»¯£¨°²È«£©
+        /// ³¹µ×ĞŞ¸´ÌØÊâ×Ö·ûµ¼ÖÂµÄ JSON ¸ñÊ½´íÎó
         /// </summary>
         private static string BuildJsonRequest(string prompt)
         {
             bool isGoogle = (provider == "Google");
-            var settings = RimTalkMemoryPatchMod.Settings;
+            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
             bool enableCaching = settings != null && settings.enablePromptCaching;
             
             if (isGoogle)
             {
-                // ? Google Gemini æ ¼å¼
+                // ? Google Gemini ¸ñÊ½
                 string escapedPrompt = EscapeJsonString(prompt);
                 
                 var sb = new StringBuilder();
@@ -629,12 +627,12 @@ namespace RimTalk.Memory.AI
             }
             else
             {
-                // ? OpenAI/DeepSeek/Player2/Custom - ç»Ÿä¸€ä½¿ç”¨OpenAIå…¼å®¹æ ¼å¼
+                // ? OpenAI/DeepSeek/Player2/Custom - Í³Ò»Ê¹ÓÃOpenAI¼æÈİ¸ñÊ½
                 
-                // å›ºå®šçš„ç³»ç»ŸæŒ‡ä»¤ï¼ˆå¯ç¼“å­˜ï¼‰
-                string systemPrompt = "ä½ æ˜¯ä¸€ä¸ªRimWorldæ®–æ°‘åœ°çš„è®°å¿†æ€»ç»“åŠ©æ‰‹ã€‚\n" +
-                                    "è¯·ç”¨æç®€çš„è¯­è¨€æ€»ç»“è®°å¿†å†…å®¹ã€‚\n" +
-                                    "åªè¾“å‡ºæ€»ç»“æ–‡å­—ï¼Œä¸è¦å…¶ä»–æ ¼å¼ã€‚";
+                // ¹Ì¶¨µÄÏµÍ³Ö¸Áî£¨¿É»º´æ£©
+                string systemPrompt = "ÄãÊÇÒ»¸öRimWorldÖ³ÃñµØµÄ¼ÇÒä×Ü½áÖúÊÖ¡£\n" +
+                                    "ÇëÓÃ¼«¼òµÄÓïÑÔ×Ü½á¼ÇÒäÄÚÈİ¡£\n" +
+                                    "Ö»Êä³ö×Ü½áÎÄ×Ö£¬²»ÒªÆäËû¸ñÊ½¡£";
                 
                 string escapedSystem = EscapeJsonString(systemPrompt);
                 string escapedPrompt = EscapeJsonString(prompt);
@@ -644,13 +642,13 @@ namespace RimTalk.Memory.AI
                 sb.Append($"\"model\":\"{model}\",");
                 sb.Append("\"messages\":[");
                 
-                // systemæ¶ˆæ¯ï¼ˆå¸¦ç¼“å­˜æ§åˆ¶ï¼‰
+                // systemÏûÏ¢£¨´ø»º´æ¿ØÖÆ£©
                 sb.Append("{\"role\":\"system\",");
                 sb.Append($"\"content\":\"{escapedSystem}\"");
                 
                 if (enableCaching)
                 {
-                    // ? OpenAI/Custom/Player2 éƒ½å°è¯•ä½¿ç”¨ cache_control
+                    // ? OpenAI/Custom/Player2 ¶¼³¢ÊÔÊ¹ÓÃ cache_control
                     if ((provider == "OpenAI" || provider == "Custom" || provider == "Player2") && 
                         (model.Contains("gpt-4") || model.Contains("gpt-3.5")))
                     {
@@ -659,14 +657,14 @@ namespace RimTalk.Memory.AI
                     }
                     else if (provider == "DeepSeek")
                     {
-                        // DeepSeekç¼“å­˜æ§åˆ¶
+                        // DeepSeek»º´æ¿ØÖÆ
                         sb.Append(",\"cache\":true");
                     }
                 }
                 
                 sb.Append("},");
                 
-                // useræ¶ˆæ¯ï¼ˆå˜åŒ–çš„å†…å®¹ï¼‰
+                // userÏûÏ¢£¨±ä»¯µÄÄÚÈİ£©
                 sb.Append("{\"role\":\"user\",");
                 sb.Append($"\"content\":\"{escapedPrompt}\"");
                 sb.Append("}],");
@@ -686,8 +684,8 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// ? v3.3.2.34: å®‰å…¨çš„ JSON å­—ç¬¦ä¸²è½¬ä¹‰
-        /// å¤„ç†æ‰€æœ‰ç‰¹æ®Šå­—ç¬¦ï¼šå¼•å·ã€æ¢è¡Œã€åæ–œæ ç­‰
+        /// ? v3.3.2.34: °²È«µÄ JSON ×Ö·û´®×ªÒå
+        /// ´¦ÀíËùÓĞÌØÊâ×Ö·û£ºÒıºÅ¡¢»»ĞĞ¡¢·´Ğ±¸ÜµÈ
         /// </summary>
         private static string EscapeJsonString(string text)
         {
@@ -722,7 +720,7 @@ namespace RimTalk.Memory.AI
                         sb.Append("\\f");
                         break;
                     default:
-                        // å…¶ä»–æ§åˆ¶å­—ç¬¦ä½¿ç”¨ Unicode è½¬ä¹‰
+                        // ÆäËû¿ØÖÆ×Ö·ûÊ¹ÓÃ Unicode ×ªÒå
                         if (c < 32)
                         {
                             sb.Append("\\u");
@@ -742,7 +740,7 @@ namespace RimTalk.Memory.AI
         private static async Task<string> CallAIAsync(string prompt)
         {
             const int MAX_RETRIES = 3;
-            const int RETRY_DELAY_MS = 2000; // 2ç§’é‡è¯•å»¶è¿Ÿ
+            const int RETRY_DELAY_MS = 2000; // 2ÃëÖØÊÔÑÓ³Ù
             
             for (int attempt = 1; attempt <= MAX_RETRIES; attempt++)
             {
@@ -770,13 +768,14 @@ namespace RimTalk.Memory.AI
                     request.Method = "POST";
                     request.ContentType = "application/json";
                     
-                    // ? v3.3.3: Google APIä¸ä½¿ç”¨Bearer tokenï¼ˆKeyåœ¨URLä¸­ï¼‰
+                    // ? v3.3.3: Google API²»Ê¹ÓÃBearer token£¨KeyÔÚURLÖĞ£©
                     if (provider != "Google")
                     {
                         request.Headers["Authorization"] = $"Bearer {apiKey}";
                     }
                     
-                    request.Timeout = 30000;
+                    // ? Ôö¼Ó³¬Ê±Ê±¼äµ½120Ãë£¨2·ÖÖÓ£©
+                    request.Timeout = 120000; // Ô­À´ÊÇ30000£¨30Ãë£©
 
                     string json = BuildJsonRequest(prompt);
                     byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
@@ -805,7 +804,7 @@ namespace RimTalk.Memory.AI
                 {
                     bool shouldRetry = false;
                     string errorDetail = "";
-                    HttpStatusCode statusCode = 0; // ? v3.3.3: ä¿å­˜çŠ¶æ€ç åˆ°å¤–éƒ¨å˜é‡
+                    HttpStatusCode statusCode = 0; // ? v3.3.3: ±£´æ×´Ì¬Âëµ½Íâ²¿±äÁ¿
                     
 
 
@@ -815,13 +814,13 @@ namespace RimTalk.Memory.AI
 	                    using (var streamReader = new System.IO.StreamReader(errorResponse.GetResponseStream()))
 	                    {
 	                        string errorText = streamReader.ReadToEnd();
-	                        statusCode = errorResponse.StatusCode; // ? ä¿å­˜çŠ¶æ€ç 
+	                        statusCode = errorResponse.StatusCode; // ? ±£´æ×´Ì¬Âë
 	                        
-	                        // ? v3.3.3: æ ¹æ®é”™è¯¯ç±»å‹æ˜¾ç¤ºå®Œæ•´æˆ–æˆªæ–­çš„é”™è¯¯ä¿¡æ¯
+	                        // ? v3.3.3: ¸ù¾İ´íÎóÀàĞÍÏÔÊ¾ÍêÕû»ò½Ø¶ÏµÄ´íÎóĞÅÏ¢
 	                        if (errorResponse.StatusCode == HttpStatusCode.Unauthorized || // 401
 	                            errorResponse.StatusCode == HttpStatusCode.Forbidden)      // 403
 	                        {
-	                            // è®¤è¯é”™è¯¯ï¼šæ˜¾ç¤ºå®Œæ•´é”™è¯¯ä¿¡æ¯ï¼ˆå¸®åŠ©è°ƒè¯•ï¼‰
+	                            // ÈÏÖ¤´íÎó£ºÏÔÊ¾ÍêÕû´íÎóĞÅÏ¢£¨°ïÖúµ÷ÊÔ£©
 	                            errorDetail = errorText;
 	                            Log.Error($"[AI Summarizer] ? Authentication Error ({errorResponse.StatusCode}):");
 	                            Log.Error($"[AI Summarizer]    API Key: {SanitizeApiKey(apiKey)}");
@@ -836,11 +835,11 @@ namespace RimTalk.Memory.AI
 	                        }
 	                        else
 	                        {
-	                            // å…¶ä»–é”™è¯¯ï¼šæˆªæ–­æ˜¾ç¤º
+	                            // ÆäËû´íÎó£º½Ø¶ÏÏÔÊ¾
 	                            errorDetail = errorText.Substring(0, Math.Min(200, errorText.Length));
 	                        }
 	                        
-	                        // åˆ¤æ–­æ˜¯å¦åº”è¯¥é‡è¯•
+	                        // ÅĞ¶ÏÊÇ·ñÓ¦¸ÃÖØÊÔ
 	                        if (errorResponse.StatusCode == HttpStatusCode.ServiceUnavailable || // 503
 	                            errorResponse.StatusCode == (HttpStatusCode)429 ||              // Too Many Requests
 	                            errorResponse.StatusCode == HttpStatusCode.GatewayTimeout ||    // 504
@@ -861,13 +860,13 @@ namespace RimTalk.Memory.AI
 	                {
 	                    errorDetail = ex.Message;
 	                    Log.Warning($"[AI Summarizer] ?? Network Error (attempt {attempt}/{MAX_RETRIES}): {errorDetail}");
-	                    shouldRetry = true; // ç½‘ç»œé”™è¯¯ä¹Ÿé‡è¯•
+	                    shouldRetry = true; // ÍøÂç´íÎóÒ²ÖØÊÔ
 	                }
 	                
-	                // å¦‚æœæ˜¯æœ€åä¸€æ¬¡å°è¯•æˆ–ä¸åº”è¯¥é‡è¯•ï¼Œåˆ™å¤±è´¥
+	                // Èç¹ûÊÇ×îºóÒ»´Î³¢ÊÔ»ò²»Ó¦¸ÃÖØÊÔ£¬ÔòÊ§°Ü
 	                if (attempt >= MAX_RETRIES || !shouldRetry)
 	                {
-	                    // ? v3.3.3: ä½¿ç”¨ä¿å­˜çš„çŠ¶æ€ç åˆ¤æ–­
+	                    // ? v3.3.3: Ê¹ÓÃ±£´æµÄ×´Ì¬ÂëÅĞ¶Ï
 	                    if (statusCode != HttpStatusCode.Unauthorized && 
 	                        statusCode != HttpStatusCode.Forbidden)
 	                    {
@@ -876,8 +875,8 @@ namespace RimTalk.Memory.AI
 	                    return null;
 	                }
 	                
-	                // ç­‰å¾…åé‡è¯•
-	                await Task.Delay(RETRY_DELAY_MS * attempt); // é€’å¢å»¶è¿Ÿï¼š2s, 4s, 6s
+	                // µÈ´ıºóÖØÊÔ
+	                await Task.Delay(RETRY_DELAY_MS * attempt); // µİÔöÑÓ³Ù£º2s, 4s, 6s
                 }
                 catch (Exception ex)
                 {
@@ -891,13 +890,13 @@ namespace RimTalk.Memory.AI
         }
 
         /// <summary>
-        /// ? v3.3.2.35: ä¼˜åŒ–ç‰ˆ - ä½¿ç”¨é™æ€ç¼–è¯‘çš„æ­£åˆ™è¡¨è¾¾å¼
+        /// ? v3.3.2.35: ÓÅ»¯°æ - Ê¹ÓÃ¾²Ì¬±àÒëµÄÕıÔò±í´ïÊ½
         /// </summary>
         private static string ParseResponse(string responseText)
         {
             try
             {
-                // ? ä½¿ç”¨é¢„ç¼–è¯‘çš„æ­£åˆ™è¡¨è¾¾å¼
+                // ? Ê¹ÓÃÔ¤±àÒëµÄÕıÔò±í´ïÊ½
                 var regex = provider == "Google" ? GoogleResponseRegex : OpenAIResponseRegex;
                 var match = regex.Match(responseText);
                 
@@ -911,7 +910,7 @@ namespace RimTalk.Memory.AI
             return null;
         }
         
-        // ? v3.3.6: Player2 æœ¬åœ°åº”ç”¨æ”¯æŒ
+        // ? v3.3.6: Player2 ±¾µØÓ¦ÓÃÖ§³Ö
         private const string Player2LocalUrl = "http://localhost:4315/v1";
         private const string Player2RemoteUrl = "https://api.player2.game/v1";
         private const string Player2GameClientId = "rimtalk-expand-memory";
@@ -919,7 +918,7 @@ namespace RimTalk.Memory.AI
         private static string player2LocalKey = null;
         
         /// <summary>
-        /// ? v3.3.6: å°è¯•æ£€æµ‹å¹¶è¿æ¥æœ¬åœ° Player2 æ¡Œé¢åº”ç”¨
+        /// ? v3.3.6: ³¢ÊÔ¼ì²â²¢Á¬½Ó±¾µØ Player2 ×ÀÃæÓ¦ÓÃ
         /// </summary>
         public static void TryDetectPlayer2LocalApp()
         {
@@ -929,10 +928,10 @@ namespace RimTalk.Memory.AI
                 {
                     Log.Message("[AI] ?? Checking for local Player2 app...");
                     
-                    // 1. å¥åº·æ£€æŸ¥
+                    // 1. ½¡¿µ¼ì²é
                     var healthRequest = (HttpWebRequest)WebRequest.Create($"{Player2LocalUrl}/health");
                     healthRequest.Method = "GET";
-                    healthRequest.Timeout = 2000; // 2ç§’è¶…æ—¶
+                    healthRequest.Timeout = 2000; // 2Ãë³¬Ê±
                     
                     try
                     {
@@ -942,7 +941,7 @@ namespace RimTalk.Memory.AI
                             {
                                 Log.Message("[AI] ? Player2 local app detected!");
                                 
-                                // 2. è·å–æœ¬åœ°Key
+                                // 2. »ñÈ¡±¾µØKey
                                 await TryGetPlayer2LocalKey();
                                 
                                 if (!string.IsNullOrEmpty(player2LocalKey))
@@ -959,7 +958,7 @@ namespace RimTalk.Memory.AI
                     }
                     catch (WebException)
                     {
-                        // æœ¬åœ°åº”ç”¨æœªè¿è¡Œ
+                        // ±¾µØÓ¦ÓÃÎ´ÔËĞĞ
                     }
                     
                     isPlayer2Local = false;
@@ -980,7 +979,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// ? v3.3.6: ä»æœ¬åœ° Player2 åº”ç”¨è·å– API Key
+        /// ? v3.3.6: ´Ó±¾µØ Player2 Ó¦ÓÃ»ñÈ¡ API Key
         /// </summary>
         private static async Task TryGetPlayer2LocalKey()
         {
@@ -1006,7 +1005,7 @@ namespace RimTalk.Memory.AI
                 {
                     string responseText = await reader.ReadToEndAsync();
                     
-                    // ? ä½¿ç”¨é¢„ç¼–è¯‘çš„æ­£åˆ™è¡¨è¾¾å¼
+                    // ? Ê¹ÓÃÔ¤±àÒëµÄÕıÔò±í´ïÊ½
                     var match = Player2KeyRegex.Match(responseText);
                     if (match.Success)
                     {

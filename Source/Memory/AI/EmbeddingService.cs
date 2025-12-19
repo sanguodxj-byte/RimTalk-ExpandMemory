@@ -9,37 +9,37 @@ using Verse;
 namespace RimTalk.Memory.AI
 {
     /// <summary>
-    /// å‘é‡åµŒå…¥æœåŠ¡ - æ”¯æŒGeminiå’ŒDeepSeek
-    /// v3.1.0 å®éªŒæ€§åŠŸèƒ½
+    /// ÏòÁ¿Ç¶Èë·şÎñ - Ö§³ÖGeminiºÍDeepSeek
+    /// v3.1.0 ÊµÑéĞÔ¹¦ÄÜ
     /// 
-    /// ç”¨é€”ï¼š
-    /// - è¯­ä¹‰ç›¸ä¼¼åº¦è®¡ç®—ï¼ˆæ¯”å…³é”®è¯åŒ¹é…æ›´å‡†ç¡®ï¼‰
-    /// - å½’æ¡£è®°å¿†æ‘˜è¦
-    /// - é•¿æœŸè®°å¿†æ£€ç´¢
+    /// ÓÃÍ¾£º
+    /// - ÓïÒåÏàËÆ¶È¼ÆËã£¨±È¹Ø¼ü´ÊÆ¥Åä¸ü×¼È·£©
+    /// - ¹éµµ¼ÇÒäÕªÒª
+    /// - ³¤ÆÚ¼ÇÒä¼ìË÷
     /// 
-    /// æˆæœ¬ä¼°ç®—ï¼š
+    /// ³É±¾¹ÀËã£º
     /// - DeepSeek: ?0.0002/1K tokens (~$0.00003)
     /// - Gemini: $0.00001/1K tokens
     /// 
-    /// ä½¿ç”¨å»ºè®®ï¼š
-    /// - ä»…å¯¹é‡è¦è®°å¿†ï¼ˆimportance > 0.7ï¼‰ä½¿ç”¨
-    /// - ç¼“å­˜ç»“æœï¼Œé¿å…é‡å¤è®¡ç®—
-    /// - æœˆæˆæœ¬æ§åˆ¶åœ¨ $0.01 ä»¥å†…
+    /// Ê¹ÓÃ½¨Òé£º
+    /// - ½ö¶ÔÖØÒª¼ÇÒä£¨importance > 0.7£©Ê¹ÓÃ
+    /// - »º´æ½á¹û£¬±ÜÃâÖØ¸´¼ÆËã
+    /// - ÔÂ³É±¾¿ØÖÆÔÚ $0.01 ÒÔÄÚ
     /// </summary>
     public static class EmbeddingService
     {
-        // åµŒå…¥ç¼“å­˜ï¼ˆå†…å­˜ç¼“å­˜ï¼Œé‡å¯åæ¸…ç©ºï¼‰
+        // Ç¶Èë»º´æ£¨ÄÚ´æ»º´æ£¬ÖØÆôºóÇå¿Õ£©
         private static Dictionary<string, float[]> embeddingCache = new Dictionary<string, float[]>();
-        private const int MAX_CACHE_SIZE = 500; // æœ€å¤šç¼“å­˜500ä¸ªå‘é‡
+        private const int MAX_CACHE_SIZE = 500; // ×î¶à»º´æ500¸öÏòÁ¿
         
-        // é…ç½®
+        // ÅäÖÃ
         private static bool isInitialized = false;
         private static string apiKey, apiUrl, provider;
         private static int embeddingDimension = 1024; // DeepSeek: 1024, Gemini: 768
         
         /// <summary>
-        /// åˆå§‹åŒ–EmbeddingæœåŠ¡
-        /// ? v3.3.2.27: VectorDBå·²ç§»é™¤ï¼Œå§‹ç»ˆè¿”å›æœªåˆå§‹åŒ–çŠ¶æ€
+        /// ³õÊ¼»¯Embedding·şÎñ
+        /// ? v3.3.2.27: VectorDBÒÑÒÆ³ı£¬Ê¼ÖÕ·µ»ØÎ´³õÊ¼»¯×´Ì¬
         /// </summary>
         public static void Initialize()
         {
@@ -47,8 +47,8 @@ namespace RimTalk.Memory.AI
             
             try
             {
-                // ? v3.3.2.27: enableSemanticEmbeddingå·²ç§»é™¤ï¼Œå§‹ç»ˆä¸åˆå§‹åŒ–
-                Log.Message("[Embedding] v3.3.2.27: Semantic embeddingåŠŸèƒ½å·²ç§»é™¤ï¼Œä½¿ç”¨SuperKeywordEngineæ›¿ä»£");
+                // ? v3.3.2.27: enableSemanticEmbeddingÒÑÒÆ³ı£¬Ê¼ÖÕ²»³õÊ¼»¯
+                Log.Message("[Embedding] v3.3.2.27: Semantic embedding¹¦ÄÜÒÑÒÆ³ı£¬Ê¹ÓÃSuperKeywordEngineÌæ´ú");
                 return;
             }
             catch (Exception ex)
@@ -59,17 +59,17 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// æ£€æŸ¥æœåŠ¡æ˜¯å¦å¯ç”¨
-        /// ? v3.3.2.27: VectorDBå·²ç§»é™¤ï¼Œå§‹ç»ˆè¿”å›false
+        /// ¼ì²é·şÎñÊÇ·ñ¿ÉÓÃ
+        /// ? v3.3.2.27: VectorDBÒÑÒÆ³ı£¬Ê¼ÖÕ·µ»Øfalse
         /// </summary>
         public static bool IsAvailable()
         {
-            return false; // v3.3.2.27: è¯­ä¹‰åµŒå…¥åŠŸèƒ½å·²ç§»é™¤
+            return false; // v3.3.2.27: ÓïÒåÇ¶Èë¹¦ÄÜÒÑÒÆ³ı
         }
         
         /// <summary>
-        /// è·å–æ–‡æœ¬çš„åµŒå…¥å‘é‡ï¼ˆå¸¦ç¼“å­˜ï¼‰
-        /// ? v3.3.2: å‡å°‘æ—¥å¿—è¾“å‡ºé¢‘ç‡
+        /// »ñÈ¡ÎÄ±¾µÄÇ¶ÈëÏòÁ¿£¨´ø»º´æ£©
+        /// ? v3.3.2: ¼õÉÙÈÕÖ¾Êä³öÆµÂÊ
         /// </summary>
         public static async Task<float[]> GetEmbeddingAsync(string text)
         {
@@ -78,15 +78,15 @@ namespace RimTalk.Memory.AI
             if (string.IsNullOrEmpty(text))
                 return null;
             
-            // ç”Ÿäº§ç¼“å­˜é”®
+            // Éú²ú»º´æ¼ü
             string cacheKey = GenerateCacheKey(text);
             
-            // æ£€æŸ¥ç¼“å­˜
+            // ¼ì²é»º´æ
             lock (embeddingCache)
             {
                 if (embeddingCache.TryGetValue(cacheKey, out float[] cachedVector))
                 {
-                    // ? v3.3.2: åªåœ¨DevModeä¸‹ä¸”éšæœº1%æ¦‚ç‡è¾“å‡ºï¼Œé¿å…åˆ·å±
+                    // ? v3.3.2: Ö»ÔÚDevModeÏÂÇÒËæ»ú1%¸ÅÂÊÊä³ö£¬±ÜÃâË¢ÆÁ
                     if (Prefs.DevMode && UnityEngine.Random.value < 0.01f)
                     {
                         Log.Message($"[Embedding] Cache hit ({embeddingCache.Count}/{MAX_CACHE_SIZE})");
@@ -95,31 +95,31 @@ namespace RimTalk.Memory.AI
                 }
             }
             
-            // ? v3.3.2: é™ä½APIè°ƒç”¨æ—¥å¿—é¢‘ç‡
+            // ? v3.3.2: ½µµÍAPIµ÷ÓÃÈÕÖ¾ÆµÂÊ
             if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
             {
                 Log.Message($"[Embedding] API call: {text.Substring(0, Math.Min(30, text.Length))}...");
             }
             
-            // è°ƒç”¨API
+            // µ÷ÓÃAPI
             float[] embedding = await CallEmbeddingAPIAsync(text);
             
             if (embedding != null)
             {
-                // ç¼“å­˜ç»“æœ
+                // »º´æ½á¹û
                 lock (embeddingCache)
                 {
-                    // é™åˆ¶ç¼“å­˜å¤§å°
+                    // ÏŞÖÆ»º´æ´óĞ¡
                     if (embeddingCache.Count >= MAX_CACHE_SIZE)
                     {
-                        // ç§»é™¤æœ€æ—§çš„50ä¸ª
+                        // ÒÆ³ı×î¾ÉµÄ50¸ö
                         var toRemove = embeddingCache.Keys.Take(50).ToList();
                         foreach (var key in toRemove)
                         {
                             embeddingCache.Remove(key);
                         }
                         
-                        // ? v3.3.2: é™ä½æ—¥å¿—è¾“å‡º
+                        // ? v3.3.2: ½µµÍÈÕÖ¾Êä³ö
                         if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                             Log.Message($"[Embedding] Cache cleanup: {toRemove.Count} removed, {embeddingCache.Count} remain");
                     }
@@ -132,7 +132,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// æ‰¹é‡è·å–åµŒå…¥å‘é‡
+        /// ÅúÁ¿»ñÈ¡Ç¶ÈëÏòÁ¿
         /// </summary>
         public static async Task<Dictionary<string, float[]>> GetEmbeddingsBatchAsync(List<string> texts)
         {
@@ -141,7 +141,7 @@ namespace RimTalk.Memory.AI
             if (!IsAvailable() || texts == null || texts.Count == 0)
                 return results;
             
-            // åˆ†æ‰¹å¤„ç†ï¼ˆæ¯æ‰¹æœ€å¤š20ä¸ªï¼‰
+            // ·ÖÅú´¦Àí£¨Ã¿Åú×î¶à20¸ö£©
             const int BATCH_SIZE = 20;
             
             for (int i = 0; i < texts.Count; i += BATCH_SIZE)
@@ -164,10 +164,10 @@ namespace RimTalk.Memory.AI
                     }
                 }
                 
-                // é¿å…é¢‘ç‡é™åˆ¶
+                // ±ÜÃâÆµÂÊÏŞÖÆ
                 if (i + BATCH_SIZE < texts.Count)
                 {
-                    await Task.Delay(100); // å»¶è¿Ÿ100ms
+                    await Task.Delay(100); // ÑÓ³Ù100ms
                 }
             }
             
@@ -175,7 +175,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è®¡ç®—ä½™å¼¦ç›¸ä¼¼åº¦
+        /// ¼ÆËãÓàÏÒÏàËÆ¶È
         /// </summary>
         public static float CosineSimilarity(float[] vectorA, float[] vectorB)
         {
@@ -206,7 +206,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è°ƒç”¨Embedding API
+        /// µ÷ÓÃEmbedding API
         /// </summary>
         private static async Task<float[]> CallEmbeddingAPIAsync(string text)
         {
@@ -229,11 +229,11 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è°ƒç”¨OpenAIé£æ ¼çš„Embedding API (DeepSeek, OpenAI)
+        /// µ÷ÓÃOpenAI·ç¸ñµÄEmbedding API (DeepSeek, OpenAI)
         /// </summary>
         private static async Task<float[]> CallOpenAIStyleEmbeddingAsync(string text)
         {
-            // ? æ·»åŠ API KeyéªŒè¯
+            // ? Ìí¼ÓAPI KeyÑéÖ¤
             if (string.IsNullOrEmpty(apiKey))
             {
                 Log.Error("[Embedding] API Key is empty! Please configure it in Mod Settings.");
@@ -251,9 +251,9 @@ namespace RimTalk.Memory.AI
             request.Method = "POST";
             request.ContentType = "application/json";
             request.Headers["Authorization"] = $"Bearer {apiKey}";
-            request.Timeout = 10000; // 10ç§’è¶…æ—¶
+            request.Timeout = 10000; // 10Ãë³¬Ê±
             
-            // æ„å»ºè¯·æ±‚ä½“
+            // ¹¹½¨ÇëÇóÌå
             string model = provider == "DeepSeek" ? "deepseek-embedding" : "text-embedding-ada-002";
             string jsonRequest = BuildOpenAIEmbeddingRequest(text, model);
             
@@ -302,7 +302,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è°ƒç”¨Gemini Embedding API
+        /// µ÷ÓÃGemini Embedding API
         /// </summary>
         private static async Task<float[]> CallGeminiEmbeddingAsync(string text)
         {
@@ -311,7 +311,7 @@ namespace RimTalk.Memory.AI
             request.ContentType = "application/json";
             request.Timeout = 10000;
             
-            // Geminiè¯·æ±‚æ ¼å¼
+            // GeminiÇëÇó¸ñÊ½
             string jsonRequest = BuildGeminiEmbeddingRequest(text);
             
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonRequest);
@@ -331,7 +331,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// æ„å»ºOpenAIé£æ ¼çš„è¯·æ±‚
+        /// ¹¹½¨OpenAI·ç¸ñµÄÇëÇó
         /// </summary>
         private static string BuildOpenAIEmbeddingRequest(string text, string model)
         {
@@ -347,7 +347,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// æ„å»ºGeminiè¯·æ±‚
+        /// ¹¹½¨GeminiÇëÇó
         /// </summary>
         private static string BuildGeminiEmbeddingRequest(string text)
         {
@@ -366,13 +366,13 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è§£æOpenAIé£æ ¼çš„å“åº”
+        /// ½âÎöOpenAI·ç¸ñµÄÏìÓ¦
         /// </summary>
         private static float[] ParseOpenAIEmbeddingResponse(string responseText)
         {
             try
             {
-                // ç®€å•çš„JSONè§£æï¼ˆæå–embeddingæ•°ç»„ï¼‰
+                // ¼òµ¥µÄJSON½âÎö£¨ÌáÈ¡embeddingÊı×é£©
                 int embeddingStart = responseText.IndexOf("\"embedding\":");
                 if (embeddingStart == -1)
                     return null;
@@ -406,13 +406,13 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è§£æGeminiå“åº”
+        /// ½âÎöGeminiÏìÓ¦
         /// </summary>
         private static float[] ParseGeminiEmbeddingResponse(string responseText)
         {
             try
             {
-                // Geminiè¿”å›æ ¼å¼: {"embedding":{"values":[...]}}
+                // Gemini·µ»Ø¸ñÊ½: {"embedding":{"values":[...]}}
                 int valuesStart = responseText.IndexOf("\"values\":");
                 if (valuesStart == -1)
                     return null;
@@ -446,17 +446,17 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// ç”Ÿæˆç¼“å­˜é”®
+        /// Éú³É»º´æ¼ü
         /// </summary>
         private static string GenerateCacheKey(string text)
         {
-            // ä½¿ç”¨MD5å“ˆå¸Œï¼ˆç®€åŒ–ç‰ˆï¼‰
+            // Ê¹ÓÃMD5¹şÏ££¨¼ò»¯°æ£©
             int hash = text.GetHashCode();
             return $"{provider}_{hash}";
         }
         
         /// <summary>
-        /// æ¸…ç©ºç¼“å­˜
+        /// Çå¿Õ»º´æ
         /// </summary>
         public static void ClearCache()
         {
@@ -469,7 +469,7 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è·å–ç¼“å­˜ç»Ÿè®¡
+        /// »ñÈ¡»º´æÍ³¼Æ
         /// </summary>
         public static EmbeddingCacheStats GetCacheStats()
         {
@@ -487,23 +487,23 @@ namespace RimTalk.Memory.AI
         }
         
         /// <summary>
-        /// è·å–EmbeddingServiceå®ä¾‹ï¼ˆé™æ€è®¿é—®ï¼‰
+        /// »ñÈ¡EmbeddingServiceÊµÀı£¨¾²Ì¬·ÃÎÊ£©
         /// </summary>
         public static EmbeddingServiceWrapper GetInstance()
         {
-            // è¿”å›åŒ…è£…å™¨å®ä¾‹
+            // ·µ»Ø°ü×°Æ÷ÊµÀı
             return new EmbeddingServiceWrapper();
         }
         
         /// <summary>
-        /// åŒæ­¥ç‰ˆæœ¬çš„GetEmbeddingï¼ˆç”¨äºå‘é‡åº“æ³¨å…¥ï¼‰
+        /// Í¬²½°æ±¾µÄGetEmbedding£¨ÓÃÓÚÏòÁ¿¿â×¢Èë£©
         /// </summary>
         public static float[] GetEmbedding(string text)
         {
             try
             {
                 var task = GetEmbeddingAsync(text);
-                task.Wait(5000); // ç­‰å¾…æœ€å¤š5ç§’
+                task.Wait(5000); // µÈ´ı×î¶à5Ãë
                 return task.Result;
             }
             catch (Exception ex)
@@ -515,7 +515,7 @@ namespace RimTalk.Memory.AI
     }
     
     /// <summary>
-    /// EmbeddingServiceåŒ…è£…å™¨ï¼Œç”¨äºå®ä¾‹æ¨¡å¼è®¿é—®
+    /// EmbeddingService°ü×°Æ÷£¬ÓÃÓÚÊµÀıÄ£Ê½·ÃÎÊ
     /// </summary>
     public class EmbeddingServiceWrapper
     {
@@ -531,7 +531,7 @@ namespace RimTalk.Memory.AI
     }
     
     /// <summary>
-    /// Embeddingç¼“å­˜ç»Ÿè®¡ä¿¡æ¯
+    /// Embedding»º´æÍ³¼ÆĞÅÏ¢
     /// </summary>
     public class EmbeddingCacheStats
     {

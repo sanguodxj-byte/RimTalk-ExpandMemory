@@ -1,30 +1,30 @@
-# TTS åŠŸèƒ½åˆ é™¤æŒ‡å—
+# TTS ¹¦ÄÜÉ¾³ıÖ¸ÄÏ
 
-## ? å·²å®Œæˆ
+## ? ÒÑÍê³É
 
-1. ? åˆ é™¤ TTS æ ¸å¿ƒæœåŠ¡æ–‡ä»¶
+1. ? É¾³ı TTS ºËĞÄ·şÎñÎÄ¼ş
    - `Source/Memory/TTS/AzureTTSService.cs`
    - `Source/Memory/TTS/ITTSService.cs`
    - `Source/Memory/TTS/TTSAudioPlayer.cs`
    - `Source/Memory/TTS/TTSHelper.cs`
    - `Source/Memory/TTS/TTSManager.cs`
 
-2. ? åˆ é™¤ TTS Patch æ–‡ä»¶
+2. ? É¾³ı TTS Patch ÎÄ¼ş
    - `Source/Patches/TTSAutoPlayPatcher.cs`
 
-3. ? åˆ é™¤ TTS æ–‡æ¡£
+3. ? É¾³ı TTS ÎÄµµ
    - `Docs/TTS_*.md`
    - `Docs/KNOWLEDGE_TEXTAREA_FIX.md`
 
-## ? éœ€è¦æ‰‹åŠ¨å®Œæˆ
+## ? ĞèÒªÊÖ¶¯Íê³É
 
-### 1. ç¼–è¾‘ `Source/RimTalkSettings.cs`
+### 1. ±à¼­ `Source/RimTalkSettings.cs`
 
-**éœ€è¦åˆ é™¤çš„éƒ¨åˆ†ï¼š**
+**ĞèÒªÉ¾³ıµÄ²¿·Ö£º**
 
-#### A. å­—æ®µå®šä¹‰ï¼ˆç¬¬ 51-58 è¡Œé™„è¿‘ï¼‰
+#### A. ×Ö¶Î¶¨Òå£¨µÚ 51-58 ĞĞ¸½½ü£©
 ```csharp
-// TTS è¯­éŸ³æœåŠ¡é…ç½®
+// TTS ÓïÒô·şÎñÅäÖÃ
 public bool enableTTS = false;
 public string ttsProvider = "Azure";
 public string azureSpeechKey = "";
@@ -35,12 +35,12 @@ public float ttsVolume = 1.0f;
 public bool ttsAutoPlay = false;
 ```
 
-#### B. UI æŠ˜å çŠ¶æ€ï¼ˆç¬¬ 97 è¡Œé™„è¿‘ï¼‰
+#### B. UI ÕÛµş×´Ì¬£¨µÚ 97 ĞĞ¸½½ü£©
 ```csharp
 private static bool expandTTSSettings = false;
 ```
 
-#### C. ExposeData åºåˆ—åŒ–ï¼ˆç¬¬ 130-138 è¡Œé™„è¿‘ï¼‰
+#### C. ExposeData ĞòÁĞ»¯£¨µÚ 130-138 ĞĞ¸½½ü£©
 ```csharp
 Scribe_Values.Look(ref enableTTS, "tts_enableTTS", false);
 Scribe_Values.Look(ref ttsProvider, "tts_provider", "Azure");
@@ -52,46 +52,46 @@ Scribe_Values.Look(ref ttsVolume, "tts_volume", 1.0f);
 Scribe_Values.Look(ref ttsAutoPlay, "tts_autoPlay", false);
 ```
 
-#### D. DoSettingsWindowContents æ–¹æ³•ï¼ˆç¬¬ 236 è¡Œé™„è¿‘ï¼‰
-åˆ é™¤è¿™è¡Œï¼š
+#### D. DoSettingsWindowContents ·½·¨£¨µÚ 236 ĞĞ¸½½ü£©
+É¾³ıÕâĞĞ£º
 ```csharp
-DrawCollapsibleSection(listingStandard, "?? TTS è¯­éŸ³æœåŠ¡", ref expandTTSSettings, () => DrawTTSSettings(listingStandard));
+DrawCollapsibleSection(listingStandard, "?? TTS ÓïÒô·şÎñ", ref expandTTSSettings, () => DrawTTSSettings(listingStandard));
 ```
 
-#### E. DrawTTSSettings æ–¹æ³•ï¼ˆæ•´ä¸ªæ–¹æ³•ï¼Œçº¦ 60-100 è¡Œï¼‰
+#### E. DrawTTSSettings ·½·¨£¨Õû¸ö·½·¨£¬Ô¼ 60-100 ĞĞ£©
 ```csharp
 private void DrawTTSSettings(Listing_Standard listing)
 {
-    // ... åˆ é™¤æ•´ä¸ªæ–¹æ³• ...
+    // ... É¾³ıÕû¸ö·½·¨ ...
 }
 ```
 
-#### F. TestTTS æ–¹æ³•ï¼ˆæ•´ä¸ªæ–¹æ³•ï¼Œçº¦ 20-30 è¡Œï¼‰
+#### F. TestTTS ·½·¨£¨Õû¸ö·½·¨£¬Ô¼ 20-30 ĞĞ£©
 ```csharp
 private void TestTTS()
 {
-    // ... åˆ é™¤æ•´ä¸ªæ–¹æ³• ...
+    // ... É¾³ıÕû¸ö·½·¨ ...
 }
 ```
 
-### 2. éªŒè¯ç¼–è¯‘
+### 2. ÑéÖ¤±àÒë
 
-åˆ é™¤ä¸Šè¿°ä»£ç åï¼Œè¿è¡Œï¼š
+É¾³ıÉÏÊö´úÂëºó£¬ÔËĞĞ£º
 ```powershell
 msbuild RimTalk-ExpandMemory.csproj /p:Configuration=Release
 ```
 
-åº”è¯¥ç¼–è¯‘æˆåŠŸã€‚
+Ó¦¸Ã±àÒë³É¹¦¡£
 
-### 3. æ›´æ–° About.xmlï¼ˆå¯é€‰ï¼‰
+### 3. ¸üĞÂ About.xml£¨¿ÉÑ¡£©
 
-å¦‚æœ `About/About.xml` ä¸­æåˆ°äº† TTS åŠŸèƒ½ï¼Œä¹Ÿå¯ä»¥åˆ é™¤ç›¸å…³æè¿°ã€‚
+Èç¹û `About/About.xml` ÖĞÌáµ½ÁË TTS ¹¦ÄÜ£¬Ò²¿ÉÒÔÉ¾³ıÏà¹ØÃèÊö¡£
 
 ---
 
-## ?? å¿«é€ŸæŸ¥æ‰¾æ–¹æ³•
+## ?? ¿ìËÙ²éÕÒ·½·¨
 
-åœ¨ `Source/RimTalkSettings.cs` ä¸­æœç´¢ä»¥ä¸‹å…³é”®è¯ï¼š
+ÔÚ `Source/RimTalkSettings.cs` ÖĞËÑË÷ÒÔÏÂ¹Ø¼ü´Ê£º
 - `TTS`
 - `enableTTS`
 - `ttsProvider`
@@ -99,20 +99,20 @@ msbuild RimTalk-ExpandMemory.csproj /p:Configuration=Release
 - `DrawTTSSettings`
 - `TestTTS`
 
-åˆ é™¤æ‰€æœ‰åŒ…å«è¿™äº›å…³é”®è¯çš„ä»£ç å—ã€‚
+É¾³ıËùÓĞ°üº¬ÕâĞ©¹Ø¼ü´ÊµÄ´úÂë¿é¡£
 
 ---
 
-## ? éªŒè¯æ¸…å•
+## ? ÑéÖ¤Çåµ¥
 
-- [ ] åˆ é™¤ TTS å­—æ®µå®šä¹‰
-- [ ] åˆ é™¤ TTS UI æŠ˜å çŠ¶æ€
-- [ ] åˆ é™¤ TTS åºåˆ—åŒ–ä»£ç 
-- [ ] åˆ é™¤ DrawTTSSettings è°ƒç”¨
-- [ ] åˆ é™¤ DrawTTSSettings æ–¹æ³•
-- [ ] åˆ é™¤ TestTTS æ–¹æ³•
-- [ ] ç¼–è¯‘æˆåŠŸ
+- [ ] É¾³ı TTS ×Ö¶Î¶¨Òå
+- [ ] É¾³ı TTS UI ÕÛµş×´Ì¬
+- [ ] É¾³ı TTS ĞòÁĞ»¯´úÂë
+- [ ] É¾³ı DrawTTSSettings µ÷ÓÃ
+- [ ] É¾³ı DrawTTSSettings ·½·¨
+- [ ] É¾³ı TestTTS ·½·¨
+- [ ] ±àÒë³É¹¦
 
 ---
 
-**å®Œæˆåï¼ŒTTS åŠŸèƒ½å°†å®Œå…¨ä»é¡¹ç›®ä¸­ç§»é™¤ã€‚**
+**Íê³Éºó£¬TTS ¹¦ÄÜ½«ÍêÈ«´ÓÏîÄ¿ÖĞÒÆ³ı¡£**

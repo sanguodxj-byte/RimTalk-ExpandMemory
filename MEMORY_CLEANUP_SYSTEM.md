@@ -1,249 +1,249 @@
-# è®°å¿†è‡ªåŠ¨æ¸…ç†ç³»ç»Ÿ v3.3.14
+# ¼ÇÒä×Ô¶¯ÇåÀíÏµÍ³ v3.3.14
 
-## ?? åŠŸèƒ½æ¦‚è¿°
+## ?? ¹¦ÄÜ¸ÅÊö
 
-ä¸ºäº†é˜²æ­¢è®°å¿†ç³»ç»Ÿä¸­ç§¯ç´¯å¤§é‡"æ­»äº¡"è®°å¿†ï¼ˆactivityæžä½Žä½†æ°¸ä¸åˆ é™¤ï¼‰ï¼Œæˆ‘ä»¬å®žçŽ°äº†**åŒé‡æ¸…ç†æœºåˆ¶**ï¼š
+ÎªÁË·ÀÖ¹¼ÇÒäÏµÍ³ÖÐ»ýÀÛ´óÁ¿"ËÀÍö"¼ÇÒä£¨activity¼«µÍµ«ÓÀ²»É¾³ý£©£¬ÎÒÃÇÊµÏÖÁË**Ë«ÖØÇåÀí»úÖÆ**£º
 
-1. **æ–¹æ¡ˆ1ï¼šActivityé˜ˆå€¼æ¸…ç†** - è‡ªåŠ¨åˆ é™¤activity < 0.01çš„è®°å¿†
-2. **æ–¹æ¡ˆ3ï¼šå®¹é‡é™åˆ¶å¼ºåˆ¶æ‰§è¡Œ** - å½“å±‚çº§æ»¡æ—¶ï¼Œåˆ é™¤æœ€ä½Žactivityçš„è®°å¿†
+1. **·½°¸1£ºActivityãÐÖµÇåÀí** - ×Ô¶¯É¾³ýactivity < 0.01µÄ¼ÇÒä
+2. **·½°¸3£ºÈÝÁ¿ÏÞÖÆÇ¿ÖÆÖ´ÐÐ** - µ±²ã¼¶ÂúÊ±£¬É¾³ý×îµÍactivityµÄ¼ÇÒä
 
 ---
 
-## ?? æ¸…ç†æœºåˆ¶è¯¦è§£
+## ?? ÇåÀí»úÖÆÏê½â
 
-### æ–¹æ¡ˆ1ï¼šActivityé˜ˆå€¼æ¸…ç†
+### ·½°¸1£ºActivityãÐÖµÇåÀí
 
-**è§¦å‘æ—¶æœº**ï¼šæ¯å°æ—¶è‡ªåŠ¨æ‰§è¡Œï¼ˆéš `DecayActivity` è°ƒç”¨ï¼‰
+**´¥·¢Ê±»ú**£ºÃ¿Ð¡Ê±×Ô¶¯Ö´ÐÐ£¨Ëæ `DecayActivity` µ÷ÓÃ£©
 
-**æ¸…ç†æ¡ä»¶**ï¼š
-- `activity < 0.01`ï¼ˆè®¤ä¸ºå·²"æ­»äº¡"ï¼‰
-- **ä¸æ˜¯**å›ºå®šè®°å¿†ï¼ˆ`isPinned = false`ï¼‰
-- **ä¸æ˜¯**ç”¨æˆ·ç¼–è¾‘è®°å¿†ï¼ˆ`isUserEdited = false`ï¼‰
+**ÇåÀíÌõ¼þ**£º
+- `activity < 0.01`£¨ÈÏÎªÒÑ"ËÀÍö"£©
+- **²»ÊÇ**¹Ì¶¨¼ÇÒä£¨`isPinned = false`£©
+- **²»ÊÇ**ÓÃ»§±à¼­¼ÇÒä£¨`isUserEdited = false`£©
 
-**å½±å“èŒƒå›´**ï¼š
-- ? **SCMï¼ˆçŸ­æœŸè®°å¿†ï¼‰**ï¼šæ¸…ç†ä½Žactivityè®°å¿†
-- ? **ELSï¼ˆä¸­æœŸè®°å¿†ï¼‰**ï¼šæ¸…ç†ä½Žactivityè®°å¿†
-- ? **CLPAï¼ˆé•¿æœŸè®°å¿†ï¼‰**ï¼šæ°¸ä¹…ä¿ç•™ï¼Œä¸æ¸…ç†
+**Ó°Ïì·¶Î§**£º
+- ? **SCM£¨¶ÌÆÚ¼ÇÒä£©**£ºÇåÀíµÍactivity¼ÇÒä
+- ? **ELS£¨ÖÐÆÚ¼ÇÒä£©**£ºÇåÀíµÍactivity¼ÇÒä
+- ? **CLPA£¨³¤ÆÚ¼ÇÒä£©**£ºÓÀ¾Ã±£Áô£¬²»ÇåÀí
 
-**ç¤ºä¾‹**ï¼š
+**Ê¾Àý**£º
 ```
-æƒ…å†µ1ï¼šè®°å¿† activity = 0.005
+Çé¿ö1£º¼ÇÒä activity = 0.005
 - isPinned = false
 - isUserEdited = false
-â†’ ? è¢«åˆ é™¤
+¡ú ? ±»É¾³ý
 
-æƒ…å†µ2ï¼šè®°å¿† activity = 0.005
+Çé¿ö2£º¼ÇÒä activity = 0.005
 - isPinned = true
-â†’ ? ä¿ç•™ï¼ˆç”¨æˆ·å›ºå®šï¼‰
+¡ú ? ±£Áô£¨ÓÃ»§¹Ì¶¨£©
 
-æƒ…å†µ3ï¼šè®°å¿† activity = 0.005
+Çé¿ö3£º¼ÇÒä activity = 0.005
 - isUserEdited = true
-â†’ ? ä¿ç•™ï¼ˆç”¨æˆ·ç¼–è¾‘ï¼‰
+¡ú ? ±£Áô£¨ÓÃ»§±à¼­£©
 ```
 
 ---
 
-### æ–¹æ¡ˆ3ï¼šå®¹é‡é™åˆ¶å¼ºåˆ¶æ‰§è¡Œ
+### ·½°¸3£ºÈÝÁ¿ÏÞÖÆÇ¿ÖÆÖ´ÐÐ
 
-**è§¦å‘æ—¶æœº**ï¼šæ¯å°æ—¶è‡ªåŠ¨æ‰§è¡Œï¼ˆéš `DecayActivity` è°ƒç”¨ï¼‰
+**´¥·¢Ê±»ú**£ºÃ¿Ð¡Ê±×Ô¶¯Ö´ÐÐ£¨Ëæ `DecayActivity` µ÷ÓÃ£©
 
-**æ¸…ç†æ¡ä»¶**ï¼š
-- å±‚çº§è®°å¿†æ•°é‡ > æœ€å¤§å®¹é‡
-- æŒ‰ `activity` å‡åºæŽ’åº
-- ç›¸åŒactivityæ—¶ï¼ŒæŒ‰ `timestamp` å‡åºï¼ˆåˆ é™¤æ›´æ—§çš„ï¼‰
-- **ä¸æ˜¯**å›ºå®šè®°å¿†ï¼ˆ`isPinned = false`ï¼‰
-- **ä¸æ˜¯**ç”¨æˆ·ç¼–è¾‘è®°å¿†ï¼ˆ`isUserEdited = false`ï¼‰
+**ÇåÀíÌõ¼þ**£º
+- ²ã¼¶¼ÇÒäÊýÁ¿ > ×î´óÈÝÁ¿
+- °´ `activity` ÉýÐòÅÅÐò
+- ÏàÍ¬activityÊ±£¬°´ `timestamp` ÉýÐò£¨É¾³ý¸ü¾ÉµÄ£©
+- **²»ÊÇ**¹Ì¶¨¼ÇÒä£¨`isPinned = false`£©
+- **²»ÊÇ**ÓÃ»§±à¼­¼ÇÒä£¨`isUserEdited = false`£©
 
-**é»˜è®¤å®¹é‡**ï¼š
-- **SCM**ï¼š20æ¡
-- **ELS**ï¼š50æ¡
-- **CLPA**ï¼šæ— é™åˆ¶
+**Ä¬ÈÏÈÝÁ¿**£º
+- **SCM**£º20Ìõ
+- **ELS**£º50Ìõ
+- **CLPA**£ºÎÞÏÞÖÆ
 
-**ç¤ºä¾‹**ï¼š
+**Ê¾Àý**£º
 ```
-SCMå®¹é‡: 20
-å½“å‰æ•°é‡: 25
-â†’ åˆ é™¤5ä¸ªæœ€ä½Žactivityçš„è®°å¿†
+SCMÈÝÁ¿: 20
+µ±Ç°ÊýÁ¿: 25
+¡ú É¾³ý5¸ö×îµÍactivityµÄ¼ÇÒä
 
-åˆ é™¤ä¼˜å…ˆçº§ï¼ˆæŒ‰activityä»Žä½Žåˆ°é«˜ï¼‰:
-1. activity = 0.08, timestamp = æ—§ â†’ åˆ é™¤
-2. activity = 0.08, timestamp = æ–° â†’ åˆ é™¤
-3. activity = 0.10 â†’ åˆ é™¤
-4. activity = 0.12 â†’ åˆ é™¤
-5. activity = 0.15 â†’ åˆ é™¤
-6. activity = 0.20 â†’ ä¿ç•™ï¼ˆå·²æ»¡è¶³å®¹é‡ï¼‰
+É¾³ýÓÅÏÈ¼¶£¨°´activity´ÓµÍµ½¸ß£©:
+1. activity = 0.08, timestamp = ¾É ¡ú É¾³ý
+2. activity = 0.08, timestamp = ÐÂ ¡ú É¾³ý
+3. activity = 0.10 ¡ú É¾³ý
+4. activity = 0.12 ¡ú É¾³ý
+5. activity = 0.15 ¡ú É¾³ý
+6. activity = 0.20 ¡ú ±£Áô£¨ÒÑÂú×ãÈÝÁ¿£©
 ```
 
 ---
 
-## ?? é…ç½®å‚æ•°
+## ?? ÅäÖÃ²ÎÊý
 
-### Activityé˜ˆå€¼
+### ActivityãÐÖµ
 ```csharp
 const float ACTIVITY_THRESHOLD = 0.01f;
 ```
-**è¯´æ˜Ž**ï¼šä½ŽäºŽæ­¤å€¼çš„è®°å¿†è¢«è§†ä¸º"æ­»äº¡"ï¼Œå¯ä»¥å®‰å…¨åˆ é™¤
+**ËµÃ÷**£ºµÍÓÚ´ËÖµµÄ¼ÇÒä±»ÊÓÎª"ËÀÍö"£¬¿ÉÒÔ°²È«É¾³ý
 
-### è¡°å‡é€ŸçŽ‡ï¼ˆSettingsï¼‰
-- `scmDecayRate`ï¼šçŸ­æœŸè®°å¿†è¡°å‡é€ŸçŽ‡
-- `elsDecayRate`ï¼šä¸­æœŸè®°å¿†è¡°å‡é€ŸçŽ‡
-- `clpaDecayRate`ï¼šé•¿æœŸè®°å¿†è¡°å‡é€ŸçŽ‡
+### Ë¥¼õËÙÂÊ£¨Settings£©
+- `scmDecayRate`£º¶ÌÆÚ¼ÇÒäË¥¼õËÙÂÊ
+- `elsDecayRate`£ºÖÐÆÚ¼ÇÒäË¥¼õËÙÂÊ
+- `clpaDecayRate`£º³¤ÆÚ¼ÇÒäË¥¼õËÙÂÊ
 
-### å®¹é‡é™åˆ¶ï¼ˆSettingsï¼‰
-- `maxActiveMemories`ï¼šè¶…çŸ­æœŸè®°å¿†ä¸Šé™ï¼ˆé»˜è®¤3ï¼‰
-- `maxSituationalMemories`ï¼šçŸ­æœŸè®°å¿†ä¸Šé™ï¼ˆé»˜è®¤20ï¼‰
-- `maxEventLogMemories`ï¼šä¸­æœŸè®°å¿†ä¸Šé™ï¼ˆé»˜è®¤50ï¼‰
+### ÈÝÁ¿ÏÞÖÆ£¨Settings£©
+- `maxActiveMemories`£º³¬¶ÌÆÚ¼ÇÒäÉÏÏÞ£¨Ä¬ÈÏ3£©
+- `maxSituationalMemories`£º¶ÌÆÚ¼ÇÒäÉÏÏÞ£¨Ä¬ÈÏ20£©
+- `maxEventLogMemories`£ºÖÐÆÚ¼ÇÒäÉÏÏÞ£¨Ä¬ÈÏ50£©
 
 ---
 
-## ?? è¡°å‡ç¤ºä¾‹
+## ?? Ë¥¼õÊ¾Àý
 
-### åœºæ™¯ï¼šçŸ­æœŸè®°å¿†ï¼ˆSCMï¼‰è¡°å‡è¿‡ç¨‹
+### ³¡¾°£º¶ÌÆÚ¼ÇÒä£¨SCM£©Ë¥¼õ¹ý³Ì
 
-å‡è®¾ `scmDecayRate = 0.1`ï¼ˆæ¯å°æ—¶è¡°å‡10%ï¼‰ï¼š
+¼ÙÉè `scmDecayRate = 0.1`£¨Ã¿Ð¡Ê±Ë¥¼õ10%£©£º
 
-| æ—¶é—´ | Activityå€¼ | çŠ¶æ€ |
+| Ê±¼ä | ActivityÖµ | ×´Ì¬ |
 |------|-----------|------|
-| 0å°æ—¶ | 1.00 | æ–°å»ºè®°å¿† |
-| 10å°æ—¶ | 0.35 | ä»ç„¶æ´»è·ƒ |
-| 20å°æ—¶ | 0.12 | å¼€å§‹è¡°å¼± |
-| 30å°æ—¶ | 0.04 | æŽ¥è¿‘"æ­»äº¡" |
-| 40å°æ—¶ | 0.015 | æŽ¥è¿‘é˜ˆå€¼ |
-| 45å°æ—¶ | **0.008** | ? **è¢«æ¸…ç†**ï¼ˆ< 0.01ï¼‰|
+| 0Ð¡Ê± | 1.00 | ÐÂ½¨¼ÇÒä |
+| 10Ð¡Ê± | 0.35 | ÈÔÈ»»îÔ¾ |
+| 20Ð¡Ê± | 0.12 | ¿ªÊ¼Ë¥Èõ |
+| 30Ð¡Ê± | 0.04 | ½Ó½ü"ËÀÍö" |
+| 40Ð¡Ê± | 0.015 | ½Ó½üãÐÖµ |
+| 45Ð¡Ê± | **0.008** | ? **±»ÇåÀí**£¨< 0.01£©|
 
-### åœºæ™¯ï¼šç”¨æˆ·ç¼–è¾‘è®°å¿†ï¼ˆæ°¸ä¹…ä¿ç•™ï¼‰
+### ³¡¾°£ºÓÃ»§±à¼­¼ÇÒä£¨ÓÀ¾Ã±£Áô£©
 
-| æ—¶é—´ | Activityå€¼ | isUserEdited | çŠ¶æ€ |
+| Ê±¼ä | ActivityÖµ | isUserEdited | ×´Ì¬ |
 |------|-----------|--------------|------|
-| 0å°æ—¶ | 1.00 | true | ç”¨æˆ·åˆ›å»º |
-| 100å°æ—¶ | 0.00001 | true | ? **ä¸æ¸…ç†**ï¼ˆç”¨æˆ·ä¿æŠ¤ï¼‰|
+| 0Ð¡Ê± | 1.00 | true | ÓÃ»§´´½¨ |
+| 100Ð¡Ê± | 0.00001 | true | ? **²»ÇåÀí**£¨ÓÃ»§±£»¤£©|
 
 ---
 
-## ??? ä¿æŠ¤æœºåˆ¶
+## ??? ±£»¤»úÖÆ
 
-### 1. å›ºå®šè®°å¿†ï¼ˆPinnedï¼‰
-- ç”¨æˆ·é€šè¿‡UIæ ‡è®°ä¸º"å›ºå®š"çš„è®°å¿†
-- **æ°¸ä¸åˆ é™¤**ï¼Œå³ä½¿activity=0
+### 1. ¹Ì¶¨¼ÇÒä£¨Pinned£©
+- ÓÃ»§Í¨¹ýUI±ê¼ÇÎª"¹Ì¶¨"µÄ¼ÇÒä
+- **ÓÀ²»É¾³ý**£¬¼´Ê¹activity=0
 
-### 2. ç”¨æˆ·ç¼–è¾‘è®°å¿†ï¼ˆUserEditedï¼‰
-- ç”¨æˆ·æ‰‹åŠ¨åˆ›å»ºæˆ–ç¼–è¾‘çš„è®°å¿†
-- **æ°¸ä¸åˆ é™¤**ï¼Œå³ä½¿activity=0
+### 2. ÓÃ»§±à¼­¼ÇÒä£¨UserEdited£©
+- ÓÃ»§ÊÖ¶¯´´½¨»ò±à¼­µÄ¼ÇÒä
+- **ÓÀ²»É¾³ý**£¬¼´Ê¹activity=0
 
-### 3. é•¿æœŸè®°å¿†ï¼ˆCLPAï¼‰
-- å½’æ¡£å±‚ï¼ˆArchiveï¼‰çš„è®°å¿†
-- **æ°¸ä¹…ä¿ç•™**ï¼Œä¸å—activityå½±å“
+### 3. ³¤ÆÚ¼ÇÒä£¨CLPA£©
+- ¹éµµ²ã£¨Archive£©µÄ¼ÇÒä
+- **ÓÀ¾Ã±£Áô**£¬²»ÊÜactivityÓ°Ïì
 
 ---
 
-## ?? æ€§èƒ½ä¼˜åŒ–
+## ?? ÐÔÄÜÓÅ»¯
 
-### æ¸…ç†é¢‘çŽ‡
-- **æ¯å°æ—¶æ‰§è¡Œä¸€æ¬¡**ï¼ˆéš `DecayActivity` è°ƒç”¨ï¼‰
-- ä¸ä¼šé€ æˆæ€§èƒ½é—®é¢˜ï¼ˆè½»é‡çº§æ“ä½œï¼‰
+### ÇåÀíÆµÂÊ
+- **Ã¿Ð¡Ê±Ö´ÐÐÒ»´Î**£¨Ëæ `DecayActivity` µ÷ÓÃ£©
+- ²»»áÔì³ÉÐÔÄÜÎÊÌâ£¨ÇáÁ¿¼¶²Ù×÷£©
 
-### æ—¥å¿—è¾“å‡º
-- ä»…åœ¨ **DevMode** ä¸‹è¾“å‡ºæ—¥å¿—
-- æ™®é€šæ¸¸æˆä¸­ä¸è¾“å‡ºï¼Œé¿å…æ—¥å¿—æ±¡æŸ“
+### ÈÕÖ¾Êä³ö
+- ½öÔÚ **DevMode** ÏÂÊä³öÈÕÖ¾
+- ÆÕÍ¨ÓÎÏ·ÖÐ²»Êä³ö£¬±ÜÃâÈÕÖ¾ÎÛÈ¾
 
-**æ—¥å¿—ç¤ºä¾‹**ï¼š
+**ÈÕÖ¾Ê¾Àý**£º
 ```
-[Memory] æŽå›› cleaned up 3 SCM + 2 ELS memories (activity < 0.01)
-[Memory] æŽå›› enforced limits: removed 5 SCM (max: 20) + 0 ELS (max: 50)
+[Memory] ÀîËÄ cleaned up 3 SCM + 2 ELS memories (activity < 0.01)
+[Memory] ÀîËÄ enforced limits: removed 5 SCM (max: 20) + 0 ELS (max: 50)
 ```
 
 ---
 
-## ?? æµ‹è¯•éªŒè¯
+## ?? ²âÊÔÑéÖ¤
 
-### æµ‹è¯•ç”¨ä¾‹1ï¼šè‡ªç„¶è¡°å‡æ¸…ç†
-**æ­¥éª¤**ï¼š
-1. åˆ›å»ºå¤§é‡çŸ­æœŸè®°å¿†
-2. ç­‰å¾…40å°æ—¶æ¸¸æˆæ—¶é—´
-3. æ£€æŸ¥è®°å¿†æ•°é‡
+### ²âÊÔÓÃÀý1£º×ÔÈ»Ë¥¼õÇåÀí
+**²½Öè**£º
+1. ´´½¨´óÁ¿¶ÌÆÚ¼ÇÒä
+2. µÈ´ý40Ð¡Ê±ÓÎÏ·Ê±¼ä
+3. ¼ì²é¼ÇÒäÊýÁ¿
 
-**é¢„æœŸç»“æžœ**ï¼š
-- activity < 0.01çš„è®°å¿†è¢«è‡ªåŠ¨åˆ é™¤
-- å›ºå®š/ç¼–è¾‘è®°å¿†ä¿ç•™
-- CLPAè®°å¿†å®Œå…¨ä¿ç•™
+**Ô¤ÆÚ½á¹û**£º
+- activity < 0.01µÄ¼ÇÒä±»×Ô¶¯É¾³ý
+- ¹Ì¶¨/±à¼­¼ÇÒä±£Áô
+- CLPA¼ÇÒäÍêÈ«±£Áô
 
-### æµ‹è¯•ç”¨ä¾‹2ï¼šå®¹é‡é™åˆ¶è§¦å‘
-**æ­¥éª¤**ï¼š
-1. åˆ›å»º25ä¸ªçŸ­æœŸè®°å¿†ï¼ˆè¶…è¿‡20ä¸Šé™ï¼‰
-2. ç­‰å¾…1å°æ—¶
+### ²âÊÔÓÃÀý2£ºÈÝÁ¿ÏÞÖÆ´¥·¢
+**²½Öè**£º
+1. ´´½¨25¸ö¶ÌÆÚ¼ÇÒä£¨³¬¹ý20ÉÏÏÞ£©
+2. µÈ´ý1Ð¡Ê±
 
-**é¢„æœŸç»“æžœ**ï¼š
-- è‡ªåŠ¨åˆ é™¤5ä¸ªæœ€ä½Žactivityçš„è®°å¿†
-- å‰©ä½™20ä¸ªè®°å¿†
-- å›ºå®š/ç¼–è¾‘è®°å¿†ä¸å—å½±å“
+**Ô¤ÆÚ½á¹û**£º
+- ×Ô¶¯É¾³ý5¸ö×îµÍactivityµÄ¼ÇÒä
+- Ê£Óà20¸ö¼ÇÒä
+- ¹Ì¶¨/±à¼­¼ÇÒä²»ÊÜÓ°Ïì
 
-### æµ‹è¯•ç”¨ä¾‹3ï¼šä¿æŠ¤æœºåˆ¶éªŒè¯
-**æ­¥éª¤**ï¼š
-1. åˆ›å»ºè®°å¿†å¹¶æ ‡è®°ä¸º"å›ºå®š"
-2. ç­‰å¾…100å°æ—¶ï¼ˆactivityè¡°å‡åˆ°æžä½Žï¼‰
-3. æ£€æŸ¥è®°å¿†æ˜¯å¦å­˜åœ¨
+### ²âÊÔÓÃÀý3£º±£»¤»úÖÆÑéÖ¤
+**²½Öè**£º
+1. ´´½¨¼ÇÒä²¢±ê¼ÇÎª"¹Ì¶¨"
+2. µÈ´ý100Ð¡Ê±£¨activityË¥¼õµ½¼«µÍ£©
+3. ¼ì²é¼ÇÒäÊÇ·ñ´æÔÚ
 
-**é¢„æœŸç»“æžœ**ï¼š
-- å›ºå®šè®°å¿†ä»ç„¶å­˜åœ¨
-- Activityå¯èƒ½=0.00001ï¼Œä½†ä¸è¢«åˆ é™¤
-
----
-
-## ?? æ³¨æ„äº‹é¡¹
-
-### 1. ä¸å¯é€†æ“ä½œ
-- æ¸…ç†åŽçš„è®°å¿†**æ— æ³•æ¢å¤**
-- å»ºè®®å®šæœŸå¤‡ä»½å­˜æ¡£
-
-### 2. ç”¨æˆ·æ•°æ®ä¿æŠ¤
-- æ‰€æœ‰ç”¨æˆ·æ‰‹åŠ¨åˆ›å»º/ç¼–è¾‘çš„è®°å¿†**æ°¸ä¸åˆ é™¤**
-- å›ºå®šè®°å¿†**æ°¸ä¸åˆ é™¤**
-
-### 3. CLPAæ°¸ä¹…æ€§
-- é•¿æœŸè®°å¿†ï¼ˆArchiveï¼‰**æ°¸ä¸æ¸…ç†**
-- å³ä½¿activity=0ï¼Œä¹Ÿä¿ç•™
-
-### 4. è®¾ç½®å»ºè®®
-- å¦‚æžœè®°å¿†åˆ é™¤è¿‡å¿«ï¼Œé™ä½Žè¡°å‡é€ŸçŽ‡
-- å¦‚æžœè®°å¿†ç§¯ç´¯è¿‡å¤šï¼Œæé«˜è¡°å‡é€ŸçŽ‡æˆ–é™ä½Žå®¹é‡ä¸Šé™
+**Ô¤ÆÚ½á¹û**£º
+- ¹Ì¶¨¼ÇÒäÈÔÈ»´æÔÚ
+- Activity¿ÉÄÜ=0.00001£¬µ«²»±»É¾³ý
 
 ---
 
-## ?? ç‰ˆæœ¬åŽ†å²
+## ?? ×¢ÒâÊÂÏî
 
-### v3.3.14ï¼ˆå½“å‰ç‰ˆæœ¬ï¼‰
-- ? æ·»åŠ activityé˜ˆå€¼æ¸…ç†ï¼ˆæ–¹æ¡ˆ1ï¼‰
-- ? æ·»åŠ å®¹é‡é™åˆ¶å¼ºåˆ¶æ‰§è¡Œï¼ˆæ–¹æ¡ˆ3ï¼‰
-- ? ä¿æŠ¤ç”¨æˆ·æ•°æ®ï¼ˆå›ºå®š/ç¼–è¾‘è®°å¿†ï¼‰
-- ? CLPAæ°¸ä¹…ä¿ç•™ç­–ç•¥
+### 1. ²»¿ÉÄæ²Ù×÷
+- ÇåÀíºóµÄ¼ÇÒä**ÎÞ·¨»Ö¸´**
+- ½¨Òé¶¨ÆÚ±¸·Ý´æµµ
 
-### æœªæ¥è®¡åˆ’
-- [ ] å¯é…ç½®çš„activityé˜ˆå€¼ï¼ˆSettingsé¢æ¿ï¼‰
-- [ ] æ¸…ç†ç»Ÿè®¡æ˜¾ç¤ºï¼ˆUIé¢æ¿ï¼‰
-- [ ] æ¸…ç†åŽ†å²è®°å½•ï¼ˆå¯é€‰æ¢å¤ï¼‰
+### 2. ÓÃ»§Êý¾Ý±£»¤
+- ËùÓÐÓÃ»§ÊÖ¶¯´´½¨/±à¼­µÄ¼ÇÒä**ÓÀ²»É¾³ý**
+- ¹Ì¶¨¼ÇÒä**ÓÀ²»É¾³ý**
+
+### 3. CLPAÓÀ¾ÃÐÔ
+- ³¤ÆÚ¼ÇÒä£¨Archive£©**ÓÀ²»ÇåÀí**
+- ¼´Ê¹activity=0£¬Ò²±£Áô
+
+### 4. ÉèÖÃ½¨Òé
+- Èç¹û¼ÇÒäÉ¾³ý¹ý¿ì£¬½µµÍË¥¼õËÙÂÊ
+- Èç¹û¼ÇÒä»ýÀÛ¹ý¶à£¬Ìá¸ßË¥¼õËÙÂÊ»ò½µµÍÈÝÁ¿ÉÏÏÞ
 
 ---
 
-## ?? å¸¸è§é—®é¢˜
+## ?? °æ±¾ÀúÊ·
 
-### Q1: ä¸ºä»€ä¹ˆæˆ‘çš„è®°å¿†è¢«åˆ é™¤äº†ï¼Ÿ
-**A**: å¦‚æžœè®°å¿†çš„activityè¡°å‡åˆ° < 0.01ï¼Œä¸”ä¸æ˜¯å›ºå®š/ç¼–è¾‘çŠ¶æ€ï¼Œä¼šè¢«è‡ªåŠ¨æ¸…ç†ã€‚è§£å†³æ–¹æ³•ï¼š
-- æ ‡è®°é‡è¦è®°å¿†ä¸º"å›ºå®š"ï¼ˆUIä¸­æ“ä½œï¼‰
-- é™ä½Žè¡°å‡é€ŸçŽ‡ï¼ˆSettingsï¼‰
+### v3.3.14£¨µ±Ç°°æ±¾£©
+- ? Ìí¼ÓactivityãÐÖµÇåÀí£¨·½°¸1£©
+- ? Ìí¼ÓÈÝÁ¿ÏÞÖÆÇ¿ÖÆÖ´ÐÐ£¨·½°¸3£©
+- ? ±£»¤ÓÃ»§Êý¾Ý£¨¹Ì¶¨/±à¼­¼ÇÒä£©
+- ? CLPAÓÀ¾Ã±£Áô²ßÂÔ
 
-### Q2: å¦‚ä½•é˜²æ­¢é‡è¦è®°å¿†è¢«åˆ é™¤ï¼Ÿ
-**A**: ä¸¤ç§æ–¹æ³•ï¼š
-1. **å›ºå®šè®°å¿†**ï¼šåœ¨è®°å¿†ç®¡ç†UIä¸­æ ‡è®°ä¸º"å›ºå®š"
-2. **æ‰‹åŠ¨ç¼–è¾‘**ï¼šç¼–è¾‘è¿‡çš„è®°å¿†è‡ªåŠ¨å—ä¿æŠ¤
+### Î´À´¼Æ»®
+- [ ] ¿ÉÅäÖÃµÄactivityãÐÖµ£¨SettingsÃæ°å£©
+- [ ] ÇåÀíÍ³¼ÆÏÔÊ¾£¨UIÃæ°å£©
+- [ ] ÇåÀíÀúÊ·¼ÇÂ¼£¨¿ÉÑ¡»Ö¸´£©
 
-### Q3: CLPAè®°å¿†ä¼šè¢«åˆ é™¤å—ï¼Ÿ
-**A**: **æ°¸ä¸åˆ é™¤**ã€‚é•¿æœŸè®°å¿†ï¼ˆArchiveï¼‰å±‚æ°¸ä¹…ä¿ç•™ã€‚
+---
 
-### Q4: å®¹é‡ä¸Šé™å¯ä»¥è°ƒæ•´å—ï¼Ÿ
-**A**: å¯ä»¥åœ¨Settingsä¸­è°ƒæ•´ï¼š
+## ?? ³£¼ûÎÊÌâ
+
+### Q1: ÎªÊ²Ã´ÎÒµÄ¼ÇÒä±»É¾³ýÁË£¿
+**A**: Èç¹û¼ÇÒäµÄactivityË¥¼õµ½ < 0.01£¬ÇÒ²»ÊÇ¹Ì¶¨/±à¼­×´Ì¬£¬»á±»×Ô¶¯ÇåÀí¡£½â¾ö·½·¨£º
+- ±ê¼ÇÖØÒª¼ÇÒäÎª"¹Ì¶¨"£¨UIÖÐ²Ù×÷£©
+- ½µµÍË¥¼õËÙÂÊ£¨Settings£©
+
+### Q2: ÈçºÎ·ÀÖ¹ÖØÒª¼ÇÒä±»É¾³ý£¿
+**A**: Á½ÖÖ·½·¨£º
+1. **¹Ì¶¨¼ÇÒä**£ºÔÚ¼ÇÒä¹ÜÀíUIÖÐ±ê¼ÇÎª"¹Ì¶¨"
+2. **ÊÖ¶¯±à¼­**£º±à¼­¹ýµÄ¼ÇÒä×Ô¶¯ÊÜ±£»¤
+
+### Q3: CLPA¼ÇÒä»á±»É¾³ýÂð£¿
+**A**: **ÓÀ²»É¾³ý**¡£³¤ÆÚ¼ÇÒä£¨Archive£©²ãÓÀ¾Ã±£Áô¡£
+
+### Q4: ÈÝÁ¿ÉÏÏÞ¿ÉÒÔµ÷ÕûÂð£¿
+**A**: ¿ÉÒÔÔÚSettingsÖÐµ÷Õû£º
 - `maxSituationalMemories`
 - `maxEventLogMemories`
 
 ---
 
-**æ„Ÿè°¢ä½¿ç”¨RimTalkè®°å¿†ç³»ç»Ÿï¼**
+**¸ÐÐ»Ê¹ÓÃRimTalk¼ÇÒäÏµÍ³£¡**

@@ -6,51 +6,51 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// é«˜çº§è¯„åˆ†ç³»ç»Ÿ v3.0
+    /// ¸ß¼¶ÆÀ·ÖÏµÍ³ v3.0
     /// 
-    /// è®¾è®¡ç›®æ ‡ï¼š
-    /// 1. ä¸Šä¸‹æ–‡ç›¸å…³æ€§ä¼˜å…ˆï¼ˆè€Œä¸æ˜¯ç®€å•çš„å…³é”®è¯åŒ¹é…ï¼‰
-    /// 2. è¯­ä¹‰å±‚çº§åŒ¹é…ï¼ˆä¸»é¢˜ > å®ä½“ > ç»†èŠ‚ï¼‰
-    /// 3. åŠ¨æ€æƒé‡è°ƒæ•´ï¼ˆæ ¹æ®å¯¹è¯åœºæ™¯ï¼‰
-    /// 4. å»é‡å’Œå¤šæ ·æ€§å¹³è¡¡
+    /// Éè¼ÆÄ¿±ê£º
+    /// 1. ÉÏÏÂÎÄÏà¹ØĞÔÓÅÏÈ£¨¶ø²»ÊÇ¼òµ¥µÄ¹Ø¼ü´ÊÆ¥Åä£©
+    /// 2. ÓïÒå²ã¼¶Æ¥Åä£¨Ö÷Ìâ > ÊµÌå > Ï¸½Ú£©
+    /// 3. ¶¯Ì¬È¨ÖØµ÷Õû£¨¸ù¾İ¶Ô»°³¡¾°£©
+    /// 4. È¥ÖØºÍ¶àÑùĞÔÆ½ºâ
     /// </summary>
     public static class AdvancedScoringSystem
     {
         /// <summary>
-        /// åœºæ™¯ç±»å‹ï¼ˆè‡ªåŠ¨è¯†åˆ«å¯¹è¯åœºæ™¯ï¼‰
+        /// ³¡¾°ÀàĞÍ£¨×Ô¶¯Ê¶±ğ¶Ô»°³¡¾°£©
         /// </summary>
         public enum SceneType
         {
-            Casual,         // æ—¥å¸¸é—²èŠ
-            EmotionalTalk,  // æƒ…æ„Ÿäº¤æµ
-            WorkDiscussion, // å·¥ä½œè®¨è®º
-            HistoryRecall,  // å›å¿†è¿‡å»
-            Emergency,      // ç´§æ€¥æƒ…å†µ
-            Introduction    // è‡ªæˆ‘ä»‹ç»
+            Casual,         // ÈÕ³£ÏĞÁÄ
+            EmotionalTalk,  // Çé¸Ğ½»Á÷
+            WorkDiscussion, // ¹¤×÷ÌÖÂÛ
+            HistoryRecall,  // »ØÒä¹ıÈ¥
+            Emergency,      // ½ô¼±Çé¿ö
+            Introduction    // ×ÔÎÒ½éÉÜ
         }
 
         /// <summary>
-        /// è¯„åˆ†ç»´åº¦æƒé‡é…ç½®
+        /// ÆÀ·ÖÎ¬¶ÈÈ¨ÖØÅäÖÃ
         /// </summary>
         public class ScoringWeights
         {
-            // æ ¸å¿ƒç»´åº¦
-            public float ContextRelevance = 0.40f;  // ä¸Šä¸‹æ–‡ç›¸å…³æ€§ï¼ˆæœ€é‡è¦ï¼‰
-            public float Recency = 0.20f;           // æ—¶é—´æ–°é²œåº¦
-            public float Importance = 0.20f;        // é‡è¦æ€§
-            public float Diversity = 0.10f;         // å¤šæ ·æ€§åŠ æˆ
-            public float LayerPriority = 0.10f;     // å±‚çº§ä¼˜å…ˆçº§
+            // ºËĞÄÎ¬¶È
+            public float ContextRelevance = 0.40f;  // ÉÏÏÂÎÄÏà¹ØĞÔ£¨×îÖØÒª£©
+            public float Recency = 0.20f;           // Ê±¼äĞÂÏÊ¶È
+            public float Importance = 0.20f;        // ÖØÒªĞÔ
+            public float Diversity = 0.10f;         // ¶àÑùĞÔ¼Ó³É
+            public float LayerPriority = 0.10f;     // ²ã¼¶ÓÅÏÈ¼¶
 
-            // è°ƒèŠ‚å› å­
-            public float EmotionalBoost = 1.3f;     // æƒ…æ„Ÿè®°å¿†åŠ æˆ
-            public float RelationshipBoost = 1.2f;  // å…³ç³»è®°å¿†åŠ æˆ
-            public float ConversationBoost = 1.1f;  // å¯¹è¯è®°å¿†åŠ æˆ
+            // µ÷½ÚÒò×Ó
+            public float EmotionalBoost = 1.3f;     // Çé¸Ğ¼ÇÒä¼Ó³É
+            public float RelationshipBoost = 1.2f;  // ¹ØÏµ¼ÇÒä¼Ó³É
+            public float ConversationBoost = 1.1f;  // ¶Ô»°¼ÇÒä¼Ó³É
         }
 
         private static ScoringWeights defaultWeights = new ScoringWeights();
 
         /// <summary>
-        /// æ™ºèƒ½è¯„åˆ†è®°å¿†ï¼ˆä¸»å…¥å£ï¼‰
+        /// ÖÇÄÜÆÀ·Ö¼ÇÒä£¨Ö÷Èë¿Ú£©
         /// </summary>
         public static List<ScoredItem<MemoryEntry>> ScoreMemories(
             List<MemoryEntry> memories,
@@ -61,16 +61,16 @@ namespace RimTalk.Memory
             if (memories == null || memories.Count == 0)
                 return new List<ScoredItem<MemoryEntry>>();
 
-            // 1. è‡ªåŠ¨è¯†åˆ«åœºæ™¯ç±»å‹
+            // 1. ×Ô¶¯Ê¶±ğ³¡¾°ÀàĞÍ
             SceneType scene = IdentifyScene(context);
 
-            // 2. æ ¹æ®åœºæ™¯è°ƒæ•´æƒé‡
+            // 2. ¸ù¾İ³¡¾°µ÷ÕûÈ¨ÖØ
             ScoringWeights weights = AdjustWeightsForScene(scene, defaultWeights);
 
-            // 3. æå–ä¸Šä¸‹æ–‡ç‰¹å¾
+            // 3. ÌáÈ¡ÉÏÏÂÎÄÌØÕ÷
             ContextFeatures features = ExtractContextFeatures(context, speaker, listener);
 
-            // 4. å¯¹æ¯æ¡è®°å¿†è¯„åˆ†
+            // 4. ¶ÔÃ¿Ìõ¼ÇÒäÆÀ·Ö
             var scored = new List<ScoredItem<MemoryEntry>>();
             foreach (var memory in memories)
             {
@@ -85,21 +85,21 @@ namespace RimTalk.Memory
                         ContextRelevance = CalculateContextRelevance(memory, features),
                         Recency = CalculateRecency(memory),
                         Importance = memory.importance,
-                        Diversity = 0f, // ç¨åè®¡ç®—
+                        Diversity = 0f, // ÉÔºó¼ÆËã
                         LayerPriority = GetLayerPriority(memory.layer)
                     }
                 });
             }
 
-            // 5. åº”ç”¨å¤šæ ·æ€§è°ƒæ•´
+            // 5. Ó¦ÓÃ¶àÑùĞÔµ÷Õû
             ApplyDiversityBoost(scored);
 
-            // 6. æ’åºå¹¶è¿”å›
+            // 6. ÅÅĞò²¢·µ»Ø
             return scored.OrderByDescending(s => s.Score).ToList();
         }
 
         /// <summary>
-        /// æ™ºèƒ½è¯„åˆ†å¸¸è¯†ï¼ˆä¸»å…¥å£ï¼‰
+        /// ÖÇÄÜÆÀ·Ö³£Ê¶£¨Ö÷Èë¿Ú£©
         /// </summary>
         public static List<ScoredItem<CommonKnowledgeEntry>> ScoreKnowledge(
             List<CommonKnowledgeEntry> knowledge,
@@ -138,10 +138,10 @@ namespace RimTalk.Memory
             return scored.OrderByDescending(s => s.Score).ToList();
         }
 
-        #region åœºæ™¯è¯†åˆ«
+        #region ³¡¾°Ê¶±ğ
 
         /// <summary>
-        /// è‡ªåŠ¨è¯†åˆ«å¯¹è¯åœºæ™¯
+        /// ×Ô¶¯Ê¶±ğ¶Ô»°³¡¾°
         /// </summary>
         private static SceneType IdentifyScene(string context)
         {
@@ -150,31 +150,31 @@ namespace RimTalk.Memory
 
             context = context.ToLower();
 
-            // ç´§æ€¥æƒ…å†µå…³é”®è¯
-            if (ContainsAny(context, new[] { "è¢­å‡»", "æ•Œäºº", "å±é™©", "å—ä¼¤", "æ­»", "å¿«", "æ•‘" }))
+            // ½ô¼±Çé¿ö¹Ø¼ü´Ê
+            if (ContainsAny(context, new[] { "Ï®»÷", "µĞÈË", "Î£ÏÕ", "ÊÜÉË", "ËÀ", "¿ì", "¾È" }))
                 return SceneType.Emergency;
 
-            // å†å²å›å¿†å…³é”®è¯
-            if (ContainsAny(context, new[] { "è¿‡å»", "ä»¥å‰", "æ›¾ç»", "è®°å¾—", "é‚£æ—¶", "å½“æ—¶" }))
+            // ÀúÊ·»ØÒä¹Ø¼ü´Ê
+            if (ContainsAny(context, new[] { "¹ıÈ¥", "ÒÔÇ°", "Ôø¾­", "¼ÇµÃ", "ÄÇÊ±", "µ±Ê±" }))
                 return SceneType.HistoryRecall;
 
-            // æƒ…æ„Ÿäº¤æµå…³é”®è¯
-            if (ContainsAny(context, new[] { "æ„Ÿè§‰", "å¿ƒæƒ…", "éš¾è¿‡", "å¼€å¿ƒ", "æƒ³", "å–œæ¬¢", "è®¨åŒ" }))
+            // Çé¸Ğ½»Á÷¹Ø¼ü´Ê
+            if (ContainsAny(context, new[] { "¸Ğ¾õ", "ĞÄÇé", "ÄÑ¹ı", "¿ªĞÄ", "Ïë", "Ï²»¶", "ÌÖÑá" }))
                 return SceneType.EmotionalTalk;
 
-            // å·¥ä½œè®¨è®ºå…³é”®è¯
-            if (ContainsAny(context, new[] { "å·¥ä½œ", "ä»»åŠ¡", "å»ºé€ ", "ç§æ¤", "ç ”ç©¶", "æ¬è¿" }))
+            // ¹¤×÷ÌÖÂÛ¹Ø¼ü´Ê
+            if (ContainsAny(context, new[] { "¹¤×÷", "ÈÎÎñ", "½¨Ôì", "ÖÖÖ²", "ÑĞ¾¿", "°áÔË" }))
                 return SceneType.WorkDiscussion;
 
-            // è‡ªæˆ‘ä»‹ç»å…³é”®è¯
-            if (ContainsAny(context, new[] { "ä½ æ˜¯", "å«ä»€ä¹ˆ", "æ¥è‡ª", "èƒŒæ™¯", "æ“…é•¿" }))
+            // ×ÔÎÒ½éÉÜ¹Ø¼ü´Ê
+            if (ContainsAny(context, new[] { "ÄãÊÇ", "½ĞÊ²Ã´", "À´×Ô", "±³¾°", "ÉÃ³¤" }))
                 return SceneType.Introduction;
 
             return SceneType.Casual;
         }
 
         /// <summary>
-        /// æ ¹æ®åœºæ™¯è°ƒæ•´æƒé‡
+        /// ¸ù¾İ³¡¾°µ÷ÕûÈ¨ÖØ
         /// </summary>
         private static ScoringWeights AdjustWeightsForScene(SceneType scene, ScoringWeights baseWeights)
         {
@@ -190,33 +190,33 @@ namespace RimTalk.Memory
             switch (scene)
             {
                 case SceneType.Emergency:
-                    // ç´§æ€¥æƒ…å†µï¼šæœ€æ–°ä¿¡æ¯æœ€é‡è¦
+                    // ½ô¼±Çé¿ö£º×îĞÂĞÅÏ¢×îÖØÒª
                     adjusted.Recency = 0.50f;
                     adjusted.ContextRelevance = 0.30f;
                     adjusted.Importance = 0.15f;
                     break;
 
                 case SceneType.HistoryRecall:
-                    // å›å¿†è¿‡å»ï¼šé™ä½æ—¶é—´å› ç´ ï¼Œæé«˜å½’æ¡£å±‚çº§
+                    // »ØÒä¹ıÈ¥£º½µµÍÊ±¼äÒòËØ£¬Ìá¸ß¹éµµ²ã¼¶
                     adjusted.Recency = 0.10f;
                     adjusted.LayerPriority = 0.25f;
                     adjusted.ContextRelevance = 0.45f;
                     break;
 
                 case SceneType.EmotionalTalk:
-                    // æƒ…æ„Ÿäº¤æµï¼šæé«˜æƒ…æ„Ÿè®°å¿†æƒé‡
+                    // Çé¸Ğ½»Á÷£ºÌá¸ßÇé¸Ğ¼ÇÒäÈ¨ÖØ
                     adjusted.EmotionalBoost = 1.5f;
                     adjusted.RelationshipBoost = 1.4f;
                     break;
 
                 case SceneType.WorkDiscussion:
-                    // å·¥ä½œè®¨è®ºï¼šè¡ŒåŠ¨è®°å¿†ä¼˜å…ˆ
+                    // ¹¤×÷ÌÖÂÛ£ºĞĞ¶¯¼ÇÒäÓÅÏÈ
                     adjusted.ContextRelevance = 0.50f;
                     adjusted.Recency = 0.25f;
                     break;
 
                 case SceneType.Introduction:
-                    // è‡ªæˆ‘ä»‹ç»ï¼šå½’æ¡£è®°å¿†ï¼ˆé•¿æœŸç»å†ï¼‰æ›´é‡è¦
+                    // ×ÔÎÒ½éÉÜ£º¹éµµ¼ÇÒä£¨³¤ÆÚ¾­Àú£©¸üÖØÒª
                     adjusted.LayerPriority = 0.30f;
                     adjusted.ContextRelevance = 0.35f;
                     adjusted.Importance = 0.25f;
@@ -228,22 +228,22 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region ä¸Šä¸‹æ–‡ç‰¹å¾æå–
+        #region ÉÏÏÂÎÄÌØÕ÷ÌáÈ¡
 
         /// <summary>
-        /// ä¸Šä¸‹æ–‡ç‰¹å¾
+        /// ÉÏÏÂÎÄÌØÕ÷
         /// </summary>
         public class ContextFeatures
         {
-            public List<string> Keywords = new List<string>();      // å…³é”®è¯
-            public List<string> Entities = new List<string>();      // å®ä½“ï¼ˆäººåã€åœ°åï¼‰
-            public List<string> Topics = new List<string>();        // ä¸»é¢˜æ ‡ç­¾
-            public HashSet<string> EmotionWords = new HashSet<string>(); // æƒ…æ„Ÿè¯
+            public List<string> Keywords = new List<string>();      // ¹Ø¼ü´Ê
+            public List<string> Entities = new List<string>();      // ÊµÌå£¨ÈËÃû¡¢µØÃû£©
+            public List<string> Topics = new List<string>();        // Ö÷Ìâ±êÇ©
+            public HashSet<string> EmotionWords = new HashSet<string>(); // Çé¸Ğ´Ê
             public SceneType Scene = SceneType.Casual;
         }
 
         /// <summary>
-        /// æå–ä¸Šä¸‹æ–‡ç‰¹å¾ï¼ˆå¢å¼ºç‰ˆï¼‰
+        /// ÌáÈ¡ÉÏÏÂÎÄÌØÕ÷£¨ÔöÇ¿°æ£©
         /// </summary>
         private static ContextFeatures ExtractContextFeatures(string context, Pawn speaker, Pawn listener)
         {
@@ -255,26 +255,26 @@ namespace RimTalk.Memory
             if (string.IsNullOrEmpty(context))
                 return features;
 
-            // 1. æå–å…³é”®è¯ï¼ˆæ”¹è¿›ç‰ˆï¼šä½¿ç”¨TF-IDFæ€æƒ³ï¼‰
+            // 1. ÌáÈ¡¹Ø¼ü´Ê£¨¸Ä½ø°æ£ºÊ¹ÓÃTF-IDFË¼Ïë£©
             features.Keywords = ExtractImportantKeywords(context);
 
-            // 2. æå–å®ä½“ï¼ˆäººåï¼‰
+            // 2. ÌáÈ¡ÊµÌå£¨ÈËÃû£©
             if (speaker != null)
                 features.Entities.Add(speaker.LabelShort);
             if (listener != null && listener != speaker)
                 features.Entities.Add(listener.LabelShort);
 
-            // 3. æå–ä¸»é¢˜
+            // 3. ÌáÈ¡Ö÷Ìâ
             features.Topics = ExtractTopics(context);
 
-            // 4. æå–æƒ…æ„Ÿè¯
+            // 4. ÌáÈ¡Çé¸Ğ´Ê
             features.EmotionWords = ExtractEmotionWords(context);
 
             return features;
         }
 
         /// <summary>
-        /// æå–é‡è¦å…³é”®è¯ï¼ˆæ”¹è¿›ç‰ˆï¼‰
+        /// ÌáÈ¡ÖØÒª¹Ø¼ü´Ê£¨¸Ä½ø°æ£©
         /// </summary>
         private static List<string> ExtractImportantKeywords(string text)
         {
@@ -283,7 +283,7 @@ namespace RimTalk.Memory
 
             var keywords = new HashSet<string>();
             
-            // æå–2-4å­—è¯è¯­
+            // ÌáÈ¡2-4×Ö´ÊÓï
             for (int length = 2; length <= 4; length++)
             {
                 for (int i = 0; i <= text.Length - length; i++)
@@ -296,51 +296,51 @@ namespace RimTalk.Memory
                 }
             }
 
-            // è¿‡æ»¤å¸¸è§åœç”¨è¯
-            var stopWords = new HashSet<string> { "çš„", "äº†", "åœ¨", "æ˜¯", "æˆ‘", "ä½ ", "ä»–", "å¥¹", "å®ƒ", "ä»¬", "è¿™", "é‚£" };
+            // ¹ıÂË³£¼ûÍ£ÓÃ´Ê
+            var stopWords = new HashSet<string> { "µÄ", "ÁË", "ÔÚ", "ÊÇ", "ÎÒ", "Äã", "Ëû", "Ëı", "Ëü", "ÃÇ", "Õâ", "ÄÇ" };
             keywords.RemoveWhere(k => stopWords.Contains(k));
 
             return keywords.Take(30).ToList();
         }
 
         /// <summary>
-        /// æå–ä¸»é¢˜æ ‡ç­¾
+        /// ÌáÈ¡Ö÷Ìâ±êÇ©
         /// </summary>
         private static List<string> ExtractTopics(string context)
         {
             var topics = new List<string>();
 
-            // å·¥ä½œç›¸å…³
-            if (ContainsAny(context, new[] { "å·¥ä½œ", "ä»»åŠ¡", "å»ºé€ ", "ç§æ¤" }))
-                topics.Add("å·¥ä½œ");
+            // ¹¤×÷Ïà¹Ø
+            if (ContainsAny(context, new[] { "¹¤×÷", "ÈÎÎñ", "½¨Ôì", "ÖÖÖ²" }))
+                topics.Add("¹¤×÷");
 
-            // æˆ˜æ–—ç›¸å…³
-            if (ContainsAny(context, new[] { "æˆ˜æ–—", "è¢­å‡»", "æ•Œäºº", "æ­¦å™¨" }))
-                topics.Add("æˆ˜æ–—");
+            // Õ½¶·Ïà¹Ø
+            if (ContainsAny(context, new[] { "Õ½¶·", "Ï®»÷", "µĞÈË", "ÎäÆ÷" }))
+                topics.Add("Õ½¶·");
 
-            // ç¤¾äº¤ç›¸å…³
-            if (ContainsAny(context, new[] { "èŠå¤©", "æœ‹å‹", "å…³ç³»", "å–œæ¬¢" }))
-                topics.Add("ç¤¾äº¤");
+            // Éç½»Ïà¹Ø
+            if (ContainsAny(context, new[] { "ÁÄÌì", "ÅóÓÑ", "¹ØÏµ", "Ï²»¶" }))
+                topics.Add("Éç½»");
 
-            // å¥åº·ç›¸å…³
-            if (ContainsAny(context, new[] { "å—ä¼¤", "æ²»ç–—", "ç”Ÿç—…", "å¥åº·" }))
-                topics.Add("å¥åº·");
+            // ½¡¿µÏà¹Ø
+            if (ContainsAny(context, new[] { "ÊÜÉË", "ÖÎÁÆ", "Éú²¡", "½¡¿µ" }))
+                topics.Add("½¡¿µ");
 
             return topics;
         }
 
         /// <summary>
-        /// æå–æƒ…æ„Ÿè¯
+        /// ÌáÈ¡Çé¸Ğ´Ê
         /// </summary>
         private static HashSet<string> ExtractEmotionWords(string context)
         {
             var emotions = new HashSet<string>();
             var emotionKeywords = new[] 
             { 
-                "å¼€å¿ƒ", "é«˜å…´", "å¿«ä¹", "æ„‰å¿«",
-                "éš¾è¿‡", "æ‚²ä¼¤", "ä¼¤å¿ƒ", "ç—›è‹¦",
-                "æ„¤æ€’", "ç”Ÿæ°”", "æ¼ç«", "è®¨åŒ",
-                "å®³æ€•", "ææƒ§", "æ‹…å¿ƒ", "ç„¦è™‘"
+                "¿ªĞÄ", "¸ßĞË", "¿ìÀÖ", "Óä¿ì",
+                "ÄÑ¹ı", "±¯ÉË", "ÉËĞÄ", "Í´¿à",
+                "·ßÅ­", "ÉúÆø", "ÄÕ»ğ", "ÌÖÑá",
+                "º¦ÅÂ", "¿Ö¾å", "µ£ĞÄ", "½¹ÂÇ"
             };
 
             foreach (var word in emotionKeywords)
@@ -354,10 +354,10 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region è¯„åˆ†è®¡ç®—
+        #region ÆÀ·Ö¼ÆËã
 
         /// <summary>
-        /// è®¡ç®—å•æ¡è®°å¿†çš„åˆ†æ•°
+        /// ¼ÆËãµ¥Ìõ¼ÇÒäµÄ·ÖÊı
         /// </summary>
         private static float ScoreSingleMemory(
             MemoryEntry memory,
@@ -368,43 +368,43 @@ namespace RimTalk.Memory
         {
             float baseScore = 0f;
 
-            // 1. ä¸Šä¸‹æ–‡ç›¸å…³æ€§ï¼ˆæœ€é‡è¦ï¼‰
+            // 1. ÉÏÏÂÎÄÏà¹ØĞÔ£¨×îÖØÒª£©
             float relevance = CalculateContextRelevance(memory, features);
             baseScore += relevance * weights.ContextRelevance;
 
-            // 2. æ—¶é—´æ–°é²œåº¦
+            // 2. Ê±¼äĞÂÏÊ¶È
             float recency = CalculateRecency(memory);
             baseScore += recency * weights.Recency;
 
-            // 3. é‡è¦æ€§
+            // 3. ÖØÒªĞÔ
             baseScore += memory.importance * weights.Importance;
 
-            // 4. å±‚çº§ä¼˜å…ˆçº§ï¼ˆä¿®å¤ï¼šç¡®ä¿å±‚çº§åŠ æˆè¢«è®¡ç®—ï¼‰
+            // 4. ²ã¼¶ÓÅÏÈ¼¶£¨ĞŞ¸´£ºÈ·±£²ã¼¶¼Ó³É±»¼ÆËã£©
             float layerScore = GetLayerPriority(memory.layer);
             baseScore += layerScore * weights.LayerPriority;
 
-            // 5. ç±»å‹åŠ æˆï¼ˆä¿®å¤ï¼šä½¿ç”¨ä¹˜æ³•è€Œä¸æ˜¯æ›¿æ¢ï¼‰
+            // 5. ÀàĞÍ¼Ó³É£¨ĞŞ¸´£ºÊ¹ÓÃ³Ë·¨¶ø²»ÊÇÌæ»»£©
             float typeBoost = GetTypeBoost(memory.type, weights);
             float finalScore = baseScore * typeBoost;
 
-            // 6. ç‰¹æ®Šæ ‡è®°åŠ æˆ
+            // 6. ÌØÊâ±ê¼Ç¼Ó³É
             if (memory.isPinned)
                 finalScore *= 1.5f;
             if (memory.isUserEdited)
                 finalScore *= 1.3f;
 
-            // 7. ç›¸å…³äººç‰©åŠ æˆ
+            // 7. Ïà¹ØÈËÎï¼Ó³É
             if (!string.IsNullOrEmpty(memory.relatedPawnName))
             {
                 if (listener != null && memory.relatedPawnName == listener.LabelShort)
-                    finalScore *= 1.2f; // ä¸å¯¹è¯å¯¹è±¡ç›¸å…³
+                    finalScore *= 1.2f; // Óë¶Ô»°¶ÔÏóÏà¹Ø
             }
 
             return finalScore;
         }
 
         /// <summary>
-        /// è®¡ç®—å•æ¡å¸¸è¯†çš„åˆ†æ•°
+        /// ¼ÆËãµ¥Ìõ³£Ê¶µÄ·ÖÊı
         /// </summary>
         private static float ScoreSingleKnowledge(
             CommonKnowledgeEntry entry,
@@ -413,18 +413,18 @@ namespace RimTalk.Memory
         {
             float score = 0f;
 
-            // 1. ä¸Šä¸‹æ–‡ç›¸å…³æ€§
+            // 1. ÉÏÏÂÎÄÏà¹ØĞÔ
             float relevance = CalculateKnowledgeRelevance(entry, features);
             score += relevance * 0.6f;
 
-            // 2. é‡è¦æ€§
+            // 2. ÖØÒªĞÔ
             score += entry.importance * 0.4f;
 
             return score;
         }
 
         /// <summary>
-        /// è®¡ç®—ä¸Šä¸‹æ–‡ç›¸å…³æ€§ï¼ˆæ ¸å¿ƒç®—æ³•ï¼‰
+        /// ¼ÆËãÉÏÏÂÎÄÏà¹ØĞÔ£¨ºËĞÄËã·¨£©
         /// </summary>
         private static float CalculateContextRelevance(MemoryEntry memory, ContextFeatures features)
         {
@@ -432,7 +432,7 @@ namespace RimTalk.Memory
             int matches = 0;
             int total = 0;
 
-            // 1. å…³é”®è¯åŒ¹é…ï¼ˆä½¿ç”¨æ”¹è¿›çš„ç›¸ä¼¼åº¦ç®—æ³•ï¼‰
+            // 1. ¹Ø¼ü´ÊÆ¥Åä£¨Ê¹ÓÃ¸Ä½øµÄÏàËÆ¶ÈËã·¨£©
             if (memory.keywords != null && memory.keywords.Count > 0)
             {
                 var intersection = memory.keywords.Intersect(features.Keywords).Count();
@@ -444,8 +444,8 @@ namespace RimTalk.Memory
                 }
             }
 
-            // 2. å†…å®¹ç›´æ¥åŒ¹é…
-            foreach (var keyword in features.Keywords.Take(10)) // åªæ£€æŸ¥å‰10ä¸ªæœ€é‡è¦çš„
+            // 2. ÄÚÈİÖ±½ÓÆ¥Åä
+            foreach (var keyword in features.Keywords.Take(10)) // Ö»¼ì²éÇ°10¸ö×îÖØÒªµÄ
             {
                 if (memory.content.Contains(keyword))
                 {
@@ -453,7 +453,7 @@ namespace RimTalk.Memory
                 }
             }
 
-            // 3. ä¸»é¢˜åŒ¹é…
+            // 3. Ö÷ÌâÆ¥Åä
             foreach (var topic in features.Topics)
             {
                 if (memory.tags.Contains(topic) || memory.content.Contains(topic))
@@ -462,7 +462,7 @@ namespace RimTalk.Memory
                 }
             }
 
-            // 4. æƒ…æ„ŸåŒ¹é…
+            // 4. Çé¸ĞÆ¥Åä
             if (memory.type == MemoryType.Emotion)
             {
                 foreach (var emotion in features.EmotionWords)
@@ -478,13 +478,13 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è®¡ç®—å¸¸è¯†ç›¸å…³æ€§
+        /// ¼ÆËã³£Ê¶Ïà¹ØĞÔ
         /// </summary>
         private static float CalculateKnowledgeRelevance(CommonKnowledgeEntry entry, ContextFeatures features)
         {
             float relevance = 0f;
 
-            // æ ‡ç­¾åŒ¹é…
+            // ±êÇ©Æ¥Åä
             var tags = entry.GetTags();
             foreach (var tag in tags)
             {
@@ -494,7 +494,7 @@ namespace RimTalk.Memory
                 }
             }
 
-            // å†…å®¹å…³é”®è¯åŒ¹é…
+            // ÄÚÈİ¹Ø¼ü´ÊÆ¥Åä
             int matchCount = 0;
             foreach (var keyword in features.Keywords.Take(15))
             {
@@ -513,37 +513,37 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è®¡ç®—æ—¶é—´æ–°é²œåº¦
+        /// ¼ÆËãÊ±¼äĞÂÏÊ¶È
         /// </summary>
         private static float CalculateRecency(MemoryEntry memory)
         {
             int currentTick = Find.TickManager.TicksGame;
             int age = currentTick - memory.timestamp;
 
-            // ä½¿ç”¨åˆ†æ®µè¡°å‡ï¼ˆæ›´ç¬¦åˆäººç±»è®°å¿†è§„å¾‹ï¼‰
-            if (age < 2500) // < 1å°æ—¶
+            // Ê¹ÓÃ·Ö¶ÎË¥¼õ£¨¸ü·ûºÏÈËÀà¼ÇÒä¹æÂÉ£©
+            if (age < 2500) // < 1Ğ¡Ê±
                 return 1.0f;
-            else if (age < 15000) // < 6å°æ—¶
+            else if (age < 15000) // < 6Ğ¡Ê±
                 return 0.9f;
-            else if (age < 60000) // < 1å¤©
+            else if (age < 60000) // < 1Ìì
                 return 0.7f;
-            else if (age < 300000) // < 5å¤©
+            else if (age < 300000) // < 5Ìì
                 return 0.5f;
-            else if (age < 900000) // < 15å¤©
+            else if (age < 900000) // < 15Ìì
                 return 0.3f;
             else
                 return 0.1f;
         }
 
         /// <summary>
-        /// è·å–å±‚çº§ä¼˜å…ˆçº§
+        /// »ñÈ¡²ã¼¶ÓÅÏÈ¼¶
         /// </summary>
         private static float GetLayerPriority(MemoryLayer layer)
         {
             switch (layer)
             {
                 case MemoryLayer.Active:
-                    return 1.0f; // ABM: æœ€é«˜
+                    return 1.0f; // ABM: ×î¸ß
                 case MemoryLayer.Situational:
                     return 0.8f; // SCM
                 case MemoryLayer.EventLog:
@@ -556,7 +556,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// è·å–ç±»å‹åŠ æˆ
+        /// »ñÈ¡ÀàĞÍ¼Ó³É
         /// </summary>
         private static float GetTypeBoost(MemoryType type, ScoringWeights weights)
         {
@@ -575,10 +575,10 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region å¤šæ ·æ€§ä¼˜åŒ–
+        #region ¶àÑùĞÔÓÅ»¯
 
         /// <summary>
-        /// åº”ç”¨å¤šæ ·æ€§åŠ æˆï¼ˆé¿å…æ³¨å…¥å†…å®¹è¿‡äºå•ä¸€ï¼‰
+        /// Ó¦ÓÃ¶àÑùĞÔ¼Ó³É£¨±ÜÃâ×¢ÈëÄÚÈİ¹ıÓÚµ¥Ò»£©
         /// </summary>
         private static void ApplyDiversityBoost<T>(List<ScoredItem<T>> scored) where T : class
         {
@@ -596,7 +596,7 @@ namespace RimTalk.Memory
 
                 typeCount[type]++;
 
-                // åŒç±»å‹è¶Šå¤šï¼ŒåŠ æˆè¶Šå°‘
+                // Í¬ÀàĞÍÔ½¶à£¬¼Ó³ÉÔ½ÉÙ
                 float diversityFactor = 1.0f / (1.0f + typeCount[type] * 0.1f);
                 item.Breakdown.Diversity = diversityFactor - 1.0f;
                 item.Score *= diversityFactor;
@@ -615,7 +615,7 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region è¾…åŠ©æ–¹æ³•
+        #region ¸¨Öú·½·¨
 
         private static bool ContainsAny(string text, string[] keywords)
         {
@@ -630,10 +630,10 @@ namespace RimTalk.Memory
         #endregion
     }
 
-    #region æ•°æ®ç»“æ„
+    #region Êı¾İ½á¹¹
 
     /// <summary>
-    /// è¯„åˆ†åçš„é¡¹ç›®
+    /// ÆÀ·ÖºóµÄÏîÄ¿
     /// </summary>
     public class ScoredItem<T> where T : class
     {
@@ -643,16 +643,16 @@ namespace RimTalk.Memory
     }
 
     /// <summary>
-    /// è¯„åˆ†ç»†åˆ†
+    /// ÆÀ·ÖÏ¸·Ö
     /// </summary>
     public class ScoreBreakdown
     {
-        public float ContextRelevance;  // ä¸Šä¸‹æ–‡ç›¸å…³æ€§
-        public float Recency;           // æ—¶é—´æ–°é²œåº¦
-        public float Importance;        // é‡è¦æ€§
-        public float Diversity;         // å¤šæ ·æ€§
-        public float LayerPriority;     // å±‚çº§ä¼˜å…ˆçº§
-        public float TypeBoost;         // ç±»å‹åŠ æˆ
+        public float ContextRelevance;  // ÉÏÏÂÎÄÏà¹ØĞÔ
+        public float Recency;           // Ê±¼äĞÂÏÊ¶È
+        public float Importance;        // ÖØÒªĞÔ
+        public float Diversity;         // ¶àÑùĞÔ
+        public float LayerPriority;     // ²ã¼¶ÓÅÏÈ¼¶
+        public float TypeBoost;         // ÀàĞÍ¼Ó³É
     }
 
     #endregion

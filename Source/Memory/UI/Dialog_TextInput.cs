@@ -5,7 +5,7 @@ using Verse;
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// 绠�鍗曠殑鏂囨湰杈撳叆瀵硅瘽妗嗭紝鐢ㄤ簬瀵煎叆甯歌瘑
+    /// 简单的文本输入对话框，用于导入常识
     /// </summary>
     public class Dialog_TextInput : Window
     {
