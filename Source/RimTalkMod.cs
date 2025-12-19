@@ -15,7 +15,7 @@ namespace RimTalk.MemoryPatch
             // ⭐ v3.3.2.5: 强制预注册关键类型，确保旧存档兼容性
             Memory.BackCompatibilityFix.ForceInitialize();
             
-            // ⭐ v3.3.2.37: 初始化提示词规范化规则
+            // ⭐ 初始化提示词规范化器
             Memory.PromptNormalizer.UpdateRules(Settings.normalizationRules);
             
             var harmony = new Harmony("cj.rimtalk.expandmemory");
@@ -37,6 +37,17 @@ namespace RimTalk.MemoryPatch
         public override string SettingsCategory()
         {
             return "RimTalk-Expand Memory";
+        }
+
+        public override void WriteSettings()
+        {
+            base.WriteSettings();
+            
+            // 重新加载提示词规范化规则
+            Memory.PromptNormalizer.UpdateRules(Settings.normalizationRules);
+            
+            // 重新加载常识库权重配置
+            Memory.KnowledgeWeights.LoadFromSettings(Settings);
         }
     }
 }

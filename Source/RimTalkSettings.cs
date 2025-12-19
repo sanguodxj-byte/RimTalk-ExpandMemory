@@ -10,7 +10,7 @@ namespace RimTalk.MemoryPatch
 {
     public class RimTalkMemoryPatchSettings : ModSettings
     {
-        // ? 新增：提示词规范化规则
+        // ⭐ 提示词规范化规则
         /// <summary>
         /// 替换规则定义
         /// </summary>
@@ -37,12 +37,8 @@ namespace RimTalk.MemoryPatch
             }
         }
         
-        // ? 提示词规范化规则列表
-        public List<ReplacementRule> normalizationRules = new List<ReplacementRule>
-        {
-            new ReplacementRule(@"\(Player\)", "Master", true),
-            new ReplacementRule(@"\(玩家\)", "主人", true)
-        };
+        // ⭐ 提示词规范化规则列表（功能保留，默认为空）
+        public List<ReplacementRule> normalizationRules = new List<ReplacementRule>();
         
         // 四层记忆容量配置
         public int maxActiveMemories = 6;
@@ -136,7 +132,7 @@ namespace RimTalk.MemoryPatch
         public bool enableKnowledgeVectorSearch = false;   // 常识向量检索
 
         // Knowledge Matching Settings
-        public bool enableKnowledgeChaining = true;
+        public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
         public int maxChainingRounds = 2;
         
         // ⭐ v3.3.20: 新增高级匹配设置
@@ -178,8 +174,6 @@ namespace RimTalk.MemoryPatch
         private static bool expandAIConfig = true;
         private static bool expandMemoryTypes = false;
         private static bool expandExperimentalFeatures = true;
-        private static bool expandVectorEnhancement = true;
-        private static bool expandPromptNormalization = true;
         
         private static Vector2 scrollPosition = Vector2.zero;
 
@@ -187,17 +181,13 @@ namespace RimTalk.MemoryPatch
         {
             base.ExposeData();
             
-            // ? 序列化提示词规范化规则
+            // ⭐ 序列化提示词规范化规则
             Scribe_Collections.Look(ref normalizationRules, "normalizationRules", LookMode.Deep);
             
-            // ? 兼容性：如果加载后为 null，初始化默认规则
+            // ⭐ 兼容性：如果加载后为 null，初始化为空列表
             if (Scribe.mode == LoadSaveMode.PostLoadInit && normalizationRules == null)
             {
-                normalizationRules = new List<ReplacementRule>
-                {
-                    new ReplacementRule(@"\(Player\)", "Master", true),
-                    new ReplacementRule(@"\(玩家\)", "主人", true)
-                };
+                normalizationRules = new List<ReplacementRule>();
             }
             
             Scribe_Values.Look(ref maxActiveMemories, "fourLayer_maxActiveMemories", 6);
@@ -268,7 +258,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableKnowledgeVectorSearch, "siliconFlow_enableKnowledgeVector", false);
 
             // Knowledge Matching
-            Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", true);
+            Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
             Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
             
             // ⭐ v3.3.20: 序列化高级匹配设置
@@ -363,7 +353,7 @@ namespace RimTalk.MemoryPatch
 
             Rect rowRect = listing.GetRect(60f);
             float spacing = 10f;
-            float buttonWidth = (rowRect.width - spacing * 2f) / 3f;
+            float buttonWidth = (rowRect.width - spacing * 2f) / 3f; // ⭐ 改回3个按钮
             float buttonHeight = rowRect.height;
 
             DrawActionButton(new Rect(rowRect.x, rowRect.y, buttonWidth, buttonHeight), "常识库", "打开并管理全局常识库", delegate
@@ -371,6 +361,7 @@ namespace RimTalk.MemoryPatch
                 OpenCommonKnowledgeDialog();
             });
 
+            // ⭐ 恢复"提示词替换"按钮
             DrawActionButton(new Rect(rowRect.x + buttonWidth + spacing, rowRect.y, buttonWidth, buttonHeight), "提示词替换", "编辑提示词替换/规范化规则", delegate
             {
                 Find.WindowStack.Add(new PromptNormalizationWindow(this));
@@ -509,36 +500,59 @@ namespace RimTalk.MemoryPatch
             
             listing.Gap();
             
-            // Prompt Caching 选项
-            listing.CheckboxLabeled("启用 Prompt Caching", ref enablePromptCaching);
+            // ⭐ 修改：Prompt Caching 选项 - 仅DeepSeek和OpenAI可切换
+            bool canToggleCaching = (independentProvider == "OpenAI" || independentProvider == "DeepSeek");
             
-            if (enablePromptCaching)
+            if (canToggleCaching)
             {
-                GUI.color = new Color(0.8f, 1f, 0.8f);
+                listing.CheckboxLabeled("启用 Prompt Caching", ref enablePromptCaching);
+            }
+            else
+            {
+                // 其他提供商强制关闭缓存
+                enablePromptCaching = false;
+                GUI.color = Color.gray;
+                bool disabledCache = false;
+                listing.CheckboxLabeled("启用 Prompt Caching (不可用)", ref disabledCache);
+                GUI.color = Color.white;
+            }
+            
+            if (enablePromptCaching || !canToggleCaching)
+            {
                 if (independentProvider == "OpenAI")
                 {
+                    GUI.color = new Color(0.8f, 1f, 0.8f);
                     listing.Label("  ✓ OpenAI 支持 Prompt Caching (Beta)");
                     listing.Label("  适用模型: gpt-4o, gpt-4-turbo");
+                    GUI.color = Color.white;
                 }
                 else if (independentProvider == "DeepSeek")
                 {
+                    GUI.color = new Color(0.8f, 1f, 0.8f);
                     listing.Label("  ✓ DeepSeek 支持 Prompt Caching");
                     listing.Label("  可节省约 50% 费用");
+                    GUI.color = Color.white;
                 }
                 else if (independentProvider == "Player2")
                 {
-                    listing.Label("  ✓ Player2 支持 Prompt Caching");
-                    listing.Label("  本地客户端自动缓存");
+                    GUI.color = Color.gray;
+                    listing.Label("  ✗ Player2 不支持 Prompt Caching");
+                    listing.Label("  本地客户端无需缓存");
+                    GUI.color = Color.white;
                 }
                 else if (independentProvider == "Google")
                 {
-                    listing.Label("  ✗ Google Gemini 暂不支持 Prompt Caching");
+                    GUI.color = Color.gray;
+                    listing.Label("  ✗ Google Gemini 不支持 Prompt Caching");
+                    GUI.color = Color.white;
                 }
                 else if (independentProvider == "Custom")
                 {
-                    listing.Label("  ✦ 取决于您的自定义 API 实现");
+                    GUI.color = Color.gray;
+                    listing.Label("  ✗ 自定义API 不支持 Prompt Caching");
+                    listing.Label("  取决于您的 API 实现");
+                    GUI.color = Color.white;
                 }
-                GUI.color = Color.white;
             }
             
             listing.Gap();
@@ -637,36 +651,6 @@ namespace RimTalk.MemoryPatch
             }
         }
 
-        private void DrawVectorEnhancementSettings(Listing_Standard listing)
-        {
-            // ⭐ v3.3.20: 使用辅助类绘制SiliconFlow设置
-            SettingsUIDrawers.DrawSiliconFlowSettings(listing, this);
-            
-            listing.GapLine();
-            
-            // 旧的向量增强设置（保留兼容性）
-            listing.CheckboxLabeled("启用向量增强 (需要重启)", ref enableVectorEnhancement);
-            if (enableVectorEnhancement)
-            {
-                GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  使用语义向量检索来增强常识匹配。");
-                GUI.color = Color.white;
-                listing.Gap();
-                
-                listing.Label($"相似度阈值: {vectorSimilarityThreshold:F2}");
-                vectorSimilarityThreshold = listing.Slider(vectorSimilarityThreshold, 0.5f, 1.0f);
-                
-                listing.Label($"最大补充结果: {maxVectorResults}");
-                maxVectorResults = (int)listing.Slider(maxVectorResults, 1, 15);
-            }
-            
-            listing.Gap();
-            listing.GapLine();
-            
-            // ⭐ v3.3.20: 使用辅助类绘制高级匹配设置
-            SettingsUIDrawers.DrawAdvancedMatchingSettings(listing, this);
-        }
-
         private void OpenCommonKnowledgeDialog()
         {
             if (Current.Game == null)
@@ -690,7 +674,7 @@ namespace RimTalk.MemoryPatch
         /// </summary>
         private void DrawPromptNormalizationSettings(Listing_Standard listing)
         {
-            // ⭐ v3.3.20: 使用辅助类绘制
+            // ⭐ 使用辅助类绘制
             SettingsUIDrawers.DrawPromptNormalizationSettings(listing, this);
         }
 
@@ -713,7 +697,7 @@ namespace RimTalk.MemoryPatch
             public override void DoWindowContents(Rect inRect)
             {
                 Listing_Standard listing = new Listing_Standard();
-                Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 2400f);
+                Rect viewRect = new Rect(0f, 0f, inRect.width - 20f, 1600f);
                 Widgets.BeginScrollView(inRect, ref scrollPos, viewRect);
                 listing.Begin(viewRect);
 
@@ -725,9 +709,7 @@ namespace RimTalk.MemoryPatch
                 GUI.color = Color.white;
                 listing.GapLine();
 
-                settings.DrawCollapsibleSection(listing, "提示词规范化", ref expandPromptNormalization, delegate { settings.DrawPromptNormalizationSettings(listing); });
                 settings.DrawCollapsibleSection(listing, "动态注入设置", ref expandDynamicInjection, delegate { settings.DrawDynamicInjectionSettings(listing); });
-                settings.DrawCollapsibleSection(listing, "?? 向量增强设置", ref expandVectorEnhancement, delegate { settings.DrawVectorEnhancementSettings(listing); });
                 settings.DrawCollapsibleSection(listing, "记忆容量配置", ref expandMemoryCapacity, delegate { settings.DrawMemoryCapacitySettings(listing); });
                 settings.DrawCollapsibleSection(listing, "记忆衰减配置", ref expandDecayRates, delegate { settings.DrawDecaySettings(listing); });
                 settings.DrawCollapsibleSection(listing, "记忆总结设置", ref expandSummarization, delegate { settings.DrawSummarizationSettings(listing); });
@@ -738,12 +720,10 @@ namespace RimTalk.MemoryPatch
                 }
 
                 settings.DrawCollapsibleSection(listing, "记忆类型开关", ref expandMemoryTypes, delegate { settings.DrawMemoryTypesSettings(listing); });
-                settings.DrawCollapsibleSection(listing, "?? 实验性功能", ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "🚀 实验性功能", ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
 
                 listing.End();
                 Widgets.EndScrollView();
-
-                PromptNormalizer.UpdateRules(settings.normalizationRules);
             }
         }
 
