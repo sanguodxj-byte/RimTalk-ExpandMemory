@@ -471,34 +471,24 @@
     <RimTalk_MindStream_GlobalActions>GLOBAL ACTIONS</RimTalk_MindStream_GlobalActions>
     <RimTalk_MindStream_SummarizeAll>Summarize All</RimTalk_MindStream_SummarizeAll>
     <RimTalk_MindStream_ArchiveAll>Archive All</RimTalk_MindStream_ArchiveAll>
+    
+    <!-- ⭐ Memory Export/Import -->
+    <RimTalk_Memory_Export>Export</RimTalk_Memory_Export>
+    <RimTalk_Memory_Import>Import</RimTalk_Memory_Import>
+    <RimTalk_Memory_ExportNoPawn>Please select a colonist first</RimTalk_Memory_ExportNoPawn>
+    <RimTalk_Memory_ExportSuccess>Exported {0} memories to {1}</RimTalk_Memory_ExportSuccess>
+    <RimTalk_Memory_ExportSuccessTitle>Export Successful</RimTalk_Memory_ExportSuccessTitle>
+    <RimTalk_Memory_OpenExportFolder>Open export folder?</RimTalk_Memory_OpenExportFolder>
+    <RimTalk_Memory_OpenFolder>📁 Open Folder</RimTalk_Memory_OpenFolder>
+    <RimTalk_Memory_ExportFailed>Export failed: {0}</RimTalk_Memory_ExportFailed>
+    <RimTalk_Memory_ImportNoPawn>Please select a colonist first</RimTalk_Memory_ImportNoPawn>
+    <RimTalk_Memory_ImportNoFolder>Export folder does not exist</RimTalk_Memory_ImportNoFolder>
+    <RimTalk_Memory_ImportNoFiles>No export files found</RimTalk_Memory_ImportNoFiles>
+    <RimTalk_Memory_ImportEmpty>No memory data in file</RimTalk_Memory_ImportEmpty>
+    <RimTalk_Memory_ImportConfirm>Import {1} memories from {0} to {2}?\nMemories exceeding capacity will be skipped.</RimTalk_Memory_ImportConfirm>
+    <RimTalk_Memory_ImportSuccess>Successfully imported {0}/{1} memories</RimTalk_Memory_ImportSuccess>
+    <RimTalk_Memory_ImportFailed>Import failed: {0}</RimTalk_Memory_ImportFailed>
+    
     <RimTalk_MindStream_ShowingN>Showing {0} memories</RimTalk_MindStream_ShowingN>
-    <RimTalk_MindStream_Unpin>Unpin</RimTalk_MindStream_Unpin>
-    <RimTalk_MindStream_Edit>Edit</RimTalk_MindStream_Edit>
-    <RimTalk_MindStream_With>with</RimTalk_MindStream_With>
-    <RimTalk_MindStream_ImportanceLabel>Importance: {0}</RimTalk_MindStream_ImportanceLabel>
-    <RimTalk_MindStream_ActivityLabel>Activity: {0}</RimTalk_MindStream_ActivityLabel>
-    <RimTalk_MindStream_NoSCMSelected>No SCM memories selected</RimTalk_MindStream_NoSCMSelected>
-    <RimTalk_MindStream_SummarizeConfirm>Summarize {0} SCM memories to ELS?</RimTalk_MindStream_SummarizeConfirm>
-    <RimTalk_MindStream_SummarizedN>Summarized {0} memories</RimTalk_MindStream_SummarizedN>
-    <RimTalk_MindStream_NoELSSelected>No ELS memories selected</RimTalk_MindStream_NoELSSelected>
-    <RimTalk_MindStream_ArchiveConfirm>Archive {0} ELS memories to CLPA?</RimTalk_MindStream_ArchiveConfirm>
-    <RimTalk_MindStream_ArchivedN>Archived {0} memories</RimTalk_MindStream_ArchivedN>
-    <RimTalk_MindStream_DeleteConfirm>Delete {0} selected memories?</RimTalk_MindStream_DeleteConfirm>
-    <RimTalk_MindStream_DeletedN>Deleted {0} memories</RimTalk_MindStream_DeletedN>
-    <RimTalk_MindStream_QueuedSummarization>Queued {0} colonists for summarization</RimTalk_MindStream_QueuedSummarization>
-    <RimTalk_MindStream_NoNeedSummarization>No colonists need summarization</RimTalk_MindStream_NoNeedSummarization>
-    <RimTalk_MindStream_ArchivedForN>Archived memories for {0} colonists</RimTalk_MindStream_ArchivedForN>
-    <RimTalk_MindStream_MustEnterGame>Must enter game first</RimTalk_MindStream_MustEnterGame>
-    <RimTalk_MindStream_CannotFindManager>Cannot find memory manager</RimTalk_MindStream_CannotFindManager>
-    
-    <!-- Additional Knowledge Keys -->
-    <RimTalk_Knowledge_EventRecord>Event Record</RimTalk_Knowledge_EventRecord>
-    <RimTalk_Knowledge_PawnStatus>Pawn Status</RimTalk_Knowledge_PawnStatus>
-    <RimTalk_Knowledge_Importance>Importance</RimTalk_Knowledge_Importance>
-    
-    <!-- Additional Type Keys -->
-    <RimTalk_Type_Action>Action</RimTalk_Type_Action>
-    <RimTalk_Type_Conversation>Conversation</RimTalk_Type_Conversation>
-    <RimTalk_ShowAllHumanlikes>Show All Humans</RimTalk_ShowAllHumanlikes>
-    
+
 </LanguageData>

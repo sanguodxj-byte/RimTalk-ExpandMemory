@@ -104,6 +104,11 @@
             <HintPath>$(USERPROFILE)\.nuget\packages\lib.harmony.ref\2.4.2\ref\netstandard2.0\0Harmony.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <!-- ⭐ v3.3.20: 添加Newtonsoft.Json引用（用于向量API） -->
+        <Reference Include="Newtonsoft.Json">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Newtonsoft.Json.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
     </ItemGroup>
 
     <!-- Remove BubblePatch.cs when bubble is disabled -->

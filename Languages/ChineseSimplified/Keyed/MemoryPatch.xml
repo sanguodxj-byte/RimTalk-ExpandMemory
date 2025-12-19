@@ -47,6 +47,23 @@
   <RimTalk_MindStream_GlobalActions>全局操作</RimTalk_MindStream_GlobalActions>
   <RimTalk_MindStream_SummarizeAll>总结全部</RimTalk_MindStream_SummarizeAll>
   <RimTalk_MindStream_ArchiveAll>归档全部</RimTalk_MindStream_ArchiveAll>
+  
+  <!-- ⭐ 记忆导出导入 -->
+  <RimTalk_Memory_Export>导出</RimTalk_Memory_Export>
+  <RimTalk_Memory_Import>导入</RimTalk_Memory_Import>
+  <RimTalk_Memory_ExportNoPawn>请先选择一个殖民者</RimTalk_Memory_ExportNoPawn>
+  <RimTalk_Memory_ExportSuccess>已导出 {0} 条记忆到 {1}</RimTalk_Memory_ExportSuccess>
+  <RimTalk_Memory_ExportSuccessTitle>导出成功</RimTalk_Memory_ExportSuccessTitle>
+  <RimTalk_Memory_OpenExportFolder>是否打开导出文件夹？</RimTalk_Memory_OpenExportFolder>
+  <RimTalk_Memory_OpenFolder>📁 打开文件夹</RimTalk_Memory_OpenFolder>
+  <RimTalk_Memory_ExportFailed>导出失败: {0}</RimTalk_Memory_ExportFailed>
+  <RimTalk_Memory_ImportNoPawn>请先选择一个殖民者</RimTalk_Memory_ImportNoPawn>
+  <RimTalk_Memory_ImportNoFolder>导出文件夹不存在</RimTalk_Memory_ImportNoFolder>
+  <RimTalk_Memory_ImportNoFiles>没有找到导出文件</RimTalk_Memory_ImportNoFiles>
+  <RimTalk_Memory_ImportEmpty>文件中没有记忆数据</RimTalk_Memory_ImportEmpty>
+  <RimTalk_Memory_ImportConfirm>从 {0} 导入 {1} 条记忆到 {2}？\n超出容量的记忆将被跳过。</RimTalk_Memory_ImportConfirm>
+  <RimTalk_Memory_ImportSuccess>已成功导入 {0}/{1} 条记忆</RimTalk_Memory_ImportSuccess>
+  <RimTalk_Memory_ImportFailed>导入失败: {0}</RimTalk_Memory_ImportFailed>
 
   <!-- 时间线 -->
   <RimTalk_MindStream_ShowingN>显示 {0} 条记忆</RimTalk_MindStream_ShowingN>

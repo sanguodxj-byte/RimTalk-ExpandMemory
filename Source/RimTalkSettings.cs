@@ -128,6 +128,12 @@ namespace RimTalk.MemoryPatch
         public bool enableVectorEnhancement = false;
         public float vectorSimilarityThreshold = 0.75f;
         public int maxVectorResults = 5;
+        
+        // ⭐ v3.3.20: SiliconFlow向量嵌入服务配置
+        public string siliconFlowApiKey = "";
+        public string siliconFlowModel = "BAAI/bge-large-zh-v1.5";
+        public bool enableMemoryVectorSearch = false;      // 记忆向量检索
+        public bool enableKnowledgeVectorSearch = false;   // 常识向量检索
 
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = true;
@@ -254,6 +260,12 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableVectorEnhancement, "vector_enableVectorEnhancement", false);
             Scribe_Values.Look(ref vectorSimilarityThreshold, "vector_vectorSimilarityThreshold", 0.75f);
             Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
+            
+            // ⭐ v3.3.20: SiliconFlow向量嵌入服务
+            Scribe_Values.Look(ref siliconFlowApiKey, "siliconFlow_apiKey", "");
+            Scribe_Values.Look(ref siliconFlowModel, "siliconFlow_model", "BAAI/bge-large-zh-v1.5");
+            Scribe_Values.Look(ref enableMemoryVectorSearch, "siliconFlow_enableMemoryVector", false);
+            Scribe_Values.Look(ref enableKnowledgeVectorSearch, "siliconFlow_enableKnowledgeVector", false);
 
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", true);
@@ -480,109 +492,8 @@ namespace RimTalk.MemoryPatch
             
             listing.Gap();
             
-            // ? v3.3.8: AI 提供商选择
-            listing.Label("AI 提供商:");
-            GUI.color = Color.gray;
-            listing.Label($"  当前: {independentProvider}");
-            GUI.color = Color.white;
-            
-            // 提供商选择按钮
-            Rect providerHeaderRect = listing.GetRect(25f);
-            Widgets.DrawBoxSolid(providerHeaderRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
-            Widgets.Label(providerHeaderRect.ContractedBy(5f), "选择提供商");
-            
-            Rect providerButtonRect1 = listing.GetRect(30f);
-            float buttonWidth = (providerButtonRect1.width - 20f) / 3f;
-            
-            // 第一行：OpenAI, DeepSeek, Player2
-            Rect openaiRect = new Rect(providerButtonRect1.x, providerButtonRect1.y, buttonWidth, 30f);
-            Rect deepseekRect = new Rect(providerButtonRect1.x + buttonWidth + 10f, providerButtonRect1.y, buttonWidth, 30f);
-            Rect player2Rect = new Rect(providerButtonRect1.x + 2 * (buttonWidth + 10f), providerButtonRect1.y, buttonWidth, 30f);
-            
-            bool isOpenAI = independentProvider == "OpenAI";
-            bool isDeepSeek = independentProvider == "DeepSeek";
-            bool isPlayer2 = independentProvider == "Player2";
-            
-            GUI.color = isOpenAI ? new Color(0.5f, 1f, 0.5f) : Color.white;
-            if (Widgets.ButtonText(openaiRect, "OpenAI"))
-            {
-                independentProvider = "OpenAI";
-                independentModel = "gpt-3.5-turbo";
-                independentApiUrl = "https://api.openai.com/v1/chat/completions";
-            }
-            
-            GUI.color = isDeepSeek ? new Color(0.5f, 0.7f, 1f) : Color.white;
-            if (Widgets.ButtonText(deepseekRect, "DeepSeek"))
-            {
-                independentProvider = "DeepSeek";
-                independentModel = "deepseek-chat";
-                independentApiUrl = "https://api.deepseek.com/v1/chat/completions";
-            }
-            
-            GUI.color = isPlayer2 ? new Color(1f, 0.8f, 0.5f) : Color.white;
-            if (Widgets.ButtonText(player2Rect, "Player2"))
-            {
-                independentProvider = "Player2";
-                independentModel = "gpt-4o";
-                independentApiUrl = "https://api.player2.game/v1/chat/completions";
-            }
-            GUI.color = Color.white;
-            
-            // 第二行：Google, Custom
-            Rect providerButtonRect2 = listing.GetRect(30f);
-            Rect googleRect = new Rect(providerButtonRect2.x, providerButtonRect2.y, buttonWidth, 30f);
-            Rect customRect = new Rect(providerButtonRect2.x + buttonWidth + 10f, providerButtonRect2.y, buttonWidth, 30f);
-            
-            bool isGoogle = independentProvider == "Google";
-            bool isCustom = independentProvider == "Custom";
-            
-            GUI.color = isGoogle ? new Color(1f, 0.5f, 0.5f) : Color.white;
-            if (Widgets.ButtonText(googleRect, "Google"))
-            {
-                independentProvider = "Google";
-                independentModel = "gemini-2.0-flash-exp";
-                independentApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent";
-            }
-            
-            GUI.color = isCustom ? new Color(0.7f, 0.7f, 0.7f) : Color.white;
-            if (Widgets.ButtonText(customRect, "Custom"))
-            {
-                independentProvider = "Custom";
-                independentModel = "custom-model";
-                independentApiUrl = "https://your-api-url.com/v1/chat/completions";
-            }
-            GUI.color = Color.white;
-            
-            listing.Gap();
-            
-            // 提供商说明
-            GUI.color = new Color(0.7f, 0.9f, 1f);
-            if (independentProvider == "OpenAI")
-            {
-                listing.Label("?? OpenAI GPT 系列模型，稳定可靠");
-                listing.Label("   推荐模型: gpt-3.5-turbo, gpt-4");
-            }
-            else if (independentProvider == "DeepSeek")
-            {
-                listing.Label("?? DeepSeek 中文优化模型，性价比高");
-                listing.Label("   推荐模型: deepseek-chat, deepseek-coder");
-            }
-            else if (independentProvider == "Player2")
-            {
-                listing.Label("?? Player2 游戏优化 AI，支持本地客户端");
-                listing.Label("   推荐模型: gpt-4o, gpt-4-turbo");
-            }
-            else if (independentProvider == "Google")
-            {
-                listing.Label("?? Google Gemini 系列，多模态能力强");
-                listing.Label("   推荐模型: gemini-2.0-flash-exp");
-            }
-            else if (independentProvider == "Custom")
-            {
-                listing.Label("?? 自定义 API 端点，支持第三方代理");
-                listing.Label("   请手动配置 API URL 和 Model");
-            }
-            GUI.color = Color.white;
+            // ⭐ v3.3.20: 使用辅助类绘制提供商选择
+            SettingsUIDrawers.DrawAIProviderSelection(listing, this);
             
             listing.Gap();
             
@@ -606,26 +517,26 @@ namespace RimTalk.MemoryPatch
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 if (independentProvider == "OpenAI")
                 {
-                    listing.Label("  ? OpenAI 支持 Prompt Caching (Beta)");
+                    listing.Label("  ✓ OpenAI 支持 Prompt Caching (Beta)");
                     listing.Label("  适用模型: gpt-4o, gpt-4-turbo");
                 }
                 else if (independentProvider == "DeepSeek")
                 {
-                    listing.Label("  ? DeepSeek 支持 Prompt Caching");
+                    listing.Label("  ✓ DeepSeek 支持 Prompt Caching");
                     listing.Label("  可节省约 50% 费用");
                 }
                 else if (independentProvider == "Player2")
                 {
-                    listing.Label("  ? Player2 支持 Prompt Caching");
+                    listing.Label("  ✓ Player2 支持 Prompt Caching");
                     listing.Label("  本地客户端自动缓存");
                 }
                 else if (independentProvider == "Google")
                 {
-                    listing.Label("  ? Google Gemini 暂不支持 Prompt Caching");
+                    listing.Label("  ✗ Google Gemini 暂不支持 Prompt Caching");
                 }
                 else if (independentProvider == "Custom")
                 {
-                    listing.Label("  ?? 取决于您的自定义 API 实现");
+                    listing.Label("  ✦ 取决于您的自定义 API 实现");
                 }
                 GUI.color = Color.white;
             }
@@ -634,7 +545,7 @@ namespace RimTalk.MemoryPatch
             
             // 配置验证按钮
             Rect validateButtonRect = listing.GetRect(35f);
-            if (Widgets.ButtonText(validateButtonRect, "?? 验证配置"))
+            if (Widgets.ButtonText(validateButtonRect, "✓ 验证配置"))
             {
                 ValidateAIConfig();
             }
@@ -728,6 +639,12 @@ namespace RimTalk.MemoryPatch
 
         private void DrawVectorEnhancementSettings(Listing_Standard listing)
         {
+            // ⭐ v3.3.20: 使用辅助类绘制SiliconFlow设置
+            SettingsUIDrawers.DrawSiliconFlowSettings(listing, this);
+            
+            listing.GapLine();
+            
+            // 旧的向量增强设置（保留兼容性）
             listing.CheckboxLabeled("启用向量增强 (需要重启)", ref enableVectorEnhancement);
             if (enableVectorEnhancement)
             {
@@ -746,56 +663,8 @@ namespace RimTalk.MemoryPatch
             listing.Gap();
             listing.GapLine();
             
-            // 常识匹配设置
-            Text.Font = GameFont.Small;
-            GUI.color = new Color(1f, 0.9f, 0.7f);
-            listing.Label("常识匹配设置");
-            GUI.color = Color.white;
-            listing.Gap();
-            
-            listing.CheckboxLabeled("启用常识链", ref enableKnowledgeChaining);
-            if (enableKnowledgeChaining)
-            {
-                GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  允许常识触发常识，进行多轮匹配");
-                GUI.color = Color.white;
-                listing.Gap();
-                
-                listing.Label($"最大轮数: {maxChainingRounds}");
-                maxChainingRounds = (int)listing.Slider(maxChainingRounds, 1, 5);
-            }
-            
-            listing.Gap();
-            
-            // ⭐ v3.3.20: 高级匹配设置 UI
-            listing.Label($"防误触领跑分 (Confidence Margin): {confidenceMargin:P0}");
-            confidenceMargin = listing.Slider(confidenceMargin, 0.0f, 0.2f);
-            GUI.color = Color.gray;
-            listing.Label("  如果第一名分数比第二名高出这么多，则自动丢弃后续条目");
-            GUI.color = Color.white;
-            
-            listing.Gap();
-            
-            listing.Label($"混合检索权重 (Hybrid Weight Balance): {hybridWeightBalance:P0}");
-            hybridWeightBalance = listing.Slider(hybridWeightBalance, 0.0f, 1.0f);
-            
-            Rect balanceLabelRect = listing.GetRect(20f);
-            Text.Font = GameFont.Tiny;
-            Widgets.Label(balanceLabelRect, "关键词优先 (Keywords) <--- 平衡 ---> 语义优先 (Vector)");
-            Text.Font = GameFont.Small;
-            
-            listing.Gap();
-            
-            listing.Label("全局排除词 (Global Exclude List):");
-            string newExclude = listing.TextEntry(globalExcludeKeywords);
-            if (newExclude != globalExcludeKeywords)
-            {
-                globalExcludeKeywords = newExclude;
-                ClearGlobalExcludeCache();
-            }
-            GUI.color = Color.gray;
-            listing.Label("  逗号分隔。如果出现这些词，绝对不要触发任何常识。");
-            GUI.color = Color.white;
+            // ⭐ v3.3.20: 使用辅助类绘制高级匹配设置
+            SettingsUIDrawers.DrawAdvancedMatchingSettings(listing, this);
         }
 
         private void OpenCommonKnowledgeDialog()
@@ -817,90 +686,12 @@ namespace RimTalk.MemoryPatch
         }
         
         /// <summary>
-        /// ? 绘制提示词规范化设置 UI
+        /// ✦ 绘制提示词规范化设置 UI
         /// </summary>
         private void DrawPromptNormalizationSettings(Listing_Standard listing)
         {
-            // 背景框
-            Rect sectionRect = listing.GetRect(300f); // 预估高度
-            Widgets.DrawBoxSolid(sectionRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
-            
-            Listing_Standard inner = new Listing_Standard();
-            inner.Begin(sectionRect.ContractedBy(10f));
-            
-            // 标题
-            Text.Font = GameFont.Small;
-            GUI.color = new Color(1f, 0.9f, 0.7f);
-            inner.Label("替换规则列表");
-            GUI.color = Color.white;
-            
-            inner.Gap(5f);
-            
-            // 规则列表（最多显示 10 条）
-            if (normalizationRules == null)
-            {
-                normalizationRules = new List<ReplacementRule>();
-            }
-            
-            // 绘制每条规则
-            for (int i = 0; i < normalizationRules.Count; i++)
-            {
-                var rule = normalizationRules[i];
-                
-                Rect ruleRect = inner.GetRect(30f);
-                
-                // 启用复选框
-                Rect checkboxRect = new Rect(ruleRect.x, ruleRect.y, 24f, 24f);
-                Widgets.Checkbox(checkboxRect.position, ref rule.isEnabled);
-                
-                // 模式输入框
-                Rect patternRect = new Rect(ruleRect.x + 30f, ruleRect.y, 200f, 25f);
-                rule.pattern = Widgets.TextField(patternRect, rule.pattern ?? "");
-                
-                // 箭头
-                Rect arrowRect = new Rect(ruleRect.x + 235f, ruleRect.y, 30f, 25f);
-                Widgets.Label(arrowRect, " → ");
-                
-                // 替换输入框
-                Rect replacementRect = new Rect(ruleRect.x + 270f, ruleRect.y, 150f, 25f);
-                rule.replacement = Widgets.TextField(replacementRect, rule.replacement ?? "");
-                
-                // 删除按钮
-                Rect deleteRect = new Rect(ruleRect.x + 430f, ruleRect.y, 30f, 25f);
-                GUI.color = new Color(1f, 0.3f, 0.3f);
-                if (Widgets.ButtonText(deleteRect, "?"))
-                {
-                    normalizationRules.RemoveAt(i);
-                    i--; // 调整索引
-                }
-                GUI.color = Color.white;
-                
-                inner.Gap(3f);
-            }
-            
-            // 添加新规则按钮
-            Rect addButtonRect = inner.GetRect(30f);
-            if (Widgets.ButtonText(addButtonRect, "+ 添加新规则"))
-            {
-                normalizationRules.Add(new ReplacementRule("", "", true));
-            }
-            
-            inner.Gap(5f);
-            
-            // 统计信息
-            int enabledCount = normalizationRules.Count(r => r.isEnabled);
-            GUI.color = Color.gray;
-            inner.Label($"已启用: {enabledCount} / {normalizationRules.Count} 条规则");
-            GUI.color = Color.white;
-            
-            // 示例提示
-            inner.Gap(3f);
-            GUI.color = new Color(0.7f, 0.9f, 1f);
-            inner.Label("?? 示例：模式 \\(Player\\) → 替换 Master");
-            inner.Label("   支持正则表达式（忽略大小写）");
-            GUI.color = Color.white;
-            
-            inner.End();
+            // ⭐ v3.3.20: 使用辅助类绘制
+            SettingsUIDrawers.DrawPromptNormalizationSettings(listing, this);
         }
 
         private class AdvancedSettingsWindow : Window
