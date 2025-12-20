@@ -613,7 +613,7 @@ namespace RimTalk.Memory.AI
                 sb.Append("}],");
                 sb.Append("\"generationConfig\":{");
                 sb.Append("\"temperature\":0.7,");
-                sb.Append("\"maxOutputTokens\":400");
+                sb.Append("\"maxOutputTokens\":4096");
                 
                 if (model.Contains("flash"))
                 {
@@ -670,7 +670,7 @@ namespace RimTalk.Memory.AI
                 sb.Append("}],");
                 
                 sb.Append("\"temperature\":0.7,");
-                sb.Append("\"max_tokens\":400");
+                sb.Append("\"max_tokens\":4096");
                 
                 if (enableCaching && provider == "DeepSeek")
                 {
