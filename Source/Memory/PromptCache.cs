@@ -7,26 +7,26 @@ using RimTalk.MemoryPatch;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ÌáÊ¾´Ê»º´æÏµÍ³ - »º´æ¼ÇÒäºÍ³£Ê¶×¢Èë½á¹û
-    /// ±ÜÃâÃ¿´Î¶Ô»°¶¼ÖØĞÂ¼ÆËã£¬ÏÔÖøÌáÉıĞÔÄÜ
+    /// æç¤ºè¯ç¼“å­˜ç³»ç»Ÿ - ç¼“å­˜è®°å¿†å’Œå¸¸è¯†æ³¨å…¥ç»“æœ
+    /// é¿å…æ¯æ¬¡å¯¹è¯éƒ½é‡æ–°è®¡ç®—ï¼Œæ˜¾è‘—æå‡æ€§èƒ½
     /// </summary>
     public class PromptCache : IExposable
     {
         /// <summary>
-        /// »º´æÌõÄ¿
+        /// ç¼“å­˜æ¡ç›®
         /// </summary>
         public class CacheEntry : IExposable
         {
-            public string memoryPrompt;       // ¼ÇÒä×¢Èë½á¹û
-            public string knowledgePrompt;    // ³£Ê¶×¢Èë½á¹û
-            public string fullPrompt;         // ÍêÕûÌáÊ¾´Ê
-            public int timestamp;             // ´´½¨Ê±¼ä
-            public int lastUsedTick;          // ×îºóÊ¹ÓÃÊ±¼ä
-            public int useCount;              // Ê¹ÓÃ´ÎÊı
+            public string memoryPrompt;       // è®°å¿†æ³¨å…¥ç»“æœ
+            public string knowledgePrompt;    // å¸¸è¯†æ³¨å…¥ç»“æœ
+            public string fullPrompt;         // å®Œæ•´æç¤ºè¯
+            public int timestamp;             // åˆ›å»ºæ—¶é—´
+            public int lastUsedTick;          // æœ€åä½¿ç”¨æ—¶é—´
+            public int useCount;              // ä½¿ç”¨æ¬¡æ•°
             
-            // »º´æÊ§Ğ§Ìõ¼ş
-            public int pawnMemoryCount;       // Pawn¼ÇÒäÊıÁ¿£¨ÓÃÓÚ¼ì²â¼ÇÒä±ä»¯£©
-            public int knowledgeCount;        // ³£Ê¶¿âÌõÄ¿Êı£¨ÓÃÓÚ¼ì²â³£Ê¶±ä»¯£©
+            // ç¼“å­˜å¤±æ•ˆæ¡ä»¶
+            public int pawnMemoryCount;       // Pawnè®°å¿†æ•°é‡ï¼ˆç”¨äºæ£€æµ‹è®°å¿†å˜åŒ–ï¼‰
+            public int knowledgeCount;        // å¸¸è¯†åº“æ¡ç›®æ•°ï¼ˆç”¨äºæ£€æµ‹å¸¸è¯†å˜åŒ–ï¼‰
             
             public CacheEntry()
             {
@@ -46,26 +46,26 @@ namespace RimTalk.Memory
             }
             
             /// <summary>
-            /// ¼ì²é»º´æÊÇ·ñÈÔÈ»ÓĞĞ§
-            /// ? v3.3.4: ·Å¿íÊ§Ğ§Ìõ¼ş£¬Ìá¸ß»º´æÃüÖĞÂÊ
+            /// æ£€æŸ¥ç¼“å­˜æ˜¯å¦ä»ç„¶æœ‰æ•ˆ
+            /// ? v3.3.4: æ”¾å®½å¤±æ•ˆæ¡ä»¶ï¼Œæé«˜ç¼“å­˜å‘½ä¸­ç‡
             /// </summary>
             public bool IsValid(int currentMemoryCount, int currentKnowledgeCount, int currentTick, int expireTicks)
             {
-                // ? ÓÅ»¯1£º·Å¿í¼ÇÒä±ä»¯ãĞÖµ£¨¡À5ÌõÄÚ²»Ê§Ğ§£©
-                // Ô­Òò£ºÔö¼Ó1-2Ìõ¼ÇÒä²»Ó¦µ¼ÖÂÕû¸öÌáÊ¾´ÊÊ§Ğ§
-                // ¼ÇÒä×¢ÈëÊÇ¶¯Ì¬Ñ¡ÔñµÄ£¬Î¢Ğ¡±ä»¯Ó°ÏìºÜĞ¡
+                // ? ä¼˜åŒ–1ï¼šæ”¾å®½è®°å¿†å˜åŒ–é˜ˆå€¼ï¼ˆÂ±5æ¡å†…ä¸å¤±æ•ˆï¼‰
+                // åŸå› ï¼šå¢åŠ 1-2æ¡è®°å¿†ä¸åº”å¯¼è‡´æ•´ä¸ªæç¤ºè¯å¤±æ•ˆ
+                // è®°å¿†æ³¨å…¥æ˜¯åŠ¨æ€é€‰æ‹©çš„ï¼Œå¾®å°å˜åŒ–å½±å“å¾ˆå°
                 int memoryDiff = Math.Abs(pawnMemoryCount - currentMemoryCount);
                 if (memoryDiff > 5)
                     return false;
                 
-                // ? ÓÅ»¯2£º·Å¿í³£Ê¶±ä»¯ãĞÖµ£¨¡À10ÌõÄÚ²»Ê§Ğ§£©
-                // Ô­Òò£º³£Ê¶¿â±ä»¯¸ü²»Ó¦µ¼ÖÂ»º´æÊ§Ğ§
-                // ³£Ê¶¿âÊÇÈ«¾Ö¹²ÏíµÄ£¬µ¥¸ö³£Ê¶±ä»¯Ó°Ïì¼«Ğ¡
+                // ? ä¼˜åŒ–2ï¼šæ”¾å®½å¸¸è¯†å˜åŒ–é˜ˆå€¼ï¼ˆÂ±10æ¡å†…ä¸å¤±æ•ˆï¼‰
+                // åŸå› ï¼šå¸¸è¯†åº“å˜åŒ–æ›´ä¸åº”å¯¼è‡´ç¼“å­˜å¤±æ•ˆ
+                // å¸¸è¯†åº“æ˜¯å…¨å±€å…±äº«çš„ï¼Œå•ä¸ªå¸¸è¯†å˜åŒ–å½±å“æå°
                 int knowledgeDiff = Math.Abs(knowledgeCount - currentKnowledgeCount);
                 if (knowledgeDiff > 10)
                     return false;
                 
-                // Ê±¼äÊ§Ğ§¼ì²é
+                // æ—¶é—´å¤±æ•ˆæ£€æŸ¥
                 if (currentTick - timestamp > expireTicks)
                     return false;
                 
@@ -85,15 +85,15 @@ namespace RimTalk.Memory
             }
         }
         
-        // »º´æ×Öµä£ºKey = pawnId_contextHash
+        // ç¼“å­˜å­—å…¸ï¼šKey = pawnId_contextHash
         private Dictionary<string, CacheEntry> cache = new Dictionary<string, CacheEntry>();
         
-        // Í³¼Æ
+        // ç»Ÿè®¡
         private int totalHits = 0;
         private int totalMisses = 0;
         private int totalInvalidations = 0;
         
-        // ÅäÖÃ
+        // é…ç½®
         private int MaxCacheSize => RimTalkMemoryPatchMod.Settings.promptCacheSize;
         private int ExpireMinutes => RimTalkMemoryPatchMod.Settings.promptCacheExpireMinutes;
         
@@ -108,7 +108,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ³¢ÊÔ´Ó»º´æ»ñÈ¡ÌáÊ¾´Ê
+        /// å°è¯•ä»ç¼“å­˜è·å–æç¤ºè¯
         /// </summary>
         public CacheEntry TryGet(Pawn pawn, string context, out bool needsRegeneration)
         {
@@ -121,17 +121,17 @@ namespace RimTalk.Memory
             
             if (cache.TryGetValue(cacheKey, out var entry))
             {
-                // ¼ì²é»º´æÊÇ·ñÈÔÈ»ÓĞĞ§
+                // æ£€æŸ¥ç¼“å­˜æ˜¯å¦ä»ç„¶æœ‰æ•ˆ
                 var memoryComp = pawn.TryGetComp<FourLayerMemoryComp>();
                 int currentMemoryCount = GetMemoryCount(memoryComp);
                 int currentKnowledgeCount = GetKnowledgeCount();
                 
                 int currentTick = Find.TickManager.TicksGame;
-                int expireTicks = ExpireMinutes * 2500; // ·ÖÖÓ×ªtick
+                int expireTicks = ExpireMinutes * 2500; // åˆ†é’Ÿè½¬tick
                 
                 if (entry.IsValid(currentMemoryCount, currentKnowledgeCount, currentTick, expireTicks))
                 {
-                    // »º´æÓĞĞ§£¡
+                    // ç¼“å­˜æœ‰æ•ˆï¼
                     entry.lastUsedTick = currentTick;
                     entry.useCount++;
                     totalHits++;
@@ -146,7 +146,7 @@ namespace RimTalk.Memory
                 }
                 else
                 {
-                    // »º´æÊ§Ğ§
+                    // ç¼“å­˜å¤±æ•ˆ
                     cache.Remove(cacheKey);
                     totalInvalidations++;
                     
@@ -162,7 +162,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// Ìí¼Óµ½»º´æ
+        /// æ·»åŠ åˆ°ç¼“å­˜
         /// </summary>
         public void Add(Pawn pawn, string context, string memoryPrompt, string knowledgePrompt, string fullPrompt)
         {
@@ -178,7 +178,7 @@ namespace RimTalk.Memory
             var entry = new CacheEntry(memoryPrompt, knowledgePrompt, fullPrompt, memoryCount, knowledgeCount);
             cache[cacheKey] = entry;
             
-            // LRUÌÔÌ­
+            // LRUæ·˜æ±°
             if (cache.Count > MaxCacheSize)
             {
                 EvictLRU();
@@ -191,7 +191,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// Ê¹»º´æÊ§Ğ§£¨µ±¼ÇÒä»ò³£Ê¶±ä»¯Ê±µ÷ÓÃ£©
+        /// ä½¿ç¼“å­˜å¤±æ•ˆï¼ˆå½“è®°å¿†æˆ–å¸¸è¯†å˜åŒ–æ—¶è°ƒç”¨ï¼‰
         /// </summary>
         public void InvalidateForPawn(Pawn pawn)
         {
@@ -211,7 +211,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// Çå¿ÕËùÓĞ»º´æ
+        /// æ¸…ç©ºæ‰€æœ‰ç¼“å­˜
         /// </summary>
         public void Clear()
         {
@@ -225,7 +225,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ¶¨ÆÚÇåÀí¹ıÆÚ»º´æ
+        /// å®šæœŸæ¸…ç†è¿‡æœŸç¼“å­˜
         /// </summary>
         public void CleanExpired()
         {
@@ -249,7 +249,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// »ñÈ¡Í³¼ÆĞÅÏ¢
+        /// è·å–ç»Ÿè®¡ä¿¡æ¯
         /// </summary>
         public string GetStats()
         {
@@ -257,12 +257,12 @@ namespace RimTalk.Memory
                    $"Invalidations: {totalInvalidations}, Hit Rate: {HitRate:P1}";
         }
         
-        // === Ë½ÓĞ¸¨Öú·½·¨ ===
+        // === ç§æœ‰è¾…åŠ©æ–¹æ³• ===
         
         private string GenerateCacheKey(Pawn pawn, string context)
         {
-            // Ê¹ÓÃpawnId + ÉÏÏÂÎÄhash
-            // ×¢Òâ£º²»°üº¬¾ßÌåÄÚÈİ£¬ÒòÎªÌáÊ¾´Ê½á¹¹ÏàÍ¬¼´¿É¸´ÓÃ
+            // ä½¿ç”¨pawnId + ä¸Šä¸‹æ–‡hash
+            // æ³¨æ„ï¼šä¸åŒ…å«å…·ä½“å†…å®¹ï¼Œå› ä¸ºæç¤ºè¯ç»“æ„ç›¸åŒå³å¯å¤ç”¨
             string contextHash = GetStableHash(context).ToString();
             return $"{pawn.ThingID}_{contextHash}";
         }
@@ -284,7 +284,7 @@ namespace RimTalk.Memory
         private int GetStableHash(string text)
         {
             if (string.IsNullOrEmpty(text)) return 0;
-            // ¼òµ¥µÄhash£¬Ö»È¡Ç°100×Ö·û±ÜÃâ¹ı³¤ÎÄ±¾
+            // ç®€å•çš„hashï¼Œåªå–å‰100å­—ç¬¦é¿å…è¿‡é•¿æ–‡æœ¬
             string sample = text.Length > 100 ? text.Substring(0, 100) : text;
             return sample.GetHashCode();
         }
@@ -293,7 +293,7 @@ namespace RimTalk.Memory
         {
             if (cache.Count == 0) return;
             
-            // ÏßĞÔ²éÕÒ×îÉÙÊ¹ÓÃµÄÌõÄ¿
+            // çº¿æ€§æŸ¥æ‰¾æœ€å°‘ä½¿ç”¨çš„æ¡ç›®
             string lruKey = null;
             int minUseCount = int.MaxValue;
             int minLastUsedTick = int.MaxValue;
@@ -322,10 +322,10 @@ namespace RimTalk.Memory
         
         private int EstimateComputeCost()
         {
-            // ¹ÀËãÖØĞÂ¼ÆËãµÄCPUÊ±¼ä
-            // ¼ÇÒä×¢Èë: ~5-10ms
-            // ³£Ê¶×¢Èë: ~3-5ms
-            // ×Ü¼Æ: ~8-15ms
+            // ä¼°ç®—é‡æ–°è®¡ç®—çš„CPUæ—¶é—´
+            // è®°å¿†æ³¨å…¥: ~5-10ms
+            // å¸¸è¯†æ³¨å…¥: ~3-5ms
+            // æ€»è®¡: ~8-15ms
             return UnityEngine.Random.Range(8, 15);
         }
         

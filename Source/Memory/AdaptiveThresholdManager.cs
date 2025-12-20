@@ -6,32 +6,32 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ×ÔÊÊÓ¦ãĞÖµ¹ÜÀíÆ÷ - ¸ù¾İÆÀ·Ö·Ö²¼¶¯Ì¬µ÷ÕûãĞÖµ
+    /// è‡ªé€‚åº”é˜ˆå€¼ç®¡ç†å™¨ - æ ¹æ®è¯„åˆ†åˆ†å¸ƒåŠ¨æ€è°ƒæ•´é˜ˆå€¼
     /// v3.0.0
-    /// ? v3.3.2.3: Ìí¼ÓÈÕÖ¾½µÆµ£¬±ÜÃâË¢ÆÁ
+    /// ? v3.3.2.3: æ·»åŠ æ—¥å¿—é™é¢‘ï¼Œé¿å…åˆ·å±
     /// </summary>
     public static class AdaptiveThresholdManager
     {
-        // ÆÀ·ÖÀúÊ·¼ÇÂ¼
+        // è¯„åˆ†å†å²è®°å½•
         private static List<float> memoryScoreHistory = new List<float>();
         private static List<float> knowledgeScoreHistory = new List<float>();
 
-        // ? ÈÕÖ¾½µÆµ¿ØÖÆ
+        // ? æ—¥å¿—é™é¢‘æ§åˆ¶
         private static int logCounter = 0;
-        private const int LOG_INTERVAL = 100; // Ã¿100´Î¼ÆËã²ÅÊä³öÒ»´ÎÈÕÖ¾
+        private const int LOG_INTERVAL = 100; // æ¯100æ¬¡è®¡ç®—æ‰è¾“å‡ºä¸€æ¬¡æ—¥å¿—
         
-        // ÅäÖÃ²ÎÊı
-        private const int MAX_HISTORY_SIZE = 1000;  // ×î´óÀúÊ·¼ÇÂ¼Êı
-        private const int MIN_SAMPLES = 50;         // ×îĞ¡Ñù±¾Êı£¨ÓÃÓÚÍ³¼Æ£©
-        private const float PERCENTILE_TARGET = 0.20f; // Ä¿±ê°Ù·ÖÎ»£¨±£ÁôÇ°20%£©
+        // é…ç½®å‚æ•°
+        private const int MAX_HISTORY_SIZE = 1000;  // æœ€å¤§å†å²è®°å½•æ•°
+        private const int MIN_SAMPLES = 50;         // æœ€å°æ ·æœ¬æ•°ï¼ˆç”¨äºç»Ÿè®¡ï¼‰
+        private const float PERCENTILE_TARGET = 0.20f; // ç›®æ ‡ç™¾åˆ†ä½ï¼ˆä¿ç•™å‰20%ï¼‰
 
-        // ãĞÖµµ÷Õû·¶Î§
+        // é˜ˆå€¼è°ƒæ•´èŒƒå›´
         private const float MIN_THRESHOLD = 0.05f;
         private const float MAX_THRESHOLD = 0.50f;
-        private const float ADJUSTMENT_RATE = 0.05f; // Ã¿´Îµ÷Õû·ù¶È
+        private const float ADJUSTMENT_RATE = 0.05f; // æ¯æ¬¡è°ƒæ•´å¹…åº¦
 
         /// <summary>
-        /// ¼ÇÂ¼¼ÇÒäÆÀ·Ö
+        /// è®°å½•è®°å¿†è¯„åˆ†
         /// </summary>
         public static void RecordMemoryScore(float score)
         {
@@ -40,7 +40,7 @@ namespace RimTalk.Memory
 
             memoryScoreHistory.Add(score);
 
-            // ÏŞÖÆÀúÊ·¼ÇÂ¼´óĞ¡
+            // é™åˆ¶å†å²è®°å½•å¤§å°
             if (memoryScoreHistory.Count > MAX_HISTORY_SIZE)
             {
                 memoryScoreHistory.RemoveAt(0);
@@ -48,7 +48,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¼ÇÂ¼³£Ê¶ÆÀ·Ö
+        /// è®°å½•å¸¸è¯†è¯„åˆ†
         /// </summary>
         public static void RecordKnowledgeScore(float score)
         {
@@ -64,7 +64,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ÅúÁ¿¼ÇÂ¼ÆÀ·Ö£¨ÓÃÓÚSmartInjectionManager£©
+        /// æ‰¹é‡è®°å½•è¯„åˆ†ï¼ˆç”¨äºSmartInjectionManagerï¼‰
         /// </summary>
         public static void RecordScores(
             List<ScoredItem<MemoryEntry>> memoryScores,
@@ -88,62 +88,62 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// »ñÈ¡ÍÆ¼öµÄ¼ÇÒäãĞÖµ
+        /// è·å–æ¨èçš„è®°å¿†é˜ˆå€¼
         /// </summary>
         public static float GetRecommendedMemoryThreshold()
         {
             if (memoryScoreHistory.Count < MIN_SAMPLES)
             {
-                // Ñù±¾²»×ã£¬·µ»Ø¹Ì¶¨µÄÄ¬ÈÏÍÆ¼öÖµ
-                return 0.20f; // ¹Ì¶¨ÍÆ¼öÖµ£¬²»ËæÓÃ»§µ÷Õû±ä»¯
+                // æ ·æœ¬ä¸è¶³ï¼Œè¿”å›å›ºå®šçš„é»˜è®¤æ¨èå€¼
+                return 0.20f; // å›ºå®šæ¨èå€¼ï¼Œä¸éšç”¨æˆ·è°ƒæ•´å˜åŒ–
             }
 
             return CalculateAdaptiveThreshold(memoryScoreHistory, "Memory");
         }
 
         /// <summary>
-        /// »ñÈ¡ÍÆ¼öµÄ³£Ê¶ãĞÖµ
+        /// è·å–æ¨èçš„å¸¸è¯†é˜ˆå€¼
         /// </summary>
         public static float GetRecommendedKnowledgeThreshold()
         {
             if (knowledgeScoreHistory.Count < MIN_SAMPLES)
             {
-                // Ñù±¾²»×ã£¬·µ»Ø¹Ì¶¨µÄÄ¬ÈÏÍÆ¼öÖµ
-                return 0.15f; // ¹Ì¶¨ÍÆ¼öÖµ£¬²»ËæÓÃ»§µ÷Õû±ä»¯
+                // æ ·æœ¬ä¸è¶³ï¼Œè¿”å›å›ºå®šçš„é»˜è®¤æ¨èå€¼
+                return 0.15f; // å›ºå®šæ¨èå€¼ï¼Œä¸éšç”¨æˆ·è°ƒæ•´å˜åŒ–
             }
 
             return CalculateAdaptiveThreshold(knowledgeScoreHistory, "Knowledge");
         }
 
         /// <summary>
-        /// ¼ÆËã×ÔÊÊÓ¦ãĞÖµ
-        /// ? v3.3.2.3: ½µÆµÈÕÖ¾Êä³ö
+        /// è®¡ç®—è‡ªé€‚åº”é˜ˆå€¼
+        /// ? v3.3.2.3: é™é¢‘æ—¥å¿—è¾“å‡º
         /// </summary>
         private static float CalculateAdaptiveThreshold(List<float> scores, string type)
         {
-            // 1. ¼ÆËãÍ³¼ÆÊı¾İ
+            // 1. è®¡ç®—ç»Ÿè®¡æ•°æ®
             var stats = CalculateStatistics(scores);
 
-            // 2. »ùÓÚ°Ù·ÖÎ»Êı¼ÆËããĞÖµ
+            // 2. åŸºäºç™¾åˆ†ä½æ•°è®¡ç®—é˜ˆå€¼
             float percentileThreshold = CalculatePercentile(scores, PERCENTILE_TARGET);
 
-            // 3. »ùÓÚ¾ùÖµºÍ±ê×¼²î¼ÆËããĞÖµ
+            // 3. åŸºäºå‡å€¼å’Œæ ‡å‡†å·®è®¡ç®—é˜ˆå€¼
             float meanThreshold = stats.Mean - (stats.StdDev * 0.5f);
 
-            // 4. È¡Á½ÕßµÄ¼ÓÈ¨Æ½¾ù
+            // 4. å–ä¸¤è€…çš„åŠ æƒå¹³å‡
             float recommendedThreshold = (percentileThreshold * 0.7f) + (meanThreshold * 0.3f);
 
-            // 5. ÏŞÖÆÔÚºÏÀí·¶Î§ÄÚ
+            // 5. é™åˆ¶åœ¨åˆç†èŒƒå›´å†…
             recommendedThreshold = Math.Max(MIN_THRESHOLD, Math.Min(MAX_THRESHOLD, recommendedThreshold));
 
-            // 6. »ñÈ¡µ±Ç°ãĞÖµ£¬Æ½»¬µ÷Õû
+            // 6. è·å–å½“å‰é˜ˆå€¼ï¼Œå¹³æ»‘è°ƒæ•´
             float currentThreshold = type == "Memory" 
                 ? GetCurrentMemoryThreshold() 
                 : GetCurrentKnowledgeThreshold();
 
             float smoothedThreshold = SmoothAdjustment(currentThreshold, recommendedThreshold);
 
-            // ? ½µÆµÈÕÖ¾Êä³ö£¨Ã¿100´Î²ÅÊä³öÒ»´Î£©
+            // ? é™é¢‘æ—¥å¿—è¾“å‡ºï¼ˆæ¯100æ¬¡æ‰è¾“å‡ºä¸€æ¬¡ï¼‰
             logCounter++;
             if (Prefs.DevMode && logCounter % LOG_INTERVAL == 0)
             {
@@ -156,7 +156,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¼ÆËã°Ù·ÖÎ»Êı
+        /// è®¡ç®—ç™¾åˆ†ä½æ•°
         /// </summary>
         private static float CalculatePercentile(List<float> scores, float percentile)
         {
@@ -167,7 +167,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¼ÆËãÍ³¼ÆÊı¾İ
+        /// è®¡ç®—ç»Ÿè®¡æ•°æ®
         /// </summary>
         private static Statistics CalculateStatistics(List<float> scores)
         {
@@ -189,7 +189,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// Æ½»¬µ÷ÕûãĞÖµ£¨±ÜÃâ¾çÁÒ²¨¶¯£©
+        /// å¹³æ»‘è°ƒæ•´é˜ˆå€¼ï¼ˆé¿å…å‰§çƒˆæ³¢åŠ¨ï¼‰
         /// </summary>
         private static float SmoothAdjustment(float current, float target)
         {
@@ -199,8 +199,8 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ×Ô¶¯Ó¦ÓÃÍÆ¼öãĞÖµ
-        /// ? v3.3.2.3: Ö»ÔÚDevModeÊä³öÈÕÖ¾
+        /// è‡ªåŠ¨åº”ç”¨æ¨èé˜ˆå€¼
+        /// ? v3.3.2.3: åªåœ¨DevModeè¾“å‡ºæ—¥å¿—
         /// </summary>
         public static void ApplyRecommendedThresholds()
         {
@@ -214,7 +214,7 @@ namespace RimTalk.Memory
             settings.memoryScoreThreshold = memoryThreshold;
             settings.knowledgeScoreThreshold = knowledgeThreshold;
 
-            // ? Ö»ÔÚDevModeÊä³öÈÕÖ¾
+            // ? åªåœ¨DevModeè¾“å‡ºæ—¥å¿—
             if (Prefs.DevMode)
             {
                 Log.Message($"[Adaptive Threshold] Applied - Memory: {memoryThreshold:F3}, Knowledge: {knowledgeThreshold:F3}");
@@ -222,7 +222,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°¼ÇÒäãĞÖµ
+        /// è·å–å½“å‰è®°å¿†é˜ˆå€¼
         /// </summary>
         private static float GetCurrentMemoryThreshold()
         {
@@ -230,7 +230,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°³£Ê¶ãĞÖµ
+        /// è·å–å½“å‰å¸¸è¯†é˜ˆå€¼
         /// </summary>
         private static float GetCurrentKnowledgeThreshold()
         {
@@ -238,7 +238,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// »ñÈ¡Õï¶Ï±¨¸æ
+        /// è·å–è¯Šæ–­æŠ¥å‘Š
         /// </summary>
         public static ThresholdDiagnostics GetDiagnostics()
         {
@@ -259,15 +259,15 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ÖØÖÃÀúÊ·¼ÇÂ¼
-        /// ? v3.3.2.3: Ö»ÔÚDevModeÊä³öÈÕÖ¾
+        /// é‡ç½®å†å²è®°å½•
+        /// ? v3.3.2.3: åªåœ¨DevModeè¾“å‡ºæ—¥å¿—
         /// </summary>
         public static void ResetHistory()
         {
             memoryScoreHistory.Clear();
             knowledgeScoreHistory.Clear();
             
-            // ? Ö»ÔÚDevModeÊä³öÈÕÖ¾
+            // ? åªåœ¨DevModeè¾“å‡ºæ—¥å¿—
             if (Prefs.DevMode)
             {
                 Log.Message("[Adaptive Threshold] History reset");
@@ -275,7 +275,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// µ¼³öÆÀ·Ö·Ö²¼£¨ÓÃÓÚ·ÖÎö£©
+        /// å¯¼å‡ºè¯„åˆ†åˆ†å¸ƒï¼ˆç”¨äºåˆ†æï¼‰
         /// </summary>
         public static ScoreDistribution GetScoreDistribution()
         {
@@ -289,7 +289,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ´´½¨Ö±·½Í¼Í°
+        /// åˆ›å»ºç›´æ–¹å›¾æ¡¶
         /// </summary>
         private static Dictionary<string, int> CreateHistogramBuckets(List<float> scores, int bucketCount)
         {
@@ -311,7 +311,7 @@ namespace RimTalk.Memory
             return buckets;
         }
 
-        #region Êı¾İ½á¹¹
+        #region æ•°æ®ç»“æ„
 
         public struct Statistics
         {

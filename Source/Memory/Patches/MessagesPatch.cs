@@ -6,9 +6,9 @@ using RimWorld;
 namespace RimTalk.Memory.Patches
 {
     /// <summary>
-    /// ? ÒÑ·ÏÆú£ºMessagesPatch
-    /// Ô­Òò£ºPlayLogÒÑ¾­°üº¬ËùÓĞÖØÒªÊÂ¼ş£¬²»ĞèÒªÖØ¸´¼àÌıMessage
-    /// EventRecordKnowledgeGeneratorÏÖÔÚÖ»´ÓPlayLog¶ÁÈ¡ÊÂ¼ş
+    /// ? å·²åºŸå¼ƒï¼šMessagesPatch
+    /// åŸå› ï¼šPlayLogå·²ç»åŒ…å«æ‰€æœ‰é‡è¦äº‹ä»¶ï¼Œä¸éœ€è¦é‡å¤ç›‘å¬Message
+    /// EventRecordKnowledgeGeneratorç°åœ¨åªä»PlayLogè¯»å–äº‹ä»¶
     /// </summary>
     /*
     [HarmonyPatch(typeof(Messages))]
@@ -19,7 +19,7 @@ namespace RimTalk.Memory.Patches
         [HarmonyPostfix]
         public static void Postfix(string text, MessageTypeDef def, bool historical)
         {
-            // ÒÑ·ÏÆú
+            // å·²åºŸå¼ƒ
         }
     }
     */

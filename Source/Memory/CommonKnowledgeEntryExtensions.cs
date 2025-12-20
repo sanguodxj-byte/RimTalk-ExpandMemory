@@ -4,39 +4,39 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// CommonKnowledgeEntryÀ©Õ¹·½·¨
-    /// ¡ï v3.3.20: ²ğ·Ö¸¨Öú·½·¨£¬¼õÉÙÖ÷ÎÄ¼ş¸´ÔÓ¶È
+    /// CommonKnowledgeEntryæ‰©å±•æ–¹æ³•
+    /// â˜… v3.3.20: æ‹†åˆ†è¾…åŠ©æ–¹æ³•ï¼Œå‡å°‘ä¸»æ–‡ä»¶å¤æ‚åº¦
     /// </summary>
     public static class CommonKnowledgeEntryExtensions
     {
         /// <summary>
-        /// ? v3.3.20: ¼ì²éÊÇ·ñÎªÍêÕû´ÊÆ¥Åä£¨±ÜÃâ×Ó×Ö·û´®ÎóÆ¥Åä£©
-        /// ÀıÈç£º
-        /// - IsCompleteWordMatch("ç²ÂŞÕÛÖ½", "ÕÛÖ½") = true  ? (±ß½çÕıÈ·)
-        /// - IsCompleteWordMatch("ç²ÂŞÕÛÖ½", "ç²ÂŞ") = false ? (²»ÊÇÍêÕû´Ê)
-        /// - IsCompleteWordMatch("»úĞµç²ÂŞ", "ç²ÂŞ") = true  ? (±ß½çÕıÈ·)
+        /// ? v3.3.20: æ£€æŸ¥æ˜¯å¦ä¸ºå®Œæ•´è¯åŒ¹é…ï¼ˆé¿å…å­å­—ç¬¦ä¸²è¯¯åŒ¹é…ï¼‰
+        /// ä¾‹å¦‚ï¼š
+        /// - IsCompleteWordMatch("ç»®ç½—æŠ˜çº¸", "æŠ˜çº¸") = true  ? (è¾¹ç•Œæ­£ç¡®)
+        /// - IsCompleteWordMatch("ç»®ç½—æŠ˜çº¸", "ç»®ç½—") = false ? (ä¸æ˜¯å®Œæ•´è¯)
+        /// - IsCompleteWordMatch("æœºæ¢°ç»®ç½—", "ç»®ç½—") = true  ? (è¾¹ç•Œæ­£ç¡®)
         /// </summary>
         public static bool IsCompleteWordMatch(string text, string word)
         {
             if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(word))
                 return false;
             
-            // ÍêÈ«ÏàµÈ
+            // å®Œå…¨ç›¸ç­‰
             if (string.Equals(text, word, StringComparison.OrdinalIgnoreCase))
                 return true;
             
-            // ²éÕÒËùÓĞ³öÏÖÎ»ÖÃ
+            // æŸ¥æ‰¾æ‰€æœ‰å‡ºç°ä½ç½®
             int index = 0;
             while ((index = text.IndexOf(word, index, StringComparison.OrdinalIgnoreCase)) >= 0)
             {
-                // ¼ì²éÇ°ÃæÊÇ·ñÊÇ±ß½ç
+                // æ£€æŸ¥å‰é¢æ˜¯å¦æ˜¯è¾¹ç•Œ
                 bool frontBoundary = (index == 0) || IsWordBoundary(text[index - 1]);
                 
-                // ¼ì²éºóÃæÊÇ·ñÊÇ±ß½ç
+                // æ£€æŸ¥åé¢æ˜¯å¦æ˜¯è¾¹ç•Œ
                 int endIndex = index + word.Length;
                 bool backBoundary = (endIndex == text.Length) || IsWordBoundary(text[endIndex]);
                 
-                // Ç°ºó¶¼ÊÇ±ß½ç²ÅËãÍêÕû´ÊÆ¥Åä
+                // å‰åéƒ½æ˜¯è¾¹ç•Œæ‰ç®—å®Œæ•´è¯åŒ¹é…
                 if (frontBoundary && backBoundary)
                     return true;
                 
@@ -47,23 +47,23 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.20: ÅĞ¶Ï×Ö·ûÊÇ·ñÎª´Ê±ß½ç
-        /// ´Ê±ß½ç°üÀ¨£º¿Õ¸ñ¡¢±êµã·ûºÅ¡¢·Ö¸ô·ûµÈ
+        /// ? v3.3.20: åˆ¤æ–­å­—ç¬¦æ˜¯å¦ä¸ºè¯è¾¹ç•Œ
+        /// è¯è¾¹ç•ŒåŒ…æ‹¬ï¼šç©ºæ ¼ã€æ ‡ç‚¹ç¬¦å·ã€åˆ†éš”ç¬¦ç­‰
         /// </summary>
         public static bool IsWordBoundary(char c)
         {
-            // ¿Õ¸ñºÍ³£¼û·Ö¸ô·û
-            if (char.IsWhiteSpace(c) || c == ',' || c == '£¬' || c == '¡¢' || c == ';' || c == '£»' ||
-                c == '.' || c == '¡£' || c == '!' || c == '£¡' || c == '?' || c == '£¿' ||
-                c == ':' || c == '£º' || c == '-' || c == '_' || c == '/' || c == '\\' ||
-                c == '(' || c == ')' || c == '£¨' || c == '£©' || c == '[' || c == ']' ||
-                c == '{' || c == '}' || c == '<' || c == '>' || c == '¡¸' || c == '¡¹' ||
-                c == '¡º' || c == '¡»' || c == '¡¾' || c == '¡¿')
+            // ç©ºæ ¼å’Œå¸¸è§åˆ†éš”ç¬¦
+            if (char.IsWhiteSpace(c) || c == ',' || c == 'ï¼Œ' || c == 'ã€' || c == ';' || c == 'ï¼›' ||
+                c == '.' || c == 'ã€‚' || c == '!' || c == 'ï¼' || c == '?' || c == 'ï¼Ÿ' ||
+                c == ':' || c == 'ï¼š' || c == '-' || c == '_' || c == '/' || c == '\\' ||
+                c == '(' || c == ')' || c == 'ï¼ˆ' || c == 'ï¼‰' || c == '[' || c == ']' ||
+                c == '{' || c == '}' || c == '<' || c == '>' || c == 'ã€Œ' || c == 'ã€' ||
+                c == 'ã€' || c == 'ã€' || c == 'ã€' || c == 'ã€‘')
             {
                 return true;
             }
             
-            // ÆäËû±êµã·ûºÅ
+            // å…¶ä»–æ ‡ç‚¹ç¬¦å·
             if (char.IsPunctuation(c) || char.IsSymbol(c))
             {
                 return true;
@@ -73,8 +73,8 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ? v3.3.22: ÅĞ¶Ïµ±Ç°ÌõÄ¿ÊÇ·ñÎª¹æÔòÀà³£Ê¶
-        /// ±êÇ©°üº¬"¹æÔò"¡¢"Instructions"¡¢"rule"£¨²»Çø·Ö´óĞ¡Ğ´£©
+        /// ? v3.3.22: åˆ¤æ–­å½“å‰æ¡ç›®æ˜¯å¦ä¸ºè§„åˆ™ç±»å¸¸è¯†
+        /// æ ‡ç­¾åŒ…å«"è§„åˆ™"ã€"Instructions"ã€"rule"ï¼ˆä¸åŒºåˆ†å¤§å°å†™ï¼‰
         /// </summary>
         public static bool IsRuleKnowledge(this CommonKnowledgeEntry entry)
         {
@@ -82,7 +82,7 @@ namespace RimTalk.Memory
                 return false;
             
             string lowerTag = entry.tag.ToLower();
-            return lowerTag.Contains("¹æÔò") || 
+            return lowerTag.Contains("è§„åˆ™") || 
                    lowerTag.Contains("instructions") || 
                    lowerTag.Contains("rule");
         }

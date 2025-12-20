@@ -6,8 +6,8 @@ using Verse;
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// ĞéÄâ»¯ÁĞ±íÊÓÍ¼ - Ö»äÖÈ¾¿É¼ûÏî£¬ÌáÉı´óÁĞ±íĞÔÄÜ
-    /// ¡ï v3.3.19: ĞÔÄÜÓÅ»¯ - 1000+ÏîÁĞ±íÈÔÄÜÁ÷³©¹ö¶¯
+    /// è™šæ‹ŸåŒ–åˆ—è¡¨è§†å›¾ - åªæ¸²æŸ“å¯è§é¡¹ï¼Œæå‡å¤§åˆ—è¡¨æ€§èƒ½
+    /// â˜… v3.3.19: æ€§èƒ½ä¼˜åŒ– - 1000+é¡¹åˆ—è¡¨ä»èƒ½æµç•…æ»šåŠ¨
     /// </summary>
     public class VirtualListView<T> where T : class
     {
@@ -16,12 +16,12 @@ namespace RimTalk.Memory.UI
         private Action<Rect, T, int> drawItem;
         private Vector2 scrollPosition;
 
-        // ²¼¾Ö»º´æ
+        // å¸ƒå±€ç¼“å­˜
         private readonly List<float> itemOffsets = new List<float>();
         private readonly List<float> itemHeights = new List<float>();
         private float totalHeight = 0f;
 
-        // ÅäÖÃ
+        // é…ç½®
         public float ItemSpacing { get; set; } = 5f;
         public Vector2 ScrollPosition
         {
@@ -29,7 +29,7 @@ namespace RimTalk.Memory.UI
             set => scrollPosition = value;
         }
 
-        // ? ĞÂÔö£º¿ÕÁĞ±íÌáÊ¾ÎÄ±¾£¨¿É×Ô¶¨Òå£©
+        // ? æ–°å¢ï¼šç©ºåˆ—è¡¨æç¤ºæ–‡æœ¬ï¼ˆå¯è‡ªå®šä¹‰ï¼‰
         public string EmptyLabel { get; set; } = "No items to display";
 
         public VirtualListView(Func<T, float> getItemHeight, Action<Rect, T, int> drawItem)
@@ -39,7 +39,7 @@ namespace RimTalk.Memory.UI
         }
 
         /// <summary>
-        /// ÉèÖÃÁĞ±íÊı¾İ
+        /// è®¾ç½®åˆ—è¡¨æ•°æ®
         /// </summary>
         public void SetItems(List<T> newItems)
         {
@@ -48,7 +48,7 @@ namespace RimTalk.Memory.UI
         }
 
         /// <summary>
-        /// ÖØ½¨²¼¾Ö»º´æ
+        /// é‡å»ºå¸ƒå±€ç¼“å­˜
         /// </summary>
         private void RebuildLayout()
         {
@@ -66,13 +66,13 @@ namespace RimTalk.Memory.UI
         }
 
         /// <summary>
-        /// »æÖÆÁĞ±í£¨ĞéÄâ»¯äÖÈ¾£©
+        /// ç»˜åˆ¶åˆ—è¡¨ï¼ˆè™šæ‹ŸåŒ–æ¸²æŸ“ï¼‰
         /// </summary>
         public void Draw(Rect rect)
         {
             if (items.Count == 0)
             {
-                // ¿ÕÁĞ±íÌáÊ¾
+                // ç©ºåˆ—è¡¨æç¤º
                 Text.Anchor = TextAnchor.MiddleCenter;
                 GUI.color = new Color(0.6f, 0.6f, 0.6f);
                 Widgets.Label(rect, EmptyLabel);
@@ -85,13 +85,13 @@ namespace RimTalk.Memory.UI
 
             Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
 
-            // ¼ÆËã¿É¼û·¶Î§
+            // è®¡ç®—å¯è§èŒƒå›´
             float visibleTop = scrollPosition.y;
             float visibleBottom = visibleTop + rect.height;
 
             GetVisibleIndexRange(visibleTop, visibleBottom, out int startIndex, out int endIndex);
 
-            // Ö»äÖÈ¾¿É¼ûÏî
+            // åªæ¸²æŸ“å¯è§é¡¹
             for (int i = startIndex; i <= endIndex; i++)
             {
                 float itemTop = itemOffsets[i];
@@ -104,7 +104,7 @@ namespace RimTalk.Memory.UI
         }
 
         /// <summary>
-        /// ²éÕÒY·¶Î§ÄÚµÄÏîË÷Òı£¨ÓÃÓÚÍÏ×§Ñ¡Ôñ£©
+        /// æŸ¥æ‰¾YèŒƒå›´å†…çš„é¡¹ç´¢å¼•ï¼ˆç”¨äºæ‹–æ‹½é€‰æ‹©ï¼‰
         /// </summary>
         public List<int> FindItemsInRange(float minY, float maxY)
         {
@@ -113,7 +113,7 @@ namespace RimTalk.Memory.UI
             if (items.Count == 0)
                 return indices;
 
-            // Ê¹ÓÃ¶ş·Ö²éÕÒ¿ìËÙ¶¨Î»ºòÑ¡Çø¼ä£¬È»ºóÏßĞÔÉ¨Ãè¿É½»²æ²¿·Ö
+            // ä½¿ç”¨äºŒåˆ†æŸ¥æ‰¾å¿«é€Ÿå®šä½å€™é€‰åŒºé—´ï¼Œç„¶åçº¿æ€§æ‰«æå¯äº¤å‰éƒ¨åˆ†
             int start = FindFirstIndexAtOrBefore(minY);
             if (start < 0) start = 0;
 
@@ -135,7 +135,7 @@ namespace RimTalk.Memory.UI
         }
 
         /// <summary>
-        /// »ñÈ¡äÖÈ¾Í³¼ÆĞÅÏ¢£¨ÓÃÓÚµ÷ÊÔ£©
+        /// è·å–æ¸²æŸ“ç»Ÿè®¡ä¿¡æ¯ï¼ˆç”¨äºè°ƒè¯•ï¼‰
         /// </summary>
         public string GetRenderStats(float viewportHeight)
         {
@@ -167,7 +167,7 @@ namespace RimTalk.Memory.UI
             if (endIndex < startIndex) endIndex = startIndex;
         }
 
-        // ÕÒµ½¡°¿ÉÄÜ°üº¬ y µÄÏî¡±£¨Ïîµ×²¿ >= y£©µÄ×îĞ¡ index
+        // æ‰¾åˆ°â€œå¯èƒ½åŒ…å« y çš„é¡¹â€ï¼ˆé¡¹åº•éƒ¨ >= yï¼‰çš„æœ€å° index
         private int FindFirstIndexAtOrBefore(float y)
         {
             int low = 0;
@@ -197,7 +197,7 @@ namespace RimTalk.Memory.UI
             return result;
         }
 
-        // ÕÒµ½¡°¿ÉÄÜ°üº¬ y µÄÏî¡±£¨Ïî¶¥²¿ <= y£©µÄ×î´ó index
+        // æ‰¾åˆ°â€œå¯èƒ½åŒ…å« y çš„é¡¹â€ï¼ˆé¡¹é¡¶éƒ¨ <= yï¼‰çš„æœ€å¤§ index
         private int FindLastIndexAtOrAfter(float y)
         {
             int low = 0;

@@ -12,7 +12,7 @@ namespace RimTalk.Patches
     [HarmonyPatch(typeof(ThingWithComps), "InitializeComps")]
     public static class InjectMemoryCompPatch
     {
-        // Ê¹ÓÃ·´Éä·ÃÎÊ AllComps µÄÖ§³Ö×Ö¶Î
+        // ä½¿ç”¨åå°„è®¿é—® AllComps çš„æ”¯æŒå­—æ®µ
         private static readonly FieldInfo allCompsField = AccessTools.Field(typeof(ThingWithComps), "comps");
         
         [HarmonyPostfix]
@@ -27,7 +27,7 @@ namespace RimTalk.Patches
                     var comp = new Memory.PawnMemoryComp();
                     comp.parent = pawn;
                     
-                    // Ê¹ÓÃ·´Éä·ÃÎÊÄÚ²¿µÄ comps ×Ö¶Î
+                    // ä½¿ç”¨åå°„è®¿é—®å†…éƒ¨çš„ comps å­—æ®µ
                     var compsList = allCompsField?.GetValue(pawn) as List<ThingComp>;
                     if (compsList == null)
                     {
