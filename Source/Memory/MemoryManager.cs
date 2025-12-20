@@ -27,6 +27,9 @@ namespace RimTalk.Memory
         
         private int lastSummarizationDay = -1; // 上次ELS总结的日期
         private int lastArchiveDay = -1;        // 上次CLPA归档的日期
+        
+        // ⭐ v3.3.2.36: 首次加载保护标志（防止旧存档立即触发归档/总结）
+        private bool isFirstLoadAfterUpdate = false;
 
         // ⭐ 总结队列（延迟处理）
         private Queue<Pawn> summarizationQueue = new Queue<Pawn>();
@@ -197,10 +200,21 @@ namespace RimTalk.Memory
         
         /// <summary>
         /// 检查并触发每日总结（游戏时间 0 点）
+        /// ⭐ v3.3.2.36: 添加首次加载保护
         /// </summary>
         private void CheckDailySummarization()
         {
             if (Current.Game == null || Find.CurrentMap == null) return;
+            
+            // ⭐ v3.3.2.36: 首次加载保护 - 跳过自动总结
+            if (isFirstLoadAfterUpdate)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Message("[RimTalk Memory] ⏭️ Skipping daily summarization due to first load protection.");
+                }
+                return;
+            }
             
             // 检查设置是否启用
             if (!RimTalkMemoryPatchMod.Settings.enableDailySummarization)
@@ -497,10 +511,21 @@ namespace RimTalk.Memory
         /// <summary>
         /// 检查并触发CLPA归档（按天数间隔）
         /// ⭐ v3.3.2.33: 重构 - 实现真正的 ELS → CLPA 自动归档
+        /// ⭐ v3.3.2.36: 添加首次加载保护
         /// </summary>
         /// <param name="currentDay">当前游戏中的天数</param>
         private void CheckArchiveInterval(int currentDay)
         {
+            // ⭐ v3.3.2.36: 首次加载保护 - 跳过自动归档
+            if (isFirstLoadAfterUpdate)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Message("[RimTalk Memory] ⏭️ Skipping auto-archive due to first load protection.");
+                }
+                return;
+            }
+            
             // 检查设置是否启用CLPA自动归档
             if (!RimTalkMemoryPatchMod.Settings.enableAutoArchive)
                 return;
@@ -786,6 +811,40 @@ namespace RimTalk.Memory
                 if (manualSummarizationQueue == null)
                     manualSummarizationQueue = new Queue<Pawn>();
                 
+                // ⭐ v3.3.2.36: 旧存档保护 - 防止立即触发归档/总结
+                int currentDay = GenDate.DaysPassed;
+                bool isOldSave = false;
+                
+                // 检测是否是旧存档（没有归档/总结日期记录）
+                if (lastArchiveDay == -1)
+                {
+                    lastArchiveDay = currentDay;
+                    isOldSave = true;
+                    Log.Warning($"[RimTalk Memory] ⚠️ Old save detected! Initialized lastArchiveDay to {currentDay} to prevent immediate archive.");
+                }
+                
+                if (lastSummarizationDay == -1)
+                {
+                    lastSummarizationDay = currentDay;
+                    isOldSave = true;
+                    Log.Warning($"[RimTalk Memory] ⚠️ Old save detected! Initialized lastSummarizationDay to {currentDay} to prevent immediate summarization.");
+                }
+                
+                // 如果是旧存档或版本号为0，启用首次加载保护
+                if (isOldSave || saveVersion == 0)
+                {
+                    isFirstLoadAfterUpdate = true;
+                    Log.Warning("[RimTalk Memory] 🛡️ First load protection ENABLED - auto-archive and daily summarization will be skipped this session.");
+                    Log.Warning("[RimTalk Memory] 💡 This prevents massive API calls when loading old saves. Protection will be disabled after next save/load.");
+                    
+                    // 给用户一个友好的提示
+                    Messages.Message(
+                        "RimTalk记忆系统：检测到旧存档，已启用保护模式。本次游戏会话将跳过自动归档和每日总结，避免大量API调用。",
+                        MessageTypeDefOf.NeutralEvent,
+                        false
+                    );
+                }
+                
                 // ⭐ 版本升级逻辑
                 if (saveVersion < 1)
                 {
@@ -794,7 +853,7 @@ namespace RimTalk.Memory
                     saveVersion = 1;
                 }
                 
-                Log.Message($"[RimTalk Memory] MemoryManager loaded successfully (save version: {saveVersion})");
+                Log.Message($"[RimTalk Memory] MemoryManager loaded successfully (save version: {saveVersion}, first load protection: {isFirstLoadAfterUpdate})");
             }
             
             if (Scribe.mode == LoadSaveMode.Saving)
