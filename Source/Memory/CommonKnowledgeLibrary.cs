@@ -534,20 +534,27 @@ namespace RimTalk.Memory
 
             var settings = RimTalkMemoryPatchMod.Settings;
             
-            // 构建完整的匹配文本（上下文 + Pawn信息）
+            // 构建完整的匹配文本（上下文 + 完整Pawn信息）
             StringBuilder matchTextBuilder = new StringBuilder();
             matchTextBuilder.Append(context);
             
+            // 提取完整的 Pawn 信息文本（不切碎）
             if (currentPawn != null)
             {
                 matchTextBuilder.Append(" ");
-                matchTextBuilder.Append(BuildPawnInfoText(currentPawn));
+                matchTextBuilder.Append(BuildCompletePawnInfoText(currentPawn));
+                
+                // 同时记录关键词信息（用于UI显示）
+                var tempKeywords = new List<string>();
+                var pawnInfo = KeywordExtractionHelper.ExtractPawnKeywords(tempKeywords, currentPawn);
+                keywordInfo.PawnInfo = pawnInfo;
+                keywordInfo.PawnKeywordsCount = pawnInfo.TotalCount;
             }
             
             if (targetPawn != null && targetPawn != currentPawn)
             {
                 matchTextBuilder.Append(" ");
-                matchTextBuilder.Append(BuildPawnInfoText(targetPawn));
+                matchTextBuilder.Append(BuildCompletePawnInfoText(targetPawn));
             }
             
             string originalMatchText = matchTextBuilder.ToString();
@@ -555,7 +562,6 @@ namespace RimTalk.Memory
             
             keywordInfo.ContextKeywords = new List<string> { context };
             keywordInfo.TotalKeywords = 1;
-            keywordInfo.PawnKeywordsCount = 0;
 
             var allMatchedEntries = new HashSet<CommonKnowledgeEntry>();
             
@@ -740,7 +746,10 @@ namespace RimTalk.Memory
             return sb.ToString();
         }
 
-        private string BuildPawnInfoText(Verse.Pawn pawn)
+        /// <summary>
+        /// 构建完整的 Pawn 信息文本（不切碎，完整保留所有信息）
+        /// </summary>
+        private string BuildCompletePawnInfoText(Verse.Pawn pawn)
         {
             if (pawn == null)
                 return string.Empty;
@@ -749,53 +758,185 @@ namespace RimTalk.Memory
 
             try
             {
+                // 1. 名字
                 if (!string.IsNullOrEmpty(pawn.Name?.ToStringShort))
                 {
                     sb.Append(pawn.Name.ToStringShort);
                     sb.Append(" ");
                 }
 
-                sb.Append(pawn.gender.GetLabel());
-                sb.Append(" ");
+                // 2. 年龄段
+                if (pawn.RaceProps != null && pawn.RaceProps.Humanlike)
+                {
+                    float ageYears = pawn.ageTracker.AgeBiologicalYearsFloat;
+                    
+                    if (ageYears < 3f)
+                    {
+                        sb.Append("婴儿 宝宝 ");
+                    }
+                    else if (ageYears < 13f)
+                    {
+                        sb.Append("儿童 小孩 ");
+                    }
+                    else if (ageYears < 18f)
+                    {
+                        sb.Append("青少年 ");
+                    }
+                    else
+                    {
+                        sb.Append("成人 ");
+                    }
+                }
 
+                // 3. 性别
+                if (pawn.gender != null)
+                {
+                    sb.Append(pawn.gender.GetLabel());
+                    sb.Append(" ");
+                }
+
+                // 4. 种族
                 if (pawn.def != null)
                 {
                     sb.Append(pawn.def.label);
                     sb.Append(" ");
+                    
+                    // 亚种信息（Biotech DLC）
+                    try
+                    {
+                        if (pawn.genes != null && pawn.genes.Xenotype != null)
+                        {
+                            string xenotypeName = pawn.genes.Xenotype.label ?? pawn.genes.Xenotype.defName;
+                            if (!string.IsNullOrEmpty(xenotypeName))
+                            {
+                                sb.Append(xenotypeName);
+                                sb.Append(" ");
+                            }
+                        }
+                    }
+                    catch { /* 兼容性：没有Biotech DLC时跳过 */ }
                 }
 
+                // 4.5. 身份（殖民者/囚犯/奴隶/访客）
+                if (pawn.IsColonist)
+                {
+                    sb.Append("殖民者 ");
+                }
+                else if (pawn.IsPrisoner)
+                {
+                    sb.Append("囚犯 ");
+                }
+                else if (pawn.IsSlaveOfColony)
+                {
+                    sb.Append("奴隶 ");
+                }
+                else if (pawn.HostFaction == Faction.OfPlayer)
+                {
+                    sb.Append("访客 ");
+                }
+                else if (pawn.Faction != null && pawn.Faction != Faction.OfPlayer)
+                {
+                    sb.Append(pawn.Faction.Name);
+                    sb.Append(" ");
+                }
+
+                // 5. 特性（所有特性）
                 if (pawn.story?.traits != null)
                 {
-                    int traitCount = 0;
                     foreach (var trait in pawn.story.traits.allTraits)
                     {
-                        if (trait?.def?.label != null && traitCount < 5)
+                        if (trait?.def?.label != null)
                         {
                             sb.Append(trait.def.label);
                             sb.Append(" ");
-                            traitCount++;
                         }
                     }
                 }
 
+                // 6. 技能（所有技能，带等级）
                 if (pawn.skills != null)
                 {
                     foreach (var skillRecord in pawn.skills.skills)
                     {
-                        if (skillRecord.TotallyDisabled || skillRecord.Level < 10)
+                        if (skillRecord.TotallyDisabled || skillRecord.def?.label == null)
                             continue;
-
-                        if (skillRecord.def?.label != null)
+                        
+                        int level = skillRecord.Level;
+                        
+                        // 只输出有一定等级的技能（>=5级）
+                        if (level >= 5)
                         {
                             sb.Append(skillRecord.def.label);
+                            sb.Append(level);
+                            sb.Append(" ");
+                            
+                            // 高等级技能额外标记
+                            if (level >= 15)
+                            {
+                                sb.Append(skillRecord.def.label);
+                                sb.Append("精通 ");
+                            }
+                            else if (level >= 10)
+                            {
+                                sb.Append(skillRecord.def.label);
+                                sb.Append("熟练 ");
+                            }
+                        }
+                    }
+                }
+
+                // 7. 健康状况
+                if (pawn.health != null)
+                {
+                    if (pawn.health.hediffSet.GetInjuredParts().Any())
+                    {
+                        sb.Append("受伤 ");
+                    }
+                    else if (!pawn.health.HasHediffsNeedingTend())
+                    {
+                        sb.Append("健康 ");
+                    }
+                }
+
+                // 8. 关系（前5个相关Pawn）
+                if (pawn.relations != null)
+                {
+                    var relatedPawns = pawn.relations.RelatedPawns.Take(5);
+                    foreach (var relatedPawn in relatedPawns)
+                    {
+                        if (!string.IsNullOrEmpty(relatedPawn.Name?.ToStringShort))
+                        {
+                            sb.Append(relatedPawn.Name.ToStringShort);
                             sb.Append(" ");
                         }
+                    }
+                }
+
+                // 9. 成年背景（使用完整标题）
+                if (pawn.story?.Adulthood != null)
+                {
+                    string backstoryTitle = pawn.story.Adulthood.TitleFor(pawn.gender);
+                    if (!string.IsNullOrEmpty(backstoryTitle))
+                    {
+                        sb.Append(backstoryTitle);
+                        sb.Append(" ");
+                    }
+                }
+                
+                // 10. 童年背景（使用完整标题）
+                if (pawn.story?.Childhood != null)
+                {
+                    string childhoodTitle = pawn.story.Childhood.TitleFor(pawn.gender);
+                    if (!string.IsNullOrEmpty(childhoodTitle))
+                    {
+                        sb.Append(childhoodTitle);
+                        sb.Append(" ");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Warning($"[RimTalk-ExpandMemory] Error building pawn info text: {ex.Message}");
+                Log.Warning($"[RimTalk-ExpandMemory] Error building complete pawn info text: {ex.Message}");
             }
 
             return sb.ToString().Trim();
@@ -844,6 +985,7 @@ namespace RimTalk.Memory
         public List<string> AgeKeywords = new List<string>();
         public List<string> GenderKeywords = new List<string>();
         public List<string> RaceKeywords = new List<string>();
+        public List<string> IdentityKeywords = new List<string>();  // 身份（殖民者/囚犯/奴隶/访客）
         public List<string> TraitKeywords = new List<string>();
         public List<string> SkillKeywords = new List<string>();
         public List<string> SkillLevelKeywords = new List<string>();

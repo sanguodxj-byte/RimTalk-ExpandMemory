@@ -724,6 +724,13 @@ namespace RimTalk.Memory.Debug
                             preview.AppendLine();
                         }
                         
+                        if (pawnInfo.IdentityKeywords.Count > 0)
+                        {
+                            preview.AppendLine($"🎫 身份关键词 ({pawnInfo.IdentityKeywords.Count}个)");
+                            preview.AppendLine("   " + string.Join(", ", pawnInfo.IdentityKeywords));
+                            preview.AppendLine();
+                        }
+                        
                         if (pawnInfo.TraitKeywords.Count > 0)
                         {
                             preview.AppendLine($"🎭 特质关键词 ({pawnInfo.TraitKeywords.Count}个)");

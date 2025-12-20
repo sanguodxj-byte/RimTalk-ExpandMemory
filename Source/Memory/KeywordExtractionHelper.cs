@@ -7,13 +7,13 @@ using RimWorld;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ¹Ø¼ü´ÊÌáÈ¡¸¨ÖúÀà
-    /// ¡ï v3.3.20: ²ğ·Ö¸´ÔÓµÄPawn¹Ø¼ü´ÊÌáÈ¡Âß¼­
+    /// å…³é”®è¯æå–è¾…åŠ©ç±»
+    /// â˜… v3.3.20: æ‹†åˆ†å¤æ‚çš„Pawnå…³é”®è¯æå–é€»è¾‘
     /// </summary>
     public static class KeywordExtractionHelper
     {
         /// <summary>
-        /// ÌáÈ¡½ÇÉ«¹Ø¼ü´Ê£¨´øÏêÏ¸ĞÅÏ¢£©
+        /// æå–è§’è‰²å…³é”®è¯ï¼ˆå¸¦è¯¦ç»†ä¿¡æ¯ï¼‰
         /// </summary>
         public static PawnKeywordInfo ExtractPawnKeywords(List<string> keywords, Verse.Pawn pawn)
         {
@@ -27,31 +27,34 @@ namespace RimTalk.Memory
 
             try
             {
-                // 1. Ãû×Ö
+                // 1. åå­—
                 ExtractNameKeywords(pawn, keywords, info);
                 
-                // 2. ÄêÁä¶Î
+                // 2. å¹´é¾„æ®µ
                 ExtractAgeKeywords(pawn, keywords, info);
                 
-                // 3. ĞÔ±ğ
+                // 3. æ€§åˆ«
                 ExtractGenderKeywords(pawn, keywords, info);
                 
-                // 4. ÖÖ×å
+                // 4. ç§æ—
                 ExtractRaceKeywords(pawn, keywords, info);
                 
-                // 5. ÌØÖÊ
+                // 4.5. èº«ä»½
+                ExtractIdentityKeywords(pawn, keywords, info);
+                
+                // 5. ç‰¹è´¨
                 ExtractTraitKeywords(pawn, keywords, info);
                 
-                // 6. ¼¼ÄÜ
+                // 6. æŠ€èƒ½
                 ExtractSkillKeywords(pawn, keywords, info);
                 
-                // 7. ½¡¿µ×´¿ö
+                // 7. å¥åº·çŠ¶å†µ
                 ExtractHealthKeywords(pawn, keywords, info);
                 
-                // 8. ¹ØÏµ
+                // 8. å…³ç³»
                 ExtractRelationshipKeywords(pawn, keywords, info);
                 
-                // 9-10. ±³¾°
+                // 9-10. èƒŒæ™¯
                 ExtractBackstoryKeywords(pawn, keywords, info);
 
                 info.TotalCount = info.NameKeywords.Count + info.AgeKeywords.Count + info.GenderKeywords.Count + 
@@ -67,7 +70,7 @@ namespace RimTalk.Memory
             return info;
         }
         
-        // ==================== Ë½ÓĞÌáÈ¡·½·¨ ====================
+        // ==================== ç§æœ‰æå–æ–¹æ³• ====================
         
         private static void ExtractNameKeywords(Verse.Pawn pawn, List<string> keywords, PawnKeywordInfo info)
         {
@@ -86,21 +89,21 @@ namespace RimTalk.Memory
                 
                 if (ageYears < 3f)
                 {
-                    AddAndRecord("Ó¤¶ù", keywords, info.AgeKeywords);
-                    AddAndRecord("±¦±¦", keywords, info.AgeKeywords);
+                    AddAndRecord("å©´å„¿", keywords, info.AgeKeywords);
+                    AddAndRecord("å®å®", keywords, info.AgeKeywords);
                 }
                 else if (ageYears < 13f)
                 {
-                    AddAndRecord("¶ùÍ¯", keywords, info.AgeKeywords);
-                    AddAndRecord("Ğ¡º¢", keywords, info.AgeKeywords);
+                    AddAndRecord("å„¿ç«¥", keywords, info.AgeKeywords);
+                    AddAndRecord("å°å­©", keywords, info.AgeKeywords);
                 }
                 else if (ageYears < 18f)
                 {
-                    AddAndRecord("ÇàÉÙÄê", keywords, info.AgeKeywords);
+                    AddAndRecord("é’å°‘å¹´", keywords, info.AgeKeywords);
                 }
                 else
                 {
-                    AddAndRecord("³ÉÈË", keywords, info.AgeKeywords);
+                    AddAndRecord("æˆäºº", keywords, info.AgeKeywords);
                 }
             }
         }
@@ -120,7 +123,7 @@ namespace RimTalk.Memory
             {
                 AddAndRecord(pawn.def.label, keywords, info.RaceKeywords);
                 
-                // ÑÇÖÖĞÅÏ¢£¨Biotech DLC£©
+                // äºšç§ä¿¡æ¯ï¼ˆBiotech DLCï¼‰
                 try
                 {
                     if (pawn.genes != null && pawn.genes.Xenotype != null)
@@ -132,7 +135,31 @@ namespace RimTalk.Memory
                         }
                     }
                 }
-                catch { /* ¼æÈİĞÔ£ºÃ»ÓĞBiotech DLCÊ±Ìø¹ı */ }
+                catch { /* å…¼å®¹æ€§ï¼šæ²¡æœ‰Biotech DLCæ—¶è·³è¿‡ */ }
+            }
+        }
+        
+        private static void ExtractIdentityKeywords(Verse.Pawn pawn, List<string> keywords, PawnKeywordInfo info)
+        {
+            if (pawn.IsColonist)
+            {
+                AddAndRecord("æ®–æ°‘è€…", keywords, info.IdentityKeywords);
+            }
+            else if (pawn.IsPrisoner)
+            {
+                AddAndRecord("å›šçŠ¯", keywords, info.IdentityKeywords);
+            }
+            else if (pawn.IsSlaveOfColony)
+            {
+                AddAndRecord("å¥´éš¶", keywords, info.IdentityKeywords);
+            }
+            else if (pawn.HostFaction == Faction.OfPlayer)
+            {
+                AddAndRecord("è®¿å®¢", keywords, info.IdentityKeywords);
+            }
+            else if (pawn.Faction != null && pawn.Faction != Faction.OfPlayer)
+            {
+                AddAndRecord(pawn.Faction.Name, keywords, info.IdentityKeywords);
             }
         }
         
@@ -159,12 +186,27 @@ namespace RimTalk.Memory
                     if (skillRecord.TotallyDisabled || skillRecord.def?.label == null)
                         continue;
                     
-                    AddAndRecord(skillRecord.def.label, keywords, info.SkillKeywords);
-                    
                     int level = skillRecord.Level;
-                    if (level >= 10)
+                    
+                    // åªæå–æœ‰ä¸€å®šç­‰çº§çš„æŠ€èƒ½ï¼ˆ>=5çº§ï¼‰
+                    if (level >= 5)
                     {
-                        AddAndRecord("ÊìÁ·", keywords, info.SkillLevelKeywords);
+                        // æ·»åŠ æŠ€èƒ½å
+                        AddAndRecord(skillRecord.def.label, keywords, info.SkillKeywords);
+                        
+                        // æ·»åŠ æŠ€èƒ½å+ç­‰çº§
+                        string skillWithLevel = skillRecord.def.label + level;
+                        AddAndRecord(skillWithLevel, keywords, info.SkillKeywords);
+                        
+                        // æ·»åŠ ç­‰çº§æ ‡è®°
+                        if (level >= 15)
+                        {
+                            AddAndRecord(skillRecord.def.label + "ç²¾é€š", keywords, info.SkillLevelKeywords);
+                        }
+                        else if (level >= 10)
+                        {
+                            AddAndRecord(skillRecord.def.label + "ç†Ÿç»ƒ", keywords, info.SkillLevelKeywords);
+                        }
                     }
                 }
             }
@@ -176,11 +218,11 @@ namespace RimTalk.Memory
             {
                 if (pawn.health.hediffSet.GetInjuredParts().Any())
                 {
-                    AddAndRecord("ÊÜÉË", keywords, info.HealthKeywords);
+                    AddAndRecord("å—ä¼¤", keywords, info.HealthKeywords);
                 }
                 else if (!pawn.health.HasHediffsNeedingTend())
                 {
-                    AddAndRecord("½¡¿µ", keywords, info.HealthKeywords);
+                    AddAndRecord("å¥åº·", keywords, info.HealthKeywords);
                 }
             }
         }
@@ -202,27 +244,28 @@ namespace RimTalk.Memory
         
         private static void ExtractBackstoryKeywords(Verse.Pawn pawn, List<string> keywords, PawnKeywordInfo info)
         {
+            // ä½¿ç”¨å®Œæ•´æ ‡é¢˜è€Œä¸æ˜¯ç¼©å†™
             if (pawn.story?.Adulthood != null)
             {
-                string backstoryTitle = pawn.story.Adulthood.TitleShortFor(pawn.gender);
+                string backstoryTitle = pawn.story.Adulthood.TitleFor(pawn.gender);
                 if (!string.IsNullOrEmpty(backstoryTitle))
                 {
-                    info.BackstoryKeywords.Add(backstoryTitle);
+                    AddAndRecord(backstoryTitle, keywords, info.BackstoryKeywords);
                 }
             }
             
             if (pawn.story?.Childhood != null)
             {
-                string childhoodTitle = pawn.story.Childhood.TitleShortFor(pawn.gender);
+                string childhoodTitle = pawn.story.Childhood.TitleFor(pawn.gender);
                 if (!string.IsNullOrEmpty(childhoodTitle))
                 {
-                    info.ChildhoodKeywords.Add(childhoodTitle);
+                    AddAndRecord(childhoodTitle, keywords, info.ChildhoodKeywords);
                 }
             }
         }
         
         /// <summary>
-        /// Ìí¼Ó¹Ø¼ü´Ê²¢¼ÇÂ¼£¨±ÜÃâÖØ¸´£©
+        /// æ·»åŠ å…³é”®è¯å¹¶è®°å½•ï¼ˆé¿å…é‡å¤ï¼‰
         /// </summary>
         private static void AddAndRecord(string keyword, List<string> allKeywords, List<string> categoryKeywords)
         {
