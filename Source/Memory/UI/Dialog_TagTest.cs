@@ -8,7 +8,7 @@ using RimWorld;
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// ±êÇ©²âÊÔ¹¤¾ßµ¯´°
+    /// æ ‡ç­¾æµ‹è¯•å·¥å…·å¼¹çª—
     /// </summary>
     public class Dialog_TagTest : Window
     {
@@ -35,30 +35,30 @@ namespace RimTalk.Memory.UI
         {
             float y = 0f;
             
-            // ±êÌâ
+            // æ ‡é¢˜
             Text.Font = GameFont.Medium;
             Widgets.Label(new Rect(0f, y, inRect.width, 35f), 
                 CommonKnowledgeTranslationKeys.TagTestTitle.Translate());
             Text.Font = GameFont.Small;
             y += 40f;
             
-            // ========== ÊäÈëÇøÓò =========
+            // ========== è¾“å…¥åŒºåŸŸ =========
             
-            // ²âÊÔ±êÇ©ÊäÈë
+            // æµ‹è¯•æ ‡ç­¾è¾“å…¥
             Widgets.Label(new Rect(0f, y, inRect.width, 22f), 
                 CommonKnowledgeTranslationKeys.TagTestInputTag.Translate());
             y += 22f;
             testTag = Widgets.TextField(new Rect(0f, y, inRect.width, 28f), testTag);
             y += 32f;
             
-            // ¶Ô»°ÄÚÈİÊäÈë
+            // å¯¹è¯å†…å®¹è¾“å…¥
             Widgets.Label(new Rect(0f, y, inRect.width, 22f), 
                 CommonKnowledgeTranslationKeys.TagTestInputContext.Translate());
             y += 22f;
             testContext = Widgets.TextArea(new Rect(0f, y, inRect.width, 50f), testContext);
             y += 54f;
             
-            // Pawn Ñ¡Ôñ
+            // Pawn é€‰æ‹©
             Widgets.Label(new Rect(0f, y, inRect.width, 22f), 
                 CommonKnowledgeTranslationKeys.TagTestSelectPawn.Translate());
             y += 22f;
@@ -73,9 +73,9 @@ namespace RimTalk.Memory.UI
             }
             y += 32f;
             
-            // ²âÊÔ°´Å¥ºÍÇå³ı°´Å¥
+            // æµ‹è¯•æŒ‰é’®å’Œæ¸…é™¤æŒ‰é’®
             float buttonWidth = (inRect.width - 10f) / 2f;
-            if (Widgets.ButtonText(new Rect(0f, y, buttonWidth, 32f), "?? ²âÊÔ"))
+            if (Widgets.ButtonText(new Rect(0f, y, buttonWidth, 32f), "?? æµ‹è¯•"))
             {
                 ExecuteTagTest();
             }
@@ -90,11 +90,11 @@ namespace RimTalk.Memory.UI
             }
             y += 40f;
             
-            // ========== ·Ö¸ôÏß =========
+            // ========== åˆ†éš”çº¿ =========
             Widgets.DrawLineHorizontal(0f, y, inRect.width);
             y += 15f;
             
-            // ========== ½á¹ûÇøÓò£¨Ê¼ÖÕÏÔÊ¾£¬Î´²âÊÔÊ±ÏÔÊ¾ÌáÊ¾£©==========
+            // ========== ç»“æœåŒºåŸŸï¼ˆå§‹ç»ˆæ˜¾ç¤ºï¼Œæœªæµ‹è¯•æ—¶æ˜¾ç¤ºæç¤ºï¼‰==========
             float resultAreaHeight = inRect.height - y;
             Rect resultRect = new Rect(0f, y, inRect.width, resultAreaHeight);
             
@@ -112,22 +112,22 @@ namespace RimTalk.Memory.UI
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             GUI.color = new Color(0.6f, 0.6f, 0.6f);
-            Widgets.Label(rect, "µã»÷ ?? ²âÊÔ °´Å¥¿ªÊ¼²âÊÔ");
+            Widgets.Label(rect, "ç‚¹å‡» ?? æµ‹è¯• æŒ‰é’®å¼€å§‹æµ‹è¯•");
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
         }
 
         private void DrawResultArea(Rect rect)
         {
-            float y = rect.y; // Ê¹ÓÃ¾ø¶Ô×ø±ê
+            float y = rect.y; // ä½¿ç”¨ç»å¯¹åæ ‡
             
-            // Æ¥Åä½á¹û±êÌâ
+            // åŒ¹é…ç»“æœæ ‡é¢˜
             Text.Font = GameFont.Small;
             Widgets.Label(new Rect(rect.x, y, rect.width, 25f), 
                 CommonKnowledgeTranslationKeys.TagTestResult.Translate());
             y += 25f;
             
-            // Æ¥Åä½á¹û
+            // åŒ¹é…ç»“æœ
             Text.Font = GameFont.Medium;
             if (testResult)
             {
@@ -145,16 +145,16 @@ namespace RimTalk.Memory.UI
             Text.Font = GameFont.Small;
             y += 35f;
             
-            // Êµ¼ÊÆ¥ÅäÎÄ±¾±êÌâ
+            // å®é™…åŒ¹é…æ–‡æœ¬æ ‡é¢˜
             Widgets.Label(new Rect(rect.x, y, rect.width, 25f), 
                 CommonKnowledgeTranslationKeys.TagTestMatchText.Translate());
             y += 25f;
             
-            // Êµ¼ÊÆ¥ÅäÎÄ±¾ÄÚÈİ£¨¿É¹ö¶¯£©
+            // å®é™…åŒ¹é…æ–‡æœ¬å†…å®¹ï¼ˆå¯æ»šåŠ¨ï¼‰
             float scrollAreaHeight = rect.yMax - y;
             Rect scrollOuterRect = new Rect(rect.x, y, rect.width, scrollAreaHeight);
             
-            // ¼ÆËãÄÚÈİ¸ß¶È
+            // è®¡ç®—å†…å®¹é«˜åº¦
             Text.Font = GameFont.Tiny;
             float contentHeight = Text.CalcHeight(testMatchText, rect.width - 20f);
             Text.Font = GameFont.Small;
@@ -163,11 +163,11 @@ namespace RimTalk.Memory.UI
             
             Widgets.BeginScrollView(scrollOuterRect, ref scrollPosition, scrollViewRect);
             
-            // »æÖÆÆ¥ÅäÎÄ±¾±³¾°
+            // ç»˜åˆ¶åŒ¹é…æ–‡æœ¬èƒŒæ™¯
             Rect textBoxRect = new Rect(5f, 5f, scrollViewRect.width - 10f, contentHeight + 10f);
             Widgets.DrawBoxSolid(textBoxRect, new Color(0.1f, 0.1f, 0.1f, 0.8f));
             
-            // »æÖÆÆ¥ÅäÎÄ±¾
+            // ç»˜åˆ¶åŒ¹é…æ–‡æœ¬
             Rect textRect = textBoxRect.ContractedBy(5f);
             Text.Font = GameFont.Tiny;
             GUI.color = new Color(0.9f, 0.9f, 0.9f);
@@ -182,13 +182,13 @@ namespace RimTalk.Memory.UI
         {
             List<FloatMenuOption> options = new List<FloatMenuOption>();
             
-            // ÎŞ Pawn Ñ¡Ïî
+            // æ—  Pawn é€‰é¡¹
             options.Add(new FloatMenuOption(
                 CommonKnowledgeTranslationKeys.TagTestNoPawn.Translate(),
                 delegate { testPawn = null; }
             ));
             
-            // µ±Ç°µØÍ¼µÄËùÓĞ Pawn
+            // å½“å‰åœ°å›¾çš„æ‰€æœ‰ Pawn
             if (Find.CurrentMap != null)
             {
                 var allPawns = Find.CurrentMap.mapPawns.AllPawns
@@ -204,7 +204,7 @@ namespace RimTalk.Memory.UI
                         label += $" ({pawn.Faction.Name})";
                     }
                     
-                    Pawn localPawn = pawn; // ±ÜÃâ±Õ°üÎÊÌâ
+                    Pawn localPawn = pawn; // é¿å…é—­åŒ…é—®é¢˜
                     options.Add(new FloatMenuOption(label, delegate { testPawn = localPawn; }));
                 }
             }
@@ -216,17 +216,17 @@ namespace RimTalk.Memory.UI
         {
             if (string.IsNullOrWhiteSpace(testTag))
             {
-                Messages.Message("ÇëÊäÈë±êÇ©", MessageTypeDefOf.RejectInput, false);
+                Messages.Message("è¯·è¾“å…¥æ ‡ç­¾", MessageTypeDefOf.RejectInput, false);
                 return;
             }
             
-            // ´´½¨ÁÙÊ±³£Ê¶ÌõÄ¿
-            var tempEntry = new CommonKnowledgeEntry(testTag, "²âÊÔÄÚÈİ")
+            // åˆ›å»ºä¸´æ—¶å¸¸è¯†æ¡ç›®
+            var tempEntry = new CommonKnowledgeEntry(testTag, "æµ‹è¯•å†…å®¹")
             {
                 matchMode = KeywordMatchMode.Any
             };
             
-            // ¹¹½¨Æ¥ÅäÎÄ±¾
+            // æ„å»ºåŒ¹é…æ–‡æœ¬
             System.Text.StringBuilder matchTextBuilder = new System.Text.StringBuilder();
             matchTextBuilder.Append(testContext);
             
@@ -238,18 +238,21 @@ namespace RimTalk.Memory.UI
             
             testMatchText = matchTextBuilder.ToString();
             
-            // ²âÊÔÆ¥Åä
+            // æµ‹è¯•åŒ¹é…
             testResult = TestTagMatch(testMatchText, tempEntry);
             testExecuted = true;
             
-            // ÏÔÊ¾ÏêÏ¸µÄÆ¥ÅäÎÄ±¾ĞÅÏ¢
-            Log.Message($"[±êÇ©²âÊÔ] ±êÇ©: {testTag}");
-            Log.Message($"[±êÇ©²âÊÔ] ¶Ô»°: {testContext}");
-            Log.Message($"[±êÇ©²âÊÔ] Pawn: {(testPawn != null ? testPawn.LabelShort : "ÎŞ")}");
-            Log.Message($"[±êÇ©²âÊÔ] Êµ¼ÊÆ¥ÅäÎÄ±¾: {testMatchText}");
-            Log.Message($"[±êÇ©²âÊÔ] ½á¹û: {(testResult ? "Æ¥Åä³É¹¦" : "²»Æ¥Åä")}");
+            // æ˜¾ç¤ºè¯¦ç»†çš„åŒ¹é…æ–‡æœ¬ä¿¡æ¯
+            Log.Message($"[æ ‡ç­¾æµ‹è¯•] æ ‡ç­¾: {testTag}");
+            Log.Message($"[æ ‡ç­¾æµ‹è¯•] å¯¹è¯: {testContext}");
+            Log.Message($"[æ ‡ç­¾æµ‹è¯•] Pawn: {(testPawn != null ? testPawn.LabelShort : "æ— ")}");
+            Log.Message($"[æ ‡ç­¾æµ‹è¯•] å®é™…åŒ¹é…æ–‡æœ¬: {testMatchText}");
+            Log.Message($"[æ ‡ç­¾æµ‹è¯•] ç»“æœ: {(testResult ? "åŒ¹é…æˆåŠŸ" : "ä¸åŒ¹é…")}");
         }
 
+        /// <summary>
+        /// æ„å»ºå®Œæ•´çš„ Pawn ä¿¡æ¯æ–‡æœ¬ï¼ˆä¸ CommonKnowledgeLibrary ä¿æŒä¸€è‡´ï¼‰
+        /// </summary>
         private string BuildPawnInfoText(Pawn pawn)
         {
             if (pawn == null)
@@ -259,53 +262,185 @@ namespace RimTalk.Memory.UI
 
             try
             {
+                // 1. åå­—
                 if (!string.IsNullOrEmpty(pawn.Name?.ToStringShort))
                 {
                     sb.Append(pawn.Name.ToStringShort);
                     sb.Append(" ");
                 }
 
-                sb.Append(pawn.gender.GetLabel());
-                sb.Append(" ");
+                // 2. å¹´é¾„æ®µ
+                if (pawn.RaceProps != null && pawn.RaceProps.Humanlike)
+                {
+                    float ageYears = pawn.ageTracker.AgeBiologicalYearsFloat;
+                    
+                    if (ageYears < 3f)
+                    {
+                        sb.Append("å©´å„¿ å®å® ");
+                    }
+                    else if (ageYears < 13f)
+                    {
+                        sb.Append("å„¿ç«¥ å°å­© ");
+                    }
+                    else if (ageYears < 18f)
+                    {
+                        sb.Append("é’å°‘å¹´ ");
+                    }
+                    else
+                    {
+                        sb.Append("æˆäºº ");
+                    }
+                }
 
+                // 3. æ€§åˆ«
+                if (pawn.gender != null)
+                {
+                    sb.Append(pawn.gender.GetLabel());
+                    sb.Append(" ");
+                }
+
+                // 4. ç§æ—
                 if (pawn.def != null)
                 {
                     sb.Append(pawn.def.label);
                     sb.Append(" ");
+                    
+                    // äºšç§ä¿¡æ¯ï¼ˆBiotech DLCï¼‰
+                    try
+                    {
+                        if (pawn.genes != null && pawn.genes.Xenotype != null)
+                        {
+                            string xenotypeName = pawn.genes.Xenotype.label ?? pawn.genes.Xenotype.defName;
+                            if (!string.IsNullOrEmpty(xenotypeName))
+                            {
+                                sb.Append(xenotypeName);
+                                sb.Append(" ");
+                            }
+                        }
+                    }
+                    catch { /* å…¼å®¹æ€§ï¼šæ²¡æœ‰Biotech DLCæ—¶è·³è¿‡ */ }
                 }
 
+                // 4.5. èº«ä»½ï¼ˆæ®–æ°‘è€…/å›šçŠ¯/å¥´éš¶/è®¿å®¢ï¼‰
+                if (pawn.IsColonist)
+                {
+                    sb.Append("æ®–æ°‘è€… ");
+                }
+                else if (pawn.IsPrisoner)
+                {
+                    sb.Append("å›šçŠ¯ ");
+                }
+                else if (pawn.IsSlaveOfColony)
+                {
+                    sb.Append("å¥´éš¶ ");
+                }
+                else if (pawn.HostFaction == Faction.OfPlayer)
+                {
+                    sb.Append("è®¿å®¢ ");
+                }
+                else if (pawn.Faction != null && pawn.Faction != Faction.OfPlayer)
+                {
+                    sb.Append(pawn.Faction.Name);
+                    sb.Append(" ");
+                }
+
+                // 5. ç‰¹æ€§ï¼ˆæ‰€æœ‰ç‰¹æ€§ï¼‰
                 if (pawn.story?.traits != null)
                 {
-                    int traitCount = 0;
                     foreach (var trait in pawn.story.traits.allTraits)
                     {
-                        if (trait?.def?.label != null && traitCount < 5)
+                        if (trait?.def?.label != null)
                         {
                             sb.Append(trait.def.label);
                             sb.Append(" ");
-                            traitCount++;
                         }
                     }
                 }
 
+                // 6. æŠ€èƒ½ï¼ˆæ‰€æœ‰æŠ€èƒ½ï¼Œå¸¦ç­‰çº§ï¼‰
                 if (pawn.skills != null)
                 {
                     foreach (var skillRecord in pawn.skills.skills)
                     {
-                        if (skillRecord.TotallyDisabled || skillRecord.Level < 10)
+                        if (skillRecord.TotallyDisabled || skillRecord.def?.label == null)
                             continue;
-
-                        if (skillRecord.def?.label != null)
+                        
+                        int level = skillRecord.Level;
+                        
+                        // åªè¾“å‡ºæœ‰ä¸€å®šç­‰çº§çš„æŠ€èƒ½ï¼ˆ>=5çº§ï¼‰
+                        if (level >= 5)
                         {
                             sb.Append(skillRecord.def.label);
+                            sb.Append(level);
+                            sb.Append(" ");
+                            
+                            // é«˜ç­‰çº§æŠ€èƒ½é¢å¤–æ ‡è®°
+                            if (level >= 15)
+                            {
+                                sb.Append(skillRecord.def.label);
+                                sb.Append("ç²¾é€š ");
+                            }
+                            else if (level >= 10)
+                            {
+                                sb.Append(skillRecord.def.label);
+                                sb.Append("ç†Ÿç»ƒ ");
+                            }
+                        }
+                    }
+                }
+
+                // 7. å¥åº·çŠ¶å†µ
+                if (pawn.health != null)
+                {
+                    if (pawn.health.hediffSet.GetInjuredParts().Any())
+                    {
+                        sb.Append("å—ä¼¤ ");
+                    }
+                    else if (!pawn.health.HasHediffsNeedingTend())
+                    {
+                        sb.Append("å¥åº· ");
+                    }
+                }
+
+                // 8. å…³ç³»ï¼ˆå‰5ä¸ªç›¸å…³Pawnï¼‰
+                if (pawn.relations != null)
+                {
+                    var relatedPawns = pawn.relations.RelatedPawns.Take(5);
+                    foreach (var relatedPawn in relatedPawns)
+                    {
+                        if (!string.IsNullOrEmpty(relatedPawn.Name?.ToStringShort))
+                        {
+                            sb.Append(relatedPawn.Name.ToStringShort);
                             sb.Append(" ");
                         }
+                    }
+                }
+
+                // 9. æˆå¹´èƒŒæ™¯ï¼ˆä½¿ç”¨å®Œæ•´æ ‡é¢˜ï¼‰
+                if (pawn.story?.Adulthood != null)
+                {
+                    string backstoryTitle = pawn.story.Adulthood.TitleFor(pawn.gender);
+                    if (!string.IsNullOrEmpty(backstoryTitle))
+                    {
+                        sb.Append(backstoryTitle);
+                        sb.Append(" ");
+                    }
+                }
+                
+                // 10. ç«¥å¹´èƒŒæ™¯ï¼ˆä½¿ç”¨å®Œæ•´æ ‡é¢˜ï¼‰
+                if (pawn.story?.Childhood != null)
+                {
+                    string childhoodTitle = pawn.story.Childhood.TitleFor(pawn.gender);
+                    if (!string.IsNullOrEmpty(childhoodTitle))
+                    {
+                        sb.Append(childhoodTitle);
+                        sb.Append(" ");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Warning($"[±êÇ©²âÊÔ] ¹¹½¨PawnĞÅÏ¢Ê±³ö´í: {ex.Message}");
+                Log.Warning($"[æ ‡ç­¾æµ‹è¯•] æ„å»ºPawnä¿¡æ¯æ—¶å‡ºé”™: {ex.Message}");
             }
 
             return sb.ToString().Trim();
