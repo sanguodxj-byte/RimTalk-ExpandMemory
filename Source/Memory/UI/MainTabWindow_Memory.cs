@@ -122,21 +122,28 @@ namespace RimTalk.Memory.UI
             float spacing = 5f;
             float rightX = innerRect.xMax;
             
-            // Preview button
+            // Preview button (最右侧)
             rightX -= buttonWidth;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Preview".Translate()))
             {
                 Find.WindowStack.Add(new Debug.Dialog_InjectionPreview());
             }
             
-            // ⭐ 修改：常识按钮移到更右侧（原来操作指南的位置）
+            // ⭐ 新增：总结提示词按钮
+            rightX -= buttonWidth + spacing;
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "总结提示词"))
+            {
+                Find.WindowStack.Add(new Dialog_PromptEditor());
+            }
+            
+            // 常识按钮
             rightX -= buttonWidth + spacing;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Knowledge".Translate()))
             {
                 OpenCommonKnowledgeDialog();
             }
 
-            // ⭐ 修改：操作指南按钮移到左侧（原来常识的位置）
+            // 操作指南按钮
             rightX -= buttonWidth + spacing;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_OperationGuide".Translate()))
             {

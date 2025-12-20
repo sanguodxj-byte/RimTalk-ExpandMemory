@@ -546,47 +546,69 @@ namespace RimTalk.Memory.AI
 
         private static string BuildPrompt(Pawn pawn, List<MemoryEntry> memories, string template)
         {
-            var sb = new StringBuilder();
+            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
             
-            // 统一极简格式
+            // 构建记忆列表
+            var memoryListSb = new StringBuilder();
+            int maxMemories = (template == "deep_archive") ? 15 : 20;
+            int i = 1;
+            foreach (var m in memories.Take(maxMemories))
+            {
+                memoryListSb.AppendLine($"{i} {m.content}");
+                i++;
+            }
+            string memoryList = memoryListSb.ToString().TrimEnd();
+            
+            // 使用自定义提示词或默认提示词
+            string promptTemplate;
+            
             if (template == "deep_archive")
             {
                 // 深度归档
-                sb.AppendLine($"殖民者{pawn.LabelShort}的记忆归档");
-                sb.AppendLine();
-                sb.AppendLine("记忆列表");
-                int i = 1;
-                foreach (var m in memories.Take(15))
+                if (!string.IsNullOrEmpty(settings.deepArchivePrompt))
                 {
-                    sb.AppendLine($"{i} {m.content}");
-                    i++;
+                    // 使用自定义提示词
+                    promptTemplate = settings.deepArchivePrompt;
                 }
-                sb.AppendLine();
-                sb.AppendLine("要求提炼核心特征和里程碑事件");
-                sb.AppendLine("合并相似经历突出长期趋势");
-                sb.AppendLine("极简表达不超过60字");
-                sb.AppendLine("只输出总结文字不要其他格式");
+                else
+                {
+                    // 使用默认提示词
+                    promptTemplate = 
+                        "殖民者{0}的记忆归档\n\n" +
+                        "记忆列表\n" +
+                        "{1}\n\n" +
+                        "要求提炼核心特征和里程碑事件\n" +
+                        "合并相似经历突出长期趋势\n" +
+                        "极简表达不超过60字\n" +
+                        "只输出总结文字不要其他格式";
+                }
             }
             else
             {
                 // 每日总结
-                sb.AppendLine($"殖民者{pawn.LabelShort}的记忆总结");
-                sb.AppendLine();
-                sb.AppendLine("记忆列表");
-                int i = 1;
-                foreach (var m in memories.Take(20))
+                if (!string.IsNullOrEmpty(settings.dailySummaryPrompt))
                 {
-                    sb.AppendLine($"{i} {m.content}");
-                    i++;
+                    // 使用自定义提示词
+                    promptTemplate = settings.dailySummaryPrompt;
                 }
-                sb.AppendLine();
-                sb.AppendLine("要求提炼地点人物事件");
-                sb.AppendLine("相似事件合并标注频率");
-                sb.AppendLine("极简表达不超过80字");
-                sb.AppendLine("只输出总结文字不要其他格式");
+                else
+                {
+                    // 使用默认提示词
+                    promptTemplate = 
+                        "殖民者{0}的记忆总结\n\n" +
+                        "记忆列表\n" +
+                        "{1}\n\n" +
+                        "要求提炼地点人物事件\n" +
+                        "相似事件合并标注频率\n" +
+                        "极简表达不超过80字\n" +
+                        "只输出总结文字不要其他格式";
+                }
             }
             
-            return sb.ToString();
+            // 替换占位符
+            string result = string.Format(promptTemplate, pawn.LabelShort, memoryList);
+            
+            return result;
         }
 
         /// <summary>
@@ -613,7 +635,8 @@ namespace RimTalk.Memory.AI
                 sb.Append("}],");
                 sb.Append("\"generationConfig\":{");
                 sb.Append("\"temperature\":0.7,");
-                sb.Append("\"maxOutputTokens\":4096");
+                int maxTokens = settings != null ? settings.summaryMaxTokens : 200;
+                sb.Append($"\"maxOutputTokens\":{maxTokens}");
                 
                 if (model.Contains("flash"))
                 {
@@ -670,7 +693,9 @@ namespace RimTalk.Memory.AI
                 sb.Append("}],");
                 
                 sb.Append("\"temperature\":0.7,");
-                sb.Append("\"max_tokens\":4096");
+                int maxTokens = settings != null ? settings.summaryMaxTokens : 200;
+                sb.Append($"\"max_tokens\":{maxTokens}");
+
                 
                 if (enableCaching && provider == "DeepSeek")
                 {
