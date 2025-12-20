@@ -149,12 +149,18 @@ namespace RimTalk.Memory
 
         public void DailySummarization()
         {
-            if (situationalMemories.Count == 0) return;
+            // ⭐ 修复：同时检查ABM和SCM是否有内容
+            if (activeMemories.Count == 0 && situationalMemories.Count == 0) return;
 
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
-            var byType = situationalMemories.GroupBy(m => m.type);
+            // ⭐ 修复：合并ABM和SCM作为总结池
+            var allMemoriesToSummarize = new List<MemoryEntry>();
+            allMemoriesToSummarize.AddRange(activeMemories);
+            allMemoriesToSummarize.AddRange(situationalMemories);
+
+            var byType = allMemoriesToSummarize.GroupBy(m => m.type);
             
             foreach (var typeGroup in byType)
             {
@@ -196,7 +202,10 @@ namespace RimTalk.Memory
                 eventLogMemories.Insert(0, summaryEntry);
             }
 
-            // ⭐ 修复：保留固定的和用户编辑的记忆
+            // ⭐ 修复：清空ABM（总结后不再需要保留）
+            activeMemories.Clear();
+            
+            // ⭐ 修复：保留固定的和用户编辑的SCM记忆
             int beforeCount = situationalMemories.Count;
             situationalMemories.RemoveAll(m => !m.isPinned && !m.isUserEdited);
             int removedCount = beforeCount - situationalMemories.Count;
@@ -204,7 +213,7 @@ namespace RimTalk.Memory
             if (Prefs.DevMode && removedCount > 0)
             {
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} daily summarization: " +
-                           $"removed {removedCount} SCM, kept {situationalMemories.Count} pinned/edited");
+                           $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned/edited");
             }
             
             TrimEventLog();
@@ -212,13 +221,18 @@ namespace RimTalk.Memory
 
         public void ManualSummarization()
         {
-            // 手动总结：与DailySummarization相同，也使用AI（如果启用）
-            if (situationalMemories.Count == 0) return;
+            // ⭐ 修复：同时检查ABM和SCM是否有内容
+            if (activeMemories.Count == 0 && situationalMemories.Count == 0) return;
 
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
-            var byType = situationalMemories.GroupBy(m => m.type);
+            // ⭐ 修复：合并ABM和SCM作为总结池
+            var allMemoriesToSummarize = new List<MemoryEntry>();
+            allMemoriesToSummarize.AddRange(activeMemories);
+            allMemoriesToSummarize.AddRange(situationalMemories);
+
+            var byType = allMemoriesToSummarize.GroupBy(m => m.type);
             
             foreach (var typeGroup in byType)
             {
@@ -261,7 +275,10 @@ namespace RimTalk.Memory
                 eventLogMemories.Insert(0, summaryEntry);
             }
 
-            // ⭐ 修复：保留固定的和用户编辑的记忆
+            // ⭐ 修复：清空ABM（总结后不再需要保留）
+            activeMemories.Clear();
+            
+            // ⭐ 修复：保留固定的和用户编辑的SCM记忆
             int beforeCount = situationalMemories.Count;
             situationalMemories.RemoveAll(m => !m.isPinned && !m.isUserEdited);
             int removedCount = beforeCount - situationalMemories.Count;
@@ -269,7 +286,7 @@ namespace RimTalk.Memory
             if (Prefs.DevMode && removedCount > 0)
             {
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} manual summarization: " +
-                           $"removed {removedCount} SCM, kept {situationalMemories.Count} pinned/edited");
+                           $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned/edited");
             }
             
             TrimEventLog();

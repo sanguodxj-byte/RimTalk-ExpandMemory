@@ -288,16 +288,16 @@ namespace RimTalk.Memory.UI
             
             float checkboxHeight = 24f;
             
-            // ABM
+            // ABM - ⭐ 带右键菜单
             Rect abmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
             Color abmColor = new Color(0.3f, 0.8f, 1f); // Cyan
-            DrawColoredCheckbox(abmRect, "RimTalk_MindStream_ABM".Translate(), ref showABM, abmColor, null);
+            DrawColoredCheckbox(abmRect, "RimTalk_MindStream_ABM".Translate(), ref showABM, abmColor, MemoryLayer.Active);
             y += checkboxHeight + 2f;
             
-            // SCM
+            // SCM - ⭐ 带右键菜单
             Rect scmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
             Color scmColor = new Color(0.3f, 1f, 0.5f); // Green
-            DrawColoredCheckbox(scmRect, "RimTalk_MindStream_SCM".Translate(), ref showSCM, scmColor, null);
+            DrawColoredCheckbox(scmRect, "RimTalk_MindStream_SCM".Translate(), ref showSCM, scmColor, MemoryLayer.Situational);
             y += checkboxHeight + 2f;
             
             // ELS - ⭐ 带右键菜单
@@ -417,17 +417,42 @@ namespace RimTalk.Memory.UI
             var targetMemories = hasSelection ? selectedMemories.ToList() : GetFilteredMemories();
             int targetCount = targetMemories.Count;
             
-            // Summarize Selected/All (SCM -> ELS)
+            // ⭐ 修复：总结按钮现在支持 ABM + SCM
+            int abmCount = targetMemories.Count(m => m.layer == MemoryLayer.Active);
             int scmCount = targetMemories.Count(m => m.layer == MemoryLayer.Situational);
-            GUI.enabled = scmCount > 0;
+            int summarizableCount = abmCount + scmCount;
+            
+            GUI.enabled = summarizableCount > 0;
             string summarizeLabel;
             if (hasSelection)
             {
-                summarizeLabel = "RimTalk_MindStream_SummarizeN".Translate(targetCount).ToString();
+                if (abmCount > 0 && scmCount > 0)
+                {
+                    summarizeLabel = $"总结选中 (ABM:{abmCount} + SCM:{scmCount})";
+                }
+                else if (abmCount > 0)
+                {
+                    summarizeLabel = $"总结选中 (ABM:{abmCount})";
+                }
+                else
+                {
+                    summarizeLabel = $"总结选中 (SCM:{scmCount})";
+                }
             }
             else
             {
-                summarizeLabel = $"总结全部 ({scmCount})";
+                if (abmCount > 0 && scmCount > 0)
+                {
+                    summarizeLabel = $"总结全部 (ABM:{abmCount} + SCM:{scmCount})";
+                }
+                else if (abmCount > 0)
+                {
+                    summarizeLabel = $"总结全部 (ABM:{abmCount})";
+                }
+                else
+                {
+                    summarizeLabel = $"总结全部 (SCM:{scmCount})";
+                }
             }
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), summarizeLabel))
             {
@@ -862,31 +887,60 @@ namespace RimTalk.Memory.UI
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
             
-            // ⭐ 修复：排除固定的和用户编辑的记忆
-            var scmMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.Situational && !m.isPinned && !m.isUserEdited)
+            // ⭐ 修复：同时收集 ABM 和 SCM（只排除固定的记忆）
+            var abmMemories = targetMemories
+                .Where(m => m.layer == MemoryLayer.Active && !m.isPinned)
                 .ToList();
                 
-            if (scmMemories.Count == 0)
+            var scmMemories = targetMemories
+                .Where(m => m.layer == MemoryLayer.Situational && !m.isPinned)
+                .ToList();
+            
+            var allMemoriesToSummarize = new List<MemoryEntry>();
+            allMemoriesToSummarize.AddRange(abmMemories);
+            allMemoriesToSummarize.AddRange(scmMemories);
+                
+            if (allMemoriesToSummarize.Count == 0)
             {
-                Messages.Message("RimTalk_MindStream_NoSCMSelected".Translate(), MessageTypeDefOf.RejectInput, false);
+                Messages.Message("没有可总结的记忆（ABM或SCM）", MessageTypeDefOf.RejectInput, false);
                 return;
             }
             
+            string confirmMessage;
+            if (abmMemories.Count > 0 && scmMemories.Count > 0)
+            {
+                confirmMessage = $"确定要总结 {abmMemories.Count} 条ABM记忆和 {scmMemories.Count} 条SCM记忆吗？";
+            }
+            else if (abmMemories.Count > 0)
+            {
+                confirmMessage = $"确定要总结 {abmMemories.Count} 条ABM记忆吗？";
+            }
+            else
+            {
+                confirmMessage = $"确定要总结 {scmMemories.Count} 条SCM记忆吗？";
+            }
+            
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                "RimTalk_MindStream_SummarizeConfirm".Translate(scmMemories.Count),
+                confirmMessage,
                 delegate
                 {
                     AggregateMemories(
-                        scmMemories,
+                        allMemoriesToSummarize,
                         MemoryLayer.EventLog,
                         currentMemoryComp.SituationalMemories,
                         currentMemoryComp.EventLogMemories,
                         "daily_summary"
                     );
                     
+                    // ⭐ 总结后清空ABM（因为已经总结过了）
+                    foreach (var abm in abmMemories)
+                    {
+                        currentMemoryComp.ActiveMemories.Remove(abm);
+                    }
+                    
                     selectedMemories.Clear();
-                    Messages.Message("RimTalk_MindStream_SummarizedN".Translate(scmMemories.Count), MessageTypeDefOf.PositiveEvent, false);
+                    Messages.Message($"已总结 {allMemoriesToSummarize.Count} 条记忆（ABM:{abmMemories.Count} + SCM:{scmMemories.Count}）", 
+                        MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
         }

@@ -166,6 +166,16 @@ namespace RimTalk.Memory.UI
             // 根据目标层级添加到相应的记忆列表
             switch (targetLayer)
             {
+                case MemoryLayer.Active:
+                    memoryComp.ActiveMemories.Insert(0, newMemory);
+                    Messages.Message($"已添加到 {pawn.LabelShort} 的ABM", MessageTypeDefOf.TaskCompletion);
+                    break;
+                    
+                case MemoryLayer.Situational:
+                    memoryComp.SituationalMemories.Insert(0, newMemory);
+                    Messages.Message($"已添加到 {pawn.LabelShort} 的SCM", MessageTypeDefOf.TaskCompletion);
+                    break;
+                    
                 case MemoryLayer.EventLog:
                     memoryComp.EventLogMemories.Insert(0, newMemory);
                     Messages.Message("RimTalk_Memory_AddedToELS".Translate(pawn.LabelShort), MessageTypeDefOf.TaskCompletion);
@@ -186,6 +196,10 @@ namespace RimTalk.Memory.UI
         {
             switch (layer)
             {
+                case MemoryLayer.Active:
+                    return "ABM";
+                case MemoryLayer.Situational:
+                    return "SCM";
                 case MemoryLayer.EventLog:
                     return "RimTalk_Layer_ELS".Translate();
                 case MemoryLayer.Archive:
