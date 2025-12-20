@@ -790,7 +790,21 @@ namespace RimTalk.Memory.AI
                     using (var streamReader = new System.IO.StreamReader(response.GetResponseStream()))
                     {
                         string responseText = await streamReader.ReadToEndAsync();
+                        
+                        // ? v3.3.7: 添加响应接收确认日志
+                        Log.Message($"[AI Summarizer] ✅ Response received, length: {responseText.Length} chars");
+                        
                         string result = ParseResponse(responseText);
+                        
+                        // ? v3.3.7: 添加解析结果确认日志
+                        if (result != null)
+                        {
+                            Log.Message($"[AI Summarizer] ✅ Parse successful, result length: {result.Length} chars");
+                        }
+                        else
+                        {
+                            Log.Warning($"[AI Summarizer] ⚠️ Parse returned null!");
+                        }
                         
                         if (attempt > 1)
                         {
@@ -894,6 +908,9 @@ namespace RimTalk.Memory.AI
         /// </summary>
         private static string ParseResponse(string responseText)
         {
+            // ? v3.3.7: 方法入口日志（确保方法被调用）
+            Log.Message($"[AI Summarizer] 🔍 ParseResponse called, provider={provider}");
+            
             try
             {
                 // ? 调试日志：输出完整响应
