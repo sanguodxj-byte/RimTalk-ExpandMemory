@@ -221,6 +221,9 @@ namespace RimTalk.Memory
         {
             Scribe_Collections.Look(ref entries, "commonKnowledge", LookMode.Deep);
 
+            // ⭐ 序列化扩展属性（允许被提取、允许被匹配）
+            ExtendedKnowledgeEntry.ExposeData();
+
             // 保存向量数据
             if (Scribe.mode == LoadSaveMode.Saving)
             {

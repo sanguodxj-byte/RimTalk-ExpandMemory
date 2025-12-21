@@ -84,32 +84,32 @@ namespace RimTalk.Memory
 
         public static void ExposeData()
         {
+            List<string> keys = null;
+            List<bool> canBeExtractedList = null;
+            List<bool> canBeMatchedList = null;
+
             if (Scribe.mode == LoadSaveMode.Saving)
             {
-                var keys = new List<string>(extendedProps.Keys);
-                var canBeExtractedList = new List<bool>();
-                var canBeMatchedList = new List<bool>();
+                // 保存时：从字典中提取数据
+                keys = new List<string>(extendedProps.Keys);
+                canBeExtractedList = new List<bool>();
+                canBeMatchedList = new List<bool>();
 
                 foreach (var key in keys)
                 {
                     canBeExtractedList.Add(extendedProps[key].canBeExtracted);
                     canBeMatchedList.Add(extendedProps[key].canBeMatched);
                 }
-
-                Scribe_Collections.Look(ref keys, "extendedKnowledgeKeys", LookMode.Value);
-                Scribe_Collections.Look(ref canBeExtractedList, "canBeExtractedList", LookMode.Value);
-                Scribe_Collections.Look(ref canBeMatchedList, "canBeMatchedList", LookMode.Value);
             }
-            else if (Scribe.mode == LoadSaveMode.LoadingVars)
+
+            // 序列化（保存和加载都会执行）
+            Scribe_Collections.Look(ref keys, "extendedKnowledgeKeys", LookMode.Value);
+            Scribe_Collections.Look(ref canBeExtractedList, "canBeExtractedList", LookMode.Value);
+            Scribe_Collections.Look(ref canBeMatchedList, "canBeMatchedList", LookMode.Value);
+
+            if (Scribe.mode == LoadSaveMode.LoadingVars || Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                var keys = new List<string>();
-                var canBeExtractedList = new List<bool>();
-                var canBeMatchedList = new List<bool>();
-
-                Scribe_Collections.Look(ref keys, "extendedKnowledgeKeys", LookMode.Value);
-                Scribe_Collections.Look(ref canBeExtractedList, "canBeExtractedList", LookMode.Value);
-                Scribe_Collections.Look(ref canBeMatchedList, "canBeMatchedList", LookMode.Value);
-
+                // 加载时：恢复到字典中
                 if (keys != null && canBeExtractedList != null && canBeMatchedList != null)
                 {
                     extendedProps.Clear();
@@ -121,6 +121,8 @@ namespace RimTalk.Memory
                             canBeMatched = canBeMatchedList[i]
                         };
                     }
+                    
+                    Log.Message($"[RimTalk-ExpandMemory] Loaded extended properties for {keys.Count} knowledge entries");
                 }
             }
         }
