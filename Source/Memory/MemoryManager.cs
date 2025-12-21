@@ -30,7 +30,7 @@ namespace RimTalk.Memory
         
         // ⭐ 冷启动缓冲：本次会话开始时间（不保存）
         private int sessionStartTick = -1;
-        private const int COLD_START_DELAY = 1000; // 启动后延迟1000 ticks (约16秒) 再开始运作
+        private const int COLD_START_DELAY = 200; // 启动后延迟200 ticks (约3秒) 再开始运作
 
         // ⭐ 总结队列（延迟处理）
         private Queue<Pawn> summarizationQueue = new Queue<Pawn>();
