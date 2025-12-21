@@ -29,8 +29,9 @@ namespace RimTalk.Memory
         private int lastArchiveDay = -1;        // 上次CLPA归档的日期
         
         // ⭐ v3.3.2.37: 首次加载保护 - 记录加载时的游戏天数
-        private int firstLoadProtectionDay = -1; // -1表示未启用保护
-        private const int PROTECTION_DURATION_DAYS = 1; // 保护持续1天
+        private int firstLoadProtectionDay = -1; // -1表示未启用保护 (保留用于兼容旧存档)
+        private int firstLoadProtectionTick = -1; // ⭐ v3.3.2.41: 改用Tick精确控制
+        private const int PROTECTION_DURATION_TICKS = 2500; // 保护持续1小时 (2500 ticks)
 
         // ⭐ 总结队列（延迟处理）
         private Queue<Pawn> summarizationQueue = new Queue<Pawn>();
@@ -213,24 +214,27 @@ namespace RimTalk.Memory
             
             int currentDay = GenDate.DaysPassed;
             
-            // ⭐ v3.3.2.37: 智能保护 - 检查是否在保护期内
-            if (firstLoadProtectionDay >= 0)
+            // ⭐ v3.3.2.41: 智能保护 - 检查是否在保护期内 (1小时)
+            if (firstLoadProtectionTick >= 0)
             {
-                int daysSinceProtection = currentDay - firstLoadProtectionDay;
+                int ticksSinceProtection = Find.TickManager.TicksGame - firstLoadProtectionTick;
                 
-                if (daysSinceProtection < PROTECTION_DURATION_DAYS)
+                if (ticksSinceProtection < PROTECTION_DURATION_TICKS)
                 {
                     // 仍在保护期内，跳过自动总结
                     if (Prefs.DevMode)
                     {
-                        Log.Message($"[RimTalk Memory] ⏭️ Skipping daily summarization (protection: {daysSinceProtection}/{PROTECTION_DURATION_DAYS} days)");
+                        Log.Message($"[RimTalk Memory] ⏭️ Skipping daily summarization (protection: {ticksSinceProtection}/{PROTECTION_DURATION_TICKS} ticks)");
                     }
                     return;
                 }
                 else
                 {
                     // 保护期结束，解除保护
+                    firstLoadProtectionTick = -1;
+                    // 同时也清除旧的标志
                     firstLoadProtectionDay = -1;
+                    
                     Log.Message("[RimTalk Memory] 🔓 First load protection expired, auto-summarization resumed.");
                     Messages.Message(
                         "RimTalk记忆系统：保护模式已解除，自动总结功能已恢复正常。",
@@ -534,17 +538,17 @@ namespace RimTalk.Memory
         /// <param name="currentDay">当前游戏中的天数</param>
         private void CheckArchiveInterval(int currentDay)
         {
-            // ⭐ v3.3.2.37: 智能保护 - 检查是否在保护期内
-            if (firstLoadProtectionDay >= 0)
+            // ⭐ v3.3.2.41: 智能保护 - 检查是否在保护期内
+            if (firstLoadProtectionTick >= 0)
             {
-                int daysSinceProtection = currentDay - firstLoadProtectionDay;
+                int ticksSinceProtection = Find.TickManager.TicksGame - firstLoadProtectionTick;
                 
-                if (daysSinceProtection < PROTECTION_DURATION_DAYS)
+                if (ticksSinceProtection < PROTECTION_DURATION_TICKS)
                 {
                     // 仍在保护期内，跳过自动归档
                     if (Prefs.DevMode)
                     {
-                        Log.Message($"[RimTalk Memory] ⏭️ Skipping auto-archive (protection: {daysSinceProtection}/{PROTECTION_DURATION_DAYS} days)");
+                        Log.Message($"[RimTalk Memory] ⏭️ Skipping auto-archive (protection: {ticksSinceProtection}/{PROTECTION_DURATION_TICKS} ticks)");
                     }
                     return;
                 }
@@ -799,12 +803,20 @@ namespace RimTalk.Memory
             
             // ⭐ 添加版本标记用于兼容性检查
             int saveVersion = 0;
+            
+            // 如果是保存模式，确保写入最新版本号
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                saveVersion = 1;
+            }
+            
             Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
             
             Scribe_Values.Look(ref lastDecayTick, "lastDecayTick", 0);
             Scribe_Values.Look(ref lastSummarizationDay, "lastSummarizationDay", -1);
             Scribe_Values.Look(ref lastArchiveDay, "lastArchiveDay", -1);
-            Scribe_Values.Look(ref firstLoadProtectionDay, "firstLoadProtectionDay", -1); // ⭐ v3.3.2.38: 修复保护期不保存的问题
+            Scribe_Values.Look(ref firstLoadProtectionDay, "firstLoadProtectionDay", -1); // 保留兼容性
+            Scribe_Values.Look(ref firstLoadProtectionTick, "firstLoadProtectionTick", -1); // ⭐ v3.3.2.41: 新增Tick级保护
             Scribe_Values.Look(ref nextSummarizationTick, "nextSummarizationTick", 0);
             // ⭐ v3.3.17: 移除colonistJoinTicks序列化 - 不再需要缓存
             Scribe_Deep.Look(ref commonKnowledge, "commonKnowledge");
@@ -856,18 +868,26 @@ namespace RimTalk.Memory
                     Log.Warning($"[RimTalk Memory] ⚠️ Old save detected! Initialized lastSummarizationDay to {currentDay} to prevent immediate summarization.");
                 }
                 
-                // ⭐ v3.3.2.40: 智能保护 - 保存后开始1天保护期
+                // ⭐ v3.3.2.41: 兼容性迁移 - 如果有旧的天数保护，转换为Tick保护
+                if (firstLoadProtectionDay != -1 && firstLoadProtectionTick == -1)
+                {
+                    firstLoadProtectionTick = Find.TickManager.TicksGame;
+                    firstLoadProtectionDay = -1; // 清除旧标志
+                    Log.Message("[RimTalk Memory] Migrated protection from Day-based to Tick-based (1 hour).");
+                }
+
+                // ⭐ v3.3.2.40: 智能保护 - 保存后开始1小时保护期
                 if (isOldSave || saveVersion == 0)
                 {
-                    // 设置保护期开始日期
-                    firstLoadProtectionDay = currentDay;
-                    Log.Warning($"[RimTalk Memory] 🛡️ First load protection ENABLED for {PROTECTION_DURATION_DAYS} day(s).");
+                    // 设置保护期开始时间
+                    firstLoadProtectionTick = Find.TickManager.TicksGame;
+                    Log.Warning($"[RimTalk Memory] 🛡️ First load protection ENABLED for 1 hour ({PROTECTION_DURATION_TICKS} ticks).");
                     Log.Warning("[RimTalk Memory] 💡 Auto-archive and daily summarization will resume after protection period.");
                     Log.Warning("[RimTalk Memory] 💡 Manual summarization is still available anytime.");
                     
                     // 给用户一个友好的提示
                     Messages.Message(
-                        $"RimTalk记忆系统：检测到旧存档，已启用{PROTECTION_DURATION_DAYS}天保护模式。期间将跳过自动归档和每日总结，但手动总结仍可使用。请存档后进行读档以解除保护。",
+                        $"RimTalk记忆系统：检测到旧存档，已启用1小时保护模式。期间将跳过自动归档和每日总结，但手动总结仍可使用。保护期结束后将自动恢复正常。",
                         MessageTypeDefOf.NeutralEvent,
                         false
                     );
@@ -886,10 +906,6 @@ namespace RimTalk.Memory
             
             if (Scribe.mode == LoadSaveMode.Saving)
             {
-                // ⭐ 保存当前版本号
-                saveVersion = 1;
-                Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
-                
                 // ⭐ v3.3.2.40: 保存时 firstLoadProtectionDay 会被正常序列化
                 // 下次加载时会读取保存的值，保护期正常计数
             }
