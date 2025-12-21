@@ -46,57 +46,159 @@ namespace RimTalk.Patches
             if (!IsSignificantJob(newJob.def))
                 return;
 
-            // ⭐ 修复：使用GetReport而不是reportString，自动替换占位符
-            string content = newJob.GetReport(pawn);
-            
-            // 如果GetReport返回的内容仍然包含无意义的占位符，则尝试手动构建
-            if (content.Contains("TargetA") || content.Contains("TargetB") || content.Contains("TargetC"))
-            {
-                // 回退到手动构建
-                content = newJob.def.reportString;
-                
-                // 尝试替换占位符
-                if (newJob.targetA.HasThing && newJob.targetA.Thing != pawn)
-                {
-                    Thing targetThing = newJob.targetA.Thing;
-                    string targetName = "";
-                    
-                    // 尝试获取有意义的名称
-                    if (targetThing is Blueprint blueprint)
-                    {
-                        var entityDef = blueprint.def.entityDefToBuild;
-                        if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
-                        {
-                            targetName = entityDef.label;
-                        }
-                    }
-                    else if (targetThing is Frame frame)
-                    {
-                        var entityDef = frame.def.entityDefToBuild;
-                        if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
-                        {
-                            targetName = entityDef.label;
-                        }
-                    }
-                    else
-                    {
-                        // 其他类型的目标，使用LabelShort
-                        targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
-                    }
-                    
-                    // 替换占位符
-                    if (!string.IsNullOrEmpty(targetName) && IsValidTargetName(targetName))
-                    {
-                        // 替换常见的占位符格式
-                        content = content.Replace("TargetA", targetName);
-                        content = content.Replace("{0}", targetName);
-                        content = content.Replace("{TargetA}", targetName);
-                    }
-                }
-            }
+            // ⭐ 方案1：智能占位符检测与替换
+            string content = BuildJobDescription(newJob, pawn);
 
             float importance = GetJobImportance(newJob.def);
             memoryComp.AddMemory(content, MemoryType.Action, importance);
+        }
+        
+        /// <summary>
+        /// ⭐ 构建工作描述（智能占位符替换）
+        /// </summary>
+        private static string BuildJobDescription(Job job, Pawn pawn)
+        {
+            // 1. 先尝试使用 GetReport()（处理标准占位符）
+            string content = job.GetReport(pawn);
+            
+            // 2. 检测是否包含任何形式的占位符
+            if (ContainsPlaceholder(content))
+            {
+                // 3. 获取目标物体的真实名称
+                string targetName = GetTargetName(job, pawn);
+                
+                // 4. 如果获取到有效的目标名称，替换所有占位符
+                if (!string.IsNullOrEmpty(targetName))
+                {
+                    content = ReplaceAllPlaceholders(content, targetName);
+                }
+            }
+            
+            return content;
+        }
+        
+        /// <summary>
+        /// ⭐ 检测字符串是否包含占位符
+        /// </summary>
+        private static bool ContainsPlaceholder(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+            
+            // 检测各种占位符格式
+            var placeholderPatterns = new[]
+            {
+                @"\{0\}",                    // {0}
+                @"\{1\}",                    // {1}
+                @"\{2\}",                    // {2}
+                @"TargetA",                  // TargetA
+                @"TargetB",                  // TargetB
+                @"TargetC",                  // TargetC
+                @"\{TargetA\}",              // {TargetA}
+                @"\{TargetB\}",              // {TargetB}
+                @"\{TARGETLABEL\}",          // {TARGETLABEL}
+                @"\{TARGET_LABEL\}",         // {TARGET_LABEL}
+            };
+            
+            foreach (var pattern in placeholderPatterns)
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(text, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// ⭐ 替换所有可能的占位符格式
+        /// </summary>
+        private static string ReplaceAllPlaceholders(string text, string replacement)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(replacement))
+                return text;
+            
+            // 按优先级替换（从最具体到最通用）
+            var replacements = new[]
+            {
+                ("{TargetA}", replacement),
+                ("{TargetB}", replacement),
+                ("{TargetC}", replacement),
+                ("{TARGETLABEL}", replacement),
+                ("{TARGET_LABEL}", replacement),
+                ("TargetA", replacement),
+                ("TargetB", replacement),
+                ("TargetC", replacement),
+                ("{0}", replacement),
+                ("{1}", replacement),
+                ("{2}", replacement),
+            };
+            
+            string result = text;
+            foreach (var (placeholder, value) in replacements)
+            {
+                result = result.Replace(placeholder, value);
+            }
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// ⭐ 统一获取目标名称的逻辑
+        /// </summary>
+        private static string GetTargetName(Job job, Pawn pawn)
+        {
+            // 检查 targetA
+            if (job.targetA.HasThing && job.targetA.Thing != pawn)
+            {
+                Thing targetThing = job.targetA.Thing;
+                string targetName = "";
+                
+                // 特殊处理：蓝图
+                if (targetThing is Blueprint blueprint)
+                {
+                    var entityDef = blueprint.def.entityDefToBuild;
+                    if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                    {
+                        targetName = entityDef.label;
+                    }
+                }
+                // 特殊处理：框架
+                else if (targetThing is Frame frame)
+                {
+                    var entityDef = frame.def.entityDefToBuild;
+                    if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                    {
+                        targetName = entityDef.label;
+                    }
+                }
+                // 通用处理：使用 LabelShort
+                else
+                {
+                    targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
+                }
+                
+                // 验证名称有效性
+                if (IsValidTargetName(targetName))
+                {
+                    return targetName;
+                }
+            }
+            
+            // 如果 targetA 无效，尝试 targetB
+            if (job.targetB.HasThing && job.targetB.Thing != pawn)
+            {
+                Thing targetThing = job.targetB.Thing;
+                string targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
+                
+                if (IsValidTargetName(targetName))
+                {
+                    return targetName;
+                }
+            }
+            
+            return "";
         }
         
         /// <summary>
