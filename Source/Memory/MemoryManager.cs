@@ -804,6 +804,7 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref lastDecayTick, "lastDecayTick", 0);
             Scribe_Values.Look(ref lastSummarizationDay, "lastSummarizationDay", -1);
             Scribe_Values.Look(ref lastArchiveDay, "lastArchiveDay", -1);
+            Scribe_Values.Look(ref firstLoadProtectionDay, "firstLoadProtectionDay", -1); // ⭐ v3.3.2.38: 修复保护期不保存的问题
             Scribe_Values.Look(ref nextSummarizationTick, "nextSummarizationTick", 0);
             // ⭐ v3.3.17: 移除colonistJoinTicks序列化 - 不再需要缓存
             Scribe_Deep.Look(ref commonKnowledge, "commonKnowledge");
@@ -855,9 +856,10 @@ namespace RimTalk.Memory
                     Log.Warning($"[RimTalk Memory] ⚠️ Old save detected! Initialized lastSummarizationDay to {currentDay} to prevent immediate summarization.");
                 }
                 
-                // 如果是旧存档或版本号为0，启用智能保护（持续1天）
+                // ⭐ v3.3.2.40: 智能保护 - 保存后开始1天保护期
                 if (isOldSave || saveVersion == 0)
                 {
+                    // 设置保护期开始日期
                     firstLoadProtectionDay = currentDay;
                     Log.Warning($"[RimTalk Memory] 🛡️ First load protection ENABLED for {PROTECTION_DURATION_DAYS} day(s).");
                     Log.Warning("[RimTalk Memory] 💡 Auto-archive and daily summarization will resume after protection period.");
@@ -865,7 +867,7 @@ namespace RimTalk.Memory
                     
                     // 给用户一个友好的提示
                     Messages.Message(
-                        $"RimTalk记忆系统：检测到旧存档，已启用{PROTECTION_DURATION_DAYS}天保护模式。期间将跳过自动归档和每日总结，但手动总结仍可使用。",
+                        $"RimTalk记忆系统：检测到旧存档，已启用{PROTECTION_DURATION_DAYS}天保护模式。期间将跳过自动归档和每日总结，但手动总结仍可使用。请存档后进行读档以解除保护。",
                         MessageTypeDefOf.NeutralEvent,
                         false
                     );
@@ -887,6 +889,9 @@ namespace RimTalk.Memory
                 // ⭐ 保存当前版本号
                 saveVersion = 1;
                 Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
+                
+                // ⭐ v3.3.2.40: 保存时 firstLoadProtectionDay 会被正常序列化
+                // 下次加载时会读取保存的值，保护期正常计数
             }
         }
     }
