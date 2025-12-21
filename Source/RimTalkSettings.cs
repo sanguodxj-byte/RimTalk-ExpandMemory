@@ -126,8 +126,8 @@ namespace RimTalk.MemoryPatch
         
         // Cloud Embedding Settings
         public string embeddingApiKey = "";
-        public string embeddingApiUrl = "https://api.openai.com/v1/embeddings";
-        public string embeddingModel = "text-embedding-3-small";
+        public string embeddingApiUrl = "https://api.siliconflow.cn/v1/embeddings";
+        public string embeddingModel = "BAAI/bge-m3";
         
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
@@ -219,8 +219,8 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
             
             Scribe_Values.Look(ref embeddingApiKey, "vector_embeddingApiKey", "");
-            Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.openai.com/v1/embeddings");
-            Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "text-embedding-3-small");
+            Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.siliconflow.cn/v1/embeddings");
+            Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "BAAI/bge-m3");
 
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
