@@ -182,7 +182,11 @@ namespace RimTalk.Memory
 
         public string FormatForExport()
         {
-            return $"[{tag}|{importance:F2}]{content}";
+            // 获取扩展属性
+            bool canBeExtracted = ExtendedKnowledgeEntry.CanBeExtracted(this);
+            bool canBeMatched = ExtendedKnowledgeEntry.CanBeMatched(this);
+            
+            return $"[{tag}|{importance:F2}|{matchMode}|{canBeExtracted}|{canBeMatched}]{content}";
         }
 
         public override string ToString()
@@ -474,29 +478,72 @@ namespace RimTalk.Memory
             if (string.IsNullOrEmpty(content))
                 return null;
 
-            string tag;
+            // 解析标签部分（支持新旧格式）
+            // 旧格式: [标签|重要性]
+            // 新格式: [标签|重要性|匹配模式|允许提取|允许匹配]
+            string[] parts = tagPart.Split('|');
+            
+            string tag = parts.Length > 0 ? parts[0].Trim() : "通用";
             float importance = 0.5f;
+            KeywordMatchMode matchMode = KeywordMatchMode.Any;
+            bool canBeExtracted = false;
+            bool canBeMatched = false;
 
-            int pipeIndex = tagPart.IndexOf('|');
-            if (pipeIndex > 0)
+            // 解析重要性（第2个字段）
+            if (parts.Length > 1)
             {
-                tag = tagPart.Substring(0, pipeIndex).Trim();
-                string importanceStr = tagPart.Substring(pipeIndex + 1).Trim();
-                
+                string importanceStr = parts[1].Trim();
                 if (!float.TryParse(importanceStr, out importance))
                 {
                     importance = 0.5f;
                     Log.Warning($"[CommonKnowledge] Failed to parse importance '{importanceStr}' in line: {line.Substring(0, Math.Min(50, line.Length))}");
                 }
-                
                 importance = Math.Max(0f, Math.Min(1f, importance));
             }
-            else
+
+            // 解析匹配模式（第3个字段，新格式）
+            if (parts.Length > 2)
             {
-                tag = tagPart;
+                string matchModeStr = parts[2].Trim();
+                if (!Enum.TryParse(matchModeStr, true, out matchMode))
+                {
+                    matchMode = KeywordMatchMode.Any;
+                    Log.Warning($"[CommonKnowledge] Failed to parse matchMode '{matchModeStr}', using default 'Any'");
+                }
             }
 
-            return new CommonKnowledgeEntry(tag, content) { importance = importance };
+            // 解析允许提取（第4个字段，新格式）
+            if (parts.Length > 3)
+            {
+                string canBeExtractedStr = parts[3].Trim();
+                if (!bool.TryParse(canBeExtractedStr, out canBeExtracted))
+                {
+                    canBeExtracted = false;
+                }
+            }
+
+            // 解析允许匹配（第5个字段，新格式）
+            if (parts.Length > 4)
+            {
+                string canBeMatchedStr = parts[4].Trim();
+                if (!bool.TryParse(canBeMatchedStr, out canBeMatched))
+                {
+                    canBeMatched = false;
+                }
+            }
+
+            // 创建条目
+            var entry = new CommonKnowledgeEntry(tag, content) 
+            { 
+                importance = importance,
+                matchMode = matchMode
+            };
+
+            // 设置扩展属性
+            ExtendedKnowledgeEntry.SetCanBeExtracted(entry, canBeExtracted);
+            ExtendedKnowledgeEntry.SetCanBeMatched(entry, canBeMatched);
+
+            return entry;
         }
 
         public string ExportToText()
