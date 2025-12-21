@@ -46,44 +46,52 @@ namespace RimTalk.Patches
             if (!IsSignificantJob(newJob.def))
                 return;
 
-            // Build memory content
-            string content = newJob.def.reportString;
+            // ⭐ 修复：使用GetReport而不是reportString，自动替换占位符
+            string content = newJob.GetReport(pawn);
             
-            // Fix Bug 2: Only add target info if it's meaningful and not "TargetA"
-            if (newJob.targetA.HasThing && newJob.targetA.Thing != pawn)
+            // 如果GetReport返回的内容仍然包含无意义的占位符，则尝试手动构建
+            if (content.Contains("TargetA") || content.Contains("TargetB") || content.Contains("TargetC"))
             {
-                Thing targetThing = newJob.targetA.Thing;
-                string targetName = "";
+                // 回退到手动构建
+                content = newJob.def.reportString;
                 
-                // 尝试获取有意义的名称
-                if (targetThing is Blueprint blueprint)
+                // 尝试替换占位符
+                if (newJob.targetA.HasThing && newJob.targetA.Thing != pawn)
                 {
-                    var entityDef = blueprint.def.entityDefToBuild;
-                    if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                    Thing targetThing = newJob.targetA.Thing;
+                    string targetName = "";
+                    
+                    // 尝试获取有意义的名称
+                    if (targetThing is Blueprint blueprint)
                     {
-                        targetName = entityDef.label;
+                        var entityDef = blueprint.def.entityDefToBuild;
+                        if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                        {
+                            targetName = entityDef.label;
+                        }
                     }
-                    // ⭐ 修复：如果entityDefToBuild为空，不使用LabelShort
-                }
-                else if (targetThing is Frame frame)
-                {
-                    var entityDef = frame.def.entityDefToBuild;
-                    if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                    else if (targetThing is Frame frame)
                     {
-                        targetName = entityDef.label;
+                        var entityDef = frame.def.entityDefToBuild;
+                        if (entityDef != null && !string.IsNullOrEmpty(entityDef.label))
+                        {
+                            targetName = entityDef.label;
+                        }
                     }
-                    // ⭐ 修复：如果entityDefToBuild为空，不使用LabelShort
-                }
-                else
-                {
-                    // 其他类型的目标，使用def.label而不是LabelShort
-                    targetName = targetThing.def?.label ?? "";
-                }
-                
-                // 使用正则表达式过滤无意义的目标名称
-                if (!string.IsNullOrEmpty(targetName) && IsValidTargetName(targetName))
-                {
-                    content = content + " - " + targetName;
+                    else
+                    {
+                        // 其他类型的目标，使用LabelShort
+                        targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
+                    }
+                    
+                    // 替换占位符
+                    if (!string.IsNullOrEmpty(targetName) && IsValidTargetName(targetName))
+                    {
+                        // 替换常见的占位符格式
+                        content = content.Replace("TargetA", targetName);
+                        content = content.Replace("{0}", targetName);
+                        content = content.Replace("{TargetA}", targetName);
+                    }
                 }
             }
 
