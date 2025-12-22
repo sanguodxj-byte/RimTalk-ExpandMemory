@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using HarmonyLib;
 using Verse;
 using RimWorld;
@@ -15,7 +17,7 @@ namespace RimTalk.Memory.Patches
     [StaticConstructorOnStartup]
     public static class RimTalkPrecisePatcher
     {
-        private const string VERSION = "v3.0.SMART"; // <-- 版本标记
+        private const string VERSION = "v3.1.PROMPT_MATCH"; // <-- 版本标记
 
         static RimTalkPrecisePatcher()
         {
@@ -65,6 +67,7 @@ namespace RimTalk.Memory.Patches
         
         /// <summary>
         /// 补丁 PromptService.DecoratePrompt
+        /// ⭐ v3.1: 用 Prompt 匹配常识，然后注入到 Context
         /// </summary>
         private static bool PatchDecoratePrompt(Harmony harmony, Assembly assembly)
         {
@@ -101,41 +104,46 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// 补丁 TalkService.GenerateTalk (备用方案)
+        /// 补丁 TalkService.GenerateTalk - 已禁用
         /// </summary>
         private static bool PatchGenerateTalk(Harmony harmony, Assembly assembly)
         {
+            // 不再需要 patch GenerateTalk
+            // 所有逻辑在 DecoratePrompt_Postfix 中处理
+            Log.Message("[RimTalk Memory Patch] ⚠ GenerateTalk patch disabled (using DecoratePrompt instead)");
+            return false;
+        }
+        
+        /// <summary>
+        /// Postfix for BuildContext - 已禁用注入逻辑
+        /// ⭐ v3.1: 注入逻辑已移至 DecoratePrompt_Postfix
+        /// </summary>
+        private static void BuildContext_Postfix(ref string __result, List<Pawn> pawns)
+        {
             try
             {
-                var talkServiceType = assembly.GetType("RimTalk.Service.TalkService");
-                if (talkServiceType == null) return false;
+                if (pawns == null || pawns.Count == 0 || string.IsNullOrEmpty(__result))
+                    return;
                 
-                // GenerateTalk 方法
-                var generateTalkMethod = talkServiceType.GetMethod("GenerateTalk", 
-                    BindingFlags.Public | BindingFlags.Static);
+                Pawn mainPawn = pawns[0];
                 
-                if (generateTalkMethod == null) return false;
+                // 仅缓存上下文到API（用于预览器）
+                RimTalkMemoryAPI.CacheContext(mainPawn, __result);
                 
-                // 应用 Prefix (在方法执行前)
-                var prefixMethod = typeof(RimTalkPrecisePatcher).GetMethod(
-                    nameof(GenerateTalk_Prefix), 
-                    BindingFlags.Static | BindingFlags.NonPublic);
-                
-                harmony.Patch(generateTalkMethod, prefix: new HarmonyMethod(prefixMethod));
-                
-                Log.Message("[RimTalk Memory Patch] ✓ Patched GenerateTalk");
-                return true;
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[BuildContext_Postfix] ⚠ Skipped injection (handled by DecoratePrompt_Postfix)");
+                }
             }
             catch (Exception ex)
             {
-                Log.Warning($"[RimTalk Memory Patch] Failed to patch GenerateTalk: {ex.Message}");
-                return false;
+                Log.Warning($"[RimTalk Memory Patch] Error in BuildContext_Postfix: {ex.Message}");
             }
         }
         
         /// <summary>
-        /// Postfix for DecoratePrompt - 在装饰提示词后添加记忆
-        /// ⭐ v3.0: 使用智能注入管理器（高级评分系统）
+        /// Postfix for DecoratePrompt - 用 Prompt 匹配常识，然后注入到 Context
+        /// ⭐ v3.1: 修复匹配逻辑 - 使用 Prompt 而不是 Context 进行匹配
         /// </summary>
         private static void DecoratePrompt_Postfix(object talkRequest, List<Pawn> pawns)
         {
@@ -159,38 +167,77 @@ namespace RimTalk.Memory.Patches
                 Pawn mainPawn = pawns[0];
                 Pawn targetPawn = pawns.Count > 1 ? pawns[1] : null;
                 
-                // 缓存上下文到API（用于预览器）
-                RimTalkMemoryAPI.CacheContext(mainPawn, currentPrompt);
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[DecoratePrompt_Postfix] 🔍 Using Prompt for matching: {currentPrompt.Substring(0, Math.Min(100, currentPrompt.Length))}...");
+                }
                 
-                // ⭐ 使用智能注入管理器（新系统）
+                // ⭐ 使用 Prompt 匹配常识（而不是 Context）
                 string injectedContext = SmartInjectionManager.InjectSmartContext(
                     speaker: mainPawn,
                     listener: targetPawn,
-                    context: currentPrompt,
+                    context: currentPrompt,  // ⬅️ 使用 Prompt 进行匹配
                     maxMemories: RimTalkMemoryPatchMod.Settings.maxInjectedMemories,
                     maxKnowledge: RimTalkMemoryPatchMod.Settings.maxInjectedKnowledge
                 );
                 
-                // ⭐ v3.0: 主动记忆召回（实验性功能）
+                // ⭐ 主动记忆召回
                 string proactiveRecall = ProactiveMemoryRecall.TryRecallMemory(mainPawn, currentPrompt, targetPawn);
                 
                 // 合并注入内容
-                string enhancedPrompt = currentPrompt;
-                
+                StringBuilder finalInjection = new StringBuilder();
                 if (!string.IsNullOrEmpty(injectedContext))
                 {
-                    enhancedPrompt += "\n\n" + injectedContext;
+                    finalInjection.Append(injectedContext);
                 }
-                
                 if (!string.IsNullOrEmpty(proactiveRecall))
                 {
-                    enhancedPrompt += "\n\n" + proactiveRecall;
+                    if (finalInjection.Length > 0)
+                        finalInjection.Append("\n\n");
+                    finalInjection.Append(proactiveRecall);
                 }
                 
-                // 更新提示词
-                if (enhancedPrompt != currentPrompt)
+                // ⭐ 注入到 Context（通过 AIService）
+                if (finalInjection.Length > 0)
                 {
-                    promptProperty.SetValue(talkRequest, enhancedPrompt);
+                    try
+                    {
+                        // 通过反射获取 AIService
+                        var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                            .FirstOrDefault(a => a.GetName().Name == "RimTalk");
+                        
+                        if (rimTalkAssembly != null)
+                        {
+                            var aiServiceType = rimTalkAssembly.GetType("RimTalk.Service.AIService");
+                            if (aiServiceType != null)
+                            {
+                                // 获取当前 Context
+                                var getContextMethod = aiServiceType.GetMethod("GetContext", 
+                                    BindingFlags.Public | BindingFlags.Static);
+                                string currentContext = getContextMethod?.Invoke(null, null) as string;
+                                
+                                if (!string.IsNullOrEmpty(currentContext))
+                                {
+                                    // 追加注入内容到 Context
+                                    string enhancedContext = currentContext + "\n\n" + finalInjection.ToString();
+                                    
+                                    // 更新 Context
+                                    var updateContextMethod = aiServiceType.GetMethod("UpdateContext", 
+                                        BindingFlags.Public | BindingFlags.Static);
+                                    updateContextMethod?.Invoke(null, new object[] { enhancedContext });
+                                    
+                                    if (Prefs.DevMode)
+                                    {
+                                        Log.Message($"[DecoratePrompt_Postfix] ✓ Injected to Context: {finalInjection.ToString().Substring(0, Math.Min(200, finalInjection.Length))}...");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning($"[DecoratePrompt_Postfix] Failed to inject to Context: {ex.Message}");
+                    }
                 }
             }
             catch (Exception ex)
