@@ -12,6 +12,7 @@ namespace RimTalk.Memory.UI
     /// <summary>
     /// Mind Stream Timeline - Multi-Select Memory Cards
     /// ★ v3.3.19: 完全重构 - 时间线卡片布局 + 拖拽多选 + 批量操作
+    /// ★ v3.3.32: 性能优化 - GetFilteredMemories缓存机制
     /// </summary>
     public partial class MainTabWindow_Memory : MainTabWindow
     {
@@ -40,6 +41,10 @@ namespace RimTalk.Memory.UI
         private bool showSCM = true;
         private bool showELS = true;
         private bool showCLPA = true;
+        
+        // ⭐ v3.3.32: Filtered memories cache
+        private List<MemoryEntry> cachedFilteredMemories;
+        private bool filtersDirty = true;
         
         // Layout constants
         private const float TOP_BAR_HEIGHT = 50f;
@@ -220,6 +225,7 @@ namespace RimTalk.Memory.UI
                     { 
                         selectedPawn = p;
                         selectedMemories.Clear(); // Clear selection when changing pawn
+                        filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty when pawn changes
                     }));
                 }
                 Find.WindowStack.Add(new FloatMenu(options));
@@ -229,6 +235,7 @@ namespace RimTalk.Memory.UI
             if (selectedPawn == null && colonists.Count > 0)
             {
                 selectedPawn = colonists[0];
+                filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty on first selection
             }
         }
 
@@ -281,6 +288,12 @@ namespace RimTalk.Memory.UI
             
             float checkboxHeight = 24f;
             
+            // ⭐ v3.3.32: Store previous values to detect changes
+            bool prevShowABM = showABM;
+            bool prevShowSCM = showSCM;
+            bool prevShowELS = showELS;
+            bool prevShowCLPA = showCLPA;
+            
             // ABM
             Rect abmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
             Color abmColor = new Color(0.3f, 0.8f, 1f); // Cyan
@@ -304,6 +317,12 @@ namespace RimTalk.Memory.UI
             Color clpaColor = new Color(0.8f, 0.4f, 1f); // Purple
             DrawColoredCheckbox(clpaRect, "RimTalk_MindStream_CLPA".Translate(), ref showCLPA, clpaColor, MemoryLayer.Archive);
             y += checkboxHeight;
+            
+            // ⭐ v3.3.32: Mark cache dirty if any filter changed
+            if (showABM != prevShowABM || showSCM != prevShowSCM || showELS != prevShowELS || showCLPA != prevShowCLPA)
+            {
+                filtersDirty = true;
+            }
             
             return y;
         }
@@ -358,8 +377,12 @@ namespace RimTalk.Memory.UI
                 GUI.color = new Color(0.5f, 0.7f, 1f);
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_All".Translate()))
             {
-                filterType = null;
-                selectedMemories.Clear();
+                if (filterType != null) // ⭐ v3.3.32: Only mark dirty if actually changed
+                {
+                    filterType = null;
+                    selectedMemories.Clear();
+                    filtersDirty = true;
+                }
             }
             GUI.color = Color.white;
             y += buttonHeight + spacing;
@@ -370,8 +393,12 @@ namespace RimTalk.Memory.UI
                 GUI.color = new Color(0.5f, 0.7f, 1f);
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_Conversation".Translate()))
             {
-                filterType = MemoryType.Conversation;
-                selectedMemories.Clear();
+                if (filterType != MemoryType.Conversation) // ⭐ v3.3.32: Only mark dirty if actually changed
+                {
+                    filterType = MemoryType.Conversation;
+                    selectedMemories.Clear();
+                    filtersDirty = true;
+                }
             }
             GUI.color = Color.white;
             y += buttonHeight + spacing;
@@ -382,8 +409,12 @@ namespace RimTalk.Memory.UI
                 GUI.color = new Color(0.5f, 0.7f, 1f);
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_Action".Translate()))
             {
-                filterType = MemoryType.Action;
-                selectedMemories.Clear();
+                if (filterType != MemoryType.Action) // ⭐ v3.3.32: Only mark dirty if actually changed
+                {
+                    filterType = MemoryType.Action;
+                    selectedMemories.Clear();
+                    filtersDirty = true;
+                }
             }
             GUI.color = Color.white;
             y += buttonHeight;
@@ -642,6 +673,7 @@ namespace RimTalk.Memory.UI
                 {
                     currentMemoryComp.PinMemory(memory.id, memory.isPinned);
                 }
+                // ⭐ v3.3.32: No need to mark dirty for pin/unpin as it doesn't affect filtering
                 clickedOnButton = true;
                 Event.current.Use();
             }
@@ -659,6 +691,9 @@ namespace RimTalk.Memory.UI
                 if (currentMemoryComp != null)
                 {
                     Find.WindowStack.Add(new Dialog_EditMemory(memory, currentMemoryComp));
+                    // ⭐ v3.3.32: Mark dirty when opening edit dialog
+                    // User might change layer or type which affects filtering
+                    filtersDirty = true;
                 }
                 clickedOnButton = true;
                 Event.current.Use();
@@ -879,6 +914,7 @@ namespace RimTalk.Memory.UI
                     );
                     
                     selectedMemories.Clear();
+                    filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty after modifying memories
                     Messages.Message("RimTalk_MindStream_SummarizedN".Translate(scmMemories.Count), MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
@@ -913,6 +949,7 @@ namespace RimTalk.Memory.UI
                     );
                     
                     selectedMemories.Clear();
+                    filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty after modifying memories
                     Messages.Message("RimTalk_MindStream_ArchivedN".Translate(elsMemories.Count), MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
@@ -935,6 +972,7 @@ namespace RimTalk.Memory.UI
                     }
                     
                     selectedMemories.Clear();
+                    filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty after modifying memories
                     Messages.Message("RimTalk_MindStream_DeletedN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
@@ -988,10 +1026,32 @@ namespace RimTalk.Memory.UI
 
         // ==================== Helper Methods ====================
         
+        /// <summary>
+        /// ⭐ v3.3.32: Get filtered memories with caching
+        /// Returns cached list if available, otherwise rebuilds cache
+        /// </summary>
         private List<MemoryEntry> GetFilteredMemories()
         {
+            if (filtersDirty || cachedFilteredMemories == null)
+            {
+                RebuildFilteredMemories();
+                filtersDirty = false;
+            }
+            
+            return cachedFilteredMemories;
+        }
+        
+        /// <summary>
+        /// ⭐ v3.3.32: Rebuild filtered memories cache
+        /// This is the original GetFilteredMemories logic
+        /// </summary>
+        private void RebuildFilteredMemories()
+        {
             if (currentMemoryComp == null)
-                return new List<MemoryEntry>();
+            {
+                cachedFilteredMemories = new List<MemoryEntry>();
+                return;
+            }
             
             var memories = new List<MemoryEntry>();
             
@@ -1016,9 +1076,7 @@ namespace RimTalk.Memory.UI
             }
             
             // Sort by timestamp (newest first)
-            memories = memories.OrderByDescending(m => m.timestamp).ToList();
-            
-            return memories;
+            cachedFilteredMemories = memories.OrderByDescending(m => m.timestamp).ToList();
         }
         
         private float GetCardHeight(MemoryLayer layer)
@@ -1361,6 +1419,8 @@ namespace RimTalk.Memory.UI
                                     break;
                             }
                         }
+                        
+                        filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty after importing memories
                         
                         Messages.Message("RimTalk_Memory_ImportSuccess".Translate(imported, importedMemories.Count), 
                             MessageTypeDefOf.PositiveEvent, false);

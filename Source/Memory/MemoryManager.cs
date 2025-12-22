@@ -554,12 +554,18 @@ namespace RimTalk.Memory
                         // 创建归档摘要（简单版本）
                         string archiveSummary = CreateArchiveSummary(memories, typeGroup.Key);
                         
+                        // ⭐ 修复：使用被归档记忆中最早的timestamp作为归档entry的时间戳
+                        int earliestTimestamp = memories.Min(m => m.timestamp);
+                        
                         var archiveEntry = new MemoryEntry(
                             content: archiveSummary,
                             type: typeGroup.Key,
                             layer: MemoryLayer.Archive,
                             importance: memories.Average(m => m.importance) + 0.3f // CLPA 记忆重要性更高
                         );
+                        
+                        // ⭐ 修复：覆盖默认的timestamp
+                        archiveEntry.timestamp = earliestTimestamp;
                         
                         // 合并关键词和标签
                         archiveEntry.keywords.AddRange(memories.SelectMany(m => m.keywords).Distinct());
