@@ -188,11 +188,38 @@ namespace RimTalk.Memory.Patches
                     sb.AppendLine($"[{item.Entry.tag}|{item.Similarity:F2}] {item.Entry.content}");
                 }
 
-                // 注入到 Prompt
-                string enhancedPrompt = currentPrompt + "\n\n" + sb.ToString();
-                promptProperty.SetValue(talkRequest, enhancedPrompt);
+                // ⭐ v3.1: 注入到 Context 而不是 Prompt
+                // 通过反射调用 AIService.GetContext() 和 UpdateContext()
+                // 注意：虽然在后台线程，但 AIService 的这两个方法只是简单的静态字段操作，是安全的
+                
+                var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => a.GetName().Name == "RimTalk");
+                
+                if (rimTalkAssembly == null)
+                {
+                    Log.Warning("[RimTalk Memory] RimTalk assembly not found for context injection");
+                    return;
+                }
 
-                Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries into prompt (excluded {keywordMatchedIds.Count} keyword-matched entries)");
+                var aiServiceType = rimTalkAssembly.GetType("RimTalk.Service.AIService");
+                if (aiServiceType != null)
+                {
+                    // ⭐ 直接访问私有字段 _instruction，避开 UpdateContext 中的 Logger.Debug
+                    // Logger.Debug 可能会在后台线程访问游戏状态导致报错
+                    var instructionField = aiServiceType.GetField("_instruction", BindingFlags.NonPublic | BindingFlags.Static);
+                    
+                    if (instructionField != null)
+                    {
+                        string currentContext = instructionField.GetValue(null) as string;
+                        if (!string.IsNullOrEmpty(currentContext))
+                        {
+                            string enhancedContext = currentContext + "\n\n" + sb.ToString();
+                            instructionField.SetValue(null, enhancedContext);
+                            
+                            Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries into Context (excluded {keywordMatchedIds.Count} keyword-matched entries)");
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
