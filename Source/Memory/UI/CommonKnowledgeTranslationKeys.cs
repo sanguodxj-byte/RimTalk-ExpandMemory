@@ -3,12 +3,12 @@ using System;
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// ³£Ê¶¿â·­Òë¼ü³£Á¿ - ¼¯ÖĞ¹ÜÀíËùÓĞUIÎÄ±¾µÄ·­Òë¼ü
-    /// ¡ï v3.3.19: ²ğ·Ö´úÂë - ·ÖÀë·­Òë¼üÓëUIÂß¼­
+    /// å¸¸è¯†åº“ç¿»è¯‘é”®å¸¸é‡ - é›†ä¸­ç®¡ç†æ‰€æœ‰UIæ–‡æœ¬çš„ç¿»è¯‘é”®
+    /// â˜… v3.3.19: æ‹†åˆ†ä»£ç  - åˆ†ç¦»ç¿»è¯‘é”®ä¸UIé€»è¾‘
     /// </summary>
     public static class CommonKnowledgeTranslationKeys
     {
-        // ==================== ·ÖÀàÏà¹Ø ====================
+        // ==================== åˆ†ç±»ç›¸å…³ ====================
         public const string Categories = "RimTalk_Knowledge_Categories";
         public const string CategoryAll = "RimTalk_Knowledge_CategoryAll";
         public const string CategoryInstructions = "RimTalk_Knowledge_CategoryInstructions";
@@ -18,7 +18,7 @@ namespace RimTalk.Memory.UI
         public const string CategoryOther = "RimTalk_Knowledge_CategoryOther";
         public const string CategoryUnknown = "RimTalk_Knowledge_CategoryUnknown";
         
-        // ==================== ¹¤¾ßÀ¸°´Å¥ ====================
+        // ==================== å·¥å…·æ æŒ‰é’® ====================
         public const string New = "RimTalk_Knowledge_New";
         public const string Import = "RimTalk_Knowledge_Import";
         public const string Export = "RimTalk_Knowledge_Export";
@@ -27,13 +27,13 @@ namespace RimTalk.Memory.UI
         public const string DeleteCount = "RimTalk_Knowledge_DeleteCount";
         public const string ClearAll = "RimTalk_Knowledge_ClearAll";
         
-        // ==================== Í³¼ÆĞÅÏ¢ ====================
+        // ==================== ç»Ÿè®¡ä¿¡æ¯ ====================
         public const string Total = "RimTalk_Knowledge_Total";
         public const string Enabled = "RimTalk_Knowledge_Enabled";
         public const string Selected = "RimTalk_Knowledge_Selected";
         public const string Showing = "RimTalk_Knowledge_Showing";
         
-        // ==================== ×Ô¶¯Éú³É ====================
+        // ==================== è‡ªåŠ¨ç”Ÿæˆ ====================
         public const string AutoGenerate = "RimTalk_Knowledge_AutoGenerate";
         public const string PawnStatus = "RimTalk_Knowledge_PawnStatus";
         public const string EventRecord = "RimTalk_Knowledge_EventRecord";
@@ -43,7 +43,7 @@ namespace RimTalk.Memory.UI
         public const string NoColonists = "RimTalk_Knowledge_NoColonists";
         public const string GenerationFailed = "RimTalk_Knowledge_GenerationFailed";
         
-        // ==================== ÏêÇéÃæ°å ====================
+        // ==================== è¯¦æƒ…é¢æ¿ ====================
         public const string Details = "RimTalk_Knowledge_Details";
         public const string Edit = "RimTalk_Knowledge_Edit";
         public const string Tag = "RimTalk_Knowledge_Tag";
@@ -55,7 +55,7 @@ namespace RimTalk.Memory.UI
         public const string Content = "RimTalk_Knowledge_Content";
         public const string Delete = "RimTalk_Knowledge_Delete";
         
-        // ==================== ¿É¼ûĞÔÑ¡Ïî ====================
+        // ==================== å¯è§æ€§é€‰é¡¹ ====================
         public const string Global = "RimTalk_Knowledge_Global";
         public const string GlobalAll = "RimTalk_Knowledge_GlobalAll";
         public const string ExclusiveTo = "RimTalk_Knowledge_ExclusiveTo";
@@ -63,13 +63,13 @@ namespace RimTalk.Memory.UI
         public const string VisibilityExclusive = "RimTalk_Knowledge_VisibilityExclusive";
         public const string VisibilityDeleted = "RimTalk_Knowledge_VisibilityDeleted";
         
-        // ==================== ±à¼­Ãæ°å ====================
+        // ==================== ç¼–è¾‘é¢æ¿ ====================
         public const string NewEntry = "RimTalk_Knowledge_NewEntry";
         public const string EditEntry = "RimTalk_Knowledge_EditEntry";
         public const string Save = "RimTalk_Knowledge_Save";
         public const string Cancel = "RimTalk_Knowledge_Cancel";
         
-        // ==================== ¶àÑ¡²Ù×÷ ====================
+        // ==================== å¤šé€‰æ“ä½œ ====================
         public const string ItemsSelected = "RimTalk_Knowledge_ItemsSelected";
         public const string EnabledCount = "RimTalk_Knowledge_EnabledCount";
         public const string DisabledCount = "RimTalk_Knowledge_DisabledCount";
@@ -79,26 +79,26 @@ namespace RimTalk.Memory.UI
         public const string ExportItems = "RimTalk_Knowledge_ExportItems";
         public const string DeleteItems = "RimTalk_Knowledge_DeleteItems";
         
-        // ==================== ¿Õ×´Ì¬ÌáÊ¾ ====================
+        // ==================== ç©ºçŠ¶æ€æç¤º ====================
         public const string SelectOrCreate = "RimTalk_Knowledge_SelectOrCreate";
         
-        // ==================== µ¼Èëµ¼³ö ====================
+        // ==================== å¯¼å…¥å¯¼å‡º ====================
         public const string ImportTitle = "RimTalk_Knowledge_ImportTitle";
         public const string ImportDescription = "RimTalk_Knowledge_ImportDescription";
         public const string Imported = "RimTalk_Knowledge_Imported";
         public const string ExportedToClipboard = "RimTalk_Knowledge_ExportedToClipboard";
         
-        // ==================== È·ÈÏ¶Ô»°¿ò ====================
+        // ==================== ç¡®è®¤å¯¹è¯æ¡† ====================
         public const string DeleteConfirm = "RimTalk_Knowledge_DeleteConfirm";
         public const string Deleted = "RimTalk_Knowledge_Deleted";
         public const string ClearConfirm = "RimTalk_Knowledge_ClearConfirm";
         public const string AllCleared = "RimTalk_Knowledge_AllCleared";
         
-        // ==================== ÑéÖ¤ÏûÏ¢ ====================
+        // ==================== éªŒè¯æ¶ˆæ¯ ====================
         public const string TagContentEmpty = "RimTalk_Knowledge_TagContentEmpty";
         public const string EntrySaved = "RimTalk_Knowledge_EntrySaved";
         
-        // ==================== Ê¹ÓÃËµÃ÷ ====================
+        // ==================== ä½¿ç”¨è¯´æ˜ ====================
         public const string Help = "RimTalk_Knowledge_Help";
         public const string HelpTitle = "RimTalk_Knowledge_HelpTitle";
         public const string HelpContent = "RimTalk_Knowledge_HelpContent";

@@ -53,6 +53,22 @@ namespace RimTalk.Memory.UI
         private const float CARD_WIDTH_FULL = 600f;
         private const float CARD_SPACING = 8f;
         
+        // ⭐ 性能优化：缓存数据
+        private List<MemoryEntry> cachedMemories = new List<MemoryEntry>();
+        private List<float> cachedCardHeights = new List<float>();
+        private List<float> cachedCardYPositions = new List<float>();
+        private float cachedTotalHeight = 0f;
+        
+        // 脏检查状态 (用于检测是否需要刷新缓存)
+        private int lastMemoryCount = -1;
+        private bool lastShowABM;
+        private bool lastShowSCM;
+        private bool lastShowELS;
+        private bool lastShowCLPA;
+        private MemoryType? lastFilterType;
+        private Pawn lastSelectedPawn;
+        private int lastRefreshTick = -1;
+        
         public override Vector2 RequestedTabSize => new Vector2(1200f, 700f);
 
         // ==================== Main Layout ====================
@@ -81,6 +97,9 @@ namespace RimTalk.Memory.UI
             }
             
             currentMemoryComp = memoryComp;
+            
+            // ⭐ 在绘制任何子组件之前刷新缓存
+            CheckAndRefreshCache();
             
             // Left Control Panel
             Rect controlPanelRect = new Rect(0f, contentY, CONTROL_PANEL_WIDTH, contentHeight);
@@ -127,21 +146,28 @@ namespace RimTalk.Memory.UI
             float spacing = 5f;
             float rightX = innerRect.xMax;
             
-            // Preview button
+            // Preview button (最右侧)
             rightX -= buttonWidth;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Preview".Translate()))
             {
                 Find.WindowStack.Add(new Debug.Dialog_InjectionPreview());
             }
             
-            // ⭐ 修改：常识按钮移到更右侧（原来操作指南的位置）
+            // ⭐ 新增：总结提示词按钮
+            rightX -= buttonWidth + spacing;
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "总结提示词"))
+            {
+                Find.WindowStack.Add(new Dialog_PromptEditor());
+            }
+            
+            // 常识按钮
             rightX -= buttonWidth + spacing;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_Knowledge".Translate()))
             {
                 OpenCommonKnowledgeDialog();
             }
 
-            // ⭐ 修改：操作指南按钮移到左侧（原来常识的位置）
+            // 操作指南按钮
             rightX -= buttonWidth + spacing;
             if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_OperationGuide".Translate()))
             {
@@ -297,13 +323,13 @@ namespace RimTalk.Memory.UI
             // ABM
             Rect abmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
             Color abmColor = new Color(0.3f, 0.8f, 1f); // Cyan
-            DrawColoredCheckbox(abmRect, "RimTalk_MindStream_ABM".Translate(), ref showABM, abmColor, null);
+            DrawColoredCheckbox(abmRect, "RimTalk_MindStream_ABM".Translate(), ref showABM, abmColor, MemoryLayer.Active);
             y += checkboxHeight + 2f;
             
-            // SCM
+            // SCM - ⭐ 带右键菜单
             Rect scmRect = new Rect(parentRect.x, y, parentRect.width, checkboxHeight);
             Color scmColor = new Color(0.3f, 1f, 0.5f); // Green
-            DrawColoredCheckbox(scmRect, "RimTalk_MindStream_SCM".Translate(), ref showSCM, scmColor, null);
+            DrawColoredCheckbox(scmRect, "RimTalk_MindStream_SCM".Translate(), ref showSCM, scmColor, MemoryLayer.Situational);
             y += checkboxHeight + 2f;
             
             // ELS - ⭐ 带右键菜单
@@ -438,20 +464,46 @@ namespace RimTalk.Memory.UI
             bool hasSelection = selectedMemories.Count > 0;
             
             // ⭐ 如果没有选中，则操作对象为当前页面所有可见记忆
-            var targetMemories = hasSelection ? selectedMemories.ToList() : GetFilteredMemories();
+            // 优先使用缓存的列表
+            var targetMemories = hasSelection ? selectedMemories.ToList() : cachedMemories;
             int targetCount = targetMemories.Count;
             
-            // Summarize Selected/All (SCM -> ELS)
+            // ⭐ 修复：总结按钮现在支持 ABM + SCM
+            int abmCount = targetMemories.Count(m => m.layer == MemoryLayer.Active);
             int scmCount = targetMemories.Count(m => m.layer == MemoryLayer.Situational);
-            GUI.enabled = scmCount > 0;
+            int summarizableCount = abmCount + scmCount;
+            
+            GUI.enabled = summarizableCount > 0;
             string summarizeLabel;
             if (hasSelection)
             {
-                summarizeLabel = "RimTalk_MindStream_SummarizeN".Translate(targetCount).ToString();
+                if (abmCount > 0 && scmCount > 0)
+                {
+                    summarizeLabel = $"总结选中 (ABM:{abmCount} + SCM:{scmCount})";
+                }
+                else if (abmCount > 0)
+                {
+                    summarizeLabel = $"总结选中 (ABM:{abmCount})";
+                }
+                else
+                {
+                    summarizeLabel = $"总结选中 (SCM:{scmCount})";
+                }
             }
             else
             {
-                summarizeLabel = $"总结全部 ({scmCount})";
+                if (abmCount > 0 && scmCount > 0)
+                {
+                    summarizeLabel = $"总结全部 (ABM:{abmCount} + SCM:{scmCount})";
+                }
+                else if (abmCount > 0)
+                {
+                    summarizeLabel = $"总结全部 (ABM:{abmCount})";
+                }
+                else
+                {
+                    summarizeLabel = $"总结全部 (SCM:{scmCount})";
+                }
             }
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), summarizeLabel))
             {
@@ -559,18 +611,9 @@ namespace RimTalk.Memory.UI
             Widgets.DrawMenuSection(rect);
             Rect innerRect = rect.ContractedBy(5f);
             
-            // Get filtered memories
-            var memories = GetFilteredMemories();
-            
-            // Calculate card heights
-            float totalHeight = 0f;
-            var cardHeights = new List<float>();
-            foreach (var memory in memories)
-            {
-                float height = GetCardHeight(memory.layer);
-                cardHeights.Add(height);
-                totalHeight += height + CARD_SPACING;
-            }
+            // 使用缓存的数据 (已在 DoWindowContents 中刷新)
+            var memories = cachedMemories;
+            float totalHeight = cachedTotalHeight;
             
             Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, totalHeight);
             
@@ -580,14 +623,43 @@ namespace RimTalk.Memory.UI
             // Draw timeline
             Widgets.BeginScrollView(innerRect, ref timelineScrollPosition, viewRect, true);
             
-            float y = 0f;
-            for (int i = 0; i < memories.Count; i++)
+            // ⭐ 高性能虚拟化：二分查找 + 提前退出
+            // 添加缓冲区以确保滚动平滑
+            float minVisibleY = timelineScrollPosition.y - 200f;
+            float maxVisibleY = timelineScrollPosition.y + innerRect.height + 200f;
+            
+            int startIndex = 0;
+            if (cachedCardYPositions.Count > 0)
             {
+                // 使用二分查找快速定位第一个可见元素
+                int binaryResult = cachedCardYPositions.BinarySearch(minVisibleY);
+                if (binaryResult >= 0)
+                {
+                    startIndex = binaryResult;
+                }
+                else
+                {
+                    // 如果没找到精确匹配，BinarySearch返回按位取反的下一个较大元素索引
+                    // 我们取它的前一个作为起始点
+                    startIndex = Mathf.Max(0, (~binaryResult) - 1);
+                }
+            }
+            
+            for (int i = startIndex; i < memories.Count; i++)
+            {
+                float y = cachedCardYPositions[i];
+                
+                // 优化：一旦超出可见范围，立即停止绘制
+                if (y > maxVisibleY)
+                {
+                    break;
+                }
+                
                 var memory = memories[i];
-                float height = cardHeights[i];
+                float height = cachedCardHeights[i];
+                
                 Rect cardRect = new Rect(0f, y, viewRect.width, height);
                 DrawMemoryCard(cardRect, memory);
-                y += height + CARD_SPACING;
             }
             
             // ⭐ 修复：在EndScrollView之前绘制选择框，使其在正确的坐标系中
@@ -607,6 +679,65 @@ namespace RimTalk.Memory.UI
                 Widgets.Label(statusRect, "RimTalk_MindStream_ShowingN".Translate(memories.Count));
                 GUI.color = Color.white;
                 Text.Font = GameFont.Small;
+            }
+        }
+        
+        private void CheckAndRefreshCache()
+        {
+            if (currentMemoryComp == null) return;
+            
+            // 获取当前状态
+            int currentCount = currentMemoryComp.ActiveMemories.Count + 
+                             currentMemoryComp.SituationalMemories.Count + 
+                             currentMemoryComp.EventLogMemories.Count + 
+                             currentMemoryComp.ArchiveMemories.Count;
+            
+            int currentTick = Find.TickManager.TicksGame;
+            
+            // 检查是否需要刷新
+            bool needRefresh = false;
+            
+            if (selectedPawn != lastSelectedPawn) needRefresh = true;
+            else if (currentCount != lastMemoryCount) needRefresh = true;
+            else if (showABM != lastShowABM) needRefresh = true;
+            else if (showSCM != lastShowSCM) needRefresh = true;
+            else if (showELS != lastShowELS) needRefresh = true;
+            else if (showCLPA != lastShowCLPA) needRefresh = true;
+            else if (filterType != lastFilterType) needRefresh = true;
+            else if (currentTick - lastRefreshTick > 60) needRefresh = true; // 每秒强制刷新一次以防内容变化
+            
+            if (needRefresh)
+            {
+                RefreshCache(currentCount, currentTick);
+            }
+        }
+        
+        private void RefreshCache(int currentCount, int currentTick)
+        {
+            // 更新状态记录
+            lastSelectedPawn = selectedPawn;
+            lastMemoryCount = currentCount;
+            lastShowABM = showABM;
+            lastShowSCM = showSCM;
+            lastShowELS = showELS;
+            lastShowCLPA = showCLPA;
+            lastFilterType = filterType;
+            lastRefreshTick = currentTick;
+            
+            // 重新获取过滤后的列表
+            cachedMemories = GetFilteredMemories();
+            
+            // 重新计算高度和位置
+            cachedCardHeights.Clear();
+            cachedCardYPositions.Clear();
+            cachedTotalHeight = 0f;
+            
+            foreach (var memory in cachedMemories)
+            {
+                cachedCardYPositions.Add(cachedTotalHeight);
+                float height = GetCardHeight(memory.layer);
+                cachedCardHeights.Add(height);
+                cachedTotalHeight += height + CARD_SPACING;
             }
         }
         
@@ -890,28 +1021,56 @@ namespace RimTalk.Memory.UI
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
             
-            // ⭐ 修复：排除固定的和用户编辑的记忆
-            var scmMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.Situational && !m.isPinned && !m.isUserEdited)
+            // ⭐ 修复：同时收集 ABM 和 SCM（只排除固定的记忆）
+            var abmMemories = targetMemories
+                .Where(m => m.layer == MemoryLayer.Active && !m.isPinned)
                 .ToList();
                 
-            if (scmMemories.Count == 0)
+            var scmMemories = targetMemories
+                .Where(m => m.layer == MemoryLayer.Situational && !m.isPinned)
+                .ToList();
+            
+            var allMemoriesToSummarize = new List<MemoryEntry>();
+            allMemoriesToSummarize.AddRange(abmMemories);
+            allMemoriesToSummarize.AddRange(scmMemories);
+                
+            if (allMemoriesToSummarize.Count == 0)
             {
-                Messages.Message("RimTalk_MindStream_NoSCMSelected".Translate(), MessageTypeDefOf.RejectInput, false);
+                Messages.Message("没有可总结的记忆（ABM或SCM）", MessageTypeDefOf.RejectInput, false);
                 return;
             }
             
+            string confirmMessage;
+            if (abmMemories.Count > 0 && scmMemories.Count > 0)
+            {
+                confirmMessage = $"确定要总结 {abmMemories.Count} 条ABM记忆和 {scmMemories.Count} 条SCM记忆吗？";
+            }
+            else if (abmMemories.Count > 0)
+            {
+                confirmMessage = $"确定要总结 {abmMemories.Count} 条ABM记忆吗？";
+            }
+            else
+            {
+                confirmMessage = $"确定要总结 {scmMemories.Count} 条SCM记忆吗？";
+            }
+            
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                "RimTalk_MindStream_SummarizeConfirm".Translate(scmMemories.Count),
+                confirmMessage,
                 delegate
                 {
                     AggregateMemories(
-                        scmMemories,
+                        allMemoriesToSummarize,
                         MemoryLayer.EventLog,
                         currentMemoryComp.SituationalMemories,
                         currentMemoryComp.EventLogMemories,
                         "daily_summary"
                     );
+                    
+                    // ⭐ 总结后清空ABM（因为已经总结过了）
+                    foreach (var abm in abmMemories)
+                    {
+                        currentMemoryComp.ActiveMemories.Remove(abm);
+                    }
                     
                     selectedMemories.Clear();
                     filtersDirty = true; // ⭐ v3.3.32: Mark cache dirty after modifying memories

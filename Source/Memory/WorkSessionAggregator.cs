@@ -427,8 +427,43 @@ namespace RimTalk.Memory
             if (defName.Contains("Doctor")) return "治疗";
             if (defName.Contains("Repair")) return "修理";
             
-            // 使用Job的reportString作为默认描述
-            return jobDef.reportString ?? jobDef.defName;
+            // ⭐ 修复：使用reportString但移除占位符
+            string description = jobDef.reportString ?? jobDef.defName;
+            
+            // 移除所有占位符（因为在聚合文本中不需要具体目标）
+            description = RemovePlaceholders(description);
+            
+            return description;
+        }
+        
+        /// <summary>
+        /// ⭐ 移除字符串中的所有占位符
+        /// </summary>
+        private static string RemovePlaceholders(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            
+            // 移除各种占位符格式
+            var placeholders = new[]
+            {
+                "TargetA", "TargetB", "TargetC",
+                "{0}", "{1}", "{2}",
+                "{TargetA}", "{TargetB}", "{TargetC}",
+                "{TARGETLABEL}", "{TARGET_LABEL}"
+            };
+            
+            string result = text;
+            foreach (var placeholder in placeholders)
+            {
+                result = result.Replace(placeholder, "").Trim();
+            }
+            
+            // 清理多余的空格和标点
+            result = Regex.Replace(result, @"\s+", " "); // 多个空格变成一个
+            result = result.Trim(' ', '.', '。', '-', '—');
+            
+            return result;
         }
         
         private static bool IsHighPriorityJob(JobDef jobDef)

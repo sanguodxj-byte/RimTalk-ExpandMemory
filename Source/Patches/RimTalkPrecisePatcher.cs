@@ -41,17 +41,16 @@ namespace RimTalk.Memory.Patches
                 }
                 
                 // 应用补丁（Harmony不修改原代码，只是拦截调用）
-                bool patchedBuildContext = PatchBuildContext(harmony, rimTalkAssembly);
+                // bool patchedBuildContext = PatchBuildContext(harmony, rimTalkAssembly); // 已移除：避免重复注入
                 bool patchedDecoratePrompt = PatchDecoratePrompt(harmony, rimTalkAssembly);
                 bool patchedGenerateTalk = PatchGenerateTalk(harmony, rimTalkAssembly);
                 
-                int successCount = (patchedBuildContext ? 1 : 0) + 
-                                  (patchedDecoratePrompt ? 1 : 0) + 
+                int successCount = (patchedDecoratePrompt ? 1 : 0) + 
                                   (patchedGenerateTalk ? 1 : 0);
                 
                 if (successCount > 0)
                 {
-                    Log.Message($"[RimTalk Memory Patch v{VERSION}] Successfully patched {successCount}/3 methods");
+                    Log.Message($"[RimTalk Memory Patch v{VERSION}] Successfully patched {successCount}/2 methods");
                 }
                 else
                 {
@@ -61,40 +60,6 @@ namespace RimTalk.Memory.Patches
             catch (Exception ex)
             {
                 Log.Error($"[RimTalk Memory Patch] Exception: {ex}");
-            }
-        }
-        
-        /// <summary>
-        /// 补丁 PromptService.BuildContext
-        /// </summary>
-        private static bool PatchBuildContext(Harmony harmony, Assembly assembly)
-        {
-            try
-            {
-                // RimTalk.Service.PromptService
-                var promptServiceType = assembly.GetType("RimTalk.Service.PromptService");
-                if (promptServiceType == null) return false;
-                
-                // BuildContext 方法
-                var buildContextMethod = promptServiceType.GetMethod("BuildContext", 
-                    BindingFlags.Public | BindingFlags.Static);
-                
-                if (buildContextMethod == null) return false;
-                
-                // 应用 Postfix
-                var postfixMethod = typeof(RimTalkPrecisePatcher).GetMethod(
-                    nameof(BuildContext_Postfix), 
-                    BindingFlags.Static | BindingFlags.NonPublic);
-                
-                harmony.Patch(buildContextMethod, postfix: new HarmonyMethod(postfixMethod));
-                
-                Log.Message("[RimTalk Memory Patch] ✓ Patched BuildContext");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[RimTalk Memory Patch] Failed to patch BuildContext: {ex.Message}");
-                return false;
             }
         }
         
@@ -165,53 +130,6 @@ namespace RimTalk.Memory.Patches
             {
                 Log.Warning($"[RimTalk Memory Patch] Failed to patch GenerateTalk: {ex.Message}");
                 return false;
-            }
-        }
-        
-        /// <summary>
-        /// Postfix for BuildContext - 在构建上下文后添加记忆
-        /// ⭐ v3.0: 使用智能注入管理器（高级评分系统）
-        /// </summary>
-        private static void BuildContext_Postfix(ref string __result, List<Pawn> pawns)
-        {
-            try
-            {
-                if (pawns == null || pawns.Count == 0 || string.IsNullOrEmpty(__result))
-                    return;
-                
-                Pawn mainPawn = pawns[0];
-                Pawn targetPawn = pawns.Count > 1 ? pawns[1] : null;
-                
-                // 缓存上下文到API（用于预览器）
-                RimTalkMemoryAPI.CacheContext(mainPawn, __result);
-                
-                // ⭐ 使用智能注入管理器（新系统）
-                string injectedContext = SmartInjectionManager.InjectSmartContext(
-                    speaker: mainPawn,
-                    listener: targetPawn,
-                    context: __result,
-                    maxMemories: RimTalkMemoryPatchMod.Settings.maxInjectedMemories,
-                    maxKnowledge: RimTalkMemoryPatchMod.Settings.maxInjectedKnowledge
-                );
-                
-                // ⭐ v3.0: 主动记忆召回（实验性功能）
-                string proactiveRecall = ProactiveMemoryRecall.TryRecallMemory(mainPawn, __result, targetPawn);
-                
-                // 合并注入内容
-                if (!string.IsNullOrEmpty(injectedContext))
-                {
-                    __result = __result + "\n\n" + injectedContext;
-                }
-                
-                // 如果触发主动召回，追加到末尾
-                if (!string.IsNullOrEmpty(proactiveRecall))
-                {
-                    __result = __result + "\n\n" + proactiveRecall;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[RimTalk Memory Patch] Error in BuildContext_Postfix: {ex.Message}");
             }
         }
         

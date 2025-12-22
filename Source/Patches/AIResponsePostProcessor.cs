@@ -5,23 +5,23 @@ using System.Threading;
 using HarmonyLib;
 using Verse;
 using RimTalk.Memory;
-// ? v3.3.2.25: AIDatabaseÒÑÒÆ³ı
+// ? v3.3.2.25: AIDatabaseå·²ç§»é™¤
 
 namespace RimTalk.Memory.Patches
 {
     /// <summary>
-    /// AIÏìÓ¦ºó´¦ÀíÆ÷
+    /// AIå“åº”åå¤„ç†å™¨
     /// v3.3.2.25
     /// 
-    /// ? AIDatabaseÒÑÒÆ³ı£¬½ö±£ÁôÄÚ²¿ÉÏÏÂÎÄ´æ´¢¹¦ÄÜ
+    /// ? AIDatabaseå·²ç§»é™¤ï¼Œä»…ä¿ç•™å†…éƒ¨ä¸Šä¸‹æ–‡å­˜å‚¨åŠŸèƒ½
     /// </summary>
     [StaticConstructorOnStartup]
     public static class AIResponsePostProcessor
     {
         static AIResponsePostProcessor()
         {
-            // ? v3.3.2.25: ÔİÊ±½ûÓÃ´Ë¹¦ÄÜ£¨AIDatabaseÒÑÒÆ³ı£©
-            // ±£Áô´úÂë¿ò¼Ü£¬Î´À´¿ÉÒÔÖØĞÂÆôÓÃ
+            // ? v3.3.2.25: æš‚æ—¶ç¦ç”¨æ­¤åŠŸèƒ½ï¼ˆAIDatabaseå·²ç§»é™¤ï¼‰
+            // ä¿ç•™ä»£ç æ¡†æ¶ï¼Œæœªæ¥å¯ä»¥é‡æ–°å¯ç”¨
             Log.Message("[AI Response Processor] Disabled (AIDatabase removed in v3.3.2.25)");
         }
     }

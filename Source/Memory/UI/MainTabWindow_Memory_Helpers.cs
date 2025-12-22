@@ -7,12 +7,12 @@ using Verse;
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// MainTabWindow_Memory ¸¨Öú·½·¨£¨²¿·ÖÀà£©
+    /// MainTabWindow_Memory è¾…åŠ©æ–¹æ³•ï¼ˆéƒ¨åˆ†ç±»ï¼‰
     /// </summary>
     public partial class MainTabWindow_Memory
     {
         /// <summary>
-        /// ? Í¨ÓÃ¼ÇÒä¾ÛºÏ·½·¨ - Ö§³ÖAI×Ü½á
+        /// ? é€šç”¨è®°å¿†èšåˆæ–¹æ³• - æ”¯æŒAIæ€»ç»“
         /// </summary>
         private void AggregateMemories(
             List<MemoryEntry> memories, 
@@ -27,7 +27,7 @@ namespace RimTalk.Memory.UI
             {
                 var items = typeGroup.ToList();
                 
-                // ´´½¨¾ÛºÏÌõÄ¿
+                // åˆ›å»ºèšåˆæ¡ç›®
                 var aggregated = new MemoryEntry(
                     content: targetLayer == MemoryLayer.Archive 
                         ? CreateArchiveSummary(items, typeGroup.Key)
@@ -37,16 +37,16 @@ namespace RimTalk.Memory.UI
                     importance: items.Average(m => m.importance) + (targetLayer == MemoryLayer.Archive ? 0.3f : 0.2f)
                 );
                 
-                // ºÏ²¢ÔªÊı¾İ
+                // åˆå¹¶å…ƒæ•°æ®
                 aggregated.keywords.AddRange(items.SelectMany(m => m.keywords).Distinct());
                 aggregated.tags.AddRange(items.SelectMany(m => m.tags).Distinct());
-                aggregated.AddTag(targetLayer == MemoryLayer.Archive ? "ÊÖ¶¯¹éµµ" : "ÊÖ¶¯×Ü½á");
+                aggregated.AddTag(targetLayer == MemoryLayer.Archive ? "æ‰‹åŠ¨å½’æ¡£" : "æ‰‹åŠ¨æ€»ç»“");
                 if (targetLayer == MemoryLayer.Archive)
                 {
-                    aggregated.AddTag($"Ô´×Ô{items.Count}ÌõELS");
+                    aggregated.AddTag($"æºè‡ª{items.Count}æ¡ELS");
                 }
                 
-                // ? AI×Ü½á£¨Èç¹û¿ÉÓÃ£©
+                // ? AIæ€»ç»“ï¼ˆå¦‚æœå¯ç”¨ï¼‰
                 var settings = RimTalkMemoryPatchMod.Settings;
                 if (settings.useAISummarization && AI.IndependentAISummarizer.IsAvailable())
                 {
@@ -57,24 +57,24 @@ namespace RimTalk.Memory.UI
                         if (!string.IsNullOrEmpty(aiSummary))
                         {
                             aggregated.content = aiSummary;
-                            aggregated.RemoveTag("¼òµ¥×Ü½á");
-                            aggregated.RemoveTag("¼òµ¥¹éµµ");
-                            aggregated.AddTag(targetLayer == MemoryLayer.Archive ? "AI¹éµµ" : "AI×Ü½á");
-                            aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "Éî¶È¹éµµ" : "×Ü½á")}ÒÑÍê³É";
+                            aggregated.RemoveTag("ç®€å•æ€»ç»“");
+                            aggregated.RemoveTag("ç®€å•å½’æ¡£");
+                            aggregated.AddTag(targetLayer == MemoryLayer.Archive ? "AIå½’æ¡£" : "AIæ€»ç»“");
+                            aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "æ·±åº¦å½’æ¡£" : "æ€»ç»“")}å·²å®Œæˆ";
                         }
                     });
                     
                     AI.IndependentAISummarizer.SummarizeMemories(selectedPawn, items, promptTemplate);
                     
-                    aggregated.AddTag("¼òµ¥" + (targetLayer == MemoryLayer.Archive ? "¹éµµ" : "×Ü½á"));
-                    aggregated.AddTag("´ıAI¸üĞÂ");
-                    aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "Éî¶È¹éµµ" : "×Ü½á")}ÕıÔÚºóÌ¨´¦ÀíÖĞ...";
+                    aggregated.AddTag("ç®€å•" + (targetLayer == MemoryLayer.Archive ? "å½’æ¡£" : "æ€»ç»“"));
+                    aggregated.AddTag("å¾…AIæ›´æ–°");
+                    aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "æ·±åº¦å½’æ¡£" : "æ€»ç»“")}æ­£åœ¨åå°å¤„ç†ä¸­...";
                 }
                 
                 targetList.Insert(0, aggregated);
             }
             
-            // ´ÓÔ´ÁĞ±íÒÆ³ı
+            // ä»æºåˆ—è¡¨ç§»é™¤
             foreach (var memory in memories)
             {
                 sourceList.Remove(memory);
@@ -82,7 +82,7 @@ namespace RimTalk.Memory.UI
         }
         
         /// <summary>
-        /// ´´½¨¼òµ¥×Ü½á£¨ÓÃÓÚÊÖ¶¯×Ü½áÊ±µÄÕ¼Î»·û£©
+        /// åˆ›å»ºç®€å•æ€»ç»“ï¼ˆç”¨äºæ‰‹åŠ¨æ€»ç»“æ—¶çš„å ä½ç¬¦ï¼‰
         /// </summary>
         private string CreateSimpleSummary(List<MemoryEntry> memories, MemoryType type)
         {
@@ -101,13 +101,13 @@ namespace RimTalk.Memory.UI
                 int shown = 0;
                 foreach (var group in byPerson.Take(5))
                 {
-                    if (shown > 0) sb.Append("£»");
-                    sb.Append($"Óë{group.Key}¶Ô»°¡Á{group.Count()}");
+                    if (shown > 0) sb.Append("ï¼›");
+                    sb.Append($"ä¸{group.Key}å¯¹è¯Ã—{group.Count()}");
                     shown++;
                 }
                 
                 if (shown == 0)
-                    sb.Append($"¶Ô»°{memories.Count}´Î");
+                    sb.Append($"å¯¹è¯{memories.Count}æ¬¡");
             }
             else if (type == MemoryType.Action)
             {
@@ -119,8 +119,8 @@ namespace RimTalk.Memory.UI
                 int shown = 0;
                 foreach (var group in grouped.Take(3))
                 {
-                    if (shown > 0) sb.Append("£»");
-                    sb.Append(group.Count() > 1 ? $"{group.Key}¡Á{group.Count()}" : group.Key);
+                    if (shown > 0) sb.Append("ï¼›");
+                    sb.Append(group.Count() > 1 ? $"{group.Key}Ã—{group.Count()}" : group.Key);
                     shown++;
                 }
             }
@@ -133,25 +133,25 @@ namespace RimTalk.Memory.UI
                 int shown = 0;
                 foreach (var group in grouped.Take(5))
                 {
-                    if (shown > 0) sb.Append("£»");
+                    if (shown > 0) sb.Append("ï¼›");
                     
                     string content = group.First().content;
                     if (content.Length > 40)
                         content = content.Substring(0, 40) + "...";
                     
-                    sb.Append(group.Count() > 1 ? $"{content}¡Á{group.Count()}" : content);
+                    sb.Append(group.Count() > 1 ? $"{content}Ã—{group.Count()}" : content);
                     shown++;
                 }
             }
             
             if (sb.Length > 0 && memories.Count > 3)
-                sb.Append($"£¨¹²{memories.Count}Ìõ£©");
+                sb.Append($"ï¼ˆå…±{memories.Count}æ¡ï¼‰");
             
-            return sb.Length > 0 ? sb.ToString() : $"{type}¼ÇÒä{memories.Count}Ìõ";
+            return sb.Length > 0 ? sb.ToString() : $"{type}è®°å¿†{memories.Count}æ¡";
         }
         
         /// <summary>
-        /// ´´½¨¹éµµÕªÒª£¨ÓÃÓÚÊÖ¶¯¹éµµÊ±µÄÕ¼Î»·û£©
+        /// åˆ›å»ºå½’æ¡£æ‘˜è¦ï¼ˆç”¨äºæ‰‹åŠ¨å½’æ¡£æ—¶çš„å ä½ç¬¦ï¼‰
         /// </summary>
         private string CreateArchiveSummary(List<MemoryEntry> memories, MemoryType type)
         {
@@ -159,7 +159,7 @@ namespace RimTalk.Memory.UI
                 return "";
             
             var sb = new System.Text.StringBuilder();
-            sb.Append($"{(type == MemoryType.Conversation ? "¶Ô»°" : type == MemoryType.Action ? "ĞĞ¶¯" : type.ToString())}¹éµµ£¨{memories.Count}Ìõ£©£º");
+            sb.Append($"{(type == MemoryType.Conversation ? "å¯¹è¯" : type == MemoryType.Action ? "è¡ŒåŠ¨" : type.ToString())}å½’æ¡£ï¼ˆ{memories.Count}æ¡ï¼‰ï¼š");
             
             if (type == MemoryType.Conversation)
             {
@@ -171,8 +171,8 @@ namespace RimTalk.Memory.UI
                 int shown = 0;
                 foreach (var group in byPerson.Take(10))
                 {
-                    if (shown > 0) sb.Append("£»");
-                    sb.Append($"Óë{group.Key}¶Ô»°¡Á{group.Count()}");
+                    if (shown > 0) sb.Append("ï¼›");
+                    sb.Append($"ä¸{group.Key}å¯¹è¯Ã—{group.Count()}");
                     shown++;
                 }
             }
@@ -186,8 +186,8 @@ namespace RimTalk.Memory.UI
                 int shown = 0;
                 foreach (var group in grouped.Take(5))
                 {
-                    if (shown > 0) sb.Append("£»");
-                    sb.Append(group.Count() > 1 ? $"{group.Key}¡Á{group.Count()}" : group.Key);
+                    if (shown > 0) sb.Append("ï¼›");
+                    sb.Append(group.Count() > 1 ? $"{group.Key}Ã—{group.Count()}" : group.Key);
                     shown++;
                 }
             }
@@ -200,13 +200,13 @@ namespace RimTalk.Memory.UI
                 int shown = 0;
                 foreach (var group in grouped.Take(8))
                 {
-                    if (shown > 0) sb.Append("£»");
+                    if (shown > 0) sb.Append("ï¼›");
                     
                     string content = group.First().content;
                     if (content.Length > 60)
                         content = content.Substring(0, 60) + "...";
                     
-                    sb.Append(group.Count() > 1 ? $"{content}¡Á{group.Count()}" : content);
+                    sb.Append(group.Count() > 1 ? $"{content}Ã—{group.Count()}" : content);
                     shown++;
                 }
             }

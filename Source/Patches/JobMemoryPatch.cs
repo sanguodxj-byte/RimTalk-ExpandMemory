@@ -46,16 +46,116 @@ namespace RimTalk.Patches
             if (!IsSignificantJob(newJob.def))
                 return;
 
-            // Build memory content
-            string content = newJob.def.reportString;
+            // ⭐ 方案1：智能占位符检测与替换
+            string content = BuildJobDescription(newJob, pawn);
+
+            float importance = GetJobImportance(newJob.def);
+            memoryComp.AddMemory(content, MemoryType.Action, importance);
+        }
+        
+        /// <summary>
+        /// ⭐ 构建工作描述（智能占位符替换）
+        /// </summary>
+        private static string BuildJobDescription(Job job, Pawn pawn)
+        {
+            // 1. 先尝试使用 GetReport()（处理标准占位符）
+            string content = job.GetReport(pawn);
             
-            // Fix Bug 2: Only add target info if it's meaningful and not "TargetA"
-            if (newJob.targetA.HasThing && newJob.targetA.Thing != pawn)
+            // 2. 检测是否包含任何形式的占位符
+            if (ContainsPlaceholder(content))
             {
-                Thing targetThing = newJob.targetA.Thing;
+                // 3. 获取目标物体的真实名称
+                string targetName = GetTargetName(job, pawn);
+                
+                // 4. 如果获取到有效的目标名称，替换所有占位符
+                if (!string.IsNullOrEmpty(targetName))
+                {
+                    content = ReplaceAllPlaceholders(content, targetName);
+                }
+            }
+            
+            return content;
+        }
+        
+        /// <summary>
+        /// ⭐ 检测字符串是否包含占位符
+        /// </summary>
+        private static bool ContainsPlaceholder(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+            
+            // 检测各种占位符格式
+            var placeholderPatterns = new[]
+            {
+                @"\{0\}",                    // {0}
+                @"\{1\}",                    // {1}
+                @"\{2\}",                    // {2}
+                @"TargetA",                  // TargetA
+                @"TargetB",                  // TargetB
+                @"TargetC",                  // TargetC
+                @"\{TargetA\}",              // {TargetA}
+                @"\{TargetB\}",              // {TargetB}
+                @"\{TARGETLABEL\}",          // {TARGETLABEL}
+                @"\{TARGET_LABEL\}",         // {TARGET_LABEL}
+            };
+            
+            foreach (var pattern in placeholderPatterns)
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(text, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// ⭐ 替换所有可能的占位符格式
+        /// </summary>
+        private static string ReplaceAllPlaceholders(string text, string replacement)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(replacement))
+                return text;
+            
+            // 按优先级替换（从最具体到最通用）
+            var replacements = new[]
+            {
+                ("{TargetA}", replacement),
+                ("{TargetB}", replacement),
+                ("{TargetC}", replacement),
+                ("{TARGETLABEL}", replacement),
+                ("{TARGET_LABEL}", replacement),
+                ("TargetA", replacement),
+                ("TargetB", replacement),
+                ("TargetC", replacement),
+                ("{0}", replacement),
+                ("{1}", replacement),
+                ("{2}", replacement),
+            };
+            
+            string result = text;
+            foreach (var (placeholder, value) in replacements)
+            {
+                result = result.Replace(placeholder, value);
+            }
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// ⭐ 统一获取目标名称的逻辑
+        /// </summary>
+        private static string GetTargetName(Job job, Pawn pawn)
+        {
+            // 检查 targetA
+            if (job.targetA.HasThing && job.targetA.Thing != pawn)
+            {
+                Thing targetThing = job.targetA.Thing;
                 string targetName = "";
                 
-                // 尝试获取有意义的名称
+                // 特殊处理：蓝图
                 if (targetThing is Blueprint blueprint)
                 {
                     var entityDef = blueprint.def.entityDefToBuild;
@@ -63,8 +163,8 @@ namespace RimTalk.Patches
                     {
                         targetName = entityDef.label;
                     }
-                    // ⭐ 修复：如果entityDefToBuild为空，不使用LabelShort
                 }
+                // 特殊处理：框架
                 else if (targetThing is Frame frame)
                 {
                     var entityDef = frame.def.entityDefToBuild;
@@ -72,23 +172,33 @@ namespace RimTalk.Patches
                     {
                         targetName = entityDef.label;
                     }
-                    // ⭐ 修复：如果entityDefToBuild为空，不使用LabelShort
                 }
+                // 通用处理：使用 LabelShort
                 else
                 {
-                    // 其他类型的目标，使用def.label而不是LabelShort
-                    targetName = targetThing.def?.label ?? "";
+                    targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
                 }
                 
-                // 使用正则表达式过滤无意义的目标名称
-                if (!string.IsNullOrEmpty(targetName) && IsValidTargetName(targetName))
+                // 验证名称有效性
+                if (IsValidTargetName(targetName))
                 {
-                    content = content + " - " + targetName;
+                    return targetName;
                 }
             }
-
-            float importance = GetJobImportance(newJob.def);
-            memoryComp.AddMemory(content, MemoryType.Action, importance);
+            
+            // 如果 targetA 无效，尝试 targetB
+            if (job.targetB.HasThing && job.targetB.Thing != pawn)
+            {
+                Thing targetThing = job.targetB.Thing;
+                string targetName = targetThing.LabelShort ?? targetThing.def?.label ?? "";
+                
+                if (IsValidTargetName(targetName))
+                {
+                    return targetName;
+                }
+            }
+            
+            return "";
         }
         
         /// <summary>

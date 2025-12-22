@@ -7,23 +7,23 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ÖÇÄÜ×¢Èë¹ÜÀíÆ÷ v3.3.2.25
-    /// Ö±½ÓÊ¹ÓÃCommonKnowledgeLibraryºÍ¹Ø¼ü´Ê¼ìË÷
-    /// ? ÍêÈ«ÒÆ³ıRAGÒÀÀµ
-    /// ? v3.3.20: Ö§³ÖÖ¸Áî·ÖÇø£¨Instruction Partitioning£©
-    /// ? v3.3.20: µ÷Õû×¢ÈëË³Ğò - ¹æÔò ¡ú ³£Ê¶ ¡ú ¼ÇÒä
+    /// æ™ºèƒ½æ³¨å…¥ç®¡ç†å™¨ v3.3.2.25
+    /// ç›´æ¥ä½¿ç”¨CommonKnowledgeLibraryå’Œå…³é”®è¯æ£€ç´¢
+    /// ? å®Œå…¨ç§»é™¤RAGä¾èµ–
+    /// ? v3.3.20: æ”¯æŒæŒ‡ä»¤åˆ†åŒºï¼ˆInstruction Partitioningï¼‰
+    /// ? v3.3.20: è°ƒæ•´æ³¨å…¥é¡ºåº - è§„åˆ™ â†’ å¸¸è¯† â†’ è®°å¿†
     /// </summary>
     public static class SmartInjectionManager
     {
         private static int callCount = 0;
         
         /// <summary>
-        /// ÖÇÄÜ×¢ÈëÉÏÏÂÎÄ
-        /// ? v3.3.20: ÖØ¹¹ÖªÊ¶×¢ÈëÂß¼­£¬Ö§³ÖÖ¸Áî·ÖÇø
-        /// ? ×¢ÈëË³Ğò£º
-        ///   1. Current Guidelines£¨¹æÔò/Ö¸Áî£©- Ç¿ÖÆÔ¼Êø
-        ///   2. World Knowledge£¨³£Ê¶/±³¾°£©- ÊÀ½ç¹ÛÖªÊ¶
-        ///   3. Character Memories£¨¼ÇÒä£©- ½ÇÉ«¸öÈË¾­Àú
+        /// æ™ºèƒ½æ³¨å…¥ä¸Šä¸‹æ–‡
+        /// ? v3.3.20: é‡æ„çŸ¥è¯†æ³¨å…¥é€»è¾‘ï¼Œæ”¯æŒæŒ‡ä»¤åˆ†åŒº
+        /// ? æ³¨å…¥é¡ºåºï¼š
+        ///   1. Current Guidelinesï¼ˆè§„åˆ™/æŒ‡ä»¤ï¼‰- å¼ºåˆ¶çº¦æŸ
+        ///   2. World Knowledgeï¼ˆå¸¸è¯†/èƒŒæ™¯ï¼‰- ä¸–ç•Œè§‚çŸ¥è¯†
+        ///   3. Character Memoriesï¼ˆè®°å¿†ï¼‰- è§’è‰²ä¸ªäººç»å†
         /// </summary>
         public static string InjectSmartContext(
             Pawn speaker,
@@ -52,11 +52,11 @@ namespace RimTalk.Memory
             {
                 var sb = new StringBuilder();
                 
-                // ? µÚÒ»ÓÅÏÈ¼¶£º×¢Èë³£Ê¶£¨·ÖÇøÎª¹æÔòºÍ±³¾°ÖªÊ¶£©
+                // ? ç¬¬ä¸€ä¼˜å…ˆçº§ï¼šæ³¨å…¥å¸¸è¯†ï¼ˆåˆ†åŒºä¸ºè§„åˆ™å’ŒèƒŒæ™¯çŸ¥è¯†ï¼‰
                 var memoryManager = Find.World?.GetComponent<MemoryManager>();
                 if (memoryManager != null)
                 {
-                    // µ÷ÓÃInjectKnowledgeWithDetails»ñÈ¡ÏêÏ¸µÄÆÀ·ÖĞÅÏ¢
+                    // è°ƒç”¨InjectKnowledgeWithDetailsè·å–è¯¦ç»†çš„è¯„åˆ†ä¿¡æ¯
                     string knowledgeText = memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
                         context,
                         maxKnowledge,
@@ -67,24 +67,24 @@ namespace RimTalk.Memory
                     
                     if (!string.IsNullOrEmpty(knowledgeText) && knowledgeScores != null && knowledgeScores.Count > 0)
                     {
-                        // ? ²½Öè1£º¸ù¾İ±êÇ©·ÖÀàÌõÄ¿
+                        // ? æ­¥éª¤1ï¼šæ ¹æ®æ ‡ç­¾åˆ†ç±»æ¡ç›®
                         var instructionEntries = new List<KnowledgeScore>();
                         var loreEntries = new List<KnowledgeScore>();
                         
-                        // Ö¸Áî±êÇ©¹Ø¼ü´Ê£¨ĞĞÎª¡¢Ö¸Áî¡¢¹æÔò¡¢System£©
+                        // æŒ‡ä»¤æ ‡ç­¾å…³é”®è¯ï¼ˆè¡Œä¸ºã€æŒ‡ä»¤ã€è§„åˆ™ã€Systemï¼‰
                         var instructionTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                         {
-                            "ĞĞÎª", "Ö¸Áî", "¹æÔò", "System", 
+                            "è¡Œä¸º", "æŒ‡ä»¤", "è§„åˆ™", "System", 
                             "Behavior", "Instruction", "Rule",
-                            "ĞĞÎª-", "Ö¸Áî-", "¹æÔò-" // Ö§³ÖÇ°×ºÆ¥Åä£¨Èç"ĞĞÎª-Õ½¶·"£©
+                            "è¡Œä¸º-", "æŒ‡ä»¤-", "è§„åˆ™-" // æ”¯æŒå‰ç¼€åŒ¹é…ï¼ˆå¦‚"è¡Œä¸º-æˆ˜æ–—"ï¼‰
                         };
                         
                         foreach (var knowledgeScore in knowledgeScores)
                         {
                             var entry = knowledgeScore.Entry;
-                            var tags = entry.GetTags(); // »ñÈ¡±êÇ©ÁĞ±í
+                            var tags = entry.GetTags(); // è·å–æ ‡ç­¾åˆ—è¡¨
                             
-                            // ¼ì²éÊÇ·ñ°üº¬Ö¸Áî±êÇ©
+                            // æ£€æŸ¥æ˜¯å¦åŒ…å«æŒ‡ä»¤æ ‡ç­¾
                             bool isInstruction = tags.Any(tag => 
                                 instructionTags.Contains(tag) || 
                                 instructionTags.Any(instructionTag => tag.StartsWith(instructionTag, StringComparison.OrdinalIgnoreCase))
@@ -100,7 +100,7 @@ namespace RimTalk.Memory
                             }
                         }
                         
-                        // ? ²½Öè2£ºÓÅÏÈ×¢ÈëÖ¸Áî²¿·Ö£¨Current Guidelines£©
+                        // ? æ­¥éª¤2ï¼šä¼˜å…ˆæ³¨å…¥æŒ‡ä»¤éƒ¨åˆ†ï¼ˆCurrent Guidelinesï¼‰
                         if (instructionEntries.Count > 0)
                         {
                             sb.AppendLine("## Current Guidelines");
@@ -118,7 +118,7 @@ namespace RimTalk.Memory
                             }
                         }
                         
-                        // ? ²½Öè3£ºÈ»ºó×¢Èë±³¾°ÖªÊ¶²¿·Ö£¨World Knowledge£©
+                        // ? æ­¥éª¤3ï¼šç„¶åæ³¨å…¥èƒŒæ™¯çŸ¥è¯†éƒ¨åˆ†ï¼ˆWorld Knowledgeï¼‰
                         if (loreEntries.Count > 0)
                         {
                             if (sb.Length > 0)
@@ -146,7 +146,7 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // ? µÚ¶şÓÅÏÈ¼¶£º×¢Èë¼ÇÒä£¨·ÅÔÚ×îºó£¬×÷Îª½ÇÉ«¸öÈË¾­Àú²¹³ä£©
+                // ? ç¬¬äºŒä¼˜å…ˆçº§ï¼šæ³¨å…¥è®°å¿†ï¼ˆæ”¾åœ¨æœ€åï¼Œä½œä¸ºè§’è‰²ä¸ªäººç»å†è¡¥å……ï¼‰
                 var memoryComp = speaker.TryGetComp<FourLayerMemoryComp>();
                 if (memoryComp != null)
                 {
@@ -174,7 +174,7 @@ namespace RimTalk.Memory
                 
                 string result = sb.ToString();
                 
-                // ? v3.3.2.37: Ó¦ÓÃÌáÊ¾´Ê¹æ·¶»¯¹æÔò
+                // ? v3.3.2.37: åº”ç”¨æç¤ºè¯è§„èŒƒåŒ–è§„åˆ™
                 if (!string.IsNullOrEmpty(result))
                 {
                     string normalizedResult = PromptNormalizer.Normalize(result);
@@ -192,7 +192,7 @@ namespace RimTalk.Memory
                 if (Prefs.DevMode)
                 {
                     Log.Message($"[SmartInjection] ? Success: {result.Length} chars formatted");
-                    Log.Message($"[SmartInjection] ?? Injection Order: Guidelines ¡ú Knowledge ¡ú Memories");
+                    Log.Message($"[SmartInjection] ?? Injection Order: Guidelines â†’ Knowledge â†’ Memories");
                 }
                 
                 return string.IsNullOrEmpty(result) ? null : result;

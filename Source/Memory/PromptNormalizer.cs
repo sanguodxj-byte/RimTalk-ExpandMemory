@@ -7,8 +7,8 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ÌáÊ¾´Ê¹æ·¶»¯Æ÷ - ÔÚ·¢ËÍ¸øAIÇ°×Ô¶¯Ìæ»»/¹æ·¶»¯ÌáÊ¾´Ê
-    /// ? v3.3.2.37: Ö§³ÖÕıÔò±í´ïÊ½Ìæ»»¹æÔò
+    /// æç¤ºè¯è§„èŒƒåŒ–å™¨ - åœ¨å‘é€ç»™AIå‰è‡ªåŠ¨æ›¿æ¢/è§„èŒƒåŒ–æç¤ºè¯
+    /// ? v3.3.2.37: æ”¯æŒæ­£åˆ™è¡¨è¾¾å¼æ›¿æ¢è§„åˆ™
     /// </summary>
     public static class PromptNormalizer
     {
@@ -16,7 +16,7 @@ namespace RimTalk.Memory
         private static Dictionary<string, Regex> compiledRegexCache = new Dictionary<string, Regex>();
         
         /// <summary>
-        /// ¸üĞÂÌæ»»¹æÔòÁĞ±í
+        /// æ›´æ–°æ›¿æ¢è§„åˆ™åˆ—è¡¨
         /// </summary>
         public static void UpdateRules(List<RimTalk.MemoryPatch.RimTalkMemoryPatchSettings.ReplacementRule> rules)
         {
@@ -29,7 +29,7 @@ namespace RimTalk.Memory
             
             activeRules = rules.Where(r => r != null && r.isEnabled).ToList();
             
-            // Ô¤±àÒëÕıÔò±í´ïÊ½ÒÔÌáÉıĞÔÄÜ
+            // é¢„ç¼–è¯‘æ­£åˆ™è¡¨è¾¾å¼ä»¥æå‡æ€§èƒ½
             compiledRegexCache.Clear();
             foreach (var rule in activeRules)
             {
@@ -49,7 +49,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// ¹æ·¶»¯ÌáÊ¾´ÊÎÄ±¾
+        /// è§„èŒƒåŒ–æç¤ºè¯æ–‡æœ¬
         /// </summary>
         public static string Normalize(string text)
         {
@@ -83,7 +83,7 @@ namespace RimTalk.Memory
         }
         
         /// <summary>
-        /// »ñÈ¡µ±Ç°¼¤»îµÄ¹æÔòÊıÁ¿
+        /// è·å–å½“å‰æ¿€æ´»çš„è§„åˆ™æ•°é‡
         /// </summary>
         public static int GetActiveRuleCount()
         {

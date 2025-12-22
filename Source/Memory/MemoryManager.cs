@@ -27,6 +27,10 @@ namespace RimTalk.Memory
         
         private int lastSummarizationDay = -1; // 上次ELS总结的日期
         private int lastArchiveDay = -1;        // 上次CLPA归档的日期
+        
+        // ⭐ 冷启动缓冲：本次会话开始时间（不保存）
+        private int sessionStartTick = -1;
+        private const int COLD_START_DELAY = 200; // 启动后延迟200 ticks (约3秒) 再开始运作
 
         // ⭐ 总结队列（延迟处理）
         private Queue<Pawn> summarizationQueue = new Queue<Pawn>();
@@ -115,6 +119,10 @@ namespace RimTalk.Memory
         public override void WorldComponentTick()
         {
             base.WorldComponentTick();
+
+            // ⭐ 冷启动缓冲：进入游戏后延迟运作，避免加载时的性能冲击
+            if (sessionStartTick == -1) sessionStartTick = Find.TickManager.TicksGame;
+            if (Find.TickManager.TicksGame - sessionStartTick < COLD_START_DELAY) return;
 
             // 每小时衰减记忆活跃度
             if (Find.TickManager.TicksGame - lastDecayTick >= DecayInterval)
@@ -753,15 +761,11 @@ namespace RimTalk.Memory
         {
             base.ExposeData();
             
-            // ⭐ 添加版本标记用于兼容性检查
-            int saveVersion = 0;
-            Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
-            
             Scribe_Values.Look(ref lastDecayTick, "lastDecayTick", 0);
             Scribe_Values.Look(ref lastSummarizationDay, "lastSummarizationDay", -1);
             Scribe_Values.Look(ref lastArchiveDay, "lastArchiveDay", -1);
             Scribe_Values.Look(ref nextSummarizationTick, "nextSummarizationTick", 0);
-            // ⭐ v3.3.17: 移除colonistJoinTicks序列化 - 不再需要缓存
+            
             Scribe_Deep.Look(ref commonKnowledge, "commonKnowledge");
             Scribe_Deep.Look(ref conversationCache, "conversationCache");
             Scribe_Deep.Look(ref promptCache, "promptCache");
@@ -784,7 +788,6 @@ namespace RimTalk.Memory
                     promptCache = new PromptCache();
                     Log.Warning("[RimTalk Memory] promptCache was null, initialized new instance");
                 }
-                // ⭐ v3.3.17: 移除colonistJoinTicks初始化 - 不再需要
                 
                 // ⭐ 重新初始化队列（不保存到存档）
                 if (summarizationQueue == null)
@@ -792,22 +795,23 @@ namespace RimTalk.Memory
                 if (manualSummarizationQueue == null)
                     manualSummarizationQueue = new Queue<Pawn>();
                 
-                // ⭐ 版本升级逻辑
-                if (saveVersion < 1)
+                // ⭐ 兼容性处理：旧存档初始化
+                // 如果是旧存档（没有记录过日期），将日期初始化为当前日期，防止立即触发归档/总结
+                int currentDay = GenDate.DaysPassed;
+                
+                if (lastArchiveDay == -1)
                 {
-                    Log.Message("[RimTalk Memory] Upgrading save data from v0 to v1");
-                    // 这里可以添加数据迁移代码
-                    saveVersion = 1;
+                    lastArchiveDay = currentDay;
+                    Log.Warning($"[RimTalk Memory] ⚠️ Old save detected! Initialized lastArchiveDay to {currentDay} to prevent immediate archive.");
                 }
                 
-                Log.Message($"[RimTalk Memory] MemoryManager loaded successfully (save version: {saveVersion})");
-            }
-            
-            if (Scribe.mode == LoadSaveMode.Saving)
-            {
-                // ⭐ 保存当前版本号
-                saveVersion = 1;
-                Scribe_Values.Look(ref saveVersion, "saveVersion", 0);
+                if (lastSummarizationDay == -1)
+                {
+                    lastSummarizationDay = currentDay;
+                    Log.Warning($"[RimTalk Memory] ⚠️ Old save detected! Initialized lastSummarizationDay to {currentDay} to prevent immediate summarization.");
+                }
+                
+                Log.Message($"[RimTalk Memory] MemoryManager loaded successfully.");
             }
         }
     }

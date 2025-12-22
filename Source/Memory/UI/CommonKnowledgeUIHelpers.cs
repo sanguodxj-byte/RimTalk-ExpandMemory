@@ -4,27 +4,27 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 using RimWorld;
-using RimTalk.MemoryPatch; // ? Ìí¼ÓÃüÃû¿Õ¼ä
+using RimTalk.MemoryPatch; // ? æ·»åŠ å‘½åç©ºé—´
 
 namespace RimTalk.Memory.UI
 {
     /// <summary>
-    /// ³£Ê¶¿âUI»æÖÆÎ¯ÍĞ - ¿É¸´ÓÃµÄUI»æÖÆ·½·¨
-    /// ¡ï v3.3.19: ²ğ·Ö´úÂë - ·ÖÀëUI»æÖÆÂß¼­
+    /// å¸¸è¯†åº“UIç»˜åˆ¶å§”æ‰˜ - å¯å¤ç”¨çš„UIç»˜åˆ¶æ–¹æ³•
+    /// â˜… v3.3.19: æ‹†åˆ†ä»£ç  - åˆ†ç¦»UIç»˜åˆ¶é€»è¾‘
     /// </summary>
     public static class CommonKnowledgeUIHelpers
     {
-        // ==================== ÑÕÉ«³£Á¿ ====================
+        // ==================== é¢œè‰²å¸¸é‡ ====================
         private static readonly Color ColorInstructions = new Color(0.3f, 0.8f, 0.3f);
         private static readonly Color ColorLore = new Color(0.8f, 0.6f, 0.3f);
         private static readonly Color ColorPawnStatus = new Color(0.3f, 0.6f, 0.9f);
         private static readonly Color ColorHistory = new Color(0.7f, 0.5f, 0.7f);
         private static readonly Color ColorOther = Color.white;
         
-        // ==================== ·ÖÀàÏà¹Ø ====================
+        // ==================== åˆ†ç±»ç›¸å…³ ====================
         
         /// <summary>
-        /// »ñÈ¡·ÖÀàÏÔÊ¾Ãû³Æ
+        /// è·å–åˆ†ç±»æ˜¾ç¤ºåç§°
         /// </summary>
         public static string GetCategoryLabel(KnowledgeCategory category)
         {
@@ -48,7 +48,7 @@ namespace RimTalk.Memory.UI
         }
         
         /// <summary>
-        /// »ñÈ¡·ÖÀàÑÕÉ«
+        /// è·å–åˆ†ç±»é¢œè‰²
         /// </summary>
         public static Color GetCategoryColor(CommonKnowledgeEntry entry)
         {
@@ -69,26 +69,26 @@ namespace RimTalk.Memory.UI
         }
         
         /// <summary>
-        /// ¸ù¾İ±êÇ©ÅĞ¶ÏÌõÄ¿·ÖÀà
+        /// æ ¹æ®æ ‡ç­¾åˆ¤æ–­æ¡ç›®åˆ†ç±»
         /// </summary>
         public static KnowledgeCategory GetEntryCategory(CommonKnowledgeEntry entry)
         {
-            if (entry.tag.Contains("¹æÔò") || entry.tag.Contains("Instructions"))
+            if (entry.tag.Contains("è§„åˆ™") || entry.tag.Contains("Instructions"))
                 return KnowledgeCategory.Instructions;
-            if (entry.tag.Contains("ÊÀ½ç¹Û") || entry.tag.Contains("Lore"))
+            if (entry.tag.Contains("ä¸–ç•Œè§‚") || entry.tag.Contains("Lore"))
                 return KnowledgeCategory.Lore;
-            if (entry.tag.Contains("Ö³ÃñÕß×´Ì¬") || entry.tag.Contains("PawnStatus"))
+            if (entry.tag.Contains("æ®–æ°‘è€…çŠ¶æ€") || entry.tag.Contains("PawnStatus"))
                 return KnowledgeCategory.PawnStatus;
-            if (entry.tag.Contains("ÀúÊ·") || entry.tag.Contains("History"))
+            if (entry.tag.Contains("å†å²") || entry.tag.Contains("History"))
                 return KnowledgeCategory.History;
             
             return KnowledgeCategory.Other;
         }
         
-        // ==================== ¿É¼ûĞÔÏà¹Ø ====================
+        // ==================== å¯è§æ€§ç›¸å…³ ====================
         
         /// <summary>
-        /// »ñÈ¡¿É¼ûĞÔÏÔÊ¾ÎÄ±¾
+        /// è·å–å¯è§æ€§æ˜¾ç¤ºæ–‡æœ¬
         /// </summary>
         public static string GetVisibilityText(CommonKnowledgeEntry entry)
         {
@@ -104,10 +104,10 @@ namespace RimTalk.Memory.UI
                 : CommonKnowledgeTranslationKeys.VisibilityDeleted.Translate(entry.targetPawnId);
         }
         
-        // ==================== »æÖÆÏêÇé×Ö¶Î ====================
+        // ==================== ç»˜åˆ¶è¯¦æƒ…å­—æ®µ ====================
         
         /// <summary>
-        /// »æÖÆÏêÇé×Ö¶Î£¨±êÇ© + Öµ£©
+        /// ç»˜åˆ¶è¯¦æƒ…å­—æ®µï¼ˆæ ‡ç­¾ + å€¼ï¼‰
         /// </summary>
         public static void DrawDetailField(Rect rect, string label, string value)
         {
@@ -122,33 +122,33 @@ namespace RimTalk.Memory.UI
             Widgets.Label(new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, rect.height), value);
         }
         
-        // ==================== »æÖÆ´øÑÕÉ«µÄ¸´Ñ¡¿ò ====================
+        // ==================== ç»˜åˆ¶å¸¦é¢œè‰²çš„å¤é€‰æ¡† ====================
         
         /// <summary>
-        /// »æÖÆ´øÑÕÉ«Ö¸Ê¾Æ÷µÄ¸´Ñ¡¿ò
+        /// ç»˜åˆ¶å¸¦é¢œè‰²æŒ‡ç¤ºå™¨çš„å¤é€‰æ¡†
         /// </summary>
         public static void DrawColoredCheckbox(Rect rect, string label, ref bool value, Color color)
         {
-            // ÑÕÉ«Ö¸Ê¾Æ÷
+            // é¢œè‰²æŒ‡ç¤ºå™¨
             Rect colorRect = new Rect(rect.x, rect.y + 2f, 3f, rect.height - 4f);
             Widgets.DrawBoxSolid(colorRect, color);
             
-            // ¸´Ñ¡¿ò
+            // å¤é€‰æ¡†
             Rect checkboxRect = new Rect(rect.x + 8f, rect.y, rect.width - 8f, rect.height);
             Widgets.CheckboxLabeled(checkboxRect, label, ref value);
         }
         
-        // ==================== »æÖÆ·ÖÀà°´Å¥ ====================
+        // ==================== ç»˜åˆ¶åˆ†ç±»æŒ‰é’® ====================
         
         /// <summary>
-        /// »æÖÆ·ÖÀà°´Å¥£¨´øÑ¡ÖĞ¸ßÁÁ£©
+        /// ç»˜åˆ¶åˆ†ç±»æŒ‰é’®ï¼ˆå¸¦é€‰ä¸­é«˜äº®ï¼‰
         /// </summary>
         public static bool DrawCategoryButton(Rect rect, KnowledgeCategory category, bool isSelected, int count)
         {
             string categoryLabel = GetCategoryLabel(category);
             string label = $"{categoryLabel} ({count})";
             
-            // ¸ßÁÁÑ¡ÖĞÏî
+            // é«˜äº®é€‰ä¸­é¡¹
             if (isSelected)
             {
                 Widgets.DrawHighlightSelected(rect);
@@ -158,14 +158,14 @@ namespace RimTalk.Memory.UI
                 Widgets.DrawHighlight(rect);
             }
             
-            // °´Å¥£¨²»»æÖÆ±³¾°£¬Ê¹ÓÃ×Ô¶¨Òå¸ßÁÁ£©
+            // æŒ‰é’®ï¼ˆä¸ç»˜åˆ¶èƒŒæ™¯ï¼Œä½¿ç”¨è‡ªå®šä¹‰é«˜äº®ï¼‰
             return Widgets.ButtonText(rect, label, drawBackground: false);
         }
         
-        // ==================== »æÖÆ×Ô¶¯Éú³ÉÉèÖÃ ====================
+        // ==================== ç»˜åˆ¶è‡ªåŠ¨ç”Ÿæˆè®¾ç½® ====================
         
         /// <summary>
-        /// »æÖÆ×Ô¶¯Éú³ÉÉèÖÃÇøÓò
+        /// ç»˜åˆ¶è‡ªåŠ¨ç”Ÿæˆè®¾ç½®åŒºåŸŸ
         /// </summary>
         public static void DrawAutoGenerateSettings(Rect rect, Action onGeneratePawnStatus, Action onGenerateEventRecord)
         {
@@ -173,9 +173,9 @@ namespace RimTalk.Memory.UI
             Rect innerRect = rect.ContractedBy(5f);
             float y = innerRect.y;
             
-            var settings = RimTalkMemoryPatchMod.Settings; // ? ĞŞ¸´£ºÊ¹ÓÃÕıÈ·µÄÃüÃû¿Õ¼ä
+            var settings = RimTalkMemoryPatchMod.Settings; // ? ä¿®å¤ï¼šä½¿ç”¨æ­£ç¡®çš„å‘½åç©ºé—´
             
-            // Ö³ÃñÕß×´Ì¬
+            // æ®–æ°‘è€…çŠ¶æ€
             bool enablePawnStatus = settings.enablePawnStatusKnowledge;
             Widgets.CheckboxLabeled(new Rect(innerRect.x, y, innerRect.width, 25f), 
                 CommonKnowledgeTranslationKeys.PawnStatus.Translate(), ref enablePawnStatus);
@@ -189,7 +189,7 @@ namespace RimTalk.Memory.UI
             }
             y += 30f;
             
-            // ÊÂ¼ş¼ÇÂ¼
+            // äº‹ä»¶è®°å½•
             bool enableEventRecord = settings.enableEventRecordKnowledge;
             Widgets.CheckboxLabeled(new Rect(innerRect.x, y, innerRect.width, 25f), 
                 CommonKnowledgeTranslationKeys.EventRecord.Translate(), ref enableEventRecord);
@@ -203,10 +203,10 @@ namespace RimTalk.Memory.UI
             }
         }
         
-        // ==================== ¹¤¾ß·½·¨ - PawnÑ¡Ôñ²Ëµ¥ ====================
+        // ==================== å·¥å…·æ–¹æ³• - Pawné€‰æ‹©èœå• ====================
         
         /// <summary>
-        /// ÏÔÊ¾PawnÑ¡Ôñ²Ëµ¥
+        /// æ˜¾ç¤ºPawné€‰æ‹©èœå•
         /// </summary>
         public static void ShowPawnSelectionMenu(Action<int> onSelected)
         {

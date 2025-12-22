@@ -68,6 +68,11 @@ namespace RimTalk.MemoryPatch
         public string independentModel = "gpt-3.5-turbo";
         public string independentProvider = "OpenAI";
         public bool enablePromptCaching = true;
+        
+        // AI 总结提示词配置
+        public string dailySummaryPrompt = "";  // 空字符串表示使用默认
+        public string deepArchivePrompt = "";   // 空字符串表示使用默认
+        public int summaryMaxTokens = 200;
 
         // UI 设置
         public bool enableMemoryUI = true;
@@ -121,8 +126,8 @@ namespace RimTalk.MemoryPatch
         
         // Cloud Embedding Settings
         public string embeddingApiKey = "";
-        public string embeddingApiUrl = "https://api.openai.com/v1/embeddings";
-        public string embeddingModel = "text-embedding-3-small";
+        public string embeddingApiUrl = "https://api.siliconflow.cn/v1/embeddings";
+        public string embeddingModel = "BAAI/bge-m3";
         
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
@@ -176,6 +181,10 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref independentModel, "ai_independentModel", "gpt-3.5-turbo");
             Scribe_Values.Look(ref independentProvider, "ai_independentProvider", "OpenAI");
             Scribe_Values.Look(ref enablePromptCaching, "ai_enablePromptCaching", true);
+            
+            Scribe_Values.Look(ref dailySummaryPrompt, "ai_dailySummaryPrompt", "");
+            Scribe_Values.Look(ref deepArchivePrompt, "ai_deepArchivePrompt", "");
+            Scribe_Values.Look(ref summaryMaxTokens, "ai_summaryMaxTokens", 200);
 
             Scribe_Values.Look(ref enableMemoryUI, "memoryPatch_enableMemoryUI", true);
             Scribe_Values.Look(ref enableActionMemory, "memoryPatch_enableActionMemory", true);
@@ -210,8 +219,8 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
             
             Scribe_Values.Look(ref embeddingApiKey, "vector_embeddingApiKey", "");
-            Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.openai.com/v1/embeddings");
-            Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "text-embedding-3-small");
+            Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.siliconflow.cn/v1/embeddings");
+            Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "BAAI/bge-m3");
 
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
