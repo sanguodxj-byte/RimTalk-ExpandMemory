@@ -553,9 +553,9 @@ namespace RimTalk.Memory
                     if (fourLayerComp.EventLogMemories.Count == 0)
                         continue;
                     
-                    // ⭐ 步骤1：选择最旧的前 25% ELS 记忆进行归档
+                    // ⭐ 步骤1：选择最旧的前 25% ELS 记忆进行归档（移除 isUserEdited 检查）
                     var nonPinnedELS = fourLayerComp.EventLogMemories
-                        .Where(m => !m.isPinned && !m.isUserEdited)
+                        .Where(m => !m.isPinned)
                         .ToList();
                     
                     if (nonPinnedELS.Count == 0)
@@ -655,13 +655,13 @@ namespace RimTalk.Memory
                         }
                     }
                     
-                    // ⭐ 步骤4：清理超过上限的旧 CLPA 记忆
+                    // ⭐ 步骤4：清理超过上限的旧 CLPA 记忆（移除 isUserEdited 检查）
                     int maxArchive = RimTalkMemoryPatchMod.Settings.maxArchiveMemories;
                     if (fourLayerComp.ArchiveMemories.Count > maxArchive)
                     {
-                        // 移除最旧的低重要性记忆
+                        // 移除最旧的低重要性记忆（只保护固定记忆）
                         var toRemove = fourLayerComp.ArchiveMemories
-                            .Where(m => !m.isPinned && !m.isUserEdited)
+                            .Where(m => !m.isPinned)
                             .OrderBy(m => m.importance)
                             .ThenBy(m => m.timestamp)
                             .Take(fourLayerComp.ArchiveMemories.Count - maxArchive)

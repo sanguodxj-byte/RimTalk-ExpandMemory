@@ -12,10 +12,11 @@ namespace RimTalk.Memory
     /// 自动生成Pawn状态常识（殖民者标识）
     /// 每24小时更新一次，不会覆盖用户手动修改
     /// 
-    /// ? v3.3.17: 重构版 - 移除缓存，直接使用RimWorld原生记录
+    /// ⭐ v3.3.17: 重构版 - 移除缓存，直接使用RimWorld原生记录
     /// - 修复"今天加入"bug
     /// - 完全依赖pawn.records.TimeAsColonistOrColonyAnimal
     /// - 简化代码逻辑，消除同步问题
+    /// ⭐ v3.3.x: 添加用户删除黑名单，避免删除后重新生成
     /// </summary>
     public static class PawnStatusKnowledgeGenerator
     {
@@ -23,8 +24,42 @@ namespace RimTalk.Memory
         private static Dictionary<int, int> lastUpdateTicks = new Dictionary<int, int>();
         private const int UPDATE_INTERVAL_TICKS = 60000; // 24小时 = 60000 ticks
         
+        // ⭐ 新增：用户删除黑名单（记录用户明确删除过的 Pawn ID）
+        private static HashSet<int> userDeletedPawns = new HashSet<int>();
+        
         // 描述切换阈值（不再删除记录）
         private const int NEW_COLONIST_THRESHOLD_DAYS = 7;
+        
+        /// <summary>
+        /// ⭐ 标记 Pawn 状态为"用户已删除"（从常识库 UI 调用）
+        /// </summary>
+        public static void MarkAsUserDeleted(int pawnId)
+        {
+            userDeletedPawns.Add(pawnId);
+            lastUpdateTicks.Remove(pawnId);
+            
+            if (Prefs.DevMode)
+                Log.Message($"[PawnStatus] Marked pawn {pawnId} as user-deleted, will not regenerate");
+        }
+        
+        /// <summary>
+        /// ⭐ 检查 Pawn 是否被用户删除过
+        /// </summary>
+        public static bool IsUserDeleted(int pawnId)
+        {
+            return userDeletedPawns.Contains(pawnId);
+        }
+        
+        /// <summary>
+        /// ⭐ 清除用户删除标记（如果用户想重新生成）
+        /// </summary>
+        public static void ClearUserDeletedMark(int pawnId)
+        {
+            userDeletedPawns.Remove(pawnId);
+            
+            if (Prefs.DevMode)
+                Log.Message($"[PawnStatus] Cleared user-deleted mark for pawn {pawnId}");
+        }
         
         /// <summary>
         /// 更新所有殖民者的状态常识（每小时检查一次）
@@ -74,6 +109,12 @@ namespace RimTalk.Memory
                 try
                 {
                     int pawnID = pawn.thingIDNumber;
+                    
+                    // ⭐ 检查是否在用户删除黑名单中
+                    if (IsUserDeleted(pawnID))
+                    {
+                        continue; // 跳过已被用户删除的 Pawn
+                    }
                     
                     // 检查是否需要更新（24小时间隔）
                     if (!lastUpdateTicks.TryGetValue(pawnID, out int lastUpdate))

@@ -1050,12 +1050,12 @@ namespace RimTalk.Memory.UI
             
             if (lastSelectedEntry == null)
             {
-                // Create new
+                // Create new - 只在创建时设置 isUserEdited
                 var newEntry = new CommonKnowledgeEntry(editTag, editContent)
                 {
                     importance = editImportance,
                     targetPawnId = editTargetPawnId,
-                    isUserEdited = true,
+                    isUserEdited = true,  // ⭐ 新创建的条目标记为用户编辑
                     matchMode = editMatchMode
                 };
                 library.AddEntry(newEntry);
@@ -1065,12 +1065,13 @@ namespace RimTalk.Memory.UI
             }
             else
             {
-                // Edit existing
+                // Edit existing - 保存时不再修改 isUserEdited 标记
                 lastSelectedEntry.tag = editTag;
                 lastSelectedEntry.content = editContent;
                 lastSelectedEntry.importance = editImportance;
                 lastSelectedEntry.targetPawnId = editTargetPawnId;
-                lastSelectedEntry.isUserEdited = true;
+                // ⭐ 移除：不再每次保存都设置 isUserEdited = true
+                // lastSelectedEntry.isUserEdited = true;
                 lastSelectedEntry.matchMode = editMatchMode;
                 
                 // 清除缓存，确保新标签生效
