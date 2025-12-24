@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <!-- Common Knowledge Library UI -->
+    <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
+    <RimTalk_Knowledge_Import>Import</RimTalk_Knowledge_Import>
+    <RimTalk_Knowledge_Export>Export</RimTalk_Knowledge_Export>
+    <RimTalk_Knowledge_Delete>Delete</RimTalk_Knowledge_Delete>
+    <RimTalk_Knowledge_ClearAll>Clear All</RimTalk_Knowledge_ClearAll>
+    
+    <RimTalk_Knowledge_TotalAndEnabled>Total: {0} | Enabled: {1}</RimTalk_Knowledge_TotalAndEnabled>
+    
+    <!-- Auto Generate Section -->
+    <RimTalk_Knowledge_AutoGenerate>Auto Generate Knowledge</RimTalk_Knowledge_AutoGenerate>
+    <RimTalk_Knowledge_PawnStatus>Colonist Status Knowledge</RimTalk_Knowledge_PawnStatus>
+    <RimTalk_Knowledge_PawnStatusDesc>Auto-update colonist status daily (join time, relationships, etc.)</RimTalk_Knowledge_PawnStatusDesc>
+    <RimTalk_Knowledge_EventRecord>Event Record Knowledge</RimTalk_Knowledge_EventRecord>
+    <RimTalk_Knowledge_EventRecordDesc>Extract major events daily from game log (death, marriage, join, construction, etc.)</RimTalk_Knowledge_EventRecordDesc>
+    <RimTalk_Knowledge_GenerateNow>Generate Now (Manual)</RimTalk_Knowledge_GenerateNow>
+    <RimTalk_Knowledge_GenerateNowDesc>Generate all enabled knowledge types immediately</RimTalk_Knowledge_GenerateNowDesc>
+    <RimTalk_Knowledge_EnableAtLeastOne>Please enable at least one knowledge generation type</RimTalk_Knowledge_EnableAtLeastOne>
+    <RimTalk_Knowledge_MustEnterGame>Must enter game first</RimTalk_Knowledge_MustEnterGame>
+    <RimTalk_Knowledge_GeneratedCount>Generated {0} colonist status knowledge</RimTalk_Knowledge_GeneratedCount>
+    <RimTalk_Knowledge_AllExist>All colonist status knowledge already exists, no need to generate</RimTalk_Knowledge_AllExist>
+    <RimTalk_Knowledge_EventGeneratedCount>Generated {0} event record knowledge</RimTalk_Knowledge_EventGeneratedCount>
+    <RimTalk_Knowledge_NoNewEvents>No new major events found, or all events already recorded</RimTalk_Knowledge_NoNewEvents>
+    <RimTalk_Knowledge_EventGenerateFailed>Event record generation failed: {0}</RimTalk_Knowledge_EventGenerateFailed>
+    
+    <!-- Detail Panel -->
+    <RimTalk_Knowledge_SelectEntry>Please select a knowledge entry</RimTalk_Knowledge_SelectEntry>
+    <RimTalk_Knowledge_Tag>Tag:</RimTalk_Knowledge_Tag>
+    <RimTalk_Knowledge_Importance>Importance:</RimTalk_Knowledge_Importance>
+    <RimTalk_Knowledge_Status>Status:</RimTalk_Knowledge_Status>
+    <RimTalk_Knowledge_Enabled>Enabled</RimTalk_Knowledge_Enabled>
+    <RimTalk_Knowledge_Disabled>Disabled</RimTalk_Knowledge_Disabled>
+    <RimTalk_Knowledge_Keywords>Keywords:</RimTalk_Knowledge_Keywords>
+    <RimTalk_Knowledge_Content>Content:</RimTalk_Knowledge_Content>
+    <RimTalk_Knowledge_Edit>Edit</RimTalk_Knowledge_Edit>
+    
+    <!-- Edit Panel -->
+    <RimTalk_Knowledge_KeywordsHint>Keywords (separated by commas, leave blank to auto-extract):</RimTalk_Knowledge_KeywordsHint>
+    <RimTalk_Knowledge_Save>Save</RimTalk_Knowledge_Save>
+    <RimTalk_Knowledge_Cancel>Cancel</RimTalk_Knowledge_Cancel>
+    <RimTalk_Knowledge_NewTag>New Tag</RimTalk_Knowledge_NewTag>
+    <RimTalk_Knowledge_ContentRequired>Content cannot be empty</RimTalk_Knowledge_ContentRequired>
+    <RimTalk_Knowledge_SaveSuccess>Saved successfully</RimTalk_Knowledge_SaveSuccess>
+    
+    <!-- Confirmations -->
+    <RimTalk_Knowledge_DeleteConfirm>Are you sure you want to delete this knowledge?</RimTalk_Knowledge_DeleteConfirm>
+    <RimTalk_Knowledge_Deleted>Deleted</RimTalk_Knowledge_Deleted>
+    <RimTalk_Knowledge_ClearAllConfirm>Are you sure you want to clear all {0} knowledge entries? This action cannot be undone!</RimTalk_Knowledge_ClearAllConfirm>
+    <RimTalk_Knowledge_Cleared>Knowledge library cleared</RimTalk_Knowledge_Cleared>
+    
+    <!-- Import Dialog -->
+    <RimTalk_Knowledge_ImportTitle>Import Knowledge</RimTalk_Knowledge_ImportTitle>
+    <RimTalk_Knowledge_ImportDesc>Enter or paste knowledge text\nFormat: [Tag]Content\nOne entry per line</RimTalk_Knowledge_ImportDesc>
+    <RimTalk_Knowledge_ImportSuccess>Successfully imported {0} knowledge entries</RimTalk_Knowledge_ImportSuccess>
+    <RimTalk_Knowledge_Confirm>Confirm</RimTalk_Knowledge_Confirm>
+    
+    <!-- Export -->
+    <RimTalk_Knowledge_NoContent>No content to export</RimTalk_Knowledge_NoContent>
+    <RimTalk_Knowledge_ExportSuccess>Exported to: {0}</RimTalk_Knowledge_ExportSuccess>
+    <RimTalk_Knowledge_ExportFailed>Export failed: {0}</RimTalk_Knowledge_ExportFailed>
+    
+    <!-- Create Memory Dialog -->
+    <RimTalk_Memory_AddToLayer>Add {0} to {1} for {2}</RimTalk_Memory_AddToLayer>
+    <RimTalk_Memory_Content>Memory Content:</RimTalk_Memory_Content>
+    <RimTalk_Memory_TagsOptional>Tags (comma-separated, optional):</RimTalk_Memory_TagsOptional>
+    <RimTalk_Memory_NotesOptional>Notes (optional):</RimTalk_Memory_NotesOptional>
+    <RimTalk_Memory_ImportanceLabel>Importance: {0}</RimTalk_Memory_ImportanceLabel>
+    <RimTalk_Memory_PinMemory>Pin this memory (won't be auto-deleted or decayed)</RimTalk_Memory_PinMemory>
+    <RimTalk_Memory_ContentRequired>Memory content cannot be empty</RimTalk_Memory_ContentRequired>
+    <RimTalk_Memory_AddedToELS>Added memory to {0}'s ELS (Mid-term Memory)</RimTalk_Memory_AddedToELS>
+    <RimTalk_Memory_AddedToCLPA>Added memory to {0}'s CLPA (Long-term Memory)</RimTalk_Memory_AddedToCLPA>
+    
+    <!-- Layer Names -->
+    <RimTalk_Layer_ELS>ELS (Mid-term Memory)</RimTalk_Layer_ELS>
+    <RimTalk_Layer_CLPA>CLPA (Long-term Memory)</RimTalk_Layer_CLPA>
+    
+    <!-- Memory Type Names -->
+    <RimTalk_Type_Action>Action Memory</RimTalk_Type_Action>
+    <RimTalk_Type_Conversation>Conversation Memory</RimTalk_Type_Conversation>
+
+    <!-- Knowledge Chaining -->
+    <RimTalk_ExtendedProperties>Extended Properties</RimTalk_ExtendedProperties>
+    <RimTalk_CanBeExtracted>Can Be Extracted: </RimTalk_CanBeExtracted>
+    <RimTalk_CanBeMatched>Can Be Matched: </RimTalk_CanBeMatched>
+    <RimTalk_Yes>Yes (✓)</RimTalk_Yes>
+    <RimTalk_No>No (×)</RimTalk_No>
+    <RimTalk_EnableAllExtract>Enable All Extraction</RimTalk_EnableAllExtract>
+    <RimTalk_DisableAllExtract>Disable All Extraction</RimTalk_DisableAllExtract>
+    <RimTalk_EnableAllMatch>Enable All Matching</RimTalk_EnableAllMatch>
+    <RimTalk_DisableAllMatch>Disable All Matching</RimTalk_DisableAllMatch>
+    <RimTalk_CanBeExtractedEnabled>Content extraction for lore chain enabled (Click to disable)</RimTalk_CanBeExtractedEnabled>
+    <RimTalk_CanBeExtractedDisabled>Content extraction for lore chain disabled (Click to enable)</RimTalk_CanBeExtractedDisabled>
+    <RimTalk_CanBeMatchedEnabled>Keyword matching enabled (Click to disable)</RimTalk_CanBeMatchedEnabled>
+    <RimTalk_CanBeMatchedDisabled>Keyword matching disabled (Click to enable)</RimTalk_CanBeMatchedDisabled>
+    
+    <!-- Common Functionality -->
+    <RimTalk_Knowledge_Categories>Categories</RimTalk_Knowledge_Categories>
+    <RimTalk_Knowledge_CategoryAll>All</RimTalk_Knowledge_CategoryAll>
+    <RimTalk_Knowledge_CategoryInstructions>Instructions</RimTalk_Knowledge_CategoryInstructions>
+    <RimTalk_Knowledge_CategoryLore>Lore</RimTalk_Knowledge_CategoryLore>
+    <RimTalk_Knowledge_CategoryPawnStatus>Pawn Status</RimTalk_Knowledge_CategoryPawnStatus>
+    <RimTalk_Knowledge_CategoryHistory>History</RimTalk_Knowledge_CategoryHistory>
+    <RimTalk_Knowledge_CategoryOther>Other</RimTalk_Knowledge_CategoryOther>
+    <RimTalk_Knowledge_CategoryUnknown>Unknown</RimTalk_Knowledge_CategoryUnknown>
+    
+    <RimTalk_Knowledge_Total>Total: {0}</RimTalk_Knowledge_Total>
+    <RimTalk_Knowledge_Enabled>Enabled: {0}</RimTalk_Knowledge_Enabled>
+    <RimTalk_Knowledge_Selected>Selected: {0}</RimTalk_Knowledge_Selected>
+    <RimTalk_Knowledge_Showing>Showing {0} / {1}</RimTalk_Knowledge_Showing>
+    
+    <RimTalk_Knowledge_ExportAll>Export All</RimTalk_Knowledge_ExportAll>
+    <RimTalk_Knowledge_ExportCount>Export ({0})</RimTalk_Knowledge_ExportCount>
+    <RimTalk_Knowledge_DeleteCount>Delete ({0})</RimTalk_Knowledge_DeleteCount>
+    
+    <RimTalk_Knowledge_Details>Details</RimTalk_Knowledge_Details>
+    <RimTalk_Knowledge_StatusEnabled>Enabled</RimTalk_Knowledge_StatusEnabled>
+    <RimTalk_Knowledge_StatusDisabled>Disabled</RimTalk_Knowledge_StatusDisabled>
+    
+    <RimTalk_Knowledge_ItemsSelected>{0} Items Selected</RimTalk_Knowledge_ItemsSelected>
+    <RimTalk_Knowledge_EnabledCount>Enabled: {0}</RimTalk_Knowledge_EnabledCount>
+    <RimTalk_Knowledge_DisabledCount>Disabled: {0}</RimTalk_Knowledge_DisabledCount>
+    <RimTalk_Knowledge_AvgImportance>Avg. Importance: {0}</RimTalk_Knowledge_AvgImportance>
+    <RimTalk_Knowledge_EnableAll>Enable All</RimTalk_Knowledge_EnableAll>
+    <RimTalk_Knowledge_DisableAll>Disable All</RimTalk_Knowledge_DisableAll>
+    <RimTalk_Knowledge_ExportItems>Export Selected ({0})</RimTalk_Knowledge_ExportItems>
+    <RimTalk_Knowledge_DeleteItems>Delete Selected ({0})</RimTalk_Knowledge_DeleteItems>
+    
+    <RimTalk_Knowledge_NewEntry>New Entry</RimTalk_Knowledge_NewEntry>
+    <RimTalk_Knowledge_EditEntry>Edit Entry</RimTalk_Knowledge_EditEntry>
+    
+    <RimTalk_Knowledge_Global>Global</RimTalk_Knowledge_Global>
+    <RimTalk_Knowledge_GlobalAll>Global (All Pawns)</RimTalk_Knowledge_GlobalAll>
+    <RimTalk_Knowledge_ExclusiveTo>Exclusive to {0}</RimTalk_Knowledge_ExclusiveTo>
+    <RimTalk_Knowledge_VisibilityGlobal>Global (All Pawns)</RimTalk_Knowledge_VisibilityGlobal>
+    <RimTalk_Knowledge_VisibilityExclusive>Exclusive to {0}</RimTalk_Knowledge_VisibilityExclusive>
+    <RimTalk_Knowledge_VisibilityDeleted>(Pawn Deleted)</RimTalk_Knowledge_VisibilityDeleted>
+    
+    <RimTalk_Knowledge_DeleteConfirm>Delete {0} knowledge entries?</RimTalk_Knowledge_DeleteConfirm>
+    <RimTalk_Knowledge_Deleted>Deleted {0} knowledge entries</RimTalk_Knowledge_Deleted>
+    <RimTalk_Knowledge_ClearConfirm>Clear all knowledge? This cannot be undone!</RimTalk_Knowledge_ClearConfirm>
+    <RimTalk_Knowledge_AllCleared>Knowledge library cleared</RimTalk_Knowledge_AllCleared>
+    
+    <RimTalk_Knowledge_ImportDescription>Paste knowledge text (Format: [Tag]Content, one per line)</RimTalk_Knowledge_ImportDescription>
+    <RimTalk_Knowledge_Imported>Imported {0} knowledge entries</RimTalk_Knowledge_Imported>
+    <RimTalk_Knowledge_ExportedToClipboard>Exported {0} knowledge entries to clipboard</RimTalk_Knowledge_ExportedToClipboard>
+    
+    <RimTalk_Knowledge_TagContentEmpty>Tag and content cannot be empty</RimTalk_Knowledge_TagContentEmpty>
+    <RimTalk_Knowledge_EntrySaved>Knowledge saved</RimTalk_Knowledge_EntrySaved>
+    
+    <RimTalk_Knowledge_NoColonists>No colonists on current map</RimTalk_Knowledge_NoColonists>
+    <RimTalk_Knowledge_GeneratedPawnStatus>Generated {0} pawn status knowledge entries</RimTalk_Knowledge_GeneratedPawnStatus>
+    <RimTalk_Knowledge_EventScanTriggered>Event scan triggered</RimTalk_Knowledge_EventScanTriggered>
+    <RimTalk_Knowledge_GenerationFailed>Generation failed: {0}</RimTalk_Knowledge_GenerationFailed>
+    
+    <!-- Help Guide -->
+    <RimTalk_Knowledge_Help>Help</RimTalk_Knowledge_Help>
+    <RimTalk_Knowledge_HelpTitle>Common Knowledge Library Guide</RimTalk_Knowledge_HelpTitle>
+    <RimTalk_Knowledge_HelpContent>【Knowledge Retrieval Logic】
+The knowledge library automatically injects relevant knowledge during AI conversations:
+
+1. Keyword Matching: Extracts keywords from conversation context and matches knowledge tags
+   • Any Mode: Matches if any keyword is found
+   • All Mode: Matches only if all keywords are found
+   • ⚠️ Uses substring matching (case-insensitive)
+
+2. Vector Similarity Matching (requires vector service):
+   • Uses semantic similarity algorithms to find most relevant knowledge
+   • Can find semantically related content even without exact keyword matches
+
+3. Importance Ranking:
+   • Matched knowledge is sorted by importance (0.0-1.0) in descending order
+   • Only top N most important entries are injected (configurable in settings)
+
+【How to Write Effective Knowledge】
+
+✓ Keep tags clear but avoid too short
+  • Good: [Lore-Planet] or [Rules-CombatSystem] (3+ chars)
+  • Bad: [War] or [AI] (1-2 chars, prone to false matches)
+  • Why: Short tags match too many unrelated contexts
+
+✓ Use compound tags for precision
+  • Good: [Lore-Ringworld] or [Character-John-Background]
+  • Bad: [John] (may trigger in unrelated conversations)
+
+✓ Tags must be triggerable by conversations
+  • Problem: Tag [Rules-CombatSystem] won't trigger in "shooting" "melee" conversations
+  • Solution: Use [Combat,Shooting,Melee,Dodge] to add trigger keywords
+  • Or: [Rules-Combat,Shooting] keeps categorization while adding triggers
+
+✓ Avoid using skill names as single tags
+  • Problem: [Shooting] triggers in ALL conversations of pawns with Shooting skill (≥10)
+  • Reason: Match text includes pawn's high-level skill names
+  • Bad: [Shooting], [Melee], [Construction] (frequent false matches)
+  • Good: [Rules-ShootingCombat,Aim], [Tips-Melee,Brawl] (requires explicit mention)
+
+✓ Make content specific and actionable
+  • Good: This planet is a ringworld with 0.8x Earth gravity
+  • Bad: This planet is special
+
+✓ Set appropriate importance levels
+  • Core settings/rules: 0.8-1.0
+  • General background: 0.5-0.7
+  • Minor details: 0.3-0.5
+
+✓ Use extended properties wisely
+  • Can Be Matched: Enable to participate in keyword/vector retrieval
+  • Can Be Extracted: Enable for knowledge chain referencing
+
+【Common Questions】
+Q: Why is my knowledge injected too frequently?
+A: Tag might be too short or too broad. Use 3+ character compound tags like [Lore-ColonyHistory] instead of [History]
+
+Q: Why isn't my knowledge being injected?
+A: Check if knowledge is enabled, matching mode is correct, importance isn't too low, and tags are relevant to conversation
+
+Q: How to make AI use certain knowledge only in specific scenarios?
+A: Use precise compound tags (e.g., [Rules-Combat-RangedWeapons]) and moderate importance
+
+✓ Tags must be triggerable by conversations
+  • Problem: Tag [Rules-CombatSystem] won't trigger in "shooting" "melee" conversations
+  • Solution: Use [Combat,Shooting,Melee,Dodge] to add trigger keywords
+  • Or: [Rules-Combat,Shooting] keeps categorization while adding triggers
+
+✓ Avoid using skill names as single tags
+  • Problem: [Shooting] triggers in ALL conversations of pawns with Shooting skill (≥10)
+  • Reason: Match text includes pawn's high-level skill names
+  • Bad: [Shooting], [Melee], [Construction] (frequent false matches)
+  • Good: [Rules-ShootingCombat,Aim], [Tips-Melee,Brawl] (requires explicit mention)
+
+✓ Make content specific and actionable
+</RimTalk_Knowledge_HelpContent>
+
+    <!-- Tag Testing Tool -->
+    <RimTalk_Knowledge_TagTest>🔍 Tag Test</RimTalk_Knowledge_TagTest>
+    <RimTalk_Knowledge_TagTestTitle>Tag Matching Test Tool</RimTalk_Knowledge_TagTestTitle>
+    <RimTalk_Knowledge_TagTestInputTag>Test Tags (comma-separated):</RimTalk_Knowledge_TagTestInputTag>
+    <RimTalk_Knowledge_TagTestInputContext>Conversation Content:</RimTalk_Knowledge_TagTestInputContext>
+    <RimTalk_Knowledge_TagTestSelectPawn>Select Pawn (optional):</RimTalk_Knowledge_TagTestSelectPawn>
+    <RimTalk_Knowledge_TagTestNoPawn>None (conversation only)</RimTalk_Knowledge_TagTestNoPawn>
+    <RimTalk_Knowledge_TagTestResult>Match Result:</RimTalk_Knowledge_TagTestResult>
+    <RimTalk_Knowledge_TagTestMatched>✅ Matched</RimTalk_Knowledge_TagTestMatched>
+    <RimTalk_Knowledge_TagTestNotMatched>❌ Not Matched</RimTalk_Knowledge_TagTestNotMatched>
+    <RimTalk_Knowledge_TagTestMatchText>Actual Match Text:</RimTalk_Knowledge_TagTestMatchText>
+    <RimTalk_Knowledge_TagTestClear>Clear</RimTalk_Knowledge_TagTestClear>
+
+</LanguageData>

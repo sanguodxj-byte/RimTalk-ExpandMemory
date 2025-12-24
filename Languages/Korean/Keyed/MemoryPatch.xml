@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <!-- RimTalk Memory Patch - 한국어 번역 (Machine Translated) -->
+    
+    <!-- Filter Buttons -->
+    <RimTalk_Filter_All>모두</RimTalk_Filter_All>
+    <RimTalk_Filter_Conversation>대화</RimTalk_Filter_Conversation>
+    <RimTalk_Filter_Interaction>상호작용</RimTalk_Filter_Interaction>
+    <RimTalk_Filter_Action>행동</RimTalk_Filter_Action>
+    <RimTalk_Filter_Observation>관찰</RimTalk_Filter_Observation>
+    <RimTalk_Filter_Event>이벤트</RimTalk_Filter_Event>
+    <RimTalk_Filter_Emotion>감정</RimTalk_Filter_Emotion>
+    <RimTalk_Filter_Relationship>관계</RimTalk_Filter_Relationship>
+    
+    <!-- Memory Stats -->
+    <RimTalk_MemoryStats>단기 기억: {0}/{1} | 장기 기억: {2}/{3}</RimTalk_MemoryStats>
+    <RimTalk_MemoryTitle>{0}의 기억</RimTalk_MemoryTitle>
+    
+    <!-- Four Layer Memory Stats -->
+    <RimTalk_FourLayerMemoryStats>ABM: {0}/{1} | SCM: {2}/{3} | ELS: {4}/{5} | CLPA: {6}</RimTalk_FourLayerMemoryStats>
+    <RimTalk_ActiveBufferMemory>활성 버퍼 메모리</RimTalk_ActiveBufferMemory>
+    <RimTalk_SituationalMemory>상황적 맥락 메모리</RimTalk_SituationalMemory>
+    <RimTalk_EventLogSummary>이벤트 로그 요약</RimTalk_EventLogSummary>
+    <RimTalk_ArchiveMemory>식민지 역사 및 인물 기록</RimTalk_ArchiveMemory>
+    
+    <!-- Colonist Selection -->
+    <RimTalk_SelectColonist>정착민 선택</RimTalk_SelectColonist>
+    <RimTalk_ChooseColonist>선택...</RimTalk_ChooseColonist>
+    <RimTalk_NoColonists>정착민 없음</RimTalk_NoColonists>
+    <RimTalk_NoMemoryComponent>이 정착민은 메모리 구성 요소가 없습니다</RimTalk_NoMemoryComponent>
+    
+    <!-- Time Display -->
+    <RimTalk_JustNow>방금</RimTalk_JustNow>
+    <RimTalk_MinutesAgo>{0}분 전</RimTalk_MinutesAgo>
+    <RimTalk_HoursAgo>{0}시간 전</RimTalk_HoursAgo>
+    <RimTalk_DaysAgo>{0}일 전</RimTalk_DaysAgo>
+    
+    <!-- Memory Types -->
+    <RimTalk_MemoryType_Conversation>대화</RimTalk_MemoryType_Conversation>
+    <RimTalk_MemoryType_Interaction>상호작용</RimTalk_MemoryType_Interaction>
+    <RimTalk_MemoryType_Action>행동</RimTalk_MemoryType_Action>
+    <RimTalk_MemoryType_Observation>관찰</RimTalk_MemoryType_Observation>
+    <RimTalk_MemoryType_Event>이벤트</RimTalk_MemoryType_Event>
+    <RimTalk_MemoryType_Emotion>감정</RimTalk_MemoryType_Emotion>
+    <RimTalk_MemoryType_Relationship>관계</RimTalk_MemoryType_Relationship>
+    
+    <!-- Memory Tab -->
+    <RimTalk_TabMemory>기억</RimTalk_TabMemory>
+    <RimTalk_TabMemoryDesc>이 정착민의 기억 보기</RimTalk_TabMemoryDesc>
+    
+    <!-- Settings -->
+    <RimTalk_MemoryPatchSettings>메모리 시스템 설정</RimTalk_MemoryPatchSettings>
+    <RimTalk_MemoryPatchDescription>RimTalk용 메모리 시스템 지원 제공</RimTalk_MemoryPatchDescription>
+    <RimTalk_OriginalRimTalkSettings>대화 기능은 원본 RimTalk 설정에 있습니다</RimTalk_OriginalRimTalkSettings>
+    
+    <!-- Memory Settings -->
+    <RimTalk_MaxShortTermMemories>단기 메모리 한도</RimTalk_MaxShortTermMemories>
+    <RimTalk_MaxLongTermMemories>장기 메모리 한도</RimTalk_MaxLongTermMemories>
+    <RimTalk_MemoryDecayRate>메모리 감쇠율</RimTalk_MemoryDecayRate>
+    <RimTalk_EnableMemoryUI>메모리 UI 활성화</RimTalk_EnableMemoryUI>
+    
+    <!-- Four Layer Memory Settings -->
+    <RimTalk_MaxActiveMemories>활성 버퍼 메모리 한도</RimTalk_MaxActiveMemories>
+    <RimTalk_MaxSituationalMemories>상황적 메모리 한도</RimTalk_MaxSituationalMemories>
+    <RimTalk_MaxEventLogMemories>이벤트 로그 메모리 한도</RimTalk_MaxEventLogMemories>
+    <RimTalk_EnableDailySummarization>일일 요약 활성화</RimTalk_EnableDailySummarization>
+    <RimTalk_SummarizationHour>요약 시간 (게임 시간)</RimTalk_SummarizationHour>
+    
+    <!-- Memory Type Toggles -->
+    <RimTalk_MemoryTypeToggles>메모리 유형 설정</RimTalk_MemoryTypeToggles>
+    <RimTalk_EnableInteractionMemory>상호작용 메모리 활성화</RimTalk_EnableInteractionMemory>
+    <RimTalk_EnableInteractionMemoryDesc>정착민 간의 사회적 상호작용 기록</RimTalk_EnableInteractionMemoryDesc>
+    <RimTalk_EnableActionMemory>행동 메모리 활성화</RimTalk_EnableActionMemory>
+    <RimTalk_EnableActionMemoryDesc>작업, 전투 및 기타 행동 기록</RimTalk_EnableActionMemoryDesc>
+    <RimTalk_EnableConversationMemory>대화 메모리 활성화</RimTalk_EnableConversationMemory>
+    <RimTalk_EnableConversationMemoryDesc>RimTalk에서 생성된 대화 기록 (RimTalk 통합 필요)</RimTalk_EnableConversationMemoryDesc>
+    <RimTalk_EnableObservationMemory>관찰 메모리 활성화</RimTalk_EnableObservationMemory>
+    <RimTalk_EnableObservationMemoryDesc>관찰된 이벤트 기록</RimTalk_EnableObservationMemoryDesc>
+    <RimTalk_EnableEventMemory>이벤트 메모리 활성화</RimTalk_EnableEventMemory>
+    <RimTalk_EnableEventMemoryDesc>중요한 이벤트 기록 (습격, 사망 등)</RimTalk_EnableEventMemoryDesc>
+    <RimTalk_EnableEmotionMemory>감정 메모리 활성화</RimTalk_EnableEmotionMemory>
+    <RimTalk_EnableEmotionMemoryDesc>감정 변화 기록</RimTalk_EnableEmotionMemoryDesc>
+    <RimTalk_EnableRelationshipMemory>관계 메모리 활성화</RimTalk_EnableRelationshipMemory>
+    <RimTalk_EnableRelationshipMemoryDesc>관계 변화 기록 (연애, 갈등 등)</RimTalk_EnableRelationshipMemoryDesc>
+    
+    <!-- Memory Edit Dialog -->
+    <RimTalk_EditMemory>기억 편집</RimTalk_EditMemory>
+    <RimTalk_DeleteMemory>기억 삭제</RimTalk_DeleteMemory>
+    <RimTalk_PinMemory>기억 고정</RimTalk_PinMemory>
+    <RimTalk_UnpinMemory>기억 고정 해제</RimTalk_UnpinMemory>
+    <RimTalk_MemoryContent>내용</RimTalk_MemoryContent>
+    <RimTalk_MemoryNotes>메모</RimTalk_MemoryNotes>
+    <RimTalk_MemoryTags>태그</RimTalk_MemoryTags>
+    <RimTalk_AddTag>태그 추가</RimTalk_AddTag>
+    <RimTalk_RemoveTag>태그 제거</RimTalk_RemoveTag>
+    <RimTalk_CustomTag>사용자 정의 태그</RimTalk_CustomTag>
+    <RimTalk_Save>저장</RimTalk_Save>
+    <RimTalk_Cancel>취소</RimTalk_Cancel>
+    <RimTalk_ConfirmDelete>이 기억을 삭제하시겠습니까?</RimTalk_ConfirmDelete>
+    <RimTalk_MemoryUpdated>기억이 업데이트되었습니다</RimTalk_MemoryUpdated>
+    <RimTalk_MemoryDeleted>기억이 삭제되었습니다</RimTalk_MemoryDeleted>
+    
+    <!-- Memory Actions -->
+    <RimTalk_ClearAll>모두 지우기</RimTalk_ClearAll>
+    <RimTalk_ClearShortTerm>단기 기억 지우기</RimTalk_ClearShortTerm>
+    <RimTalk_ClearLongTerm>장기 기억 지우기</RimTalk_ClearLongTerm>
+    <RimTalk_ConfirmClearAll>모든 기억을 지우시겠습니까?</RimTalk_ConfirmClearAll>
+    <RimTalk_ConfirmClearShortTerm>단기 기억을 지우시겠습니까?</RimTalk_ConfirmClearShortTerm>
+    <RimTalk_ConfirmClearLongTerm>장기 기억을 지우시겠습니까?</RimTalk_ConfirmClearLongTerm>
+    
+    <!-- UI Buttons -->
+    <RimTalk_UI_Preview>미리보기</RimTalk_UI_Preview>
+    <RimTalk_UI_Knowledge>지식</RimTalk_UI_Knowledge>
+    <RimTalk_UI_ImmediateSummarize>즉시 요약 (SCM → ELS)</RimTalk_UI_ImmediateSummarize>
+    <RimTalk_UI_ImmediateSummarizeNoMemory>요약할 SCM 없음</RimTalk_UI_ImmediateSummarizeNoMemory>
+    <RimTalk_UI_MemorySummarized>{0}의 메모리 요약됨</RimTalk_UI_MemorySummarized>
+    <RimTalk_UI_SummarizeAll>모두 요약 (대기열)</RimTalk_UI_SummarizeAll>
+    <RimTalk_UI_MemoriesSummarizedCount>{0}명의 정착민이 메모리 요약 대기열에 추가됨</RimTalk_UI_MemoriesSummarizedCount>
+    <RimTalk_UI_NoColonistsNeedSummarize>요약이 필요한 정착민 없음</RimTalk_UI_NoColonistsNeedSummarize>
+    <RimTalk_UI_ImmediateArchive>즉시 아카이브 (ELS → CLPA)</RimTalk_UI_ImmediateArchive>
+    <RimTalk_UI_ImmediateArchiveNoMemory>아카이브할 ELS 없음</RimTalk_UI_ImmediateArchiveNoMemory>
+    <RimTalk_UI_MemoryArchived>{0}의 메모리 아카이브됨</RimTalk_UI_MemoryArchived>
+    <RimTalk_UI_ArchiveAll>모두 아카이브</RimTalk_UI_ArchiveAll>
+    <RimTalk_UI_MemoriesArchivedCount>{0}명의 정착민 메모리 아카이브됨</RimTalk_UI_MemoriesArchivedCount>
+    
+    <!-- Other -->
+    <RimTalk_With>와(과)</RimTalk_With>
+    <RimTalk_ObservationPlaceholder>(관찰 메모리 플레이스홀더 - 아직 구현되지 않음)</RimTalk_ObservationPlaceholder>
+</LanguageData>

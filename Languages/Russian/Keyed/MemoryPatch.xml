@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <!-- RimTalk Memory Patch - Русский перевод -->
+    
+    <!-- Filter Buttons -->
+    <RimTalk_Filter_All>Все</RimTalk_Filter_All>
+    <RimTalk_Filter_Conversation>Разговоры</RimTalk_Filter_Conversation>
+    <RimTalk_Filter_Interaction>Взаимодействия</RimTalk_Filter_Interaction>
+    <RimTalk_Filter_Action>Действия</RimTalk_Filter_Action>
+    <RimTalk_Filter_Observation>Наблюдения</RimTalk_Filter_Observation>
+    <RimTalk_Filter_Event>События</RimTalk_Filter_Event>
+    <RimTalk_Filter_Emotion>Эмоции</RimTalk_Filter_Emotion>
+    <RimTalk_Filter_Relationship>Отношения</RimTalk_Filter_Relationship>
+    
+    <!-- Memory Stats -->
+    <RimTalk_MemoryStats>Кратковременная: {0}/{1} | Долговременная: {2}/{3}</RimTalk_MemoryStats>
+    <RimTalk_MemoryTitle>Воспоминания {0}</RimTalk_MemoryTitle>
+    
+    <!-- Four Layer Memory Stats -->
+    <RimTalk_FourLayerMemoryStats>ABM: {0}/{1} | SCM: {2}/{3} | ELS: {4}/{5} | CLPA: {6}</RimTalk_FourLayerMemoryStats>
+    <RimTalk_ActiveBufferMemory>Активная буферная память</RimTalk_ActiveBufferMemory>
+    <RimTalk_SituationalMemory>Ситуативная контекстная память</RimTalk_SituationalMemory>
+    <RimTalk_EventLogSummary>Сводка журнала событий</RimTalk_EventLogSummary>
+    <RimTalk_ArchiveMemory>Архив долговременной личности</RimTalk_ArchiveMemory>
+    
+    <!-- Colonist Selection -->
+    <RimTalk_SelectColonist>Выбрать колониста</RimTalk_SelectColonist>
+    <RimTalk_ChooseColonist>Выбрать...</RimTalk_ChooseColonist>
+    <RimTalk_NoColonists>Нет колонистов</RimTalk_NoColonists>
+    <RimTalk_NoMemoryComponent>У этого колониста нет компонента памяти</RimTalk_NoMemoryComponent>
+    
+    <!-- Time Display -->
+    <RimTalk_JustNow>Только что</RimTalk_JustNow>
+    <RimTalk_MinutesAgo>{0} минут назад</RimTalk_MinutesAgo>
+    <RimTalk_HoursAgo>{0} часов назад</RimTalk_HoursAgo>
+    <RimTalk_DaysAgo>{0} дней назад</RimTalk_DaysAgo>
+    
+    <!-- Memory Types -->
+    <RimTalk_MemoryType_Conversation>Разговор</RimTalk_MemoryType_Conversation>
+    <RimTalk_MemoryType_Interaction>Взаимодействие</RimTalk_MemoryType_Interaction>
+    <RimTalk_MemoryType_Action>Действие</RimTalk_MemoryType_Action>
+    <RimTalk_MemoryType_Observation>Наблюдение</RimTalk_MemoryType_Observation>
+    <RimTalk_MemoryType_Event>Событие</RimTalk_MemoryType_Event>
+    <RimTalk_MemoryType_Emotion>Эмоция</RimTalk_MemoryType_Emotion>
+    <RimTalk_MemoryType_Relationship>Отношение</RimTalk_MemoryType_Relationship>
+    
+    <!-- Memory Tab -->
+    <RimTalk_TabMemory>Память</RimTalk_TabMemory>
+    <RimTalk_TabMemoryDesc>Просмотр воспоминаний этого колониста</RimTalk_TabMemoryDesc>
+    
+    <!-- Settings -->
+    <RimTalk_MemoryPatchSettings>Настройки системы памяти</RimTalk_MemoryPatchSettings>
+    <RimTalk_MemoryPatchDescription>Обеспечивает поддержку системы памяти для RimTalk</RimTalk_MemoryPatchDescription>
+    <RimTalk_OriginalRimTalkSettings>Настройки функции диалогов в оригинальных настройках RimTalk</RimTalk_OriginalRimTalkSettings>
+    
+    <!-- Memory Settings -->
+    <RimTalk_MaxShortTermMemories>Лимит кратковременной памяти</RimTalk_MaxShortTermMemories>
+    <RimTalk_MaxLongTermMemories>Лимит долговременной памяти</RimTalk_MaxLongTermMemories>
+    <RimTalk_MemoryDecayRate>Скорость затухания памяти</RimTalk_MemoryDecayRate>
+    <RimTalk_EnableMemoryUI>Включить интерфейс памяти</RimTalk_EnableMemoryUI>
+    
+    <!-- Four Layer Memory Settings -->
+    <RimTalk_MaxActiveMemories>Лимит активной буферной памяти</RimTalk_MaxActiveMemories>
+    <RimTalk_MaxSituationalMemories>Лимит ситуативной памяти</RimTalk_MaxSituationalMemories>
+    <RimTalk_MaxEventLogMemories>Лимит памяти журнала событий</RimTalk_MaxEventLogMemories>
+    <RimTalk_EnableDailySummarization>Включить ежедневную сводку</RimTalk_EnableDailySummarization>
+    <RimTalk_SummarizationHour>Час создания сводки (игровое время)</RimTalk_SummarizationHour>
+    
+    <!-- Memory Type Toggles -->
+    <RimTalk_MemoryTypeToggles>Настройки типов памяти</RimTalk_MemoryTypeToggles>
+    <RimTalk_EnableInteractionMemory>Включить память взаимодействий</RimTalk_EnableInteractionMemory>
+    <RimTalk_EnableInteractionMemoryDesc>Записывать социальные взаимодействия между колонистами</RimTalk_EnableInteractionMemoryDesc>
+    <RimTalk_EnableActionMemory>Включить память действий</RimTalk_EnableActionMemory>
+    <RimTalk_EnableActionMemoryDesc>Записывать работы, сражения и другие действия</RimTalk_EnableActionMemoryDesc>
+    <RimTalk_EnableConversationMemory>Включить память разговоров</RimTalk_EnableConversationMemory>
+    <RimTalk_EnableConversationMemoryDesc>Записывать диалоги, созданные RimTalk (требуется интеграция с RimTalk)</RimTalk_EnableConversationMemoryDesc>
+    <RimTalk_EnableObservationMemory>Включить память наблюдений</RimTalk_EnableObservationMemory>
+    <RimTalk_EnableObservationMemoryDesc>Записывать наблюдаемые события</RimTalk_EnableObservationMemoryDesc>
+    <RimTalk_EnableEventMemory>Включить память событий</RimTalk_EnableEventMemory>
+    <RimTalk_EnableEventMemoryDesc>Записывать важные события (рейды, смерти и т.д.)</RimTalk_EnableEventMemoryDesc>
+    <RimTalk_EnableEmotionMemory>Включить память эмоций</RimTalk_EnableEmotionMemory>
+    <RimTalk_EnableEmotionMemoryDesc>Записывать эмоциональные изменения</RimTalk_EnableEmotionMemoryDesc>
+    <RimTalk_EnableRelationshipMemory>Включить память отношений</RimTalk_EnableRelationshipMemory>
+    <RimTalk_EnableRelationshipMemoryDesc>Записывать изменения в отношениях (романтика, конфликты и т.д.)</RimTalk_EnableRelationshipMemoryDesc>
+    
+    <!-- Memory Edit Dialog -->
+    <RimTalk_EditMemory>Редактировать воспоминание</RimTalk_EditMemory>
+    <RimTalk_DeleteMemory>Удалить воспоминание</RimTalk_DeleteMemory>
+    <RimTalk_PinMemory>Закрепить воспоминание</RimTalk_PinMemory>
+    <RimTalk_UnpinMemory>Открепить воспоминание</RimTalk_UnpinMemory>
+    <RimTalk_MemoryContent>Содержание</RimTalk_MemoryContent>
+    <RimTalk_MemoryNotes>Заметки</RimTalk_MemoryNotes>
+    <RimTalk_MemoryTags>Теги</RimTalk_MemoryTags>
+    <RimTalk_AddTag>Добавить тег</RimTalk_AddTag>
+    <RimTalk_RemoveTag>Удалить тег</RimTalk_RemoveTag>
+    <RimTalk_CustomTag>Пользовательский тег</RimTalk_CustomTag>
+    <RimTalk_Save>Сохранить</RimTalk_Save>
+    <RimTalk_Cancel>Отмена</RimTalk_Cancel>
+    <RimTalk_ConfirmDelete>Подтвердить удаление этого воспоминания?</RimTalk_ConfirmDelete>
+    <RimTalk_MemoryUpdated>Воспоминание обновлено</RimTalk_MemoryUpdated>
+    <RimTalk_MemoryDeleted>Воспоминание удалено</RimTalk_MemoryDeleted>
+    
+    <!-- Memory Actions -->
+    <RimTalk_ClearAll>Очистить все</RimTalk_ClearAll>
+    <RimTalk_ClearShortTerm>Очистить кратковременную</RimTalk_ClearShortTerm>
+    <RimTalk_ClearLongTerm>Очистить долговременную</RimTalk_ClearLongTerm>
+    <RimTalk_ConfirmClearAll>Подтвердить очистку всех воспоминаний?</RimTalk_ConfirmClearAll>
+    <RimTalk_ConfirmClearShortTerm>Подтвердить очистку кратковременной памяти?</RimTalk_ConfirmClearShortTerm>
+    <RimTalk_ConfirmClearLongTerm>Подтвердить очистку долговременной памяти?</RimTalk_ConfirmClearLongTerm>
+    
+    <!-- UI Buttons -->
+    <RimTalk_UI_Preview>Предпросмотр</RimTalk_UI_Preview>
+    <RimTalk_UI_Knowledge>Знания</RimTalk_UI_Knowledge>
+    <RimTalk_UI_ImmediateSummarize>Немедленная сводка (SCM → ELS)</RimTalk_UI_ImmediateSummarize>
+    <RimTalk_UI_ImmediateSummarizeNoMemory>Нет SCM для сводки</RimTalk_UI_ImmediateSummarizeNoMemory>
+    <RimTalk_UI_MemorySummarized>Память {0} обобщена</RimTalk_UI_MemorySummarized>
+    <RimTalk_UI_SummarizeAll>Обобщить всех (Очередь)</RimTalk_UI_SummarizeAll>
+    <RimTalk_UI_MemoriesSummarizedCount>Поставлено в очередь {0} колонистов для обобщения памяти</RimTalk_UI_MemoriesSummarizedCount>
+    <RimTalk_UI_NoColonistsNeedSummarize>Нет колонистов, требующих обобщения</RimTalk_UI_NoColonistsNeedSummarize>
+    <RimTalk_UI_ImmediateArchive>Немедленный архив (ELS → CLPA)</RimTalk_UI_ImmediateArchive>
+    <RimTalk_UI_ImmediateArchiveNoMemory>Нет ELS для архивации</RimTalk_UI_ImmediateArchiveNoMemory>
+    <RimTalk_UI_MemoryArchived>Память {0} архивирована</RimTalk_UI_MemoryArchived>
+    <RimTalk_UI_ArchiveAll>Архивировать всех</RimTalk_UI_ArchiveAll>
+    <RimTalk_UI_MemoriesArchivedCount>Архивирована память {0} колонистов</RimTalk_UI_MemoriesArchivedCount>
+    
+    <!-- Other -->
+    <RimTalk_With>с</RimTalk_With>
+    <RimTalk_ObservationPlaceholder>(Заполнитель памяти наблюдения - еще не реализовано)</RimTalk_ObservationPlaceholder>
+</LanguageData>

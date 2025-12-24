@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <!-- RimTalk Memory Patch - ���w���ķ��g -->
+    
+    <!-- Filter Buttons -->
+    <RimTalk_Filter_All>ȫ��</RimTalk_Filter_All>
+    <RimTalk_Filter_Conversation>��Ԓ</RimTalk_Filter_Conversation>
+    <RimTalk_Filter_Interaction>����</RimTalk_Filter_Interaction>
+    <RimTalk_Filter_Action>�Є�</RimTalk_Filter_Action>
+    <RimTalk_Filter_Observation>�^��</RimTalk_Filter_Observation>
+    <RimTalk_Filter_Event>�¼�</RimTalk_Filter_Event>
+    <RimTalk_Filter_Emotion>��w</RimTalk_Filter_Emotion>
+    <RimTalk_Filter_Relationship>�P�S</RimTalk_Filter_Relationship>
+    
+    <!-- Memory Stats -->
+    <RimTalk_MemoryStats>����ӛ��: {0}/{1} | �L��ӛ��: {2}/{3}</RimTalk_MemoryStats>
+    <RimTalk_MemoryTitle>{0} ��ӛ��</RimTalk_MemoryTitle>
+    
+    <!-- Four Layer Memory Stats -->
+    <RimTalk_FourLayerMemoryStats>ABM: {0}/{1} | SCM: {2}/{3} | ELS: {4}/{5} | CLPA: {6}</RimTalk_FourLayerMemoryStats>
+    <RimTalk_ActiveBufferMemory>������ӛ��</RimTalk_ActiveBufferMemory>
+    <RimTalk_SituationalMemory>����ӛ��</RimTalk_SituationalMemory>
+    <RimTalk_EventLogSummary>����ӛ��</RimTalk_EventLogSummary>
+    <RimTalk_ArchiveMemory>�L��ӛ��</RimTalk_ArchiveMemory>
+    
+    <!-- Colonist Selection -->
+    <RimTalk_SelectColonist>�x��ֳ����</RimTalk_SelectColonist>
+    <RimTalk_ChooseColonist>�x��...</RimTalk_ChooseColonist>
+    <RimTalk_NoColonists>�]��ֳ����</RimTalk_NoColonists>
+    <RimTalk_NoMemoryComponent>ԓֳ���ߛ]��ӛ���M��</RimTalk_NoMemoryComponent>
+    
+    <!-- Time Display -->
+    <RimTalk_JustNow>����</RimTalk_JustNow>
+    <RimTalk_MinutesAgo>{0} ���ǰ</RimTalk_MinutesAgo>
+    <RimTalk_HoursAgo>{0} С�rǰ</RimTalk_HoursAgo>
+    <RimTalk_DaysAgo>{0} ��ǰ</RimTalk_DaysAgo>
+    
+    <!-- Memory Types -->
+    <RimTalk_MemoryType_Conversation>��Ԓ</RimTalk_MemoryType_Conversation>
+    <RimTalk_MemoryType_Interaction>����</RimTalk_MemoryType_Interaction>
+    <RimTalk_MemoryType_Action>�Є�</RimTalk_MemoryType_Action>
+    <RimTalk_MemoryType_Observation>�^��</RimTalk_MemoryType_Observation>
+    <RimTalk_MemoryType_Event>�¼�</RimTalk_MemoryType_Event>
+    <RimTalk_MemoryType_Emotion>��w</RimTalk_MemoryType_Emotion>
+    <RimTalk_MemoryType_Relationship>�P�S</RimTalk_MemoryType_Relationship>
+    
+    <!-- Memory Tab -->
+    <RimTalk_TabMemory>ӛ��</RimTalk_TabMemory>
+    <RimTalk_TabMemoryDesc>�鿴ԓֳ���ߵ�ӛ��</RimTalk_TabMemoryDesc>
+    
+    <!-- Settings -->
+    <RimTalk_MemoryPatchSettings>ӛ��ϵ�y�O��</RimTalk_MemoryPatchSettings>
+    <RimTalk_MemoryPatchDescription>�� RimTalk �ṩӛ��ϵ�y֧Ԯ</RimTalk_MemoryPatchDescription>
+    <RimTalk_OriginalRimTalkSettings>��Ԓ����Ո�� RimTalk ԭ���O��������</RimTalk_OriginalRimTalkSettings>
+    
+    <!-- Memory Settings -->
+    <RimTalk_MaxShortTermMemories>����ӛ������</RimTalk_MaxShortTermMemories>
+    <RimTalk_MaxLongTermMemories>�L��ӛ������</RimTalk_MaxLongTermMemories>
+    <RimTalk_MemoryDecayRate>ӛ��˥�p����</RimTalk_MemoryDecayRate>
+    <RimTalk_EnableMemoryUI>����ӛ������</RimTalk_EnableMemoryUI>
+    
+    <!-- Four Layer Memory Settings -->
+    <RimTalk_MaxActiveMemories>������ӛ������</RimTalk_MaxActiveMemories>
+    <RimTalk_MaxSituationalMemories>����ӛ������</RimTalk_MaxSituationalMemories>
+    <RimTalk_MaxEventLogMemories>����ӛ������</RimTalk_MaxEventLogMemories>
+    <RimTalk_EnableDailySummarization>����ÿ�տ��Y</RimTalk_EnableDailySummarization>
+    <RimTalk_SummarizationHour>���Y�|�l�r�g���[��С�r��</RimTalk_SummarizationHour>
+    
+    <!-- Memory Type Toggles -->
+    <RimTalk_MemoryTypeToggles>ӛ������O��</RimTalk_MemoryTypeToggles>
+    <RimTalk_EnableInteractionMemory>���û���ӛ��</RimTalk_EnableInteractionMemory>
+    <RimTalk_EnableInteractionMemoryDesc>ӛ�ֳ����֮�g���罻����</RimTalk_EnableInteractionMemoryDesc>
+    <RimTalk_EnableActionMemory>�����Є�ӛ��</RimTalk_EnableActionMemory>
+    <RimTalk_EnableActionMemoryDesc>ӛ䛹��������Y�Ȼ��</RimTalk_EnableActionMemoryDesc>
+    <RimTalk_EnableConversationMemory>���Ì�Ԓӛ��</RimTalk_EnableConversationMemory>
+    <RimTalk_EnableConversationMemoryDesc>ӛ� RimTalk ���ɵČ�Ԓ����Ҫ RimTalk ���ɣ�</RimTalk_EnableConversationMemoryDesc>
+    <RimTalk_EnableObservationMemory>�����^��ӛ��</RimTalk_EnableObservationMemory>
+    <RimTalk_EnableObservationMemoryDesc>ӛ��^�쵽���¼�</RimTalk_EnableObservationMemoryDesc>
+    <RimTalk_EnableEventMemory>�����¼�ӛ��</RimTalk_EnableEventMemory>
+    <RimTalk_EnableEventMemoryDesc>ӛ���Ҫ�¼����u��������ȣ�</RimTalk_EnableEventMemoryDesc>
+    <RimTalk_EnableEmotionMemory>������wӛ��</RimTalk_EnableEmotionMemory>
+    <RimTalk_EnableEmotionMemoryDesc>ӛ���w׃��</RimTalk_EnableEmotionMemoryDesc>
+    <RimTalk_EnableRelationshipMemory>�����P�Sӛ��</RimTalk_EnableRelationshipMemory>
+    <RimTalk_EnableRelationshipMemoryDesc>ӛ��P�S׃�����ِۡ��nͻ�ȣ�</RimTalk_EnableRelationshipMemoryDesc>
+    
+    <!-- Memory Edit Dialog -->
+    <RimTalk_EditMemory>��݋ӛ��</RimTalk_EditMemory>
+    <RimTalk_DeleteMemory>�h��ӛ��</RimTalk_DeleteMemory>
+    <RimTalk_PinMemory>�̶�ӛ��</RimTalk_PinMemory>
+    <RimTalk_UnpinMemory>ȡ���̶�</RimTalk_UnpinMemory>
+    <RimTalk_MemoryContent>����</RimTalk_MemoryContent>
+    <RimTalk_MemoryNotes>���]</RimTalk_MemoryNotes>
+    <RimTalk_MemoryTags>�˻`</RimTalk_MemoryTags>
+    <RimTalk_AddTag>��Ә˻`</RimTalk_AddTag>
+    <RimTalk_RemoveTag>�Ƴ��˻`</RimTalk_RemoveTag>
+    <RimTalk_CustomTag>�Զ��x�˻`</RimTalk_CustomTag>
+    <RimTalk_Save>����</RimTalk_Save>
+    <RimTalk_Cancel>ȡ��</RimTalk_Cancel>
+    <RimTalk_ConfirmDelete>�_�J�h����ӛ����</RimTalk_ConfirmDelete>
+    <RimTalk_MemoryUpdated>ӛ���Ѹ���</RimTalk_MemoryUpdated>
+    <RimTalk_MemoryDeleted>ӛ���фh��</RimTalk_MemoryDeleted>
+    
+    <!-- Memory Actions -->
+    <RimTalk_ClearAll>���ȫ��</RimTalk_ClearAll>
+    <RimTalk_ClearShortTerm>��ն���</RimTalk_ClearShortTerm>
+    <RimTalk_ClearLongTerm>����L��</RimTalk_ClearLongTerm>
+    <RimTalk_ConfirmClearAll>�_�J�������ӛ����</RimTalk_ConfirmClearAll>
+    <RimTalk_ConfirmClearShortTerm>�_�J��ն���ӛ����</RimTalk_ConfirmClearShortTerm>
+    <RimTalk_ConfirmClearLongTerm>�_�J����L��ӛ����</RimTalk_ConfirmClearLongTerm>
+    
+    <!-- Other -->
+    <RimTalk_With>�c</RimTalk_With>
+    <RimTalk_ObservationPlaceholder>���^��ӛ����λ����δ���F��</RimTalk_ObservationPlaceholder>
+</LanguageData>

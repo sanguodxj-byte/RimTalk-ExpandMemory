@@ -1,0 +1,22 @@
+# RimWorld Mod 部署配置示例
+# 复制此文件为 .rimworld.config 并填入您的路径
+
+# RimWorld 安装目录（必填）
+# 示例（Steam 默认路径）：
+#   Windows: C:\Program Files (x86)\Steam\steamapps\common\RimWorld
+#   Linux:   ~/.steam/steam/steamapps/common/RimWorld
+#   macOS:   ~/Library/Application Support/Steam/steamapps/common/RimWorld
+RIMWORLD_DIR=YOUR_RIMWORLD_PATH_HERE
+
+# Mod 文件夹名称（可选，默认：RimTalk-MemoryPatch）
+MOD_FOLDER_NAME=RimTalk-MemoryPatch
+
+# 游戏版本（可选，默认：1.6）
+GAME_VERSION=1.6
+
+# 使用说明：
+# 1. 复制此文件为 .rimworld.config
+# 2. 将 YOUR_RIMWORLD_PATH_HERE 替换为您的 RimWorld 安装路径
+# 3. 设置环境变量（可选，用于 Visual Studio 自动部署）：
+#    Windows: setx RIMWORLD_DIR "您的路径"
+#    Linux/macOS: export RIMWORLD_DIR="您的路径"

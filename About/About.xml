@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<packageId>cj.rimtalk.expandmemory</packageId>
+	<name>RimTalk - Expand Memory</name>
+	<author>SANGUO</author>
+	<supportedVersions>
+		<li>1.5</li>
+		<li>1.6</li>
+	</supportedVersions>
+	<modVersion>3.3.21</modVersion>
+	<url>https://github.com/sanguodxj-byte/RimTalk-ExpandMemory</url>
+	
+	<description>[h1]RimTalk - Expand Memory v3.3.21[/h1]
+
+[b]四层记忆系统 + 智能注入 + 提示词规范化 + AI多平台支持 + 全新UI + 标签测试工具[/b]
+
+为RimTalk AI对话提供强大的记忆与常识支持，让殖民者拥有真实的记忆和知识！
+
+[hr][/hr]
+
+[h1]核心功能[/h1]
+
+[b]四层记忆架构[/b]
+超短期(ABM 6条) 短期(SCM 10-50条) 中期(ELS 20-100条) 长期(CLPA 无限)，模拟真实的记忆衰减
+
+[b]Mind Stream UI (v3.3.19)[/b]
+时间线卡片布局：垂直滚动的记忆卡片，彩色边框区分层级
+拖拽多选：Ctrl/Shift/框选，支持批量操作
+智能过滤：按层级(ABM/SCM/ELS/CLPA)和类型过滤
+实时统计：显示各层记忆数量和选中数量
+
+[b]图书馆风格常识库 + 标签测试工具 (v3.3.21 最新)[/b]
+三栏布局：分类导航 + 列表 + 详情/编辑
+分类过滤：全部/规则/世界观/角色状态/历史/其他
+多选操作：批量启用/禁用/导出/删除
+搜索功能：按标签或内容快速查找
+📘 使用说明：完整的标签最佳实践指南，包含技能名陷阱警告
+🔍 标签测试工具：实时测试标签匹配效果，支持Pawn信息模拟
+
+[b]智能动态注入[/b]
+时间衰减30% + 重要性30% + 关键词40%
+自动选择最相关记忆注入对话
+名字识别加成：+0.3分（v3.3.2.38优化）
+支持双角色关键词提取（当前角色 + 交互对象）
+O(1) LRU缓存优化
+
+[b]自动清理系统 (v3.3.14)[/b]
+Activity阈值清理：自动删除activity &lt; 0.01的"死亡"记忆
+容量限制强制执行：超过上限时删除最低activity记忆
+三重保护：固定记忆、用户编辑记忆、长期记忆永不删除
+每小时自动执行，防止记忆无限累积
+
+[b]提示词规范化 (v3.3.2.37)[/b]
+用户自定义文本替换规则
+支持正则表达式（忽略大小写）
+预编译优化 + 20ms超时保护
+实时生效，无需重启
+
+[b]通用常识库[/b]
+格式：[标签|重要性]内容
+支持导入导出、角色专属、可视化UI
+标签解析容错：[Noble] 和 [Noble} 都能识别
+名字匹配智能识别：直接检测角色名字，+0.3加成
+
+[b]AI 多平台支持[/b]
+OpenAI GPT、DeepSeek、Player2、Google Gemini、Custom
+Prompt Caching 节省50%费用
+独立配置，不依赖RimTalk设置
+
+[hr][/hr]
+
+[h1]使用方法[/h1]
+
+[b]基础配置[/b]
+1. 安装 Harmony + RimTalk
+2. 启用本Mod
+3. 游戏内打开 Memory 标签页
+4. 点击右上角"Knowledge"按钮打开常识库
+
+[b]常识库操作指南（v3.3.21）[/b]
+
+左侧分类：全部/规则/世界观/角色状态/历史/其他
+顶部工具栏：新建、导入、导出、删除
+多选操作：Ctrl/Shift/拖拽选择，批量启用/禁用/导出
+右侧面板：查看详情、编辑内容、设置可见范围
+
+📘 使用说明按钮（侧边栏底部）：
+• 完整的常识库使用指南
+• 标签最佳实践（避免过短标签、技能名误触）
+• 匹配逻辑详解（关键词匹配 + 向量增强）
+• 常见问题FAQ
+
+🔍 标签测试工具（侧边栏，浅绿色按钮）：
+• 实时测试标签是否会匹配对话
+• 支持Pawn信息模拟（包含技能、特性）
+• 显示完整的匹配文本
+• 帮助诊断标签误触问题
+• 独立弹窗，清晰的上下分隔布局
+
+标签测试快速教程：
+1. 点击 🔍 标签测试 打开测试窗口
+2. 输入标签（如：战斗,射击,瞄准）
+3. 输入对话内容（如：我要练习射击）
+4. 可选：选择Pawn查看技能影响
+5. 点击 🔍 测试 查看匹配结果
+6. 查看实际匹配文本，诊断问题
+
+[b]记忆时间线操作（v3.3.19）[/b]
+单击选中、Ctrl+单击多选、Shift+单击范围选择
+鼠标拖拽框选多个记忆
+批量操作：总结、归档、删除选中的记忆
+
+[b]推荐配置[/b]
+动态注入：启用 - 最大记忆：8-10条 - 最大常识：3-5条 - 记忆阈值：0.15 - 常识阈值：0.10
+
+[hr][/hr]
+
+[h1]更新日志[/h1]
+
+[b]v3.3.21 最新 - 标签测试工具[/b]
+🔍 标签测试工具
+• 独立弹窗式测试工具（650x600像素）
+• 实时测试标签匹配效果
+• 支持Pawn信息模拟（名字、性别、种族、特性、技能≥10级）
+• 清晰的上下分隔布局（输入区 + 分隔线 + 结果区）
+• 可滚动的匹配文本显示
+• 详细日志输出（F12查看）
+
+📘 使用说明系统
+• 完整的常识库使用指南（内置帮助按钮）
+• 标签最佳实践文档
+• 技能名陷阱警告（避免 [射击] 等单标签误触）
+• 匹配引擎评估报告
+• 中英文完整翻译
+
+标签最佳实践：
+• ✅ 推荐：[规则-射击战斗,瞄准] （组合标签，精确触发）
+• ❌ 避免：[射击] （会在任何射击专家的所有对话中触发）
+• 原因：匹配文本包含Pawn的10级以上技能名称
+
+bug修复：
+• 修复标签测试工具结果区域与输入重叠
+• 使用绝对坐标确保布局正确
+• 增加窗口尺寸提供更多显示空间
+
+[b]v3.3.19[/b]
+Mind Stream UI - 全新记忆时间线
+卡片式布局：垂直滚动的记忆卡片，每个卡片带彩色边框
+拖拽多选：支持Ctrl+点击、Shift+范围选择、鼠标框选
+智能过滤：按层级和类型过滤
+实时统计：显示各层记忆数量和选中项数量
+批量操作：总结、归档、删除选中的记忆
+彩色层级：ABM(青)、SCM(绿)、ELS(黄)、CLPA(紫)
+
+图书馆风格常识库UI
+三栏布局：分类导航 + 列表 + 详情/编辑
+分类过滤：全部/规则/世界观/角色状态/历史/其他
+多选操作：批量启用/禁用/导出/删除
+搜索功能：按标签或内容快速查找
+自动生成：支持Pawn状态和事件记录自动生成
+可视化管理：直观的UI替代手动编辑XML
+
+完整翻译支持
+新增100+翻译键覆盖所有UI元素
+英文/中文双语完整支持
+所有按钮、提示、消息都使用翻译系统
+
+[b]v3.3.14[/b]
+记忆自动清理系统
+Activity阈值清理：自动删除低活跃度记忆
+容量限制强制执行：超过上限时删除最低activity记忆
+三重保护：固定记忆、用户编辑记忆、长期记忆永不删除
+每小时自动执行，防止记忆无限累积导致性能下降
+
+[b]v3.3.13[/b]
+常识库评分优化：提升2字关键词评分0.10、3字关键词评分0.16
+场景分析显示：预览器显示场景类型（战斗/社交/工作等）
+关键词列表显示：预览器显示具体的上下文关键词
+
+[hr][/hr]
+
+[h1]兼容性[/h1]
+必需：Harmony
+推荐：RimTalk（获得AI对话功能）
+加载顺序：Core Harmony RimTalk 本Mod
+向后兼容：旧存档自动兼容
+
+[hr][/hr]
+
+[h1]鸣谢[/h1]
+
+Juicy - RimTalk 原作者
+RimTalk 是 RimWorld 最优秀的 AI 对话 Mod 之一，为殖民者赋予了真正的灵魂和个性。
+
+GitHub Copilot (Claude Sonnet 4.5)
+AI 辅助让开发更高效
+
+GitHub: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory
+
+让你的殖民者拥有真实记忆！
+	</description>
+	
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+		</li>
+		<li>
+			<packageId>cj.rimtalk</packageId>
+			<displayName>RimTalk</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3381946324</steamWorkshopUrl>
+			<downloadUrl>https://github.com/CET-Chengdu/RimTalk</downloadUrl>
+		</li>
+	</modDependencies>
+	
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>cj.rimtalk</li>
+	</loadAfter>
+	
+	<incompatibleWith>
+	</incompatibleWith>
+</ModMetaData>

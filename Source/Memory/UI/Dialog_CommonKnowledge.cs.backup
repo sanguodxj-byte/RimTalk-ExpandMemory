@@ -1,0 +1,830 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using RimWorld;
+
+namespace RimTalk.Memory.UI
+{
+    /// <summary>
+    /// 常识库管理窗口
+    /// </summary>
+    public class Dialog_CommonKnowledge : Window
+    {
+        private CommonKnowledgeLibrary library;
+        private Vector2 scrollPosition;
+        private string searchFilter = "";
+        private CommonKnowledgeEntry selectedEntry = null;
+        private bool editMode = false;
+        
+        // ? 自动生成折叠状态
+        private bool expandAutoGenerate = false;
+        
+        // 编辑字段
+        private string editTag = "";
+        private string editContent = "";
+        private float editImportance = 0.5f;
+        private string editKeywords = ""; // 新增：关键词编辑字段
+        
+        // 导入文本
+        private string importText = "";
+
+        public override Vector2 InitialSize => new Vector2(900f, 700f);
+
+        public Dialog_CommonKnowledge(CommonKnowledgeLibrary library)
+        {
+            this.library = library;
+            this.doCloseX = true;
+            this.doCloseButton = true;
+            this.closeOnClickedOutside = false;
+            this.absorbInputAroundWindow = true;
+        }
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            float yPos = 0f;
+
+            // 工具栏 - 直接从顶部开始
+            Rect toolbarRect = new Rect(0f, yPos, inRect.width, 40f);
+            DrawToolbar(toolbarRect);
+            yPos += 45f;
+
+            // 搜索框
+            Rect searchRect = new Rect(0f, yPos, 300f, 30f);
+            searchFilter = Widgets.TextField(searchRect, searchFilter);
+
+            // 统计信息
+            Rect statsRect = new Rect(310f, yPos, 300f, 30f);
+            int enabledCount = library.Entries.Count(e => e.isEnabled);
+            Widgets.Label(statsRect, $"总数: {library.Entries.Count} | 启用: {enabledCount}");
+            yPos += 35f;
+
+            // ? 自动生成常识折叠区（移到搜索框下方）
+            Rect autoGenRect = new Rect(0f, yPos, inRect.width, 35f);
+            DrawAutoGenerateSection(autoGenRect);
+            yPos += expandAutoGenerate ? 160f : 40f; // 展开时需要更多空间
+
+            // 左侧列表
+            Rect listRect = new Rect(0f, yPos, 450f, inRect.height - yPos - 50f);
+            DrawEntryList(listRect);
+
+            // 右侧详情/编辑区
+            Rect detailRect = new Rect(460f, yPos, inRect.width - 460f, inRect.height - yPos - 50f);
+            if (editMode)
+                DrawEditPanel(detailRect);
+            else
+                DrawDetailPanel(detailRect);
+        }
+
+        private void DrawToolbar(Rect rect)
+        {
+            float buttonWidth = 100f;
+            float spacing = 5f;
+            float x = 0f;
+
+            // 新建按钮
+            if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "新建"))
+            {
+                CreateNewEntry();
+            }
+            x += buttonWidth + spacing;
+
+            // 导入按钮
+            if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "导入"))
+            {
+                ShowImportDialog();
+            }
+            x += buttonWidth + spacing;
+
+            // 导出按钮
+            if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "导出"))
+            {
+                ExportToFile();
+            }
+            x += buttonWidth + spacing;
+
+            // 删除按钮
+            if (selectedEntry != null)
+            {
+                if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "删除"))
+                {
+                    DeleteSelectedEntry();
+                }
+                x += buttonWidth + spacing;
+            }
+
+            // 清空按钮
+            if (Widgets.ButtonText(new Rect(x, 0f, buttonWidth, 35f), "清空全部"))
+            {
+                ClearAllEntries();
+            }
+        }
+
+        /// <summary>
+        /// ? 绘制自动生成常识折叠区
+        /// </summary>
+        private void DrawAutoGenerateSection(Rect rect)
+        {
+            // 绘制折叠标题栏
+            Rect headerRect = new Rect(rect.x, rect.y, rect.width, 30f);
+            Widgets.DrawBoxSolid(headerRect, new Color(0.2f, 0.3f, 0.4f, 0.5f));
+            
+            // 展开/折叠按钮
+            Rect iconRect = new Rect(headerRect.x + 5f, headerRect.y + 5f, 20f, 20f);
+            if (Widgets.ButtonImage(iconRect, expandAutoGenerate ? TexButton.Collapse : TexButton.Reveal))
+            {
+                expandAutoGenerate = !expandAutoGenerate;
+            }
+            
+            // 标题（删除emoji）
+            Text.Font = GameFont.Small;
+            GUI.color = new Color(0.8f, 1f, 1f);
+            Rect titleRect = new Rect(headerRect.x + 30f, headerRect.y + 5f, headerRect.width - 30f, headerRect.height);
+            Widgets.Label(titleRect, "自动生成常识");
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            
+            // 如果展开，显示内容（从下方展开）
+            if (expandAutoGenerate)
+            {
+                Rect contentRect = new Rect(rect.x + 10f, rect.y + 35f, rect.width - 20f, 120f);
+                DrawAutoGenerateContent(contentRect);
+            }
+        }
+
+        /// <summary>
+        /// ? 绘制自动生成内容
+        /// </summary>
+        private void DrawAutoGenerateContent(Rect rect)
+        {
+            float yPos = 0f;
+            float buttonWidth = 200f;
+            float buttonHeight = 35f;
+            float spacing = 10f;
+
+            // 殖民者状态常识生成（删除emoji）
+            Rect pawnStatusRect = new Rect(rect.x, yPos, buttonWidth, buttonHeight);
+            if (Widgets.ButtonText(pawnStatusRect, "殖民者状态常识"))
+            {
+                GeneratePawnStatusKnowledge();
+            }
+            
+            Rect pawnStatusDescRect = new Rect(rect.x + buttonWidth + 10f, yPos + 8f, rect.width - buttonWidth - 10f, 20f);
+            GUI.color = Color.gray;
+            Text.Font = GameFont.Tiny;
+            Widgets.Label(pawnStatusDescRect, "为每个殖民者生成状态常识（入殖时长、重要关系等）");
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+
+            yPos += buttonHeight + spacing;
+
+            // 事件记录常识生成（删除emoji）
+            Rect eventRecordRect = new Rect(rect.x, yPos, buttonWidth, buttonHeight);
+            if (Widgets.ButtonText(eventRecordRect, "事件记录常识"))
+            {
+                GenerateEventRecordKnowledge();
+            }
+            
+            Rect eventRecordDescRect = new Rect(rect.x + buttonWidth + 10f, yPos + 8f, rect.width - buttonWidth - 10f, 20f);
+            GUI.color = Color.gray;
+            Text.Font = GameFont.Tiny;
+            Widgets.Label(eventRecordDescRect, "从游戏日志提取重大事件（死亡、结婚、加入、完成建造等）");
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+        }
+
+        /// <summary>
+        /// ? 生成殖民者状态常识
+        /// </summary>
+        private void GeneratePawnStatusKnowledge()
+        {
+            if (Current.Game == null)
+            {
+                Messages.Message("请先进入游戏", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+
+            int generatedCount = 0;
+            int currentTick = Find.TickManager.TicksGame;
+
+            foreach (var map in Find.Maps)
+            {
+                foreach (var pawn in map.mapPawns.FreeColonists)
+                {
+                    try
+                    {
+                        // 计算入殖时长
+                        int ticksSinceJoin = currentTick - pawn.records.GetAsInt(RecordDefOf.TimeAsColonistOrColonyAnimal);
+                        int daysSinceJoin = ticksSinceJoin / GenDate.TicksPerDay;
+                        
+                        // 生成标签
+                        string tag = $"殖民者,{pawn.LabelShort}";
+                        
+                        // 生成内容
+                        var sb = new System.Text.StringBuilder();
+                        sb.Append($"{pawn.LabelShort}");
+                        
+                        // 入殖时长
+                        if (daysSinceJoin < 5)
+                        {
+                            sb.Append("刚加入殖民地不久");
+                        }
+                        else if (daysSinceJoin < 15)
+                        {
+                            sb.Append($"加入殖民地约{daysSinceJoin}天");
+                        }
+                        else if (daysSinceJoin < 60)
+                        {
+                            sb.Append($"是殖民地的老成员（{daysSinceJoin}天）");
+                        }
+                        else
+                        {
+                            int years = daysSinceJoin / 60;
+                            sb.Append($"是殖民地的元老（{years}年{daysSinceJoin % 60}天）");
+                        }
+                        
+                        // 添加重要关系
+                        if (pawn.relations != null)
+                        {
+                            var spouse = pawn.relations.GetFirstDirectRelationPawn(PawnRelationDefOf.Spouse);
+                            if (spouse != null)
+                            {
+                                sb.Append($"，配偶是{spouse.LabelShort}");
+                            }
+                            
+                            var lover = pawn.relations.GetFirstDirectRelationPawn(PawnRelationDefOf.Lover);
+                            if (lover != null && lover != spouse)
+                            {
+                                sb.Append($"，恋人是{lover.LabelShort}");
+                            }
+                        }
+                        
+                        string content = sb.ToString();
+                        
+                        // 检查是否已存在
+                        bool exists = library.Entries.Any(e => 
+                            e.tag.Contains(pawn.LabelShort) && 
+                            e.content.Contains("殖民地") &&
+                            (e.content.Contains("加入") || e.content.Contains("老成员") || e.content.Contains("元老"))
+                        );
+                        
+                        if (!exists)
+                        {
+                            var entry = new CommonKnowledgeEntry(tag, content);
+                            entry.importance = 0.6f; // 中等重要性
+                            library.AddEntry(entry);
+                            generatedCount++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"[CommonKnowledge] Error generating status for {pawn.LabelShort}: {ex.Message}");
+                    }
+                }
+            }
+
+            if (generatedCount > 0)
+            {
+                Messages.Message($"已生成 {generatedCount} 条殖民者状态常识", MessageTypeDefOf.PositiveEvent, false);
+                Log.Message($"[CommonKnowledge] Generated {generatedCount} pawn status knowledge entries");
+            }
+            else
+            {
+                Messages.Message("所有殖民者状态常识已存在，无需生成", MessageTypeDefOf.NeutralEvent, false);
+            }
+        }
+
+        /// <summary>
+        /// ? 生成事件记录常识
+        /// </summary>
+        private void GenerateEventRecordKnowledge()
+        {
+            if (Current.Game == null)
+            {
+                Messages.Message("请先进入游戏", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+
+            int generatedCount = 0;
+
+            try
+            {
+                // 从游戏历史提取重大事件
+                var gameHistory = Find.PlayLog;
+                if (gameHistory != null)
+                {
+                    var recentEntries = gameHistory.AllEntries
+                        .Where(e => e != null)
+                        .OrderByDescending(e => e.Age)
+                        .Take(100); // 检查最近100条记录
+
+                    foreach (var logEntry in recentEntries)
+                    {
+                        try
+                        {
+                            string eventDesc = ExtractEventInfo(logEntry);
+                            if (!string.IsNullOrEmpty(eventDesc))
+                            {
+                                // 检查是否已存在
+                                bool exists = library.Entries.Any(e => 
+                                    e.content.Contains(eventDesc.Substring(0, Math.Min(15, eventDesc.Length)))
+                                );
+                                
+                                if (!exists)
+                                {
+                                    var entry = new CommonKnowledgeEntry("事件,历史", eventDesc);
+                                    entry.importance = 0.6f;
+                                    library.AddEntry(entry);
+                                    generatedCount++;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning($"[CommonKnowledge] Error extracting event: {ex.Message}");
+                        }
+                    }
+                }
+
+                if (generatedCount > 0)
+                {
+                    Messages.Message($"已生成 {generatedCount} 条事件记录常识", MessageTypeDefOf.PositiveEvent, false);
+                    Log.Message($"[CommonKnowledge] Generated {generatedCount} event knowledge entries");
+                }
+                else
+                {
+                    Messages.Message("未找到新的重大事件，或所有事件已记录", MessageTypeDefOf.NeutralEvent, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[CommonKnowledge] Error generating event knowledge: {ex.Message}\n{ex.StackTrace}");
+                Messages.Message($"生成事件记录失败: {ex.Message}", MessageTypeDefOf.RejectInput, false);
+            }
+        }
+
+        /// <summary>
+        /// ? 提取游戏事件信息
+        /// </summary>
+        private string ExtractEventInfo(LogEntry logEntry)
+        {
+            if (logEntry == null) return null;
+
+            try
+            {
+                // 获取事件文本
+                string text = logEntry.ToGameStringFromPOV(null, false);
+                if (string.IsNullOrEmpty(text)) return null;
+
+                // 过滤掉太短或太长的条目
+                if (text.Length < 10 || text.Length > 200) return null;
+
+                // 过滤掉不重要的日常事件
+                var boringKeywords = new[] { "走路", "吃饭", "睡觉", "娱乐", "闲逛" };
+                if (boringKeywords.Any(k => text.Contains(k)))
+                    return null;
+
+                // 重要事件关键词
+                var importantKeywords = new[] 
+                { 
+                    "死亡", "死了", "被杀", "击杀",
+                    "袭击", "进攻", "入侵",
+                    "爆炸", "火灾", "崩溃",
+                    "结婚", "订婚", "分手",
+                    "加入", "逃跑", "离开",
+                    "完成", "建造", "研究",
+                    "贸易", "商队"
+                };
+
+                if (!importantKeywords.Any(k => text.Contains(k)))
+                    return null;
+
+                // 添加时间信息
+                int currentTick = Find.TickManager.TicksGame;
+                int ticksAgo = currentTick - logEntry.Age;
+                int daysAgo = ticksAgo / GenDate.TicksPerDay;
+                
+                string timePrefix = "";
+                if (daysAgo < 1)
+                {
+                    timePrefix = "今天";
+                }
+                else if (daysAgo < 5)
+                {
+                    timePrefix = $"{daysAgo}天前";
+                }
+                else if (daysAgo < 60)
+                {
+                    timePrefix = $"约{daysAgo}天前";
+                }
+                else
+                {
+                    return null; // 太久远的事件不记录
+                }
+
+                return $"{timePrefix}{text}";
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[CommonKnowledge] Error in ExtractEventInfo: {ex.Message}");
+                return null;
+            }
+        }
+
+        private void DrawEntryList(Rect rect)
+        {
+            Widgets.DrawBoxSolid(rect, new Color(0.2f, 0.2f, 0.2f, 0.5f));
+            
+            var entries = library.Entries;
+            
+            // 应用搜索过滤
+            if (!string.IsNullOrEmpty(searchFilter))
+            {
+                entries = entries.Where(e => 
+                    (e.tag != null && e.tag.Contains(searchFilter)) ||
+                    (e.content != null && e.content.Contains(searchFilter))
+                ).ToList();
+            }
+
+            float viewHeight = entries.Count * 80f;
+            Rect viewRect = new Rect(0f, 0f, rect.width - 20f, viewHeight);
+            
+            Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
+
+            float y = 0f;
+            foreach (var entry in entries)
+            {
+                Rect entryRect = new Rect(5f, y, viewRect.width - 10f, 75f);
+                DrawEntryRow(entryRect, entry);
+                y += 80f;
+            }
+
+            Widgets.EndScrollView();
+        }
+
+        private void DrawEntryRow(Rect rect, CommonKnowledgeEntry entry)
+        {
+            bool isSelected = selectedEntry == entry;
+            
+            if (isSelected)
+            {
+                Widgets.DrawHighlight(rect);
+            }
+
+            if (Widgets.ButtonInvisible(rect))
+            {
+                selectedEntry = entry;
+                editMode = false;
+            }
+
+            Rect innerRect = rect.ContractedBy(5f);
+            
+            // 启用复选框
+            Rect checkboxRect = new Rect(innerRect.x, innerRect.y + 5f, 24f, 24f);
+            bool wasEnabled = entry.isEnabled;
+            Widgets.Checkbox(checkboxRect.x, checkboxRect.y, ref entry.isEnabled);
+            
+            if (entry.isEnabled != wasEnabled)
+            {
+                // 状态改变时的逻辑
+            }
+
+            // 标签
+            Rect tagRect = new Rect(innerRect.x + 30f, innerRect.y, 120f, 25f);
+            GUI.color = entry.isEnabled ? Color.white : Color.gray;
+            Widgets.Label(tagRect, $"[{entry.tag}]");
+            
+            // 内容预览
+            Rect contentRect = new Rect(innerRect.x + 30f, innerRect.y + 25f, innerRect.width - 30f, 40f);
+            string preview = entry.content.Length > 60 ? entry.content.Substring(0, 60) + "..." : entry.content;
+            Widgets.Label(contentRect, preview);
+            
+            GUI.color = Color.white;
+        }
+
+        private void DrawDetailPanel(Rect rect)
+        {
+            if (selectedEntry == null)
+            {
+                Widgets.Label(rect, "请选择一个常识条目");
+                return;
+            }
+
+            Widgets.DrawBoxSolid(rect, new Color(0.2f, 0.2f, 0.2f, 0.3f));
+            Rect innerRect = rect.ContractedBy(10f);
+            
+            float y = 0f;
+
+            // 标签
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "标签:");
+            Widgets.Label(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), selectedEntry.tag);
+            y += 30f;
+
+            // 重要性
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "重要性:");
+            Widgets.Label(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), selectedEntry.importance.ToString("F2"));
+            y += 30f;
+
+            // 启用状态
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "状态:");
+            Widgets.Label(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), selectedEntry.isEnabled ? "启用" : "禁用");
+            y += 30f;
+
+            // 关键词
+            if (selectedEntry.keywords != null && selectedEntry.keywords.Any())
+            {
+                Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "关键词:");
+                y += 25f;
+                
+                string keywordsText = string.Join(", ", selectedEntry.keywords.Take(10));
+                Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 50f), keywordsText);
+                y += 55f;
+            }
+
+            // 内容
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "内容:");
+            y += 25f;
+            
+            Rect contentRect = new Rect(innerRect.x, y, innerRect.width, innerRect.height - y - 50f);
+            Widgets.TextArea(contentRect, selectedEntry.content, true);
+
+            // 编辑按钮
+            Rect editButtonRect = new Rect(innerRect.x, innerRect.yMax - 40f, 100f, 35f);
+            if (Widgets.ButtonText(editButtonRect, "编辑"))
+            {
+                StartEdit(selectedEntry);
+            }
+        }
+
+        private void DrawEditPanel(Rect rect)
+        {
+            Widgets.DrawBoxSolid(rect, new Color(0.2f, 0.2f, 0.2f, 0.3f));
+            Rect innerRect = rect.ContractedBy(10f);
+            
+            float y = 0f;
+
+            // 标签
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), "标签:");
+            editTag = Widgets.TextField(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), editTag);
+            y += 30f;
+
+            // 重要性
+            Widgets.Label(new Rect(innerRect.x, y, 100f, 25f), $"重要性: {editImportance:F2}");
+            editImportance = Widgets.HorizontalSlider(new Rect(innerRect.x + 100f, y, innerRect.width - 100f, 25f), editImportance, 0f, 1f);
+            y += 35f;
+
+            // 关键词
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "关键词 (用逗号分隔，留空则自动提取):");
+            y += 25f;
+            Rect keywordsRect = new Rect(innerRect.x, y, innerRect.width, 25f);
+            editKeywords = Widgets.TextField(keywordsRect, editKeywords);
+            y += 30f;
+
+            // 内容
+            Widgets.Label(new Rect(innerRect.x, y, innerRect.width, 25f), "内容:");
+            y += 25f;
+            
+            Rect contentRect = new Rect(innerRect.x, y, innerRect.width, innerRect.height - y - 50f);
+            editContent = Widgets.TextArea(contentRect, editContent);
+
+            // 按钮行
+            Rect buttonRect = new Rect(innerRect.x, innerRect.yMax - 40f, 100f, 35f);
+            
+            if (Widgets.ButtonText(buttonRect, "保存"))
+            {
+                SaveEdit();
+            }
+            
+            buttonRect.x += 110f;
+            if (Widgets.ButtonText(buttonRect, "取消"))
+            {
+                editMode = false;
+            }
+        }
+
+        private void CreateNewEntry()
+        {
+            editMode = true;
+            editTag = "新标签";
+            editContent = "";
+            editImportance = 0.5f;
+            editKeywords = ""; // 新建条目时清空关键词字段
+            selectedEntry = null;
+        }
+
+        private void StartEdit(CommonKnowledgeEntry entry)
+        {
+            editMode = true;
+            editTag = entry.tag;
+            editContent = entry.content;
+            editImportance = entry.importance;
+            editKeywords = string.Join(", ", entry.keywords); // 编辑时填充关键词字段
+        }
+
+        private void SaveEdit()
+        {
+            if (string.IsNullOrEmpty(editContent))
+            {
+                Messages.Message("内容不能为空", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+
+            if (selectedEntry != null)
+            {
+                // 编辑现有条目
+                selectedEntry.tag = editTag;
+                selectedEntry.content = editContent;
+                selectedEntry.importance = editImportance;
+                
+                // 处理关键词（可选功能）
+                if (!string.IsNullOrWhiteSpace(editKeywords))
+                {
+                    // 使用用户输入的关键词
+                    selectedEntry.keywords = editKeywords
+                        .Split(',')
+                        .Select(k => k.Trim())
+                        .Where(k => !string.IsNullOrEmpty(k))
+                        .ToList();
+                }
+                else
+                {
+                    // 不自动提取，保持为空
+                    selectedEntry.keywords.Clear();
+                }
+                
+                // 清除标签缓存，强制重新解析
+                selectedEntry.GetTags();
+            }
+            else
+            {
+                // 创建新条目
+                var newEntry = new CommonKnowledgeEntry(editTag, editContent);
+                newEntry.importance = editImportance;
+                
+                // 处理关键词（可选功能）
+                if (!string.IsNullOrWhiteSpace(editKeywords))
+                {
+                    newEntry.keywords = editKeywords
+                        .Split(',')
+                        .Select(k => k.Trim())
+                        .Where(k => !string.IsNullOrEmpty(k))
+                        .ToList();
+                }
+                
+                library.AddEntry(newEntry);
+                selectedEntry = newEntry;
+            }
+
+            editMode = false;
+            Messages.Message("保存成功", MessageTypeDefOf.PositiveEvent, false);
+        }
+
+        private void DeleteSelectedEntry()
+        {
+            if (selectedEntry == null)
+                return;
+
+            Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                "确定要删除这条常识吗？",
+                delegate
+                {
+                    library.RemoveEntry(selectedEntry);
+                    selectedEntry = null;
+                    Messages.Message("已删除", MessageTypeDefOf.TaskCompletion, false);
+                }
+            ));
+        }
+
+        private void ClearAllEntries()
+        {
+            Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                $"确定要清空所有 {library.Entries.Count} 条常识吗？此操作不可撤销！",
+                delegate
+                {
+                    library.Clear();
+                    selectedEntry = null;
+                    Messages.Message("已清空常识库", MessageTypeDefOf.TaskCompletion, false);
+                }
+            ));
+        }
+
+        private void ShowImportDialog()
+        {
+            Dialog_TextInput dialog = new Dialog_TextInput(
+                "导入常识",
+                "请输入或粘贴常识文本\n格式: [标签]内容\n每行一条",
+                "",
+                delegate(string text)
+                {
+                    int count = library.ImportFromText(text, false);
+                    Messages.Message($"成功导入 {count} 条常识", MessageTypeDefOf.PositiveEvent, false);
+                },
+                null,
+                multiline: true
+            );
+            
+            Find.WindowStack.Add(dialog);
+        }
+
+        private void ExportToFile()
+        {
+            try
+            {
+                string exportText = library.ExportToText();
+                
+                if (string.IsNullOrEmpty(exportText))
+                {
+                    Messages.Message("没有可导出的内容", MessageTypeDefOf.RejectInput, false);
+                    return;
+                }
+
+                // 保存到文件
+                string fileName = $"CommonKnowledge_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                string filePath = Path.Combine(GenFilePaths.SaveDataFolderPath, fileName);
+                
+                File.WriteAllText(filePath, exportText);
+                
+                Messages.Message($"已导出到: {filePath}", MessageTypeDefOf.PositiveEvent, false);
+                Application.OpenURL(GenFilePaths.SaveDataFolderPath);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"导出常识库失败: {ex}");
+                Messages.Message("导出失败: " + ex.Message, MessageTypeDefOf.RejectInput, false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 简单的文本输入对话框
+    /// </summary>
+    public class Dialog_TextInput : Window
+    {
+        private string title;
+        private string description;
+        private string text;
+        private Action<string> onAccept;
+        private Action onCancel;
+        private bool multiline;
+
+        public override Vector2 InitialSize => new Vector2(600f, multiline ? 500f : 250f);
+
+        public Dialog_TextInput(string title, string description, string initialText, Action<string> onAccept, Action onCancel = null, bool multiline = false)
+        {
+            this.title = title;
+            this.description = description;
+            this.text = initialText ?? "";
+            this.onAccept = onAccept;
+            this.onCancel = onCancel;
+            this.multiline = multiline;
+            
+            this.doCloseX = true;
+            this.closeOnClickedOutside = false;
+            this.absorbInputAroundWindow = true;
+        }
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(0f, 0f, inRect.width, 35f), title);
+            Text.Font = GameFont.Small;
+
+            float y = 40f;
+            
+            if (!string.IsNullOrEmpty(description))
+            {
+                float descHeight = Text.CalcHeight(description, inRect.width);
+                Widgets.Label(new Rect(0f, y, inRect.width, descHeight), description);
+                y += descHeight + 10f;
+            }
+
+            // 文本输入区域
+            Rect textRect = new Rect(0f, y, inRect.width, inRect.height - y - 50f);
+            if (multiline)
+            {
+                text = Widgets.TextArea(textRect, text);
+            }
+            else
+            {
+                text = Widgets.TextField(textRect, text);
+            }
+
+            // 按钮
+            Rect buttonRect = new Rect(inRect.width - 220f, inRect.height - 40f, 100f, 35f);
+            if (Widgets.ButtonText(buttonRect, "确定"))
+            {
+                onAccept?.Invoke(text);
+                Close();
+            }
+
+            buttonRect.x += 110f;
+            if (Widgets.ButtonText(buttonRect, "取消"))
+            {
+                onCancel?.Invoke();
+                Close();
+            }
+        }
+    }
+}

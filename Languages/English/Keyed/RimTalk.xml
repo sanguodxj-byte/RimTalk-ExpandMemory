@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <!-- BioTabPersonalityPatch.cs -->
+    <RimTalk.BioTab.RimTalkPersona>Persona</RimTalk.BioTab.RimTalkPersona>
+
+    <!-- TickManager_DoSingleTick.cs -->
+    <RimTalk.TickManager.ApiKeyMissing>RimTalk: API key or Endpoint is missing.</RimTalk.TickManager.ApiKeyMissing>
+
+    <!-- TalkService.cs -->
+    <RimTalk.TalkService.QuotaReached>API quota exceeded. Try reducing prompt size or increasing cooldown.</RimTalk.TalkService.QuotaReached>
+    <RimTalk.TalkService.APIError>API error occurred</RimTalk.TalkService.APIError>
+    <RimTalk.TalkService.TryingNextAPI>Trying next API ({0})</RimTalk.TalkService.TryingNextAPI>
+    <RimTalk.TalkService.GenerationFailed>RimTalk generation failed</RimTalk.TalkService.GenerationFailed>
+
+    <!-- Persona -->
+    <RimTalk.Persona.CheerfulHelper>Cheerful Helper – Warm, upbeat, and encouraging. Always trying to lift spirits.</RimTalk.Persona.CheerfulHelper>
+    <RimTalk.Persona.CynicalRealist>Cynical Realist – Dry, sarcastic, and skeptical. Cuts straight to harsh truths.</RimTalk.Persona.CynicalRealist>
+    <RimTalk.Persona.ShyThinker>Shy Thinker – Quiet and hesitant. Uses few words but thoughtful when speaking.</RimTalk.Persona.ShyThinker>
+    <RimTalk.Persona.Hothead>Hothead – Short-tempered, loud, and impulsive. Snaps easily with fiery language.</RimTalk.Persona.Hothead>
+    <RimTalk.Persona.Philosopher>Philosopher – Reflective and abstract. Speaks in riddles or big questions.</RimTalk.Persona.Philosopher>
+    <RimTalk.Persona.DarkHumorist>Dark Humorist – Jokes about grim topics. Finds comedy in misery.</RimTalk.Persona.DarkHumorist>
+    <RimTalk.Persona.Caregiver>Caregiver – Gentle and protective. Comforting, soothing, and nurturing tone.</RimTalk.Persona.Caregiver>
+    <RimTalk.Persona.Opportunist>Opportunist – Sly and persuasive. Talks like a hustler, bargains, and twists words.</RimTalk.Persona.Opportunist>
+    <RimTalk.Persona.OptimisticDreamer>Optimistic Dreamer – Imaginative and hopeful. Excited about the future.</RimTalk.Persona.OptimisticDreamer>
+    <RimTalk.Persona.Pessimist>Pessimist – Gloomy and resigned. Expects failure and highlights risks.</RimTalk.Persona.Pessimist>
+    <RimTalk.Persona.StoicSoldier>Stoic Soldier – Calm, disciplined, and brief. Little emotion, matter-of-fact.</RimTalk.Persona.StoicSoldier>
+    <RimTalk.Persona.FreeSpirit>Free Spirit – Playful and carefree. Resists rules, shrugs off worries.</RimTalk.Persona.FreeSpirit>
+    <RimTalk.Persona.Workaholic>Workaholic – Driven and restless. Obsessed with duty and efficiency.</RimTalk.Persona.Workaholic>
+    <RimTalk.Persona.Slacker>Slacker – Lazy and casual. Complains about effort, prefers comfort.</RimTalk.Persona.Slacker>
+    <RimTalk.Persona.NobleIdealist>Noble Idealist – Formal and principled. Talks about honor and justice.</RimTalk.Persona.NobleIdealist>
+    <RimTalk.Persona.StreetwiseSurvivor>Streetwise Survivor – Rough, pragmatic, and cynical. Distrusts others, values grit.</RimTalk.Persona.StreetwiseSurvivor>
+    <RimTalk.Persona.Scholar>Scholar – Curious and intellectual. Loves explaining and correcting others.</RimTalk.Persona.Scholar>
+    <RimTalk.Persona.Jokester>Jokester – Lighthearted and silly. Constantly cracks jokes and puns.</RimTalk.Persona.Jokester>
+    <RimTalk.Persona.MelancholicPoet>Melancholic Poet – Soft-spoken and moody. Expresses feelings poetically.</RimTalk.Persona.MelancholicPoet>
+    <RimTalk.Persona.Paranoid>Paranoid – Nervous and distrustful. Assumes betrayal, always suspicious.</RimTalk.Persona.Paranoid>
+    <RimTalk.Persona.Commander>Commander – Confident and commanding. Motivates others, expects obedience.</RimTalk.Persona.Commander>
+    <RimTalk.Persona.Coward>Coward – Timid and fearful. Worries aloud, avoids confrontation.</RimTalk.Persona.Coward>
+    <RimTalk.Persona.ArrogantNoble>Arrogant Noble – Proud and condescending. Uses formal, superior language.</RimTalk.Persona.ArrogantNoble>
+    <RimTalk.Persona.LoyalCompanion>Loyal Companion – Steadfast and supportive. Talks about trust and unity.</RimTalk.Persona.LoyalCompanion>
+    <RimTalk.Persona.CuriousExplorer>Curious Explorer – Wide-eyed and eager. Asks questions with enthusiasm.</RimTalk.Persona.CuriousExplorer>
+    <RimTalk.Persona.ColdRationalist>Cold Rationalist – Detached and logical. Focused only on facts and efficiency.</RimTalk.Persona.ColdRationalist>
+    <RimTalk.Persona.FlirtatiousCharmer>Flirtatious Charmer – Playful, teasing, and bold. Enjoys witty banter.</RimTalk.Persona.FlirtatiousCharmer>
+    <RimTalk.Persona.BitterOutcast>Bitter Outcast – Resentful and sharp. Hostile, quick to recall grievances.</RimTalk.Persona.BitterOutcast>
+    <RimTalk.Persona.Zealot>Zealot – Fanatical and intense. Speaks in absolutes, condemns unbelievers.</RimTalk.Persona.Zealot>
+    <RimTalk.Persona.Trickster>Trickster – Mischievous and mocking. Teases and stirs trouble for fun.</RimTalk.Persona.Trickster>
+    <RimTalk.Persona.DeadpanRealist>Deadpan Realist – Flat, emotionless tone. Blunt facts with no exaggeration.</RimTalk.Persona.DeadpanRealist>
+    <RimTalk.Persona.ChildAtHeart>Child-at-Heart – Excitable and naive. Talks with wonder, sometimes childish.</RimTalk.Persona.ChildAtHeart>
+    <RimTalk.Persona.SkepticalScientist>Skeptical Scientist – Demands evidence, dismisses superstition, explains logically.</RimTalk.Persona.SkepticalScientist>
+    <RimTalk.Persona.Martyr>Martyr – Self-sacrificing and dramatic. Talks about burden and enduring pain.</RimTalk.Persona.Martyr>
+    <RimTalk.Persona.Manipulator>Manipulator – Charming but insincere. Uses flattery and deception.</RimTalk.Persona.Manipulator>
+    <RimTalk.Persona.Rebel>Rebel – Defiant and mocking. Challenges authority, questions rules.</RimTalk.Persona.Rebel>
+    <RimTalk.Persona.Oddball>Oddball – Quirky and strange. Uses odd metaphors and unpredictable logic.</RimTalk.Persona.Oddball>
+    <RimTalk.Persona.GreedyMerchant>Greedy Merchant – Obsessed with trade. Talks in profits, bargains, and losses.</RimTalk.Persona.GreedyMerchant>
+    <RimTalk.Persona.Romantic>Romantic – Dreamy and affectionate. Speaks in flowery language about love.</RimTalk.Persona.Romantic>
+    <RimTalk.Persona.BattleManiac>Battle Maniac – Thrives on conflict. Talks excitedly about combat and glory.</RimTalk.Persona.BattleManiac>
+    <RimTalk.Persona.GrumpyElder>Grumpy Elder – Complains constantly. Nostalgic, critical of others.</RimTalk.Persona.GrumpyElder>
+    <RimTalk.Persona.AmbitiousClimber>Ambitious Climber – Competitive and status-driven. Obsessed with rank.</RimTalk.Persona.AmbitiousClimber>
+    <RimTalk.Persona.Mediator>Mediator – Calm and fair-minded. Tries to reconcile arguments.</RimTalk.Persona.Mediator>
+    <RimTalk.Persona.Gambler>Gambler – Risk-loving and bold. Speaks in chance metaphors.</RimTalk.Persona.Gambler>
+    <RimTalk.Persona.ArtisticSoul>Artistic Soul – Talks about beauty, inspiration, and creativity.</RimTalk.Persona.ArtisticSoul>
+    <RimTalk.Persona.Drifter>Drifter – Detached and aloof. Casual tone, avoids attachment.</RimTalk.Persona.Drifter>
+    <RimTalk.Persona.Perfectionist>Perfectionist – Demanding and critical. Insists on doing things right.</RimTalk.Persona.Perfectionist>
+    <RimTalk.Persona.Vengeful>Vengeful – Grudge-holding and intense. Obsessed with revenge.</RimTalk.Persona.Vengeful>
+
+    <!-- RimTalk_Toggle.cs -->
+    <RimTalk.Toggle.Tooltip>Toggle overlay window\nShift+click for mod settings\nCtrl+click for debug window</RimTalk.Toggle.Tooltip>
+
+    <!-- Settings.cs -->
+    <RimTalk.Settings.BasicSettings>Basic Settings</RimTalk.Settings.BasicSettings>
+    <RimTalk.Settings.AIInstruction>AI Instruction</RimTalk.Settings.AIInstruction>
+    <RimTalk.Settings.EventFilter>Event Filter</RimTalk.Settings.EventFilter>
+    <RimTalk.Settings.ApiKey>Cloud API Key</RimTalk.Settings.ApiKey>
+    <RimTalk.Settings.GetFreeApiKey>Get a free API key</RimTalk.Settings.GetFreeApiKey>
+    <RimTalk.Settings.AICooldown>AI Cooldown (Seconds): {0}</RimTalk.Settings.AICooldown>
+    <RimTalk.Settings.OverrideInteractions>Override All Interactions with AI Dialogue</RimTalk.Settings.OverrideInteractions>
+    <RimTalk.Settings.OverrideInteractionsTooltip>Enable this to allow AI to override and regenerate dialogue for all interactions (including vanilla RimWorld and other mods). Note: AI dialogue has a cooldown period set above. To generate dialogue more frequently, lower the cooldown.</RimTalk.Settings.OverrideInteractionsTooltip>
+    <RimTalk.Settings.AllowSimultaneousConversations>Allow Simultaneous Conversations</RimTalk.Settings.AllowSimultaneousConversations>
+    <RimTalk.Settings.AllowSimultaneousConversationsTooltip>When enabled, multiple groups of pawns can talk at the same time. Turn this off if you prefer to see only one conversation at a time or if too many are happening at once.</RimTalk.Settings.AllowSimultaneousConversationsTooltip>
+    <RimTalk.Settings.DisplayTalkWhenDrafted>Display Talk When Drafted</RimTalk.Settings.DisplayTalkWhenDrafted>
+    <RimTalk.Settings.DisplayTalkWhenDraftedTooltip>Shows RimTalk bubbles even when pawns are drafted. This temporarily overrides bubble mod settings during talk generation.</RimTalk.Settings.DisplayTalkWhenDraftedTooltip>
+    <RimTalk.Settings.AllowCustomConversation>Allow Player-Created Conversations</RimTalk.Settings.AllowCustomConversation>
+    <RimTalk.Settings.AllowCustomConversationTooltip>Allows you to start custom dialogues between characters or talk directly to a character by writing your own lines. Right-click a pawn to begin a conversation.</RimTalk.Settings.AllowCustomConversationTooltip>
+    
+    <RimTalk.Settings.AllowSlavesToTalk>Allow Slaves to Talk</RimTalk.Settings.AllowSlavesToTalk>
+    <RimTalk.Settings.AllowSlavesToTalkTooltip>Enable this to allow slaves to have AI-generated conversations.</RimTalk.Settings.AllowSlavesToTalkTooltip>
+    <RimTalk.Settings.AllowPrisonersToTalk>Allow Prisoners to Talk</RimTalk.Settings.AllowPrisonersToTalk>
+    <RimTalk.Settings.AllowPrisonersToTalkTooltip>Enable this to allow prisoners to have AI-generated conversations.</RimTalk.Settings.AllowPrisonersToTalkTooltip>
+    <RimTalk.Settings.AllowOtherFactionsToTalk>Allow Other Factions to Talk</RimTalk.Settings.AllowOtherFactionsToTalk>
+    <RimTalk.Settings.AllowOtherFactionsToTalkTooltip>Enable this to allow members of other factions to have AI-generated conversations.</RimTalk.Settings.AllowOtherFactionsToTalkTooltip>
+    <RimTalk.Settings.AllowEnemiesToTalk>Allow Enemies to Talk</RimTalk.Settings.AllowEnemiesToTalk>
+    <RimTalk.Settings.AllowEnemiesToTalkTooltip>Enable this to allow enemies to have AI-generated conversations.</RimTalk.Settings.AllowEnemiesToTalkTooltip>
+    <RimTalk.Settings.PauseAtSpeed>Pause AI on High Speed</RimTalk.Settings.PauseAtSpeed>
+    <RimTalk.Settings.DisableAiAtSpeedTooltip>To reduce API calls, the AI will be paused when game speed is set to this level or higher.</RimTalk.Settings.DisableAiAtSpeedTooltip>
+    <RimTalk.Settings.Disabled>Disabled</RimTalk.Settings.Disabled>
+    <RimTalk.Settings.ButtonDisplay>RimTalk Button Display</RimTalk.Settings.ButtonDisplay>
+    <RimTalk.Settings.ButtonDisplayTooltip>Controls how the debug interface is accessed. 'Tab' adds a main tab, 'Toggle' shows an icon on the bottom bar, and 'None' hides it.</RimTalk.Settings.ButtonDisplayTooltip>
+    
+    <RimTalk.Settings.AIInstructionPrompt>AI Instruction Prompt (Model: {0})</RimTalk.Settings.AIInstructionPrompt>
+    <RimTalk.Settings.ExternalEditorTip>Tip: Use copy/paste with an external editor for multiline editing, or type \+n for new lines.</RimTalk.Settings.ExternalEditorTip>
+    <RimTalk.Settings.AutoIncludedTip>Tip: Pawn details (traits, relationships, race, age, etc.) are auto-included. Write generic instructions that work across all characters and colonies.</RimTalk.Settings.AutoIncludedTip>
+    <RimTalk.Settings.RateLimitWarning>Warning: Longer prompts will consume more tokens and hit rate limits faster. No prompt caching is used.</RimTalk.Settings.RateLimitWarning>
+    <RimTalk.Settings.BubbleFadeTip>Tip: Adjust the bubble fade time in the Interaction Bubbles mod settings to keep dialogue visible longer during fast-forward play.</RimTalk.Settings.BubbleFadeTip>
+    <RimTalk.Settings.TokenInfo>Current: ~{0} tokens | Recommended limit: {1} tokens</RimTalk.Settings.TokenInfo>
+    <RimTalk.Settings.ResetToDefault>Reset to Default</RimTalk.Settings.ResetToDefault>
+    <RimTalk.Settings.EventFilterTip>Tip: Only checked event types will be processed by AI. Uncheck types you don't want AI to respond to.</RimTalk.Settings.EventFilterTip>
+    <RimTalk.Settings.NoArchivableTypes>No archivable types found. Try starting a game and then rescanning.</RimTalk.Settings.NoArchivableTypes>
+
+    <!-- Dialog_PersonaEditor.cs -->
+    <RimTalk.PersonaEditor.Title>{0}'s Conversation Style</RimTalk.PersonaEditor.Title>
+    <RimTalk.PersonaEditor.Instruct>Describe how this colonist talks and behaves. Keep it brief (under 300 characters) for best results.</RimTalk.PersonaEditor.Instruct>
+    <RimTalk.PersonaEditor.Characters>Characters: {0}</RimTalk.PersonaEditor.Characters>
+    <RimTalk.PersonaEditor.Save>Save</RimTalk.PersonaEditor.Save>
+    <RimTalk.PersonaEditor.Updated>Updated conversation style for {0}</RimTalk.PersonaEditor.Updated>
+    <RimTalk.PersonaEditor.TalkFrequencyDesc>Controls how often this colonist initiates talks. Even at the lowest setting, they will still reply when others speak to them. This only affects conversation initiation frequency.</RimTalk.PersonaEditor.TalkFrequencyDesc>
+    <RimTalk.PersonaEditor.Chattiness>Chattiness</RimTalk.PersonaEditor.Chattiness>
+    <RimTalk.PersonaEditor.Quiet>Quiet</RimTalk.PersonaEditor.Quiet>
+    <RimTalk.PersonaEditor.Chatty>Chatty</RimTalk.PersonaEditor.Chatty>
+    <RimTalk.PersonaEditor.Generating>Generating...</RimTalk.PersonaEditor.Generating>
+    <RimTalk.PersonaEditor.SmartGen>Smart Gen</RimTalk.PersonaEditor.SmartGen>
+    <RimTalk.PersonaEditor.RollGen>Roll Gen</RimTalk.PersonaEditor.RollGen>
+    <RimTalk.PersonaEditor.Clear>Clear</RimTalk.PersonaEditor.Clear>
+
+    <!-- Settings_Api.cs -->
+    <RimTalk.Settings.GoogleApiKeyLabel>Google AI API Key:</RimTalk.Settings.GoogleApiKeyLabel>
+    <RimTalk.Settings.GoogleApiKeyDesc>Uses the free Gemma3 27B model. For other models or providers, use Advanced Settings.</RimTalk.Settings.GoogleApiKeyDesc>
+    <RimTalk.Settings.GetFreeApiKeyButton>Get a Free API Key</RimTalk.Settings.GetFreeApiKeyButton>
+    <RimTalk.Settings.SwitchToAdvancedSettings>Switch to Advanced Settings</RimTalk.Settings.SwitchToAdvancedSettings>
+    <RimTalk.Settings.SwitchToSimpleSettings>Switch to Simple Settings</RimTalk.Settings.SwitchToSimpleSettings>
+    <RimTalk.Settings.CloudProviders>Cloud Providers</RimTalk.Settings.CloudProviders>
+    <RimTalk.Settings.CloudProvidersDesc>Use online AI services like Google AI, OpenAI, etc. Requires internet connection and API keys.</RimTalk.Settings.CloudProvidersDesc>
+    <RimTalk.Settings.LocalProvider>Local Provider</RimTalk.Settings.LocalProvider>
+    <RimTalk.Settings.LocalProviderDesc>Use a local AI server running on your machine (Ollama, LM Studio, etc.). Must support OpenAPI.</RimTalk.Settings.LocalProviderDesc>
+    <RimTalk.Settings.CloudApiConfigurations>Cloud API Configurations</RimTalk.Settings.CloudApiConfigurations>
+    <RimTalk.Settings.CloudApiConfigurationsDesc>If multiple APIs are enabled, the system will attempt to use them in order. If one API fails, it will automatically try the next enabled API in the list.</RimTalk.Settings.CloudApiConfigurationsDesc>
+    <RimTalk.Settings.ProviderHeader>Provider</RimTalk.Settings.ProviderHeader>
+    <RimTalk.Settings.ApiKeyHeader>API Key</RimTalk.Settings.ApiKeyHeader>
+    <RimTalk.Settings.ModelHeader>Model</RimTalk.Settings.ModelHeader>
+    <RimTalk.Settings.CustomModelHeader>Custom Model</RimTalk.Settings.CustomModelHeader>
+    <RimTalk.Settings.EnabledHeader>Enabled</RimTalk.Settings.EnabledHeader>
+    <RimTalk.Settings.EnableDisableApiConfigTooltip>Enable or disable this API configuration</RimTalk.Settings.EnableDisableApiConfigTooltip>
+    <RimTalk.Settings.LocalProviderConfiguration>Local Provider Configuration</RimTalk.Settings.LocalProviderConfiguration>
+    <RimTalk.Settings.BaseUrlLabel>Base Url:</RimTalk.Settings.BaseUrlLabel>
+    <RimTalk.Settings.ModelLabel>Model:</RimTalk.Settings.ModelLabel>
+    <RimTalk.Settings.EnterApiKey>(enter valid api key to fetch models)</RimTalk.Settings.EnterApiKey>
+    <RimTalk_Settings_Api_BaseUrlInfo>If you provide only the base (e.g., http://localhost:1234), /v1/chat/completions will be added automatically. If you enter the full path, it will be used exactly as entered.</RimTalk_Settings_Api_BaseUrlInfo>
+    
+    <!-- DebugWindow.cs -->
+    <RimTalk.DebugWindow.Generating>[Generating...]</RimTalk.DebugWindow.Generating>
+    <RimTalk.DebugWindow.StatusDisabled>Disabled</RimTalk.DebugWindow.StatusDisabled>
+    <RimTalk.DebugWindow.StatusProcessing>Processing</RimTalk.DebugWindow.StatusProcessing>
+    <RimTalk.DebugWindow.StatusIdle>Idle</RimTalk.DebugWindow.StatusIdle>
+    <RimTalk.DebugWindow.GroupByPawn>Group by Pawn</RimTalk.DebugWindow.GroupByPawn>
+    <RimTalk.DebugWindow.ModSettings>Mod Settings</RimTalk.DebugWindow.ModSettings>
+    <RimTalk.DebugWindow.EnableRimTalk>Enable RimTalk</RimTalk.DebugWindow.EnableRimTalk>
+    <RimTalk.DebugWindow.AIStatus>AI Status:</RimTalk.DebugWindow.AIStatus>
+    <RimTalk.DebugWindow.TotalCalls>Total Calls:</RimTalk.DebugWindow.TotalCalls>
+    <RimTalk.DebugWindow.TotalTokens>Total Tokens:</RimTalk.DebugWindow.TotalTokens>
+    <RimTalk.DebugWindow.AvgCallsPerMin>Avg Calls/min:</RimTalk.DebugWindow.AvgCallsPerMin>
+    <RimTalk.DebugWindow.AvgTokensPerMin>Avg Tokens/min:</RimTalk.DebugWindow.AvgTokensPerMin>
+    <RimTalk.DebugWindow.AvgTokensPerCall>Avg Tokens/Call:</RimTalk.DebugWindow.AvgTokensPerCall>
+    <RimTalk.DebugWindow.TokensPerSecond>Tokens/s</RimTalk.DebugWindow.TokensPerSecond>
+    <RimTalk.DebugWindow.SixtySecondsAgo>60s ago</RimTalk.DebugWindow.SixtySecondsAgo>
+    <RimTalk.DebugWindow.Now>Now</RimTalk.DebugWindow.Now>
+    <RimTalk.DebugWindow.StatusReady>Ready</RimTalk.DebugWindow.StatusReady>
+    <RimTalk.DebugWindow.StatusBusy>Busy</RimTalk.DebugWindow.StatusBusy>
+    <RimTalk.DebugWindow.HeaderPawn>Pawn</RimTalk.DebugWindow.HeaderPawn>
+    <RimTalk.DebugWindow.HeaderResponse>Response</RimTalk.DebugWindow.HeaderResponse>
+    <RimTalk.DebugWindow.HeaderStatus>Status</RimTalk.DebugWindow.HeaderStatus>
+    <RimTalk.DebugWindow.HeaderLastTalk>Last Talk</RimTalk.DebugWindow.HeaderLastTalk>
+    <RimTalk.DebugWindow.HeaderRequests>Requests</RimTalk.DebugWindow.HeaderRequests>
+    <RimTalk.DebugWindow.HeaderChattiness>Chattiness</RimTalk.DebugWindow.HeaderChattiness>
+    <RimTalk.DebugWindow.HeaderTimestamp>Timestamp</RimTalk.DebugWindow.HeaderTimestamp>
+    <RimTalk.DebugWindow.HeaderTimeMs>Time(ms)</RimTalk.DebugWindow.HeaderTimeMs>
+    <RimTalk.DebugWindow.HeaderTokens>Tokens</RimTalk.DebugWindow.HeaderTokens>
+    <RimTalk.DebugWindow.HeaderState>State</RimTalk.DebugWindow.HeaderState>
+    <RimTalk.DebugWindow.Pending>Pending</RimTalk.DebugWindow.Pending>
+    <RimTalk.DebugWindow.Ignored>Ignored</RimTalk.DebugWindow.Ignored>
+    <RimTalk.DebugWindow.Spoken>Spoken</RimTalk.DebugWindow.Spoken>
+    <RimTalk.DebugWindow.TooltipPromptResponse>Prompt:\n{0}\n\nResponse:\n{1}</RimTalk.DebugWindow.TooltipPromptResponse>
+    
+    <!-- Overlay.cs -->
+    <RimTalk.Overlay.Debug>Debug</RimTalk.Overlay.Debug>
+    <RimTalk.Overlay.Option>Overlay Option</RimTalk.Overlay.Option>
+    <RimTalk.Overlay.Opacity>Opacity</RimTalk.Overlay.Opacity>
+    <RimTalk.Overlay.FontSize>Font Size</RimTalk.Overlay.FontSize>
+
+    <!-- FloatMenuMakerMapGetOptionsPatch.cs -->
+    <RimTalk.FloatMenu.ChatWith>Chat with {0}</RimTalk.FloatMenu.ChatWith>
+    <RimTalk.FloatMenu.WhatToSayToSelf>What do you want to say to {0}?</RimTalk.FloatMenu.WhatToSayToSelf>
+    <RimTalk.FloatMenu.WhatToSayToOther>What do you want {0} to say to {1}?</RimTalk.FloatMenu.WhatToSayToOther>
+    <RimTalk.FloatMenu.Send>Send</RimTalk.FloatMenu.Send>
+    <RimTalk.FloatMenu.Cancel>Cancel</RimTalk.FloatMenu.Cancel>
+
+    <!-- CustomDialogueService.cs -->
+    <RimTalk.CustomDialogue.Player>Player</RimTalk.CustomDialogue.Player>
+
+    <!-- Memory System -->
+    <RimTalk_GeminiAPIKey>Gemini API Key</RimTalk_GeminiAPIKey>
+    <RimTalk_TalkInterval>Talk Interval</RimTalk_TalkInterval>
+    <RimTalk_SuppressUnprocessed>Suppress Unprocessed Messages</RimTalk_SuppressUnprocessed>
+    <RimTalk_MemorySettings>Memory Settings</RimTalk_MemorySettings>
+    <RimTalk_MaxShortTermMemories>Max Short-term Memories</RimTalk_MaxShortTermMemories>
+    <RimTalk_MaxLongTermMemories>Max Long-term Memories</RimTalk_MaxLongTermMemories>
+    <RimTalk_MemoryDecayRate>Memory Decay Rate</RimTalk_MemoryDecayRate>
+    <RimTalk_EnableMemoryUI>Enable Memory UI Tab</RimTalk_EnableMemoryUI>
+    <RimTalk_TabMemory>Memory</RimTalk_TabMemory>
+    <RimTalk_MemoryTitle>{0}'s Memories</RimTalk_MemoryTitle>
+    <RimTalk_All>All</RimTalk_All>
+    <RimTalk_MemoryStats>Short-term: {0}/{1} | Long-term: {2}/{3}</RimTalk_MemoryStats>
+    <RimTalk_JustNow>Just now</RimTalk_JustNow>
+    <RimTalk_MinutesAgo>{0} minutes ago</RimTalk_MinutesAgo>
+    <RimTalk_HoursAgo>{0} hours ago</RimTalk_HoursAgo>
+    <RimTalk_DaysAgo>{0} days ago</RimTalk_DaysAgo>
+    
+    <!-- Settings UI Translations - Added for v2.4.1 -->
+    <!-- Knowledge Library -->
+    <RimTalk_Settings_KnowledgeLibraryTitle>Knowledge Library Management</RimTalk_Settings_KnowledgeLibraryTitle>
+    <RimTalk_Settings_KnowledgeLibraryDesc>Knowledge library can be used to inject worldview, background knowledge and other common information into AI</RimTalk_Settings_KnowledgeLibraryDesc>
+    <RimTalk_Settings_OpenKnowledgeLibrary>Open Knowledge Library Manager</RimTalk_Settings_OpenKnowledgeLibrary>
+    
+    <!-- Dynamic Injection System -->
+    <RimTalk_Settings_DynamicInjectionTitle>Dynamic Injection System</RimTalk_Settings_DynamicInjectionTitle>
+    <RimTalk_Settings_EnableDynamicInjection>Enable Dynamic Memory Injection (Recommended)</RimTalk_Settings_EnableDynamicInjection>
+    <RimTalk_Settings_DynamicInjectionDesc>Dynamically select the most relevant memories and knowledge based on time, importance and keyword matching</RimTalk_Settings_DynamicInjectionDesc>
+    <RimTalk_Settings_StaticInjectionNote>Will use static injection (by layer order)</RimTalk_Settings_StaticInjectionNote>
+    <RimTalk_Settings_MaxInjectedMemories>Max Injected Memories</RimTalk_Settings_MaxInjectedMemories>
+    <RimTalk_Settings_MaxInjectedKnowledge>Max Injected Knowledge</RimTalk_Settings_MaxInjectedKnowledge>
+    <RimTalk_Settings_ScoreThresholdTitle>Score Threshold (content below this score will not be injected):</RimTalk_Settings_ScoreThresholdTitle>
+    <RimTalk_Settings_MemoryScoreThreshold>Memory Score Threshold</RimTalk_Settings_MemoryScoreThreshold>
+    <RimTalk_Settings_KnowledgeScoreThreshold>Knowledge Score Threshold</RimTalk_Settings_KnowledgeScoreThreshold>
+    
+    <!-- Weight Configuration -->
+    <RimTalk_Settings_MemoryWeights>📝 Memory Weights</RimTalk_Settings_MemoryWeights>
+    <RimTalk_Settings_KnowledgeWeights>📘 Knowledge Weights</RimTalk_Settings_KnowledgeWeights>
+    <RimTalk_Settings_TimeDecay>Time Decay</RimTalk_Settings_TimeDecay>
+    <RimTalk_Settings_Importance>Importance</RimTalk_Settings_Importance>
+    <RimTalk_Settings_KeywordMatch>Keyword Match</RimTalk_Settings_KeywordMatch>
+    <RimTalk_Settings_TagMatch>Tag Match</RimTalk_Settings_TagMatch>
+    <RimTalk_Settings_KeywordMatchAuto>Keyword Match: Auto</RimTalk_Settings_KeywordMatchAuto>
+    
+    <!-- Four-Layer Memory Capacity -->
+    <RimTalk_Settings_MemoryCapacityTitle>Four-Layer Memory Capacity</RimTalk_Settings_MemoryCapacityTitle>
+    <RimTalk_Settings_ABMCapacity>ABM (Ultra-short): 6 entries (fixed, not adjustable)</RimTalk_Settings_ABMCapacity>
+    <RimTalk_Settings_SCMCapacity>SCM (Short-term): {0} entries</RimTalk_Settings_SCMCapacity>
+    <RimTalk_Settings_ELSCapacity>ELS (Medium-term): {0} entries</RimTalk_Settings_ELSCapacity>
+    <RimTalk_Settings_CLPACapacity>CLPA (Long-term): Unlimited</RimTalk_Settings_CLPACapacity>
+    <RimTalk_Settings_Entries>entries</RimTalk_Settings_Entries>
+    
+    <!-- Memory Decay Rates -->
+    <RimTalk_Settings_DecayRatesTitle>Memory Decay Rates</RimTalk_Settings_DecayRatesTitle>
+    <RimTalk_Settings_SCMDecay>SCM (per hour)</RimTalk_Settings_SCMDecay>
+    <RimTalk_Settings_ELSDecay>ELS (per hour)</RimTalk_Settings_ELSDecay>
+    <RimTalk_Settings_CLPADecay>CLPA (per hour)</RimTalk_Settings_CLPADecay>
+    
+    <!-- AI Auto-Summarization -->
+    <RimTalk_Settings_SummarizationTitle>AI Auto-Summarization</RimTalk_Settings_SummarizationTitle>
+    <RimTalk_Settings_EnableELSSummarization>Enable ELS Summarization (SCM → ELS)</RimTalk_Settings_EnableELSSummarization>
+    <RimTalk_Settings_TriggerTime>Trigger Time: Daily at {0}:00 (game time)</RimTalk_Settings_TriggerTime>
+    <RimTalk_Settings_MaxSummaryLength>Max Summary Length: {0} characters</RimTalk_Settings_MaxSummaryLength>
+    <RimTalk_Settings_Characters>characters</RimTalk_Settings_Characters>
+    <RimTalk_Settings_EnableCLPAArchive>Enable CLPA Auto-Archive</RimTalk_Settings_EnableCLPAArchive>
+    <RimTalk_Settings_ArchiveInterval>Archive Interval: Every {0} days</RimTalk_Settings_ArchiveInterval>
+    
+    <!-- AI API Configuration -->
+    <RimTalk_Settings_AIConfigTitle>AI API Configuration</RimTalk_Settings_AIConfigTitle>
+    <RimTalk_Settings_PreferRimTalkAI>Prefer RimTalk's AI Configuration</RimTalk_Settings_PreferRimTalkAI>
+    <RimTalk_Settings_WillUseRimTalkConfig>Will attempt to read RimTalk Mod's API configuration</RimTalk_Settings_WillUseRimTalkConfig>
+    <RimTalk_Settings_FallbackToIndependent>If RimTalk is not installed or configured, will use the independent configuration below</RimTalk_Settings_FallbackToIndependent>
+    <RimTalk_Settings_UseIndependentConfig>Will use the independent configuration below, independent of RimTalk</RimTalk_Settings_UseIndependentConfig>
+    <RimTalk_Settings_IndependentAIConfig>=== Independent AI Configuration ===</RimTalk_Settings_IndependentAIConfig>
+    <RimTalk_Settings_Provider>Provider:</RimTalk_Settings_Provider>
+    <RimTalk_Settings_APIKey>API Key:</RimTalk_Settings_APIKey>
+    <RimTalk_Settings_APIURL>API URL:</RimTalk_Settings_APIURL>
+    <RimTalk_Settings_ModelName>Model Name:</RimTalk_Settings_ModelName>
+    
+    <!-- Memory Types -->
+    <RimTalk_Settings_MemoryTypesTitle>Memory Types</RimTalk_Settings_MemoryTypesTitle>
+    <RimTalk_Settings_ActionMemory>Action Memory (work, combat)</RimTalk_Settings_ActionMemory>
+    <RimTalk_Settings_ConversationMemory>Conversation Memory (RimTalk dialogues)</RimTalk_Settings_ConversationMemory>
+    <RimTalk_Settings_PawnStatusKnowledge>Auto-generate Newcomer/Veteran Status Knowledge</RimTalk_Settings_PawnStatusKnowledge>
+    <RimTalk_Settings_PawnStatusDesc>Automatically generate status knowledge based on colonist join time</RimTalk_Settings_PawnStatusDesc>
+    <RimTalk_Settings_PawnStatusExample>Example: Alice is a new member who joined 3 days ago and doesn't know the colony's history</RimTalk_Settings_PawnStatusExample>
+    <RimTalk_Settings_PawnStatusWarning>When disabled, new members may incorrectly talk about events they didn't experience</RimTalk_Settings_PawnStatusWarning>
+    
+    <!-- Debug Tools -->
+    <RimTalk_Settings_DebugToolsTitle>Debug Tools:</RimTalk_Settings_DebugToolsTitle>
+    <RimTalk_Settings_OpenInjectionPreviewer>Open Injection Content Previewer</RimTalk_Settings_OpenInjectionPreviewer>
+    <RimTalk_Settings_PreviewerDesc>Real-time preview of memories and knowledge to be injected to AI (requires entering game)</RimTalk_Settings_PreviewerDesc>
+    
+    <!-- Error Messages -->
+    <RimTalk_Settings_MustEnterGame>Must enter game to manage knowledge library</RimTalk_Settings_MustEnterGame>
+    <RimTalk_Settings_CannotFindManager>Cannot find memory manager</RimTalk_Settings_CannotFindManager>
+    
+    <!-- Main Memory UI - Manual Summarization/Archive Buttons -->
+    <RimTalk_UI_ImmediateSummarize>Summarize Now (SCM→ELS)</RimTalk_UI_ImmediateSummarize>
+    <RimTalk_UI_ImmediateSummarizeNoMemory>Summarize Now (No SCM)</RimTalk_UI_ImmediateSummarizeNoMemory>
+    <RimTalk_UI_SummarizeAll>Summarize All Colonists</RimTalk_UI_SummarizeAll>
+    <RimTalk_UI_ImmediateArchive>Archive Now (ELS→CLPA)</RimTalk_UI_ImmediateArchive>
+    <RimTalk_UI_ImmediateArchiveNoMemory>Archive Now (No ELS)</RimTalk_UI_ImmediateArchiveNoMemory>
+    <RimTalk_UI_ArchiveAll>Archive All Colonists</RimTalk_UI_ArchiveAll>
+    <RimTalk_UI_MemorySummarized>{0}'s short-term memories have been summarized to mid-term memory</RimTalk_UI_MemorySummarized>
+    <RimTalk_UI_MemoriesSummarizedCount>{0} colonists have been queued for summarization</RimTalk_UI_MemoriesSummarizedCount>
+    <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
+    <RimTalk_UI_MemoryArchived>{0}'s mid-term memories have been archived to long-term memory</RimTalk_UI_MemoryArchived>
+    <RimTalk_UI_MemoriesArchivedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
+    
+    <!-- Knowledge Library Management UI -->
+    <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
+    <RimTalk_Knowledge_Import>Import</RimTalk_Knowledge_Import>
+    <RimTalk_Knowledge_Export>Export</RimTalk_Knowledge_Export>
+    <RimTalk_Knowledge_Delete>Delete</RimTalk_Knowledge_Delete>
+    <RimTalk_Knowledge_ClearAll>Clear All</RimTalk_Knowledge_ClearAll>
+    
+    <RimTalk_Knowledge_TotalAndEnabled>Total: {0} | Enabled: {1}</RimTalk_Knowledge_TotalAndEnabled>
+    
+    <!-- Auto Generate Section -->
+    <RimTalk_Knowledge_AutoGenerate>Auto Generate Knowledge</RimTalk_Knowledge_AutoGenerate>
+    <RimTalk_Knowledge_PawnStatus>Colonist Status Knowledge</RimTalk_Knowledge_PawnStatus>
+    <RimTalk_Knowledge_PawnStatusDesc>Auto-update colonist status daily (join time, relationships, etc.)</RimTalk_Knowledge_PawnStatusDesc>
+    <RimTalk_Knowledge_EventRecord>Event Record Knowledge</RimTalk_Knowledge_EventRecord>
+    <RimTalk_Knowledge_EventRecordDesc>Extract major events daily from game log (death, marriage, join, construction, etc.)</RimTalk_Knowledge_EventRecordDesc>
+    <RimTalk_Knowledge_GenerateNow>Generate Now (Manual)</RimTalk_Knowledge_GenerateNow>
+    <RimTalk_Knowledge_GenerateNowDesc>Generate all enabled knowledge types immediately</RimTalk_Knowledge_GenerateNowDesc>
+    <RimTalk_Knowledge_EnableAtLeastOne>Please enable at least one knowledge generation type</RimTalk_Knowledge_EnableAtLeastOne>
+    <RimTalk_Knowledge_MustEnterGame>Must enter game first</RimTalk_Knowledge_MustEnterGame>
+    <RimTalk_Knowledge_GeneratedCount>Generated {0} colonist status knowledge entries</RimTalk_Knowledge_GeneratedCount>
+    <RimTalk_Knowledge_AllExist>All colonist status knowledge already exists, no need to generate</RimTalk_Knowledge_AllExist>
+    <RimTalk_Knowledge_EventGeneratedCount>Generated {0} event record knowledge entries</RimTalk_Knowledge_EventGeneratedCount>
+    <RimTalk_Knowledge_NoNewEvents>No new major events found, or all events already recorded</RimTalk_Knowledge_NoNewEvents>
+    <RimTalk_Knowledge_EventGenerateFailed>Event record generation failed: {0}</RimTalk_Knowledge_EventGenerateFailed>
+    <RimTalk_Knowledge_Confirm>Confirm</RimTalk_Knowledge_Confirm>
+    
+    <RimTalk_Knowledge_Tag>Tag:</RimTalk_Knowledge_Tag>
+
+    <!-- UI Buttons 界面按钮 -->
+    <RimTalk_UI_Preview>Preview</RimTalk_UI_Preview>
+    <RimTalk_UI_Knowledge>Knowledge</RimTalk_UI_Knowledge>
+    <RimTalk_UI_ImmediateSummarize>Summarize Now (SCM→ELS)</RimTalk_UI_ImmediateSummarize>
+    <RimTalk_UI_ImmediateSummarizeNoMemory>Summarize Now (No SCM)</RimTalk_UI_ImmediateSummarizeNoMemory>
+    <RimTalk_UI_SummarizeAll>Summarize All Colonists</RimTalk_UI_SummarizeAll>
+    <RimTalk_UI_ImmediateArchive>Archive Now (ELS→CLPA)</RimTalk_UI_ImmediateArchive>
+    <RimTalk_UI_ImmediateArchiveNoMemory>Archive Now (No ELS)</RimTalk_UI_ImmediateArchiveNoMemory>
+    <RimTalk_UI_ArchiveAll>Archive All Colonists</RimTalk_UI_ArchiveAll>
+    
+    <!-- UI Messages 界面消息 -->
+    <RimTalk_UI_MemorySummarized>{0}'s short-term memories have been summarized to mid-term memory</RimTalk_UI_MemorySummarized>
+    <RimTalk_UI_MemoriesSummarizedCount>{0} colonists have been queued for summarization</RimTalk_UI_MemoriesSummarizedCount>
+    <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
+    <RimTalk_UI_MemoryArchived>{0}'s mid-term memories have been archived to long-term memory</RimTalk_UI_MemoryArchived>
+    <RimTalk_UI_MemoriesArchivedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
+
+</LanguageData>
