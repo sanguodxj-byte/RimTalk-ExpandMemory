@@ -132,6 +132,9 @@ namespace RimTalk.MemoryPatch
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
         public int maxChainingRounds = 2;
+        
+        // ⭐ Context Injection Settings
+        public bool injectToContext = false; // 默认关闭，注入到Prompt；开启时注入到Context
 
         // UI折叠状态
         private static bool expandDynamicInjection = true;
@@ -225,6 +228,9 @@ namespace RimTalk.MemoryPatch
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
             Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
+            
+            // Context Injection
+            Scribe_Values.Look(ref injectToContext, "injection_injectToContext", false);
         }
 
         public void DoSettingsWindowContents(Rect inRect)
@@ -374,6 +380,23 @@ namespace RimTalk.MemoryPatch
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 listing.Label("  智能选择最相关的记忆和常识注入到AI对话中");
                 GUI.color = Color.white;
+                
+                listing.Gap();
+                
+                // ⭐ 注入位置选择
+                listing.CheckboxLabeled("注入到 Context (System Instruction)", ref injectToContext);
+                if (injectToContext)
+                {
+                    GUI.color = new Color(1f, 0.9f, 0.7f);
+                    listing.Label("  ✓ 记忆和常识将注入到 System Instruction");
+                    GUI.color = Color.white;
+                }
+                else
+                {
+                    GUI.color = Color.gray;
+                    listing.Label("  默认：注入到 Prompt (User Message)");
+                    GUI.color = Color.white;
+                }
                 
                 listing.Gap();
                 
