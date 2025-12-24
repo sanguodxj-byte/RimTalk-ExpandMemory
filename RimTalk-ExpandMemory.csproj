@@ -1,0 +1,175 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <GameVersion Condition=" '$(GameVersion)' == '' ">1.6</GameVersion>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net472</TargetFramework>
+        <PlatformTarget>x64</PlatformTarget>
+        <RootNamespace>RimTalk.MemoryPatch</RootNamespace>
+        <AssemblyName>RimTalkMemoryPatch</AssemblyName>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <!-- 移除app.manifest引用 -->
+        <!-- <ApplicationManifest>app.manifest</ApplicationManifest> -->
+
+        <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
+
+        <OutputPath>$(GameVersion)/Assemblies</OutputPath>
+        <ModFolderName>RimTalk-ExpandMemory</ModFolderName>  <!-- ⭐ 修正为正确的 Mod 名称 -->
+        <LangVersion>7.3</LangVersion>
+        <EnableBubbles>true</EnableBubbles>
+        
+        <!-- Fix compiler crash -->
+        <UseSharedCompilation>false</UseSharedCompilation>
+        <Deterministic>false</Deterministic>
+        <Platforms>AnyCPU;x64</Platforms>
+        <!-- ⭐ 额外的编译器稳定性配置 -->
+        <UseHostCompilerIfAvailable>false</UseHostCompilerIfAvailable>
+        <ProvideCommandLineArgs>false</ProvideCommandLineArgs>
+        
+        <!-- Enable long path support to bypass Windows 260 character limit -->
+        <LongPathsEnabled>true</LongPathsEnabled>
+        
+        <!-- 禁用自动添加引用，避免 SDK 项目的引用处理问题 -->
+        <DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>
+        
+        <!-- 只编译当前项目的 Source 目录 -->
+        <DefaultItemExcludes>$(DefaultItemExcludes);../RimTalk/**</DefaultItemExcludes>
+    </PropertyGroup>
+
+    <!-- Define version constants based on GameVersion -->
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants);V$(GameVersion.Replace('.', '_'))</DefineConstants>
+    </PropertyGroup>
+
+    <!-- Release build configuration -->
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <None Include=".github\copilot-instructions.md" />
+      <None Include="CreateChineseTranslation.csproj" />
+      <None Include="RimTalk-MemoryPatch.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Core RimWorld & UnityEngine libraries - 仅用于下载包，不自动引用 -->
+        <PackageReference Include="Krafs.Rimworld.Ref" Version="$(GameVersion).*-*" ExcludeAssets="compile" />
+        <!-- Harmony API -->
+        <PackageReference Include="Lib.Harmony.Ref" Version="2.*" ExcludeAssets="compile" />
+        <!-- ⭐ 使用稳定版 Roslyn 编译器，兼容 SDK 9 -->
+        <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.9.2" PrivateAssets="All" />
+        <!-- ⭐ Newtonsoft.Json: 用于向量 API，标准版本 13.0.3 -->
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <!-- ⭐ v3.3.2.27: 移除 SQLite 依赖（VectorDB已移除） -->
+        <!-- <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" /> -->
+        <!-- <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" /> -->
+        <!-- ⭐ 修复：移除 System.Net.Http NuGet 包，使用框架自带版本避免与 SOS2 冲突 -->
+        <!-- <PackageReference Include="System.Net.Http" Version="4.3.4" /> -->
+    </ItemGroup>
+    
+    <!-- 手动添加所有必需的 RimWorld 和 Unity 引用 -->
+    <ItemGroup>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp-firstpass">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Assembly-CSharp-firstpass.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextRenderingModule">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.TextRenderingModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <!-- ⭐ v3.3.7: 添加音频和网络模块支持 TTS 播放 -->
+        <Reference Include="UnityEngine.AudioModule">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.AudioModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestModule">
+            <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.UnityWebRequestModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="0Harmony">
+            <HintPath>$(USERPROFILE)\.nuget\packages\lib.harmony.ref\2.4.2\ref\netstandard2.0\0Harmony.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <!-- ⭐ 修复：添加框架自带的 System.Net.Http 引用（用于向量API） -->
+        <Reference Include="System.Net.Http">
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <!-- Remove BubblePatch.cs when bubble is disabled -->
+    <ItemGroup Condition=" '$(EnableBubbles)' == 'false' ">
+        <Compile Remove="Source/Patch/BubblePatch.cs" />
+    </ItemGroup>
+    
+    <!-- Exclude broken RimTalk original source files -->
+    <ItemGroup>
+        <Compile Remove="..\RimTalk\**\*.cs" />
+        <Compile Remove="backup\**" />
+        <Compile Remove="Backups\**" />
+        <Compile Remove="**\*.backup.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Source\Memory\Debug\" />
+      <Folder Include="Source\Memory\DevTools\" />
+      <Folder Include="Source\Memory\TTS\" />
+    </ItemGroup>
+
+    <!-- Deploy to RimWorld client -->
+    <Target Name="DeployToModsFolder" AfterTargets="Build" Condition=" '$(BuildingWithScript)' != 'true' AND '$(RimWorldDir)' != '' ">
+        <CallTarget Targets="WinDeploy" Condition=" '$(OS)' == 'Windows_NT' " />
+        <CallTarget Targets="MacDeploy" Condition=" '$(OS)' != 'Windows_NT' " />
+    </Target>
+
+    <!-- Deploy to RimWorld client (macOS) -->
+    <Target Name="MacDeploy">
+        <PropertyGroup>
+            <DeployPath>$(RimWorldDir)/RimWorldMac.app/Mods/$(ModFolderName)/</DeployPath>
+        </PropertyGroup>
+        <MakeDir Directories="$(DeployPath)" />
+        <Exec Command="rsync -a --delete --checksum &quot;$(ProjectDir)About/&quot;     &quot;$(DeployPath)About/&quot;" />
+        <Exec Command="rsync -a --delete --checksum &quot;$(ProjectDir)Defs/&quot;      &quot;$(DeployPath)Defs/&quot;" />
+        <Exec Command="rsync -a --delete --checksum &quot;$(ProjectDir)Languages/&quot; &quot;$(DeployPath)Languages/&quot;" />
+        <Exec Command="rsync -a --delete --checksum &quot;$(ProjectDir)Textures/&quot;  &quot;$(DeployPath)Textures/&quot;" />
+        <Exec Command="rsync -a --delete --checksum &quot;$(ProjectDir)$(GameVersion)/&quot;       &quot;$(DeployPath)$(GameVersion)/&quot;" />
+        <Message Text="--- macOS deployment finished successfully ---" Importance="high" />
+    </Target>
+
+    <!-- Deploy to RimWorld client (Windows) -->
+    <Target Name="WinDeploy">
+        <PropertyGroup>
+            <WinModPath>$(RimWorldDir)\Mods\$(ModFolderName)\</WinModPath>
+        </PropertyGroup>
+        <Message Text="Copying to $(WinModPath)" Importance="high" />
+        <ItemGroup>
+            <_CopyDirs Include="About;Defs;Languages;Textures;$(GameVersion)" />
+        </ItemGroup>
+        <MakeDir Directories="$(WinModPath)" />
+        <Exec Command="robocopy &quot;$(ProjectDir)About&quot;     &quot;$(WinModPath)About&quot; /MIR" IgnoreExitCode="true" />
+        <Exec Command="robocopy &quot;$(ProjectDir)Defs&quot;      &quot;$(WinModPath)Defs&quot; /MIR" IgnoreExitCode="true" />
+        <Exec Command="robocopy &quot;$(ProjectDir)Languages&quot; &quot;$(WinModPath)Languages&quot; /MIR" IgnoreExitCode="true" />
+        <Exec Command="robocopy &quot;$(ProjectDir)Textures&quot;  &quot;$(WinModPath)Textures&quot; /MIR" IgnoreExitCode="true" />
+        <Exec Command="robocopy &quot;$(ProjectDir)$(GameVersion)&quot;       &quot;$(WinModPath)$(GameVersion)&quot; /MIR" IgnoreExitCode="true" />
+        <Message Text="--- Windows deployment finished successfully ---" Importance="high" />
+    </Target>
+
+</Project>
