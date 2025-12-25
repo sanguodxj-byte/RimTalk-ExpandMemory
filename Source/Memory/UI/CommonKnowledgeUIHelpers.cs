@@ -70,18 +70,49 @@ namespace RimTalk.Memory.UI
         
         /// <summary>
         /// 根据标签判断条目分类
+        /// ⭐ 新规则：只要标签中包含分类关键词，即归入该分类
+        /// 例如："规则-世界观"、"常识规则"、"规则，鼠族" 都归入"规则"分类
         /// </summary>
         public static KnowledgeCategory GetEntryCategory(CommonKnowledgeEntry entry)
         {
-            if (entry.tag.Contains("规则") || entry.tag.Contains("Instructions"))
-                return KnowledgeCategory.Instructions;
-            if (entry.tag.Contains("世界观") || entry.tag.Contains("Lore"))
-                return KnowledgeCategory.Lore;
-            if (entry.tag.Contains("殖民者状态") || entry.tag.Contains("PawnStatus"))
-                return KnowledgeCategory.PawnStatus;
-            if (entry.tag.Contains("历史") || entry.tag.Contains("History"))
-                return KnowledgeCategory.History;
+            if (string.IsNullOrEmpty(entry.tag))
+                return KnowledgeCategory.Other;
+
+            // 转换为小写以进行不区分大小写的匹配
+            string tagLower = entry.tag.ToLower();
+
+            // 按优先级顺序检查（优先匹配更具体的分类）
             
+            // 1. 规则/指令类（Instructions）
+            if (tagLower.Contains("规则") || tagLower.Contains("instructions") || 
+                tagLower.Contains("instruction") || tagLower.Contains("rule"))
+            {
+                return KnowledgeCategory.Instructions;
+            }
+
+            // 2. 殖民者状态（PawnStatus）
+            if (tagLower.Contains("殖民者状态") || tagLower.Contains("pawnstatus") || 
+                tagLower.Contains("colonist") || tagLower.Contains("状态"))
+            {
+                return KnowledgeCategory.PawnStatus;
+            }
+
+            // 3. 历史（History）
+            if (tagLower.Contains("历史") || tagLower.Contains("history") || 
+                tagLower.Contains("past") || tagLower.Contains("记录"))
+            {
+                return KnowledgeCategory.History;
+            }
+
+            // 4. 世界观/背景（Lore）
+            if (tagLower.Contains("世界观") || tagLower.Contains("lore") || 
+                tagLower.Contains("background") || tagLower.Contains("背景") ||
+                tagLower.Contains("设定"))
+            {
+                return KnowledgeCategory.Lore;
+            }
+
+            // 5. 其他
             return KnowledgeCategory.Other;
         }
         
