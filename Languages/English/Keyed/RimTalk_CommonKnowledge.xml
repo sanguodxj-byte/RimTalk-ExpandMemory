@@ -160,14 +160,14 @@
     <RimTalk_Knowledge_HelpContent>【Knowledge Retrieval Logic】
 The knowledge library automatically injects relevant knowledge during AI conversations:
 
-1. Keyword Matching: Extracts keywords from conversation context and matches knowledge tags
-   • Any Mode: Matches if any keyword is found
-   • All Mode: Matches only if all keywords are found
+1. Tag Matching: Extracts tags from conversation context and matches knowledge tags
+   • Any Mode: Matches if any tag is found
+   • All Mode: Matches only if all tags are found
    • ⚠️ Uses substring matching (case-insensitive)
 
 2. Vector Similarity Matching (requires vector service):
    • Uses semantic similarity algorithms to find most relevant knowledge
-   • Can find semantically related content even without exact keyword matches
+   • Can find semantically related content even without exact tag matches
 
 3. Importance Ranking:
    • Matched knowledge is sorted by importance (0.0-1.0) in descending order
@@ -175,25 +175,30 @@ The knowledge library automatically injects relevant knowledge during AI convers
 
 【How to Write Effective Knowledge】
 
+✓ Use comma-separated tags (recommended)
+  • Good: [Lore,Ringworld] or [Rules,Dialog]
+  • Good: [CharacterBackground,John] or [Event,Active,Raid]
+  • Why: Commas are standard separators, clear and consistent
+
 ✓ Keep tags clear but avoid too short
-  • Good: [Lore-Planet] or [Rules-CombatSystem] (3+ chars)
+  • Good: [Lore,PlanetSetting] (3+ chars)
   • Bad: [War] or [AI] (1-2 chars, prone to false matches)
   • Why: Short tags match too many unrelated contexts
 
 ✓ Use compound tags for precision
-  • Good: [Lore-Ringworld] or [Character-John-Background]
+  • Good: [Lore,Ringworld,Technology] or [CharacterBackground,John,Past]
   • Bad: [John] (may trigger in unrelated conversations)
 
 ✓ Tags must be triggerable by conversations
-  • Problem: Tag [Rules-CombatSystem] won't trigger in "shooting" "melee" conversations
-  • Solution: Use [Combat,Shooting,Melee,Dodge] to add trigger keywords
-  • Or: [Rules-Combat,Shooting] keeps categorization while adding triggers
+  • Problem: Tag [Rules,CombatSystem] won't trigger in "shooting" "melee" conversations
+  • Solution: Use [Combat,Shooting,Melee,Dodge] to add trigger tags
+  • Or: [Rules,Combat,Shooting] keeps categorization while adding triggers
 
 ✓ Avoid using skill names as single tags
   • Problem: [Shooting] triggers in ALL conversations of pawns with Shooting skill (≥10)
   • Reason: Match text includes pawn's high-level skill names
   • Bad: [Shooting], [Melee], [Construction] (frequent false matches)
-  • Good: [Rules-ShootingCombat,Aim], [Tips-Melee,Brawl] (requires explicit mention)
+  • Good: [Rules,ShootingCombat,Aim], [Tips,Melee,Brawl] (requires explicit mention)
 
 ✓ Make content specific and actionable
   • Good: This planet is a ringworld with 0.8x Earth gravity
@@ -205,18 +210,18 @@ The knowledge library automatically injects relevant knowledge during AI convers
   • Minor details: 0.3-0.5
 
 ✓ Use extended properties wisely
-  • Can Be Matched: Enable to participate in keyword/vector retrieval
+  • Can Be Matched: Enable to participate in tag/vector retrieval
   • Can Be Extracted: Enable for knowledge chain referencing
 
 【Common Questions】
 Q: Why is my knowledge injected too frequently?
-A: Tag might be too short or too broad. Use 3+ character compound tags like [Lore-ColonyHistory] instead of [History]
+A: Tag might be too short or too broad. Use 3+ character compound tags like [Lore,ColonyHistory] instead of [History]
 
 Q: Why isn't my knowledge being injected?
 A: Check if knowledge is enabled, matching mode is correct, importance isn't too low, and tags are relevant to conversation
 
 Q: How to make AI use certain knowledge only in specific scenarios?
-A: Use precise compound tags (e.g., [Rules-Combat-RangedWeapons]) and moderate importance
+A: Use precise compound tags (e.g., [Rules,Combat,RangedWeapons]) and moderate importance
 
 ✓ Tags must be triggerable by conversations
   • Problem: Tag [Rules-CombatSystem] won't trigger in "shooting" "melee" conversations
