@@ -155,10 +155,20 @@ namespace RimTalk.Memory
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
-            // ⭐ 修复：合并ABM和SCM作为总结池
+            // ⭐ 修复：合并ABM和SCM作为总结池，排除固定的记忆
             var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(activeMemories);
-            allMemoriesToSummarize.AddRange(situationalMemories);
+            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.isPinned));
+            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.isPinned));
+
+            // 如果没有非固定记忆，不需要总结
+            if (allMemoriesToSummarize.Count == 0)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} daily summarization: no non-pinned memories to summarize");
+                }
+                return;
+            }
 
             var byType = allMemoriesToSummarize.GroupBy(m => m.type);
             
@@ -205,7 +215,8 @@ namespace RimTalk.Memory
                     summaryEntry.notes = "AI 总结正在后台处理中...";
                 }
 
-                eventLogMemories.Insert(0, summaryEntry);
+                // ⭐ 修复：根据时间戳插入到正确位置，而不是总是插入到开头
+                InsertMemoryByTimestamp(eventLogMemories, summaryEntry);
             }
 
             // ⭐ 修复：清空ABM（总结后不再需要保留）
@@ -233,10 +244,20 @@ namespace RimTalk.Memory
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
-            // ⭐ 修复：合并ABM和SCM作为总结池
+            // ⭐ 修复：合并ABM和SCM作为总结池，排除固定的记忆
             var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(activeMemories);
-            allMemoriesToSummarize.AddRange(situationalMemories);
+            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.isPinned));
+            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.isPinned));
+
+            // 如果没有非固定记忆，不需要总结
+            if (allMemoriesToSummarize.Count == 0)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} manual summarization: no non-pinned memories to summarize");
+                }
+                return;
+            }
 
             var byType = allMemoriesToSummarize.GroupBy(m => m.type);
             
@@ -284,7 +305,8 @@ namespace RimTalk.Memory
                     summaryEntry.notes = "AI 总结正在后台处理中...";
                 }
 
-                eventLogMemories.Insert(0, summaryEntry);
+                // ⭐ 修复：根据时间戳插入到正确位置，而不是总是插入到开头
+                InsertMemoryByTimestamp(eventLogMemories, summaryEntry);
             }
 
             // ⭐ 修复：清空ABM（总结后不再需要保留）
@@ -302,6 +324,32 @@ namespace RimTalk.Memory
             }
             
             TrimEventLog();
+        }
+
+        /// <summary>
+        /// ⭐ 新方法：根据时间戳将记忆插入到正确的位置（保持列表按时间降序排序）
+        /// </summary>
+        private void InsertMemoryByTimestamp(List<MemoryEntry> list, MemoryEntry entry)
+        {
+            // 如果列表为空，直接添加
+            if (list.Count == 0)
+            {
+                list.Add(entry);
+                return;
+            }
+
+            // 使用二分查找找到插入位置（降序排列，新的在前）
+            int insertIndex = list.FindIndex(m => m.timestamp < entry.timestamp);
+            
+            // 如果没找到（所有记忆都比新记忆新），添加到末尾
+            if (insertIndex == -1)
+            {
+                list.Add(entry);
+            }
+            else
+            {
+                list.Insert(insertIndex, entry);
+            }
         }
 
         private string CreateSimpleSummary(List<MemoryEntry> memories, MemoryType type)
@@ -393,7 +441,7 @@ namespace RimTalk.Memory
 
             return summary.Length > 0 ? summary.ToString() : $"{type}记忆{memories.Count}条";
         }
-
+        
         private void TrimEventLog()
         {
             if (eventLogMemories.Count <= MAX_EVENTLOG)
