@@ -12,7 +12,8 @@ namespace RimTalk.Memory.UI
     public partial class MainTabWindow_Memory
     {
         /// <summary>
-        /// ? 通用记忆聚合方法 - 支持AI总结
+        /// ⭐ 通用记忆聚合方法 - 支持AI总结
+        /// ⭐ v3.3.2.35: 修复时间戳继承和插入位置问题
         /// </summary>
         private void AggregateMemories(
             List<MemoryEntry> memories, 
@@ -21,11 +22,26 @@ namespace RimTalk.Memory.UI
             List<MemoryEntry> targetList,
             string promptTemplate)
         {
-            var byType = memories.GroupBy(m => m.type);
+            // ⭐ 修复：过滤掉固定记忆（不应该被总结）
+            var memoriesToSummarize = memories.Where(m => !m.isPinned).ToList();
+            
+            if (memoriesToSummarize.Count == 0)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Warning("[Memory] AggregateMemories: All selected memories are pinned, skipping summarization");
+                }
+                return;
+            }
+            
+            var byType = memoriesToSummarize.GroupBy(m => m.type);
             
             foreach (var typeGroup in byType)
             {
                 var items = typeGroup.ToList();
+                
+                // ⭐ 修复：使用被总结记忆中最晚（最新）的timestamp
+                int latestTimestamp = items.Max(m => m.timestamp);
                 
                 // 创建聚合条目
                 var aggregated = new MemoryEntry(
@@ -37,16 +53,19 @@ namespace RimTalk.Memory.UI
                     importance: items.Average(m => m.importance) + (targetLayer == MemoryLayer.Archive ? 0.3f : 0.2f)
                 );
                 
+                // ⭐ 修复：覆盖默认的timestamp（MemoryEntry构造函数会自动设置为当前时间）
+                aggregated.timestamp = latestTimestamp;
+                
                 // 合并元数据
                 aggregated.keywords.AddRange(items.SelectMany(m => m.keywords).Distinct());
                 aggregated.tags.AddRange(items.SelectMany(m => m.tags).Distinct());
-                aggregated.AddTag(targetLayer == MemoryLayer.Archive ? "手动归档" : "手动总结");
+                aggregated.AddTag(targetLayer == MemoryLayer.Archive ? "手动归档" : "选中总结");
                 if (targetLayer == MemoryLayer.Archive)
                 {
                     aggregated.AddTag($"源自{items.Count}条ELS");
                 }
                 
-                // ? AI总结（如果可用）
+                // ⭐ AI总结（如果可用）
                 var settings = RimTalkMemoryPatchMod.Settings;
                 if (settings.useAISummarization && AI.IndependentAISummarizer.IsAvailable())
                 {
@@ -71,13 +90,40 @@ namespace RimTalk.Memory.UI
                     aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "深度归档" : "总结")}正在后台处理中...";
                 }
                 
-                targetList.Insert(0, aggregated);
+                // ⭐ 修复：根据时间戳插入到正确位置，而不是总是插入到开头
+                InsertMemoryByTimestamp(targetList, aggregated);
             }
             
-            // 从源列表移除
-            foreach (var memory in memories)
+            // ⭐ 修复：只从源列表中移除非固定记忆
+            foreach (var memory in memoriesToSummarize)
             {
                 sourceList.Remove(memory);
+            }
+        }
+        
+        /// <summary>
+        /// ⭐ 新方法：根据时间戳将记忆插入到正确的位置（保持列表按时间降序排序）
+        /// </summary>
+        private void InsertMemoryByTimestamp(List<MemoryEntry> list, MemoryEntry entry)
+        {
+            // 如果列表为空，直接添加
+            if (list.Count == 0)
+            {
+                list.Add(entry);
+                return;
+            }
+
+            // 使用二分查找找到插入位置（降序排列，新的在前）
+            int insertIndex = list.FindIndex(m => m.timestamp < entry.timestamp);
+            
+            // 如果没找到（所有记忆都比新记忆新），添加到末尾
+            if (insertIndex == -1)
+            {
+                list.Add(entry);
+            }
+            else
+            {
+                list.Insert(insertIndex, entry);
             }
         }
         

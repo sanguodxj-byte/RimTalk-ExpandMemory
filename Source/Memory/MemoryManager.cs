@@ -584,8 +584,8 @@ namespace RimTalk.Memory
                         // 创建归档摘要（简单版本）
                         string archiveSummary = CreateArchiveSummary(memories, typeGroup.Key);
                         
-                        // ⭐ 修复：使用被归档记忆中最早的timestamp作为归档entry的时间戳
-                        int earliestTimestamp = memories.Min(m => m.timestamp);
+                        // ⭐ 修复：使用被归档记忆中最晚（最新）的timestamp作为归档entry的时间戳
+                        int latestTimestamp = memories.Max(m => m.timestamp);
                         
                         var archiveEntry = new MemoryEntry(
                             content: archiveSummary,
@@ -595,7 +595,7 @@ namespace RimTalk.Memory
                         );
                         
                         // ⭐ 修复：覆盖默认的timestamp
-                        archiveEntry.timestamp = earliestTimestamp;
+                        archiveEntry.timestamp = latestTimestamp;
                         
                         // 合并关键词和标签
                         archiveEntry.keywords.AddRange(memories.SelectMany(m => m.keywords).Distinct());

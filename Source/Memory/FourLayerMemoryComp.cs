@@ -177,8 +177,8 @@ namespace RimTalk.Memory
                 var memories = typeGroup.ToList();
                 string simpleSummary = CreateSimpleSummary(memories, typeGroup.Key);
 
-                // ⭐ 修复：使用被总结记忆中最早的timestamp作为总结的时间戳
-                int earliestTimestamp = memories.Min(m => m.timestamp);
+                // ⭐ 修复：使用被总结记忆中最晚（最新）的timestamp作为总结的时间戳
+                int latestTimestamp = memories.Max(m => m.timestamp);
 
                 var summaryEntry = new MemoryEntry(
                     content: simpleSummary,
@@ -188,7 +188,7 @@ namespace RimTalk.Memory
                 );
                 
                 // ⭐ 修复：覆盖默认的timestamp（MemoryEntry构造函数会自动设置为当前时间）
-                summaryEntry.timestamp = earliestTimestamp;
+                summaryEntry.timestamp = latestTimestamp;
 
                 summaryEntry.keywords.AddRange(memories.SelectMany(m => m.keywords).Distinct());
                 summaryEntry.tags.AddRange(memories.SelectMany(m => m.tags).Distinct());
@@ -266,8 +266,8 @@ namespace RimTalk.Memory
                 var memories = typeGroup.ToList();
                 string simpleSummary = CreateSimpleSummary(memories, typeGroup.Key);
 
-                // ⭐ 修复：使用被总结记忆中最早的timestamp作为总结的时间戳
-                int earliestTimestamp = memories.Min(m => m.timestamp);
+                // ⭐ 修复：使用被总结记忆中最晚（最新）的timestamp作为总结的时间戳
+                int latestTimestamp = memories.Max(m => m.timestamp);
 
                 var summaryEntry = new MemoryEntry(
                     content: simpleSummary,
@@ -277,7 +277,7 @@ namespace RimTalk.Memory
                 );
                 
                 // ⭐ 修复：覆盖默认的timestamp
-                summaryEntry.timestamp = earliestTimestamp;
+                summaryEntry.timestamp = latestTimestamp;
 
                 summaryEntry.keywords.AddRange(memories.SelectMany(m => m.keywords).Distinct());
                 summaryEntry.tags.AddRange(memories.SelectMany(m => m.tags).Distinct());
