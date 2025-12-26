@@ -134,8 +134,9 @@ namespace RimTalk.Memory.Patches
         }
         
         /// <summary>
-        /// Postfix for DecoratePrompt - 在装饰提示词后添加记忆
+        /// Postfix for DecoratePrompt - ⭐ 注入记忆和常识到 context（用户消息），而非 prompts（系统提示）
         /// ⭐ v3.0: 使用智能注入管理器（高级评分系统）
+        /// ⭐ v3.3.38: 修改注入位置 - 从 systemPrompt 改为 context
         /// </summary>
         private static void DecoratePrompt_Postfix(object talkRequest, List<Pawn> pawns)
         {
@@ -144,9 +145,9 @@ namespace RimTalk.Memory.Patches
                 if (talkRequest == null || pawns == null || pawns.Count == 0)
                     return;
                 
-                // 通过反射获取 TalkRequest.Prompt 属性
+                // 通过反射获取 TalkRequest 的属性
                 var talkRequestType = talkRequest.GetType();
-                var promptProperty = talkRequestType.GetProperty("Prompt");
+                var promptProperty = talkRequestType.GetProperty("Prompt");  // 用户消息（context）
                 
                 if (promptProperty == null)
                     return;
@@ -174,23 +175,33 @@ namespace RimTalk.Memory.Patches
                 // ⭐ v3.0: 主动记忆召回（实验性功能）
                 string proactiveRecall = ProactiveMemoryRecall.TryRecallMemory(mainPawn, currentPrompt, targetPawn);
                 
-                // 合并注入内容
+                // ⭐ v3.3.38: 注入到 context（用户消息），而非 systemPrompt
+                // 合并注入内容到用户消息末尾
                 string enhancedPrompt = currentPrompt;
                 
                 if (!string.IsNullOrEmpty(injectedContext))
                 {
-                    enhancedPrompt += "\n\n" + injectedContext;
+                    // 格式化：在用户消息后添加上下文信息
+                    enhancedPrompt += "\n\n---\n\n";
+                    enhancedPrompt += "# Additional Context\n\n";
+                    enhancedPrompt += injectedContext;
                 }
                 
                 if (!string.IsNullOrEmpty(proactiveRecall))
                 {
-                    enhancedPrompt += "\n\n" + proactiveRecall;
+                    enhancedPrompt += "\n\n";
+                    enhancedPrompt += proactiveRecall;
                 }
                 
-                // 更新提示词
+                // 更新 Prompt（用户消息）
                 if (enhancedPrompt != currentPrompt)
                 {
                     promptProperty.SetValue(talkRequest, enhancedPrompt);
+                    
+                    if (Prefs.DevMode)
+                    {
+                        Log.Message($"[RimTalk Memory Patch] ✓ Injected context to user message (not system prompt)");
+                    }
                 }
             }
             catch (Exception ex)

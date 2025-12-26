@@ -51,7 +51,8 @@ namespace RimTalk.Memory.Patches
         }
 
         /// <summary>
-        /// Prefix: 在异步方法开始前进行向量搜索并注入到 Prompt
+        /// Prefix: 在异步方法开始前进行向量搜索并注入到 context（用户消息）
+        /// ⭐ v3.3.38: 修改注入位置 - 从 Prompt 改为 context
         /// 注意：Harmony 不支持 async Prefix，所以我们使用同步方法但在内部启动异步任务
         /// 由于 GenerateAndProcessTalkAsync 本身在 Task.Run 中，所以这里的同步等待不会卡主线程
         /// </summary>
@@ -63,7 +64,7 @@ namespace RimTalk.Memory.Patches
                 if (!settings.enableVectorEnhancement)
                     return;
 
-                // 通过反射获取 TalkRequest.Prompt
+                // 通过反射获取 TalkRequest.Prompt（用户消息）
                 var talkRequestType = talkRequest.GetType();
                 var promptProperty = talkRequestType.GetProperty("Prompt");
                 
@@ -148,7 +149,9 @@ namespace RimTalk.Memory.Patches
                 }
 
                 var sb = new StringBuilder();
-                sb.AppendLine("## World Knowledge (Vector Enhanced)");
+                sb.AppendLine("\n\n---\n\n");
+                sb.AppendLine("# Vector Enhanced Knowledge");
+                sb.AppendLine();
 
                 // ⭐ 线程安全：创建集合快照，避免 "Collection was modified" 异常
                 var entriesSnapshot = memoryManager.CommonKnowledge.Entries.ToList();
@@ -183,16 +186,18 @@ namespace RimTalk.Memory.Patches
                     return;
                 }
 
+                int index = 1;
                 foreach (var item in finalResults)
                 {
-                    sb.AppendLine($"[{item.Entry.tag}|{item.Similarity:F2}] {item.Entry.content}");
+                    sb.AppendLine($"{index}. [{item.Entry.tag}] {item.Entry.content} (similarity: {item.Similarity:F2})");
+                    index++;
                 }
 
-                // 注入到 Prompt
-                string enhancedPrompt = currentPrompt + "\n\n" + sb.ToString();
+                // ⭐ v3.3.38: 注入到 context（用户消息末尾），而非 systemPrompt
+                string enhancedPrompt = currentPrompt + sb.ToString();
                 promptProperty.SetValue(talkRequest, enhancedPrompt);
 
-                Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries into prompt (excluded {keywordMatchedIds.Count} keyword-matched entries)");
+                Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries to context (excluded {keywordMatchedIds.Count} keyword-matched entries)");
             }
             catch (Exception ex)
             {

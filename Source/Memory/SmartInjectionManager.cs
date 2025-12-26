@@ -7,11 +7,17 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// 智能注入管理器 v3.3.2.25
+    /// 智能注入管理器 v3.3.38
     /// 直接使用CommonKnowledgeLibrary和关键词检索
-    /// ? 完全移除RAG依赖
-    /// ? v3.3.20: 支持指令分区（Instruction Partitioning）
-    /// ? v3.3.20: 调整注入顺序 - 规则 → 常识 → 记忆
+    /// ⭐ 完全移除RAG依赖
+    /// ⭐ v3.3.20: 支持指令分区（Instruction Partitioning）
+    /// ⭐ v3.3.20: 调整注入顺序 - 规则 → 常识 → 记忆
+    /// ⭐ v3.3.38: 注入位置改为 context（用户消息）而非 prompts（系统提示）
+    ///
+    /// 设计理念：
+    /// - 记忆和常识注入到用户消息末尾，作为对话上下文补充
+    /// - 保持 system prompt 简洁，只包含角色设定和对话规则
+    /// - 提高 AI 对上下文信息的敏感度
     /// </summary>
     public static class SmartInjectionManager
     {
@@ -19,8 +25,8 @@ namespace RimTalk.Memory
         
         /// <summary>
         /// 智能注入上下文
-        /// ? v3.3.20: 重构知识注入逻辑，支持指令分区
-        /// ? 注入顺序：
+        /// ⭐ v3.3.38: 返回格式化的上下文文本，用于注入到用户消息（context）
+        /// ⭐ 注入顺序：
         ///   1. Current Guidelines（规则/指令）- 强制约束
         ///   2. World Knowledge（常识/背景）- 世界观知识
         ///   3. Character Memories（记忆）- 角色个人经历
