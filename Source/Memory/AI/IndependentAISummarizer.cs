@@ -554,7 +554,7 @@ namespace RimTalk.Memory.AI
             int i = 1;
             foreach (var m in memories.Take(maxMemories))
             {
-                memoryListSb.AppendLine($"{i} {m.content}");
+                memoryListSb.AppendLine($"{i}. {m.content}");
                 i++;
             }
             string memoryList = memoryListSb.ToString().TrimEnd();
@@ -605,8 +605,15 @@ namespace RimTalk.Memory.AI
                 }
             }
             
+            // ⭐ 修复：先转义花括号，防止 string.Format 报错
+            // 将用户自定义提示词中的 { 和 } 转义为 {{ 和 }}
+            string escapedTemplate = promptTemplate.Replace("{", "{{").Replace("}", "}}");
+            
+            // 然后把占位符 {{{0}}} 和 {{{1}}} 替换回 {0} 和 {1}
+            escapedTemplate = escapedTemplate.Replace("{{0}}", "{0}").Replace("{{1}}", "{1}");
+            
             // 替换占位符
-            string result = string.Format(promptTemplate, pawn.LabelShort, memoryList);
+            string result = string.Format(escapedTemplate, pawn.LabelShort, memoryList);
             
             return result;
         }
