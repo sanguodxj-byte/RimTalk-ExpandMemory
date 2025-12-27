@@ -110,11 +110,8 @@ namespace RimTalk.Memory
         
         private static void ExtractGenderKeywords(Verse.Pawn pawn, List<string> keywords, PawnKeywordInfo info)
         {
-            if (pawn.gender != null)
-            {
-                var genderLabel = pawn.gender.GetLabel();
-                AddAndRecord(genderLabel, keywords, info.GenderKeywords);
-            }
+            var genderLabel = pawn.gender.GetLabel();
+            AddAndRecord(genderLabel, keywords, info.GenderKeywords);
         }
         
         private static void ExtractRaceKeywords(Verse.Pawn pawn, List<string> keywords, PawnKeywordInfo info)
