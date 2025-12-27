@@ -13,11 +13,11 @@ namespace RimTalk.Memory.Patches
 {
     /// <summary>
     /// Patch for TalkService.GenerateAndProcessTalkAsync
-    /// 在异步方法中进行向量搜索，不会卡主线程
     ///
-    /// ⭐ v3.5: 适配 RimTalk API 变更
-    /// - 使用 TalkRequest.Context 属性注入（新版 RimTalk）
-    /// - 移除了已废弃的 AIService._instruction 回退
+    /// ⭐ v3.5.1: 统一注入入口
+    /// - 当 injectToContext = true 时，在这里处理所有注入（关键词匹配 + 向量增强）
+    /// - 使用 Prompt 进行匹配，注入到 Context
+    /// - 这解决了之前 Patch_BuildContext 无法访问 Prompt 的问题
     /// </summary>
     [HarmonyPatch]
     public static class Patch_GenerateAndProcessTalkAsync
@@ -42,7 +42,7 @@ namespace RimTalk.Memory.Patches
                 return null;
             }
 
-            var method = talkServiceType.GetMethod("GenerateAndProcessTalkAsync", 
+            var method = talkServiceType.GetMethod("GenerateAndProcessTalkAsync",
                 BindingFlags.NonPublic | BindingFlags.Static);
             
             if (method == null)
@@ -56,10 +56,14 @@ namespace RimTalk.Memory.Patches
         }
 
         /// <summary>
-        /// Prefix: 在异步方法开始前进行向量搜索并注入到 context（用户消息）
-        /// ⭐ v3.3.38: 修改注入位置 - 从 Prompt 改为 context
-        /// 注意：Harmony 不支持 async Prefix，所以我们使用同步方法但在内部启动异步任务
-        /// 由于 GenerateAndProcessTalkAsync 本身在 Task.Run 中，所以这里的同步等待不会卡主线程
+        /// Prefix: 统一处理所有记忆和常识注入
+        ///
+        /// ⭐ v3.5.1: 当 injectToContext = true 时：
+        /// 1. 使用 Prompt 进行关键词匹配（SmartInjectionManager）
+        /// 2. 使用 Prompt 进行向量增强（如果启用）
+        /// 3. 将结果注入到 Context
+        ///
+        /// 这解决了 Patch_BuildContext 用 Context 匹配常识导致的问题
         /// </summary>
         [HarmonyPrefix]
         public static void Prefix(object talkRequest)
@@ -67,8 +71,6 @@ namespace RimTalk.Memory.Patches
             try
             {
                 var settings = RimTalkMemoryPatchMod.Settings;
-                if (!settings.enableVectorEnhancement)
-                    return;
 
                 // 通过反射获取 TalkRequest 属性
                 var talkRequestType = talkRequest.GetType();
@@ -91,163 +93,195 @@ namespace RimTalk.Memory.Patches
                 if (string.IsNullOrEmpty(currentPrompt))
                     return;
 
-                Log.Message($"[RimTalk Memory] Starting async vector search for prompt: {currentPrompt.Substring(0, Math.Min(50, currentPrompt.Length))}...");
+                // ⭐ v3.5.1: 缓存 Prompt 用于预览器
+                RimTalkMemoryAPI.CacheContext(initiator, currentPrompt);
 
                 // ⭐ 使用 ContextCleaner 清理上下文，去除 RimTalk 格式噪音
-                string cleanedContext = ContextCleaner.CleanForVectorMatching(currentPrompt);
+                string cleanedPrompt = ContextCleaner.CleanForVectorMatching(currentPrompt);
                 
-                if (string.IsNullOrEmpty(cleanedContext))
+                if (string.IsNullOrEmpty(cleanedPrompt))
                 {
-                    Log.Warning($"[RimTalk Memory] Context cleaned to empty, using original prompt for vector search");
-                    cleanedContext = currentPrompt; // 回退到原始 prompt
-                }
-                else
-                {
-                    Log.Message($"[RimTalk Memory] Cleaned context: {cleanedContext.Substring(0, Math.Min(100, cleanedContext.Length))}...");
+                    cleanedPrompt = currentPrompt; // 回退到原始 prompt
                 }
 
-                // 异步向量搜索并同步等待结果
-                // 因为这个 Prefix 本身就在 Task.Run 的后台线程中执行，所以 .Result 不会卡主线程
-                var vectorResults = VectorService.Instance.FindBestLoreIdsAsync(
-                    cleanedContext,  // ⬅️ 使用清理后的上下文
-                    settings.maxVectorResults,
-                    settings.vectorSimilarityThreshold
-                ).Result;
-
-                if (vectorResults == null || vectorResults.Count == 0)
+                if (Prefs.DevMode)
                 {
-                    Log.Message("[RimTalk Memory] No vector results found");
-                    return;
+                    Log.Message($"[RimTalk Memory] Processing prompt: {cleanedPrompt.Substring(0, Math.Min(50, cleanedPrompt.Length))}...");
                 }
 
-                Log.Message($"[RimTalk Memory] Found {vectorResults.Count} vector knowledge entries");
+                var allInjections = new StringBuilder();
 
-                // 构建向量常识文本
-                var memoryManager = Find.World?.GetComponent<MemoryManager>();
-                if (memoryManager == null)
-                {
-                    Log.Warning("[RimTalk Memory] MemoryManager not found");
-                    return;
-                }
-
-                // ⭐ 去重逻辑：先获取关键词匹配的条目ID
-                var keywordMatchedIds = new HashSet<string>();
-                try
-                {
-                    // 调用关键词匹配获取已匹配的条目
-                    memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
-                        cleanedContext,
-                        settings.maxVectorResults,
-                        out var keywordScores,
-                        initiator,
-                        recipient
-                    );
-                    
-                    if (keywordScores != null)
-                    {
-                        foreach (var score in keywordScores)
-                        {
-                            keywordMatchedIds.Add(score.Entry.id);
-                        }
-                        
-                        if (keywordMatchedIds.Count > 0)
-                        {
-                            Log.Message($"[RimTalk Memory] Found {keywordMatchedIds.Count} keyword-matched entries, will exclude from vector results");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[RimTalk Memory] Failed to get keyword matches for deduplication: {ex.Message}");
-                }
-
-                var sb = new StringBuilder();
-                sb.AppendLine("\n\n---\n\n");
-                sb.AppendLine("# Vector Enhanced Knowledge");
-                sb.AppendLine();
-
-                // ⭐ 线程安全：创建集合快照，避免 "Collection was modified" 异常
-                var entriesSnapshot = memoryManager.CommonKnowledge.Entries.ToList();
-
-                // ⭐ 综合排序：结合相似度和重要性
-                // Score = Similarity + (Importance * 0.2)
-                var scoredResults = new List<(CommonKnowledgeEntry Entry, float Similarity, float Score)>();
-
-                foreach (var (id, similarity) in vectorResults)
-                {
-                    // ⭐ 去重：跳过已被关键词匹配的条目
-                    if (keywordMatchedIds.Contains(id))
-                    {
-                        Log.Message($"[RimTalk Memory] Skipping vector result '{id}' (already matched by keyword)");
-                        continue;
-                    }
-                    
-                    var entry = entriesSnapshot.FirstOrDefault(e => e.id == id);
-                    if (entry != null)
-                    {
-                        float score = similarity + (entry.importance * 0.2f);
-                        scoredResults.Add((entry, similarity, score));
-                    }
-                }
-                
-                // 按综合得分排序
-                var finalResults = scoredResults.OrderByDescending(x => x.Score).ToList();
-
-                if (finalResults.Count == 0)
-                {
-                    Log.Message("[RimTalk Memory] No unique vector results after deduplication");
-                    return;
-                }
-
-                int index = 1;
-                foreach (var item in finalResults)
-                {
-                    sb.AppendLine($"{index}. [{item.Entry.tag}] {item.Entry.content} (similarity: {item.Similarity:F2})");
-                    index++;
-                }
-
-                // ⭐ v3.5: 根据设置选择注入位置
-                var vectorInjection = sb.ToString();
-                bool injectionSuccess = false;
-                
+                // ==========================================
+                // ⭐ 第一部分：关键词匹配的记忆和常识
+                // ⭐ v3.5.1: 当 injectToContext = true 时，在这里处理
+                // ==========================================
                 if (settings.injectToContext)
                 {
-                    // 尝试注入到 TalkRequest.Context (新版 RimTalk)
-                    if (contextProperty != null)
+                    // 使用 SmartInjectionManager 进行关键词匹配
+                    string smartInjection = SmartInjectionManager.InjectSmartContext(
+                        speaker: initiator,
+                        listener: recipient,
+                        context: cleanedPrompt,  // ⬅️ 使用清理后的 Prompt 进行匹配
+                        maxMemories: settings.maxInjectedMemories,
+                        maxKnowledge: settings.maxInjectedKnowledge
+                    );
+                    
+                    if (!string.IsNullOrEmpty(smartInjection))
                     {
-                        try
+                        allInjections.Append(smartInjection);
+                        
+                        if (Prefs.DevMode)
                         {
-                            string currentContext = contextProperty.GetValue(talkRequest) as string;
-                            string enhancedContext = currentContext + "\n\n" + vectorInjection;
-                            contextProperty.SetValue(talkRequest, enhancedContext);
-                            injectionSuccess = true;
-                            
-                            if (Prefs.DevMode)
-                            {
-                                Log.Message($"[RimTalk Memory] ✓ Injected {finalResults.Count} vector entries to TalkRequest.Context");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Warning($"[RimTalk Memory] Failed to inject to TalkRequest.Context: {ex.Message}");
+                            Log.Message($"[RimTalk Memory] ✓ SmartInjection: {smartInjection.Length} chars");
                         }
                     }
-                    else
+                    
+                    // 主动记忆召回
+                    string proactiveRecall = ProactiveMemoryRecall.TryRecallMemory(initiator, cleanedPrompt, recipient);
+                    if (!string.IsNullOrEmpty(proactiveRecall))
                     {
-                        Log.Warning("[RimTalk Memory] TalkRequest.Context property not found, falling back to Prompt injection");
+                        if (allInjections.Length > 0)
+                            allInjections.Append("\n\n");
+                        allInjections.Append(proactiveRecall);
                     }
                 }
 
-                // 如果不注入 Context，或者 Context 注入失败，则回退到注入 Prompt
+                // ==========================================
+                // ⭐ 第二部分：向量增强（如果启用）
+                // ==========================================
+                if (settings.enableVectorEnhancement)
+                {
+                    try
+                    {
+                        // 异步向量搜索并同步等待结果
+                        var vectorResults = VectorService.Instance.FindBestLoreIdsAsync(
+                            cleanedPrompt,  // ⬅️ 使用清理后的 Prompt
+                            settings.maxVectorResults,
+                            settings.vectorSimilarityThreshold
+                        ).Result;
+
+                        if (vectorResults != null && vectorResults.Count > 0)
+                        {
+                            var memoryManager = Find.World?.GetComponent<MemoryManager>();
+                            if (memoryManager != null)
+                            {
+                                // 获取关键词匹配的条目ID用于去重
+                                var keywordMatchedIds = new HashSet<string>();
+                                try
+                                {
+                                    memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
+                                        cleanedPrompt,
+                                        settings.maxVectorResults,
+                                        out var keywordScores,
+                                        initiator,
+                                        recipient
+                                    );
+                                    
+                                    if (keywordScores != null)
+                                    {
+                                        foreach (var score in keywordScores)
+                                        {
+                                            keywordMatchedIds.Add(score.Entry.id);
+                                        }
+                                    }
+                                }
+                                catch { }
+
+                                // 构建向量常识文本
+                                var entriesSnapshot = memoryManager.CommonKnowledge.Entries.ToList();
+                                var scoredResults = new List<(CommonKnowledgeEntry Entry, float Similarity, float Score)>();
+
+                                foreach (var (id, similarity) in vectorResults)
+                                {
+                                    if (keywordMatchedIds.Contains(id))
+                                        continue;
+                                    
+                                    var entry = entriesSnapshot.FirstOrDefault(e => e.id == id);
+                                    if (entry != null)
+                                    {
+                                        float score = similarity + (entry.importance * 0.2f);
+                                        scoredResults.Add((entry, similarity, score));
+                                    }
+                                }
+                                
+                                var finalResults = scoredResults.OrderByDescending(x => x.Score).ToList();
+
+                                if (finalResults.Count > 0)
+                                {
+                                    var vectorSb = new StringBuilder();
+                                    vectorSb.AppendLine("## Vector Enhanced Knowledge");
+                                    vectorSb.AppendLine();
+                                    
+                                    int index = 1;
+                                    foreach (var item in finalResults)
+                                    {
+                                        vectorSb.AppendLine($"{index}. [{item.Entry.tag}] {item.Entry.content} (similarity: {item.Similarity:F2})");
+                                        index++;
+                                    }
+                                    
+                                    if (allInjections.Length > 0)
+                                        allInjections.Append("\n\n");
+                                    allInjections.Append(vectorSb.ToString());
+                                    
+                                    if (Prefs.DevMode)
+                                    {
+                                        Log.Message($"[RimTalk Memory] ✓ Vector: {finalResults.Count} entries");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning($"[RimTalk Memory] Vector search error: {ex.Message}");
+                    }
+                }
+
+                // ==========================================
+                // ⭐ 第三部分：执行注入
+                // ==========================================
+                if (allInjections.Length == 0)
+                {
+                    if (Prefs.DevMode)
+                    {
+                        Log.Message("[RimTalk Memory] No content to inject");
+                    }
+                    return;
+                }
+
+                string injectionText = "\n\n---\n\n# Memory & Knowledge Context\n\n" + allInjections.ToString();
+                bool injectionSuccess = false;
+                
+                if (settings.injectToContext && contextProperty != null)
+                {
+                    // 注入到 Context
+                    try
+                    {
+                        string currentContext = contextProperty.GetValue(talkRequest) as string;
+                        string enhancedContext = currentContext + injectionText;
+                        contextProperty.SetValue(talkRequest, enhancedContext);
+                        injectionSuccess = true;
+                        
+                        if (Prefs.DevMode)
+                        {
+                            Log.Message($"[RimTalk Memory] ✓ Injected to Context: {allInjections.Length} chars");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning($"[RimTalk Memory] Failed to inject to Context: {ex.Message}");
+                    }
+                }
+
+                // 回退到注入 Prompt
                 if (!injectionSuccess)
                 {
-                    // 注入到 Prompt (User Message) - 默认行为
-                    string enhancedPrompt = currentPrompt + "\n\n" + vectorInjection;
+                    string enhancedPrompt = currentPrompt + injectionText;
                     promptProperty.SetValue(talkRequest, enhancedPrompt);
                     
                     if (Prefs.DevMode)
                     {
-                        Log.Message($"[RimTalk Memory] ✓ Injected {finalResults.Count} vector entries to Prompt (excluded {keywordMatchedIds.Count} keyword-matched)");
+                        Log.Message($"[RimTalk Memory] ✓ Injected to Prompt: {allInjections.Length} chars");
                     }
                 }
             }

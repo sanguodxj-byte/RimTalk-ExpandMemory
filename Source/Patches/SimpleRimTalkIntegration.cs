@@ -32,6 +32,13 @@ namespace RimTalk.Memory.Patches
         private static Pawn lastRimTalkPawn = null;
         private static int lastRimTalkTick = 0;
         
+        // ⭐ v3.5.1: 新增 Prompt 缓存（用于 BuildContext 阶段匹配）
+        // 由 DecoratePrompt Prefix 缓存，供 BuildContext Postfix 使用
+        private static string cachedPromptForMatching = "";
+        private static Pawn cachedPromptPawn = null;
+        private static Pawn cachedPromptTargetPawn = null;
+        private static int cachedPromptTick = 0;
+        
         static RimTalkMemoryAPI()
         {
             // API已加载
@@ -55,6 +62,52 @@ namespace RimTalk.Memory.Patches
             pawn = lastRimTalkPawn;
             tick = lastRimTalkTick;
             return lastRimTalkContext;
+        }
+        
+        /// <summary>
+        /// ⭐ v3.5.1: 缓存 Prompt 用于匹配（由 DecoratePrompt Prefix 调用）
+        /// 这允许 BuildContext Postfix 使用 Prompt 而非 Context 进行常识匹配
+        /// </summary>
+        public static void CachePromptForMatching(Pawn speaker, Pawn listener, string prompt)
+        {
+            cachedPromptForMatching = prompt ?? "";
+            cachedPromptPawn = speaker;
+            cachedPromptTargetPawn = listener;
+            cachedPromptTick = Find.TickManager?.TicksGame ?? 0;
+            
+            if (Prefs.DevMode)
+            {
+                Log.Message($"[RimTalkMemoryAPI] Cached Prompt for matching: {prompt?.Substring(0, Math.Min(50, prompt?.Length ?? 0))}...");
+            }
+        }
+        
+        /// <summary>
+        /// ⭐ v3.5.1: 获取缓存的 Prompt（供 BuildContext 使用）
+        /// </summary>
+        public static string GetCachedPromptForMatching(out Pawn speaker, out Pawn listener)
+        {
+            speaker = cachedPromptPawn;
+            listener = cachedPromptTargetPawn;
+            
+            // 检查缓存是否过期（超过 60 ticks 视为过期）
+            int currentTick = Find.TickManager?.TicksGame ?? 0;
+            if (currentTick - cachedPromptTick > 60)
+            {
+                // 缓存过期，返回空
+                return null;
+            }
+            
+            return cachedPromptForMatching;
+        }
+        
+        /// <summary>
+        /// ⭐ v3.5.1: 清除 Prompt 缓存（在注入完成后调用）
+        /// </summary>
+        public static void ClearCachedPrompt()
+        {
+            cachedPromptForMatching = "";
+            cachedPromptPawn = null;
+            cachedPromptTargetPawn = null;
         }
         
         /// <summary>

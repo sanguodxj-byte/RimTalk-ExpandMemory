@@ -14,9 +14,11 @@ namespace RimTalk.Memory.Patches
     /// 针对 RimTalk 的精确补丁 - 基于实际代码结构
     /// ⭐ v3.0: 集成高级评分系统（不修改RimTalk代码）
     /// ⭐ v3.5: 适配 RimTalk API 变更，移除已废弃的 AIService.GetContext/UpdateContext
+    /// ⭐ v3.5.1: 注入逻辑重构
     ///
     /// 注入模式：
-    /// - injectToContext = true: 由 Patch_BuildContext 在 Context 构建阶段注入
+    /// - injectToContext = true: 由 Patch_GenerateAndProcessTalkAsync 处理所有注入
+    ///   （使用 Prompt 匹配，注入到 Context）
     /// - injectToContext = false: 由此 Patch 在 DecoratePrompt 阶段注入到 Prompt
     /// </summary>
     [StaticConstructorOnStartup]
@@ -72,6 +74,7 @@ namespace RimTalk.Memory.Patches
         
         /// <summary>
         /// 补丁 PromptService.DecoratePrompt
+        /// ⭐ v3.5.1: 添加 Prefix 缓存 Prompt，供 BuildContext 使用
         /// </summary>
         private static bool PatchDecoratePrompt(Harmony harmony, Assembly assembly)
         {
@@ -81,7 +84,7 @@ namespace RimTalk.Memory.Patches
                 if (promptServiceType == null) return false;
                 
                 // DecoratePrompt 方法
-                var decoratePromptMethod = promptServiceType.GetMethod("DecoratePrompt", 
+                var decoratePromptMethod = promptServiceType.GetMethod("DecoratePrompt",
                     BindingFlags.Public | BindingFlags.Static);
                 
                 if (decoratePromptMethod == null)
@@ -90,14 +93,21 @@ namespace RimTalk.Memory.Patches
                     return false;
                 }
                 
-                // 应用 Postfix
-                var postfixMethod = typeof(RimTalkPrecisePatcher).GetMethod(
-                    nameof(DecoratePrompt_Postfix), 
+                // ⭐ v3.5.1: 应用 Prefix（用于缓存 Prompt，供 BuildContext 使用）
+                var prefixMethod = typeof(RimTalkPrecisePatcher).GetMethod(
+                    nameof(DecoratePrompt_Prefix),
                     BindingFlags.Static | BindingFlags.NonPublic);
                 
-                harmony.Patch(decoratePromptMethod, postfix: new HarmonyMethod(postfixMethod));
+                // 应用 Postfix
+                var postfixMethod = typeof(RimTalkPrecisePatcher).GetMethod(
+                    nameof(DecoratePrompt_Postfix),
+                    BindingFlags.Static | BindingFlags.NonPublic);
                 
-                Log.Message("[RimTalk Memory Patch] ✓ Patched DecoratePrompt");
+                harmony.Patch(decoratePromptMethod,
+                    prefix: new HarmonyMethod(prefixMethod),
+                    postfix: new HarmonyMethod(postfixMethod));
+                
+                Log.Message("[RimTalk Memory Patch] ✓ Patched DecoratePrompt (with Prefix for Prompt caching)");
                 return true;
             }
             catch (Exception ex)
@@ -137,6 +147,58 @@ namespace RimTalk.Memory.Patches
             {
                 Log.Warning($"[RimTalk Memory Patch] Failed to patch GenerateTalk: {ex.Message}");
                 return false;
+            }
+        }
+        
+        /// <summary>
+        /// ⭐ v3.5.1: Prefix for DecoratePrompt - 缓存 Prompt 用于 BuildContext 匹配
+        ///
+        /// 时序说明：
+        /// 1. DecoratePrompt_Prefix（这里）- 缓存 Prompt
+        /// 2. DecoratePrompt 原方法
+        /// 3. DecoratePrompt_Postfix
+        /// 4. BuildContext（使用缓存的 Prompt 进行匹配）
+        /// 5. GenerateAndProcessTalkAsync
+        /// </summary>
+        private static void DecoratePrompt_Prefix(object talkRequest, List<Pawn> pawns)
+        {
+            try
+            {
+                var settings = RimTalkMemoryPatchMod.Settings;
+                
+                // 只在 Context 注入模式下缓存 Prompt
+                if (!settings.injectToContext)
+                    return;
+                
+                if (talkRequest == null || pawns == null || pawns.Count == 0)
+                    return;
+                
+                // 通过反射获取 TalkRequest 的 Prompt 属性
+                var talkRequestType = talkRequest.GetType();
+                var promptProperty = talkRequestType.GetProperty("Prompt");
+                
+                if (promptProperty == null)
+                    return;
+                
+                string prompt = promptProperty.GetValue(talkRequest) as string;
+                if (string.IsNullOrEmpty(prompt))
+                    return;
+                
+                // 获取 Speaker 和 Listener
+                Pawn speaker = pawns[0];
+                Pawn listener = pawns.Count > 1 ? pawns[1] : null;
+                
+                // ⭐ 缓存 Prompt，供 Patch_BuildContext 使用
+                RimTalkMemoryAPI.CachePromptForMatching(speaker, listener, prompt);
+                
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[DecoratePrompt_Prefix] Cached Prompt for BuildContext: {prompt.Substring(0, Math.Min(50, prompt.Length))}...");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[RimTalk Memory Patch] Error in DecoratePrompt_Prefix: {ex.Message}");
             }
         }
         
@@ -242,6 +304,8 @@ namespace RimTalk.Memory.Patches
 
         /// <summary>
         /// Prefix for GenerateTalk - 在生成对话前准备记忆上下文
+        /// ⭐ v3.5.1: 在这里缓存 Prompt，因为 GenerateTalk 是整个对话流程的起点
+        /// 时序：GenerateTalk → DecoratePrompt → BuildContext → GenerateAndProcessTalkAsync
         /// </summary>
         private static void GenerateTalk_Prefix(object talkRequest)
         {
@@ -250,9 +314,13 @@ namespace RimTalk.Memory.Patches
                 if (talkRequest == null)
                     return;
                 
-                // 通过反射获取 Initiator
+                var settings = RimTalkMemoryPatchMod.Settings;
+                
+                // 通过反射获取 TalkRequest 属性
                 var talkRequestType = talkRequest.GetType();
                 var initiatorProperty = talkRequestType.GetProperty("Initiator");
+                var recipientProperty = talkRequestType.GetProperty("Recipient");
+                var promptProperty = talkRequestType.GetProperty("Prompt");
                 
                 if (initiatorProperty == null)
                     return;
@@ -260,6 +328,24 @@ namespace RimTalk.Memory.Patches
                 Pawn initiator = initiatorProperty.GetValue(talkRequest) as Pawn;
                 if (initiator == null)
                     return;
+                
+                Pawn recipient = recipientProperty?.GetValue(talkRequest) as Pawn;
+                
+                // ⭐ v3.5.1: 在 GenerateTalk 阶段就缓存 Prompt
+                // 这确保在 BuildContext 执行时缓存已经就绪
+                if (settings.injectToContext && promptProperty != null)
+                {
+                    string prompt = promptProperty.GetValue(talkRequest) as string;
+                    if (!string.IsNullOrEmpty(prompt))
+                    {
+                        RimTalkMemoryAPI.CachePromptForMatching(initiator, recipient, prompt);
+                        
+                        if (Prefs.DevMode)
+                        {
+                            Log.Message($"[GenerateTalk_Prefix] ⭐ Cached Prompt for BuildContext: {prompt.Substring(0, Math.Min(50, prompt.Length))}...");
+                        }
+                    }
+                }
                 
                 var memoryComp = initiator.TryGetComp<PawnMemoryComp>();
                 if (memoryComp != null)
