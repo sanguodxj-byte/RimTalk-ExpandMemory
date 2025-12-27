@@ -14,6 +14,10 @@ namespace RimTalk.Memory.Patches
     /// <summary>
     /// Patch for TalkService.GenerateAndProcessTalkAsync
     /// 在异步方法中进行向量搜索，不会卡主线程
+    ///
+    /// ⭐ v3.5: 适配 RimTalk API 变更
+    /// - 使用 TalkRequest.Context 属性注入（新版 RimTalk）
+    /// - 移除了已废弃的 AIService._instruction 回退
     /// </summary>
     [HarmonyPatch]
     public static class Patch_GenerateAndProcessTalkAsync
@@ -202,13 +206,13 @@ namespace RimTalk.Memory.Patches
                     index++;
                 }
 
-                // ⭐ v3.4: 根据设置选择注入位置
+                // ⭐ v3.5: 根据设置选择注入位置
                 var vectorInjection = sb.ToString();
                 bool injectionSuccess = false;
                 
                 if (settings.injectToContext)
                 {
-                    // 策略 1: 尝试注入到 TalkRequest.Context (新版 RimTalk)
+                    // 尝试注入到 TalkRequest.Context (新版 RimTalk)
                     if (contextProperty != null)
                     {
                         try
@@ -217,47 +221,34 @@ namespace RimTalk.Memory.Patches
                             string enhancedContext = currentContext + "\n\n" + vectorInjection;
                             contextProperty.SetValue(talkRequest, enhancedContext);
                             injectionSuccess = true;
-                            Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries to TalkRequest.Context");
+                            
+                            if (Prefs.DevMode)
+                            {
+                                Log.Message($"[RimTalk Memory] ✓ Injected {finalResults.Count} vector entries to TalkRequest.Context");
+                            }
                         }
                         catch (Exception ex)
                         {
                             Log.Warning($"[RimTalk Memory] Failed to inject to TalkRequest.Context: {ex.Message}");
                         }
                     }
-
-                    // 策略 2: 如果策略1失败，尝试注入到 AIService._instruction (旧版 RimTalk 兼容)
-                    if (!injectionSuccess)
+                    else
                     {
-                        try
-                        {
-                            var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RimTalk");
-                            var aiServiceType = rimTalkAssembly?.GetType("RimTalk.Service.AIService");
-                            var instructionField = aiServiceType?.GetField("_instruction", BindingFlags.NonPublic | BindingFlags.Static);
-
-                            if (instructionField != null)
-                            {
-                                string currentContext = instructionField.GetValue(null) as string;
-                                string enhancedContext = currentContext + "\n\n" + vectorInjection;
-                                instructionField.SetValue(null, enhancedContext);
-                                injectionSuccess = true;
-                                Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} entries to AIService._instruction (Legacy Fallback)");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Warning($"[RimTalk Memory] Legacy fallback injection failed: {ex.Message}");
-                        }
+                        Log.Warning("[RimTalk Memory] TalkRequest.Context property not found, falling back to Prompt injection");
                     }
                 }
 
-                // 如果不注入 Context，或者 Context 注入都失败了，则回退到注入 Prompt
+                // 如果不注入 Context，或者 Context 注入失败，则回退到注入 Prompt
                 if (!injectionSuccess)
                 {
                     // 注入到 Prompt (User Message) - 默认行为
                     string enhancedPrompt = currentPrompt + "\n\n" + vectorInjection;
                     promptProperty.SetValue(talkRequest, enhancedPrompt);
                     
-                    Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries to Prompt (excluded {keywordMatchedIds.Count} keyword-matched entries)");
+                    if (Prefs.DevMode)
+                    {
+                        Log.Message($"[RimTalk Memory] ✓ Injected {finalResults.Count} vector entries to Prompt (excluded {keywordMatchedIds.Count} keyword-matched)");
+                    }
                 }
             }
             catch (Exception ex)
