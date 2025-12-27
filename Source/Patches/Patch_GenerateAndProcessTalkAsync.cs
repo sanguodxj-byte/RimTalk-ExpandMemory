@@ -18,7 +18,8 @@ namespace RimTalk.Memory.Patches
     [HarmonyPatch]
     public static class Patch_GenerateAndProcessTalkAsync
     {
-        static MethodBase TargetMethod()
+        [HarmonyTargetMethod]
+        public static MethodBase TargetMethod()
         {
             // 查找 RimTalk.Service.TalkService.GenerateAndProcessTalkAsync
             var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
@@ -56,7 +57,8 @@ namespace RimTalk.Memory.Patches
         /// 注意：Harmony 不支持 async Prefix，所以我们使用同步方法但在内部启动异步任务
         /// 由于 GenerateAndProcessTalkAsync 本身在 Task.Run 中，所以这里的同步等待不会卡主线程
         /// </summary>
-        static void Prefix(object talkRequest, List<Pawn> allInvolvedPawns)
+        [HarmonyPrefix]
+        public static void Prefix(object talkRequest)
         {
             try
             {
@@ -64,9 +66,16 @@ namespace RimTalk.Memory.Patches
                 if (!settings.enableVectorEnhancement)
                     return;
 
-                // 通过反射获取 TalkRequest.Prompt（用户消息）
+                // 通过反射获取 TalkRequest 属性
                 var talkRequestType = talkRequest.GetType();
                 var promptProperty = talkRequestType.GetProperty("Prompt");
+                var contextProperty = talkRequestType.GetProperty("Context");
+                
+                // 获取 Initiator 和 Recipient
+                var initiatorProperty = talkRequestType.GetProperty("Initiator");
+                var recipientProperty = talkRequestType.GetProperty("Recipient");
+                Pawn initiator = initiatorProperty?.GetValue(talkRequest) as Pawn;
+                Pawn recipient = recipientProperty?.GetValue(talkRequest) as Pawn;
                 
                 if (promptProperty == null)
                 {
@@ -126,8 +135,8 @@ namespace RimTalk.Memory.Patches
                         cleanedContext,
                         settings.maxVectorResults,
                         out var keywordScores,
-                        allInvolvedPawns?.FirstOrDefault(),
-                        allInvolvedPawns?.Skip(1).FirstOrDefault()
+                        initiator,
+                        recipient
                     );
                     
                     if (keywordScores != null)
@@ -195,15 +204,54 @@ namespace RimTalk.Memory.Patches
 
                 // ⭐ v3.4: 根据设置选择注入位置
                 var vectorInjection = sb.ToString();
+                bool injectionSuccess = false;
                 
                 if (settings.injectToContext)
                 {
-                    // 注入到 Context (System Instruction)
-                    InjectVectorToContext(vectorInjection);
-                    
-                    Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries to Context (excluded {keywordMatchedIds.Count} keyword-matched entries)");
+                    // 策略 1: 尝试注入到 TalkRequest.Context (新版 RimTalk)
+                    if (contextProperty != null)
+                    {
+                        try
+                        {
+                            string currentContext = contextProperty.GetValue(talkRequest) as string;
+                            string enhancedContext = currentContext + "\n\n" + vectorInjection;
+                            contextProperty.SetValue(talkRequest, enhancedContext);
+                            injectionSuccess = true;
+                            Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} unique vector knowledge entries to TalkRequest.Context");
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning($"[RimTalk Memory] Failed to inject to TalkRequest.Context: {ex.Message}");
+                        }
+                    }
+
+                    // 策略 2: 如果策略1失败，尝试注入到 AIService._instruction (旧版 RimTalk 兼容)
+                    if (!injectionSuccess)
+                    {
+                        try
+                        {
+                            var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RimTalk");
+                            var aiServiceType = rimTalkAssembly?.GetType("RimTalk.Service.AIService");
+                            var instructionField = aiServiceType?.GetField("_instruction", BindingFlags.NonPublic | BindingFlags.Static);
+
+                            if (instructionField != null)
+                            {
+                                string currentContext = instructionField.GetValue(null) as string;
+                                string enhancedContext = currentContext + "\n\n" + vectorInjection;
+                                instructionField.SetValue(null, enhancedContext);
+                                injectionSuccess = true;
+                                Log.Message($"[RimTalk Memory] Successfully injected {finalResults.Count} entries to AIService._instruction (Legacy Fallback)");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning($"[RimTalk Memory] Legacy fallback injection failed: {ex.Message}");
+                        }
+                    }
                 }
-                else
+
+                // 如果不注入 Context，或者 Context 注入都失败了，则回退到注入 Prompt
+                if (!injectionSuccess)
                 {
                     // 注入到 Prompt (User Message) - 默认行为
                     string enhancedPrompt = currentPrompt + "\n\n" + vectorInjection;
@@ -215,61 +263,6 @@ namespace RimTalk.Memory.Patches
             catch (Exception ex)
             {
                 Log.Error($"[RimTalk Memory] Error in GenerateAndProcessTalkAsync Prefix: {ex}");
-            }
-        }
-        
-        /// <summary>
-        /// 通过反射将向量搜索结果注入到 AIService 的 Context
-        /// 注意：在后台线程中，需要使用字段反射而非方法调用
-        /// </summary>
-        private static void InjectVectorToContext(string injectionContent)
-        {
-            try
-            {
-                // 查找 RimTalk 程序集
-                var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                    .FirstOrDefault(a => a.GetName().Name == "RimTalk");
-                
-                if (rimTalkAssembly == null)
-                {
-                    Log.Warning("[RimTalk Memory] RimTalk assembly not found for vector Context injection");
-                    return;
-                }
-                
-                var aiServiceType = rimTalkAssembly.GetType("RimTalk.Service.AIService");
-                if (aiServiceType == null)
-                {
-                    Log.Warning("[RimTalk Memory] AIService type not found");
-                    return;
-                }
-                
-                // ⭐ 在后台线程中，直接通过字段反射修改 _instruction
-                // 避免调用 UpdateContext 方法（可能包含不安全的 Logger 调用）
-                var instructionField = aiServiceType.GetField("_instruction", 
-                    BindingFlags.NonPublic | BindingFlags.Static);
-                
-                if (instructionField == null)
-                {
-                    Log.Warning("[RimTalk Memory] _instruction field not found");
-                    return;
-                }
-                
-                string currentContext = instructionField.GetValue(null) as string;
-                
-                // 追加注入内容
-                string enhancedContext = currentContext + "\n\n" + injectionContent;
-                
-                // 直接设置字段值
-                instructionField.SetValue(null, enhancedContext);
-                
-                if (Prefs.DevMode)
-                {
-                    Log.Message($"[RimTalk Memory] Successfully injected vector results to Context via field reflection");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[RimTalk Memory] Failed to inject vector results to Context: {ex.Message}");
             }
         }
     }

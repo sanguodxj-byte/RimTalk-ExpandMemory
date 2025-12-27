@@ -297,7 +297,7 @@ namespace RimTalk.Memory
                 
                 return $"{timePrefix}{compressedText}";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // ? v3.3.2: 移除调试日志
                 // if (Prefs.DevMode) { ... }

@@ -34,7 +34,9 @@ namespace RimTalk.Memory.AI
         
         // 配置
         private static bool isInitialized = false;
-        private static string apiKey, apiUrl, provider;
+        private static string apiKey = "";
+        private static string apiUrl = "";
+        private static string provider = "";
         private static int embeddingDimension = 1024; // DeepSeek: 1024, Gemini: 768
         
         /// <summary>

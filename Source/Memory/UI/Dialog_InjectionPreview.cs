@@ -104,9 +104,7 @@ namespace RimTalk.Memory.Debug
             if (selectedPawn != null)
             {
                 GUI.color = Color.gray;
-                string info = $"{selectedPawn.def.label}";
-                if (selectedPawn.gender != null)
-                    info += $" | {selectedPawn.gender.GetLabel()}";
+                string info = $"{selectedPawn.def.label} | {selectedPawn.gender.GetLabel()}";
                 Widgets.Label(new Rect(rect.x + 340f, rect.y + 8f, 300f, rect.height / 2), info);
                 GUI.color = Color.white;
             }
@@ -129,9 +127,7 @@ namespace RimTalk.Memory.Debug
             if (targetPawn != null)
             {
                 GUI.color = Color.gray;
-                string targetInfo = $"{targetPawn.def.label}";
-                if (targetPawn.gender != null)
-                    targetInfo += $" | {targetPawn.gender.GetLabel()}";
+                string targetInfo = $"{targetPawn.def.label} | {targetPawn.gender.GetLabel()}";
                 Widgets.Label(new Rect(rect.x + 340f, secondRowY + 8f, 300f, rect.height / 2), targetInfo);
                 GUI.color = Color.white;
                 
