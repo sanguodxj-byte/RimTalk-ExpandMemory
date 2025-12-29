@@ -69,6 +69,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 每小时扫描PlayLog事件
         /// 生成全局公共殖民地历史常识
+        /// ⚠️ v3.4.4: 性能优化 - 从尾部倒序扫描，避免全量遍历
         /// </summary>
         public static void ScanRecentPlayLog()
         {
@@ -78,31 +79,46 @@ namespace RimTalk.Memory
             try
             {
                 var gameHistory = Find.PlayLog;
-                if (gameHistory == null)
+                if (gameHistory == null || gameHistory.AllEntries == null)
                     return;
                 
                 var library = MemoryManager.GetCommonKnowledge();
                 if (library == null)
                     return;
                 
-                // ? v3.3.3: 先更新已有事件常识的时间前缀
+                // ⭐ v3.3.3: 先更新已有事件常识的时间前缀
                 UpdateEventKnowledgeTimePrefix(library);
                 
                 int processedCount = 0;
                 int currentTick = Find.TickManager.TicksGame;
+                int hourThreshold = currentTick - GenDate.TicksPerHour;
                 
-                // ? v3.3.3 修复：正确筛选最近1小时的事件
-                // PlayLog.Age 是事件发生时的游戏tick（绝对时间）
-                // 所以应该是：currentTick - Age <= GenDate.TicksPerHour
-                var recentEntries = gameHistory.AllEntries
-                    .Where(e => e != null && (currentTick - e.Age) <= GenDate.TicksPerHour) // ? 修复时间判断
-                    .OrderByDescending(e => e.Age) // 按时间倒序（最新的优先）
-                    .Take(50);
+                // ⚠️ v3.4.4: 性能优化关键修复
+                // 不再使用 LINQ Where 遍历全部历史，改为从尾部倒序扫描
+                // PlayLog.AllEntries 是 List，最新的记录在尾部
+                var allEntries = gameHistory.AllEntries;
+                int totalCount = allEntries.Count;
+                int scannedCount = 0;
+                int maxScan = Math.Min(50, totalCount); // 最多扫描50条
                 
-                foreach (var logEntry in recentEntries)
+                // 从尾部（最新）向前遍历
+                for (int i = totalCount - 1; i >= 0 && scannedCount < maxScan; i--)
                 {
                     try
                     {
+                        var logEntry = allEntries[i];
+                        if (logEntry == null)
+                            continue;
+                        
+                        scannedCount++;
+                        
+                        // ⚠️ 关键优化：一旦遇到超过1小时的记录，立即终止
+                        if (logEntry.Age < hourThreshold)
+                        {
+                            // 已经超过时间范围，因为 Age 是递减的，后面的更旧
+                            break;
+                        }
+                        
                         // 使用LogEntry的ID去重
                         int logID = logEntry.GetHashCode();
                         
@@ -136,24 +152,24 @@ namespace RimTalk.Memory
                                 // 计算重要性
                                 float importance = CalculateImportance(eventText);
                                 
-                                // ? v3.3.3: 提取原始事件文本（移除时间前缀）
+                                // ⭐ v3.3.3: 提取原始事件文本（移除时间前缀）
                                 string originalText = ExtractOriginalEventText(eventText);
                                 
-                                // ? v3.3.3: 创建事件常识，保存创建时间和原始文本
+                                // ⭐ v3.3.3: 创建事件常识，保存创建时间和原始文本
                                 var entry = new CommonKnowledgeEntry("事件,历史", eventText)
                                 {
                                     importance = importance,
                                     isEnabled = true,
                                     isUserEdited = false,
-                                    creationTick = currentTick,           // ? 设置创建时间戳
-                                    originalEventText = originalText      // ? 保存原始文本
+                                    creationTick = currentTick,           // ⭐ 设置创建时间戳
+                                    originalEventText = originalText      // ⭐ 保存原始文本
                                     // targetPawnId = -1 (默认全局)
                                 };
                                 
                                 library.AddEntry(entry);
                                 processedCount++;
                                 
-                                // ? v3.3.2: 减少日志量 - 仅DevMode且10%概率
+                                // ⭐ v3.3.2: 减少日志量 - 仅DevMode且10%概率
                                 if (Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                                 {
                                     Log.Message($"[EventRecord] Created event knowledge: {eventText.Substring(0, Math.Min(50, eventText.Length))}...");
@@ -163,7 +179,7 @@ namespace RimTalk.Memory
                     }
                     catch (Exception ex)
                     {
-                        // ? v3.3.2: 仅在DevMode且随机输出
+                        // ⭐ v3.3.2: 仅在DevMode且随机输出
                         if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
                         {
                             Log.Warning($"[EventRecord] Error processing log entry: {ex.Message}");
@@ -171,15 +187,15 @@ namespace RimTalk.Memory
                     }
                 }
                 
-                // ? v3.3.2: 减少日志量 - 仅DevMode且10%概率
+                // ⭐ v3.3.2: 减少日志量 - 仅DevMode且10%概率
                 if (processedCount > 0 && Prefs.DevMode && UnityEngine.Random.value < 0.1f)
                 {
-                    Log.Message($"[EventRecord] Processed {processedCount} new PlayLog events");
+                    Log.Message($"[EventRecord] Scanned {scannedCount} entries, processed {processedCount} new events (total: {totalCount})");
                 }
             }
             catch (Exception ex)
             {
-                // ? v3.3.2: 减少日志量，降低错误频率
+                // ⭐ v3.3.2: 减少日志量，降低错误频率
                 if (Prefs.DevMode && UnityEngine.Random.value < 0.2f)
                 {
                     Log.Error($"[EventRecord] Error scanning PlayLog: {ex.Message}");
