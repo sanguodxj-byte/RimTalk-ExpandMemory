@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Verse;
 using RimTalk.Memory;
+using RimWorld;
 
 namespace RimTalk.MemoryPatch.Patches
 {
@@ -20,7 +21,7 @@ namespace RimTalk.MemoryPatch.Patches
         
         // 目标方法：PlayLogEntry_RimTalkInteraction的构造函数
         [HarmonyTargetMethod]
-        static System.Reflection.MethodBase TargetMethod()
+        public static System.Reflection.MethodBase TargetMethod()
         {
             // 查找 RimTalk.PlayLogEntry_RimTalkInteraction 类
             var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
@@ -39,9 +40,13 @@ namespace RimTalk.MemoryPatch.Patches
                 return null;
             }
             
-            // 获取所有构造函数，找到参数最多的那个
-            var constructors = playLogType.GetConstructors();
-            var constructor = constructors.OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
+            // 直接查找特定签名的构造函数
+            var constructor = playLogType.GetConstructor(new Type[] {
+                typeof(InteractionDef),
+                typeof(Pawn),
+                typeof(Pawn),
+                typeof(List<RulePackDef>)
+            });
             
             if (constructor != null)
             {
@@ -49,7 +54,10 @@ namespace RimTalk.MemoryPatch.Patches
             }
             else
             {
-                Log.Warning("[RimTalk Memory] Cannot find constructor for PlayLogEntry_RimTalkInteraction!");
+                // 如果找不到特定签名的构造函数，尝试回退到查找参数最多的构造函数
+                Log.Warning("[RimTalk Memory] Cannot find exact constructor for PlayLogEntry_RimTalkInteraction, falling back to parameter count.");
+                var constructors = playLogType.GetConstructors();
+                constructor = constructors.OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
             }
             
             return constructor;
@@ -57,13 +65,14 @@ namespace RimTalk.MemoryPatch.Patches
         
         // Postfix：在构造函数执行后捕获对话
         [HarmonyPostfix]
-        static void Postfix(object __instance)
+        public static void Postfix(object __instance)
         {
             try
             {
                 // 使用反射获取字段
                 var instanceType = __instance.GetType();
                 
+                // _cachedString 是 private 的
                 var cachedStringField = instanceType.GetField("_cachedString", 
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 
@@ -78,27 +87,35 @@ namespace RimTalk.MemoryPatch.Patches
                 if (string.IsNullOrEmpty(content))
                     return;
                 
-                // 检查是否是回复（RimTalk的回复通常没有明确的initiator/recipient区分）
-                // 我们通过检查TalkService的当前状态来判断是否是主动对话
-                var initiatorField = instanceType.BaseType?.GetField("initiator", 
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                var recipientField = instanceType.BaseType?.GetField("recipient", 
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                
-                if (initiatorField == null || recipientField == null)
+                // 尝试通过 Property 获取 Initiator 和 Recipient (Public properties)
+                var initiatorProp = instanceType.GetProperty("Initiator");
+                var recipientProp = instanceType.GetProperty("Recipient");
+
+                Pawn initiator = null;
+                Pawn recipient = null;
+
+                if (initiatorProp != null && recipientProp != null)
                 {
-                    Log.Warning("[RimTalk Memory] Cannot find initiator/recipient fields!");
-                    return;
+                    initiator = initiatorProp.GetValue(__instance) as Pawn;
+                    recipient = recipientProp.GetValue(__instance) as Pawn;
+                }
+                else
+                {
+                    // Fallback to fields if properties are missing (unlikely based on source)
+                     var initiatorField = instanceType.BaseType?.GetField("initiator", 
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var recipientField = instanceType.BaseType?.GetField("recipient", 
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    
+                    if (initiatorField != null) initiator = initiatorField.GetValue(__instance) as Pawn;
+                    if (recipientField != null) recipient = recipientField.GetValue(__instance) as Pawn;
                 }
                 
-                var initiator = initiatorField.GetValue(__instance) as Pawn;
-                var recipient = recipientField.GetValue(__instance) as Pawn;
-                
-                // RimTalk对于自言自语或单人对话，initiator和recipient是同一个pawn
-                // 我们需要解析content来确定真正的说话者
-                
                 if (initiator == null)
+                {
+                    // Log.Warning("[RimTalk Memory] Cannot resolve initiator!"); // Reduce noise
                     return;
+                }
                 
                 // 清理旧的缓存（防止内存泄漏）
                 if (Find.TickManager != null && Find.TickManager.TicksGame - lastCleanupTick > CleanupInterval)
@@ -122,8 +139,6 @@ namespace RimTalk.MemoryPatch.Patches
                 // 去重检查
                 if (processedConversations.Contains(conversationId))
                 {
-                    if (Prefs.DevMode)
-                        Log.Message($"[RimTalk Memory] ⏭️ Skipped duplicate: {conversationId}");
                     return;
                 }
                 

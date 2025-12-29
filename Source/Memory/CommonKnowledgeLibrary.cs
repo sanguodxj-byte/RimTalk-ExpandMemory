@@ -839,11 +839,8 @@ namespace RimTalk.Memory
                 }
 
                 // 3. 性别
-                if (pawn.gender != null)
-                {
-                    sb.Append(pawn.gender.GetLabel());
-                    sb.Append(" ");
-                }
+                sb.Append(pawn.gender.GetLabel());
+                sb.Append(" ");
 
                 // 4. 种族
                 if (pawn.def != null)
