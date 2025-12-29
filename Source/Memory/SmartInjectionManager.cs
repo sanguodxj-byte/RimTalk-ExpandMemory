@@ -106,7 +106,7 @@ namespace RimTalk.Memory
                             }
                         }
                         
-                        // ? 步骤2：优先注入指令部分（Current Guidelines）
+                        // ? 步骤2：优先注入指令部分（Current Guidelines）- 使用 XML 格式
                         if (instructionEntries.Count > 0)
                         {
                             sb.AppendLine("## Current Guidelines");
@@ -114,17 +114,18 @@ namespace RimTalk.Memory
                             foreach (var scored in instructionEntries)
                             {
                                 var entry = scored.Entry;
-                                sb.AppendLine($"{index}. [{entry.tag}] {entry.content}");
+                                // 使用 XML 格式标签: <Tag>content</Tag>
+                                sb.AppendLine($"{index}. <{entry.tag}>{entry.content}</{entry.tag}>");
                                 index++;
                             }
                             
                             if (Prefs.DevMode)
                             {
-                                Log.Message($"[SmartInjection]   ? Injected {instructionEntries.Count} instruction entries (Current Guidelines)");
+                                Log.Message($"[SmartInjection]   ? Injected {instructionEntries.Count} instruction entries (Current Guidelines) with XML format");
                             }
                         }
                         
-                        // ? 步骤3：然后注入背景知识部分（World Knowledge）
+                        // ? 步骤3：然后注入背景知识部分（World Knowledge）- 使用 XML 格式
                         if (loreEntries.Count > 0)
                         {
                             if (sb.Length > 0)
@@ -135,7 +136,8 @@ namespace RimTalk.Memory
                             foreach (var scored in loreEntries)
                             {
                                 var entry = scored.Entry;
-                                sb.AppendLine($"{index}. [{entry.tag}] {entry.content}");
+                                // 使用 XML 格式标签: <Tag>content</Tag>
+                                sb.AppendLine($"{index}. <{entry.tag}>{entry.content}</{entry.tag}>");
                                 index++;
                             }
                             

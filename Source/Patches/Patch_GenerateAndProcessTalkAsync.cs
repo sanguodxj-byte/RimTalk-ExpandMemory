@@ -14,6 +14,7 @@ namespace RimTalk.Memory.Patches
     /// <summary>
     /// Patch for TalkService.GenerateAndProcessTalkAsync
     /// 在异步方法中进行向量搜索，不会卡主线程
+    /// ⭐ v3.4.2: 更新以匹配 RimTalk 新版本的方法签名
     /// </summary>
     [HarmonyPatch]
     public static class Patch_GenerateAndProcessTalkAsync
@@ -52,10 +53,8 @@ namespace RimTalk.Memory.Patches
         }
 
         /// <summary>
-        /// Prefix: 在异步方法开始前进行向量搜索并注入到 context（用户消息）
-        /// ⭐ v3.3.38: 修改注入位置 - 从 Prompt 改为 context
-        /// 注意：Harmony 不支持 async Prefix，所以我们使用同步方法但在内部启动异步任务
-        /// 由于 GenerateAndProcessTalkAsync 本身在 Task.Run 中，所以这里的同步等待不会卡主线程
+        /// Prefix: 在异步方法开始前进行向量搜索并注入到 context
+        /// ⭐ v3.4.2: 更新参数以匹配新版本 RimTalk（只有一个 TalkRequest 参数）
         /// </summary>
         [HarmonyPrefix]
         public static void Prefix(object talkRequest)
@@ -66,17 +65,11 @@ namespace RimTalk.Memory.Patches
                 if (!settings.enableVectorEnhancement)
                     return;
 
-                // 通过反射获取 TalkRequest 属性
+                // 通过反射获取 TalkRequest 的属性
                 var talkRequestType = talkRequest.GetType();
+                
+                // ⭐ 获取 Prompt（用户消息）
                 var promptProperty = talkRequestType.GetProperty("Prompt");
-                var contextProperty = talkRequestType.GetProperty("Context");
-                
-                // 获取 Initiator 和 Recipient
-                var initiatorProperty = talkRequestType.GetProperty("Initiator");
-                var recipientProperty = talkRequestType.GetProperty("Recipient");
-                Pawn initiator = initiatorProperty?.GetValue(talkRequest) as Pawn;
-                Pawn recipient = recipientProperty?.GetValue(talkRequest) as Pawn;
-                
                 if (promptProperty == null)
                 {
                     Log.Warning("[RimTalk Memory] Prompt property not found in TalkRequest");
@@ -86,6 +79,18 @@ namespace RimTalk.Memory.Patches
                 string currentPrompt = promptProperty.GetValue(talkRequest) as string;
                 if (string.IsNullOrEmpty(currentPrompt))
                     return;
+
+                // ⭐ 获取 Initiator 和 Recipient
+                var initiatorProperty = talkRequestType.GetProperty("Initiator");
+                var recipientProperty = talkRequestType.GetProperty("Recipient");
+                
+                Verse.Pawn initiator = initiatorProperty?.GetValue(talkRequest) as Verse.Pawn;
+                Verse.Pawn recipient = recipientProperty?.GetValue(talkRequest) as Verse.Pawn;
+                
+                // 构建参与者列表
+                var allInvolvedPawns = new List<Verse.Pawn>();
+                if (initiator != null) allInvolvedPawns.Add(initiator);
+                if (recipient != null && recipient != initiator) allInvolvedPawns.Add(recipient);
 
                 Log.Message($"[RimTalk Memory] Starting async vector search for prompt: {currentPrompt.Substring(0, Math.Min(50, currentPrompt.Length))}...");
 
@@ -103,9 +108,8 @@ namespace RimTalk.Memory.Patches
                 }
 
                 // 异步向量搜索并同步等待结果
-                // 因为这个 Prefix 本身就在 Task.Run 的后台线程中执行，所以 .Result 不会卡主线程
                 var vectorResults = VectorService.Instance.FindBestLoreIdsAsync(
-                    cleanedContext,  // ⬅️ 使用清理后的上下文
+                    cleanedContext,
                     settings.maxVectorResults,
                     settings.vectorSimilarityThreshold
                 ).Result;
@@ -162,11 +166,10 @@ namespace RimTalk.Memory.Patches
                 sb.AppendLine("# Vector Enhanced Knowledge");
                 sb.AppendLine();
 
-                // ⭐ 线程安全：创建集合快照，避免 "Collection was modified" 异常
+                // ⭐ 线程安全：创建集合快照
                 var entriesSnapshot = memoryManager.CommonKnowledge.Entries.ToList();
 
                 // ⭐ 综合排序：结合相似度和重要性
-                // Score = Similarity + (Importance * 0.2)
                 var scoredResults = new List<(CommonKnowledgeEntry Entry, float Similarity, float Score)>();
 
                 foreach (var (id, similarity) in vectorResults)
@@ -202,18 +205,19 @@ namespace RimTalk.Memory.Patches
                     index++;
                 }
 
-                // ⭐ v3.4: 根据设置选择注入位置
+                // ⭐ v3.4.2: 根据设置选择注入位置（带多重回退策略）
                 var vectorInjection = sb.ToString();
                 bool injectionSuccess = false;
                 
                 if (settings.injectToContext)
                 {
                     // 策略 1: 尝试注入到 TalkRequest.Context (新版 RimTalk)
+                    var contextProperty = talkRequestType.GetProperty("Context");
                     if (contextProperty != null)
                     {
                         try
                         {
-                            string currentContext = contextProperty.GetValue(talkRequest) as string;
+                            string currentContext = contextProperty.GetValue(talkRequest) as string ?? "";
                             string enhancedContext = currentContext + "\n\n" + vectorInjection;
                             contextProperty.SetValue(talkRequest, enhancedContext);
                             injectionSuccess = true;
@@ -236,7 +240,7 @@ namespace RimTalk.Memory.Patches
 
                             if (instructionField != null)
                             {
-                                string currentContext = instructionField.GetValue(null) as string;
+                                string currentContext = instructionField.GetValue(null) as string ?? "";
                                 string enhancedContext = currentContext + "\n\n" + vectorInjection;
                                 instructionField.SetValue(null, enhancedContext);
                                 injectionSuccess = true;
