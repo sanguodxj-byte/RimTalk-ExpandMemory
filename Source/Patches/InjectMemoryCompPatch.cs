@@ -3,11 +3,13 @@ using Verse;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using RimTalk.Memory;
 
-namespace RimTalk.Patches
+namespace RimTalk.Memory.Patches
 {
     /// <summary>
     /// Patch to inject PawnMemoryComp into all humanlike pawns
+    /// ⚠️ v3.4.5: 修复命名空间和类型引用
     /// </summary>
     [HarmonyPatch(typeof(ThingWithComps), "InitializeComps")]
     public static class InjectMemoryCompPatch
@@ -21,10 +23,10 @@ namespace RimTalk.Patches
             if (__instance is Pawn pawn && pawn.RaceProps?.Humanlike == true)
             {
                 // Check if comp already exists
-                if (pawn.GetComp<Memory.PawnMemoryComp>() == null)
+                if (pawn.GetComp<PawnMemoryComp>() == null)
                 {
                     // Add the comp
-                    var comp = new Memory.PawnMemoryComp();
+                    var comp = new PawnMemoryComp();
                     comp.parent = pawn;
                     
                     // 使用反射访问内部的 comps 字段
@@ -36,7 +38,12 @@ namespace RimTalk.Patches
                     }
                     
                     compsList.Add(comp);
-                    comp.Initialize(new Memory.CompProperties_PawnMemory());
+                    comp.Initialize(new CompProperties_PawnMemory());
+                    
+                    if (Prefs.DevMode)
+                    {
+                        Log.Message($"[RimTalk Memory] ✅ Injected PawnMemoryComp for {pawn.LabelShort}");
+                    }
                 }
             }
         }
