@@ -18,21 +18,10 @@ namespace RimTalk.Memory.Patches
     /// - 当 injectToContext = true 时，在这里处理所有注入（关键词匹配 + 向量增强）
     /// - 使用 Prompt 进行匹配，注入到 Context
     /// - 这解决了之前 Patch_BuildContext 无法访问 Prompt 的问题
-    /// 
-    /// ⚠️ v3.4.10: 性能优化 - 缓存反射属性，避免高频反射查找
     /// </summary>
     [HarmonyPatch]
     public static class Patch_GenerateAndProcessTalkAsync
     {
-        // ⚠️ v3.4.10: 性能优化 - 静态缓存 PropertyInfo，避免每次对话都反射查找
-        private static Type cachedTalkRequestType = null;
-        private static PropertyInfo cachedPromptProperty = null;
-        private static PropertyInfo cachedContextProperty = null;
-        private static PropertyInfo cachedInitiatorProperty = null;
-        private static PropertyInfo cachedRecipientProperty = null;
-        private static bool reflectionInitialized = false;
-        private static readonly object reflectionLock = new object();
-        
         [HarmonyTargetMethod]
         public static MethodBase TargetMethod()
         {
@@ -63,44 +52,7 @@ namespace RimTalk.Memory.Patches
             }
 
             Log.Message("[RimTalk Memory] ✓ Found GenerateAndProcessTalkAsync for patching");
-            
-            // ⚠️ v3.4.10: 在找到目标方法时，预初始化反射缓存
-            InitializeReflectionCache(rimTalkAssembly);
-            
             return method;
-        }
-        
-        /// <summary>
-        /// ⚠️ v3.4.10: 预初始化反射缓存（线程安全）
-        /// </summary>
-        private static void InitializeReflectionCache(Assembly rimTalkAssembly)
-        {
-            if (reflectionInitialized) return;
-            
-            lock (reflectionLock)
-            {
-                if (reflectionInitialized) return; // Double-check
-                
-                try
-                {
-                    cachedTalkRequestType = rimTalkAssembly.GetType("RimTalk.Data.TalkRequest");
-                    
-                    if (cachedTalkRequestType != null)
-                    {
-                        cachedPromptProperty = cachedTalkRequestType.GetProperty("Prompt");
-                        cachedContextProperty = cachedTalkRequestType.GetProperty("Context");
-                        cachedInitiatorProperty = cachedTalkRequestType.GetProperty("Initiator");
-                        cachedRecipientProperty = cachedTalkRequestType.GetProperty("Recipient");
-                        
-                        reflectionInitialized = true;
-                        Log.Message("[RimTalk Memory] ✓ Reflection cache initialized successfully");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[RimTalk Memory] Failed to initialize reflection cache: {ex.Message}");
-                }
-            }
         }
 
         /// <summary>
@@ -112,53 +64,32 @@ namespace RimTalk.Memory.Patches
         /// 3. 将结果注入到 Context
         ///
         /// 这解决了 Patch_BuildContext 用 Context 匹配常识导致的问题
-        /// 
-        /// ⚠️ v3.4.10: 性能优化 - 使用缓存的 PropertyInfo，避免高频反射
         /// </summary>
         [HarmonyPrefix]
         public static void Prefix(object talkRequest)
         {
             try
             {
-                // ⚠️ v3.4.10: 快速路径 - 如果反射未初始化，延迟初始化（懒加载）
-                if (!reflectionInitialized)
-                {
-                    // 尝试从 talkRequest 的类型推断并初始化
-                    if (talkRequest != null)
-                    {
-                        var requestType = talkRequest.GetType();
-                        var assembly = requestType.Assembly;
-                        InitializeReflectionCache(assembly);
-                    }
-                    
-                    // 如果仍然失败，直接返回
-                    if (!reflectionInitialized)
-                    {
-                        if (Prefs.DevMode)
-                        {
-                            Log.Warning("[RimTalk Memory] Reflection not initialized, skipping injection");
-                        }
-                        return;
-                    }
-                }
-                
                 var settings = RimTalkMemoryPatchMod.Settings;
 
-                // ⚠️ v3.4.10: 使用缓存的 PropertyInfo（性能提升 10-100 倍）
-                if (cachedPromptProperty == null || cachedContextProperty == null)
+                // 通过反射获取 TalkRequest 属性
+                var talkRequestType = talkRequest.GetType();
+                var promptProperty = talkRequestType.GetProperty("Prompt");
+                var contextProperty = talkRequestType.GetProperty("Context");
+                
+                // 获取 Initiator 和 Recipient
+                var initiatorProperty = talkRequestType.GetProperty("Initiator");
+                var recipientProperty = talkRequestType.GetProperty("Recipient");
+                Pawn initiator = initiatorProperty?.GetValue(talkRequest) as Pawn;
+                Pawn recipient = recipientProperty?.GetValue(talkRequest) as Pawn;
+                
+                if (promptProperty == null)
                 {
-                    if (Prefs.DevMode)
-                    {
-                        Log.Warning("[RimTalk Memory] Cached properties are null, skipping injection");
-                    }
+                    Log.Warning("[RimTalk Memory] Prompt property not found in TalkRequest");
                     return;
                 }
-                
-                // 获取 Initiator 和 Recipient（使用缓存）
-                Pawn initiator = cachedInitiatorProperty?.GetValue(talkRequest) as Pawn;
-                Pawn recipient = cachedRecipientProperty?.GetValue(talkRequest) as Pawn;
 
-                string currentPrompt = cachedPromptProperty.GetValue(talkRequest) as string;
+                string currentPrompt = promptProperty.GetValue(talkRequest) as string;
                 if (string.IsNullOrEmpty(currentPrompt))
                     return;
 
@@ -217,30 +148,93 @@ namespace RimTalk.Memory.Patches
 
                 // ==========================================
                 // ⭐ 第二部分：向量增强（如果启用）
-                // ⚠️ v3.4.9: 移除同步阻塞 - 向量增强仅用于后台同步，不在实时对话中使用
                 // ==========================================
                 if (settings.enableVectorEnhancement)
                 {
-                    // ⚠️ 架构警告：向量增强需要网络请求（2-5秒），在 Harmony Patch Prefix 中同步等待会导致游戏卡死！
-                    // 
-                    // 原代码问题：
-                    // var vectorResults = VectorService.Instance.FindBestLoreIdsAsync(...).Result; // ❌ 死锁炸弹！
-                    //
-                    // 正确做法：
-                    // 1. 向量增强应该在后台预加载（通过 SyncKnowledgeLibrary）
-                    // 2. 实时对话只使用关键词匹配（无网络请求，<1ms）
-                    // 3. 预览器中可以手动测试向量匹配
-                    //
-                    // 因此，我们在这里只记录警告日志，不执行向量搜索。
-                    
-                    if (Prefs.DevMode)
+                    try
                     {
-                        Log.Warning("[RimTalk Memory] ⚠️ Vector enhancement is enabled but DISABLED in real-time dialogue to prevent freezing. " +
-                                   "Vector search requires 2-5s network request which would block game thread. " +
-                                   "Use '测试向量匹配' button in preview window for manual testing.");
+                        // 异步向量搜索并同步等待结果
+                        var vectorResults = VectorService.Instance.FindBestLoreIdsAsync(
+                            cleanedPrompt,  // ⬅️ 使用清理后的 Prompt
+                            settings.maxVectorResults,
+                            settings.vectorSimilarityThreshold
+                        ).Result;
+
+                        if (vectorResults != null && vectorResults.Count > 0)
+                        {
+                            var memoryManager = Find.World?.GetComponent<MemoryManager>();
+                            if (memoryManager != null)
+                            {
+                                // 获取关键词匹配的条目ID用于去重
+                                var keywordMatchedIds = new HashSet<string>();
+                                try
+                                {
+                                    memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
+                                        cleanedPrompt,
+                                        settings.maxVectorResults,
+                                        out var keywordScores,
+                                        initiator,
+                                        recipient
+                                    );
+                                    
+                                    if (keywordScores != null)
+                                    {
+                                        foreach (var score in keywordScores)
+                                        {
+                                            keywordMatchedIds.Add(score.Entry.id);
+                                        }
+                                    }
+                                }
+                                catch { }
+
+                                // 构建向量常识文本
+                                var entriesSnapshot = memoryManager.CommonKnowledge.Entries.ToList();
+                                var scoredResults = new List<(CommonKnowledgeEntry Entry, float Similarity, float Score)>();
+
+                                foreach (var (id, similarity) in vectorResults)
+                                {
+                                    if (keywordMatchedIds.Contains(id))
+                                        continue;
+                                    
+                                    var entry = entriesSnapshot.FirstOrDefault(e => e.id == id);
+                                    if (entry != null)
+                                    {
+                                        float score = similarity + (entry.importance * 0.2f);
+                                        scoredResults.Add((entry, similarity, score));
+                                    }
+                                }
+                                
+                                var finalResults = scoredResults.OrderByDescending(x => x.Score).ToList();
+
+                                if (finalResults.Count > 0)
+                                {
+                                    var vectorSb = new StringBuilder();
+                                    vectorSb.AppendLine("## Vector Enhanced Knowledge");
+                                    vectorSb.AppendLine();
+                                    
+                                    int index = 1;
+                                    foreach (var item in finalResults)
+                                    {
+                                        vectorSb.AppendLine($"{index}. [{item.Entry.tag}] {item.Entry.content} (similarity: {item.Similarity:F2})");
+                                        index++;
+                                    }
+                                    
+                                    if (allInjections.Length > 0)
+                                        allInjections.Append("\n\n");
+                                    allInjections.Append(vectorSb.ToString());
+                                    
+                                    if (Prefs.DevMode)
+                                    {
+                                        Log.Message($"[RimTalk Memory] ✓ Vector: {finalResults.Count} entries");
+                                    }
+                                }
+                            }
+                        }
                     }
-                    
-                    // 向量增强已禁用，不再执行异步网络请求
+                    catch (Exception ex)
+                    {
+                        Log.Warning($"[RimTalk Memory] Vector search error: {ex.Message}");
+                    }
                 }
 
                 // ==========================================
@@ -258,14 +252,14 @@ namespace RimTalk.Memory.Patches
                 string injectionText = "\n\n---\n\n# Memory & Knowledge Context\n\n" + allInjections.ToString();
                 bool injectionSuccess = false;
                 
-                if (settings.injectToContext && cachedContextProperty != null)
+                if (settings.injectToContext && contextProperty != null)
                 {
-                    // 注入到 Context（使用缓存的 PropertyInfo）
+                    // 注入到 Context
                     try
                     {
-                        string currentContext = cachedContextProperty.GetValue(talkRequest) as string;
+                        string currentContext = contextProperty.GetValue(talkRequest) as string;
                         string enhancedContext = currentContext + injectionText;
-                        cachedContextProperty.SetValue(talkRequest, enhancedContext);
+                        contextProperty.SetValue(talkRequest, enhancedContext);
                         injectionSuccess = true;
                         
                         if (Prefs.DevMode)
@@ -279,11 +273,11 @@ namespace RimTalk.Memory.Patches
                     }
                 }
 
-                // 回退到注入 Prompt（使用缓存的 PropertyInfo）
+                // 回退到注入 Prompt
                 if (!injectionSuccess)
                 {
                     string enhancedPrompt = currentPrompt + injectionText;
-                    cachedPromptProperty.SetValue(talkRequest, enhancedPrompt);
+                    promptProperty.SetValue(talkRequest, enhancedPrompt);
                     
                     if (Prefs.DevMode)
                     {

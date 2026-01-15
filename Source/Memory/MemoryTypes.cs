@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using Verse;
 
 namespace RimTalk.Memory
@@ -186,6 +187,41 @@ namespace RimTalk.Memory
         /// 获取记忆年龄（游戏tick）
         /// </summary>
         public int Age => Find.TickManager.TicksGame - timestamp;
+
+        /// <summary>
+        /// ⭐ v3.4.0: 获取记忆的游戏日期时间戳（精确到日期）
+        /// 格式：5220年春12日
+        /// </summary>
+        public string GameDateString
+        {
+            get
+            {
+                try
+                {
+                    // 获取年份
+                    int year = GenDate.Year(timestamp, 0);
+                    
+                    // 获取日期（0-59，每年60天）
+                    int dayOfYear = GenDate.DayOfYear(timestamp, 0);
+                    
+                    // RimWorld 使用 Quadrum（季度）：0=春, 1=夏, 2=秋, 3=冬
+                    // 每个季度15天
+                    int quadrumIndex = dayOfYear / 15; // 0-3
+                    int dayOfQuadrum = (dayOfYear % 15) + 1; // 1-15
+                    
+                    string[] quadrumNames = { "春", "夏", "秋", "冬" };
+                    string quadrumName = quadrumNames[quadrumIndex % 4];
+                    
+                    return $"{year}年{quadrumName}{dayOfQuadrum}日";
+                }
+                catch (Exception ex)
+                {
+                    // 如果计算失败，记录错误并返回模糊时间
+                    Log.Error($"[RimTalk Memory] Failed to generate GameDateString for timestamp {timestamp}: {ex.Message}");
+                    return TimeAgoString;
+                }
+            }
+        }
 
         /// <summary>
         /// 获取记忆年龄描述（完全口语化）

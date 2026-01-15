@@ -137,56 +137,38 @@ namespace RimTalk.Memory.VectorDB
         
         public void SyncKnowledgeLibrary(CommonKnowledgeLibrary library)
         {
-            // ⚠️ v3.4.10: 线程安全修复 - 在主线程创建数据快照，避免后台线程访问主线程对象
-            // 
-            // 原问题：library.Entries 是 RimWorld 主线程对象，在后台线程访问可能导致：
-            // 1. InvalidOperationException: Collection was modified during enumeration
-            // 2. 数据损坏或不一致
-            // 3. Unity 崩溃（Unity 对象不能跨线程访问）
-            //
-            // 修复：在主线程创建快照，传递给后台任务
-            
-            if (!_isInitialized) return;
-            if (library == null || library.Entries == null) return;
-            if (_isSyncing) return; // 防止重复同步
-            
-            // ⚠️ 步骤1：在主线程创建数据快照（线程安全）
-            var entriesSnapshot = library.Entries
-                .Where(e => e != null && e.isEnabled && !string.IsNullOrWhiteSpace(e.content))
-                .Select(e => new 
-                { 
-                    e.id, 
-                    e.content, 
-                    e.isEnabled 
-                })
-                .ToList();
-            
-            // ⚠️ 步骤2：将快照传递给后台任务，不再访问主线程对象
+            // 在后台任务中运行，避免阻塞主线程
             Task.Run(async () => 
             {
                 try
                 {
+                    if (!_isInitialized) return;
+                    if (library == null || library.Entries == null) return;
+                    if (_isSyncing) return; // 防止重复同步
+
                     _isSyncing = true;
+
+                    var entriesToProcess = library.Entries.Where(e => e != null && e.isEnabled && !string.IsNullOrWhiteSpace(e.content)).ToList();
                     
                     // 检测需要更新的条目
-                    var entriesToUpdate = new List<(string id, string content)>();
+                    var entriesToUpdate = new List<CommonKnowledgeEntry>();
                     var entriesToRemove = new List<string>();
                     
                     lock (_loreVectors)
                     {
-                        // 检查哪些条目需要更新（使用快照数据）
-                        foreach (var entry in entriesSnapshot)
+                        // 检查哪些条目需要更新
+                        foreach (var entry in entriesToProcess)
                         {
                             string currentHash = ComputeHash(entry.content);
                             
                             if (!_contentHashes.ContainsKey(entry.id) || _contentHashes[entry.id] != currentHash)
                             {
-                                entriesToUpdate.Add((entry.id, entry.content));
+                                entriesToUpdate.Add(entry);
                             }
                         }
                         
                         // 检查哪些条目需要删除（已不存在或被禁用）
-                        var currentIds = new HashSet<string>(entriesSnapshot.Select(e => e.id));
+                        var currentIds = new HashSet<string>(entriesToProcess.Select(e => e.id));
                         foreach (var id in _loreVectors.Keys.ToList())
                         {
                             if (!currentIds.Contains(id))
@@ -221,7 +203,7 @@ namespace RimTalk.Memory.VectorDB
                         }
                     }
 
-                    // 批量处理更新（使用快照数据）
+                    // 批量处理更新
                     int batchSize = 10;
                     int syncedCount = 0;
 

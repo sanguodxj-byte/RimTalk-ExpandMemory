@@ -10,17 +10,38 @@ namespace RimTalk.Patches
 {
     /// <summary>
     /// Patch to capture job start as memories
+    /// ⭐ v3.5.2: 支持配置了链接催化剂的殖民地动物/机械体
     /// </summary>
     [HarmonyPatch(typeof(Pawn_JobTracker), "StartJob")]
     public static class JobStartMemoryPatch
     {
         private static readonly FieldInfo pawnField = AccessTools.Field(typeof(Pawn_JobTracker), "pawn");
         
+        /// <summary>
+        /// ⭐ v3.5.2: 检测是否为配置了链接催化剂的殖民地动物或机械体
+        /// </summary>
+        private static bool IsColonyAnimalWithVocalLink(Pawn pawn)
+        {
+            if (pawn == null || pawn.Faction != Faction.OfPlayer) return false;
+            if (pawn.RaceProps?.Humanlike == true) return false;
+            
+            try
+            {
+                var vocalLinkDef = DefDatabase<HediffDef>.GetNamed("VocalLinkImplant", false);
+                return vocalLinkDef != null && pawn.health?.hediffSet?.HasHediff(vocalLinkDef) == true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
         [HarmonyPostfix]
         public static void Postfix(Pawn_JobTracker __instance, Job newJob)
         {
             Pawn pawn = pawnField?.GetValue(__instance) as Pawn;
-            if (pawn == null || !pawn.IsColonist || newJob == null || newJob.def == null)
+            // ⭐ v3.5.2: 扩展到殖民者 + 配置了链接催化剂的殖民地动物/机械体
+            if (pawn == null || (!pawn.IsColonist && !IsColonyAnimalWithVocalLink(pawn)) || newJob == null || newJob.def == null)
                 return;
 
             var memoryComp = pawn.TryGetComp<PawnMemoryComp>();

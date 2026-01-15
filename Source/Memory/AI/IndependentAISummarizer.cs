@@ -12,65 +12,9 @@ using RimWorld;  // ? v3.3.6: 添加 RimWorld 命名空间
 
 namespace RimTalk.Memory.AI
 {
-    // ? v3.3.2.34: DTO 类定义 - OpenAI 兼容格式
-    [Serializable]
-    public class OpenAIRequest
-    {
-        public string model;
-        public OpenAIMessage[] messages;
-        public float temperature;
-        public int max_tokens;
-        public bool enable_prompt_cache; // DeepSeek
-    }
-    
-    [Serializable]
-    public class OpenAIMessage
-    {
-        public string role;
-        public string content;
-        public CacheControl cache_control; // OpenAI Prompt Caching
-        public bool cache; // DeepSeek cache
-    }
-    
-    [Serializable]
-    public class CacheControl
-    {
-        public string type;
-    }
-    
-    // ? v3.3.2.34: DTO 类定义 - Google Gemini 格式
-    [Serializable]
-    public class GeminiRequest
-    {
-        public GeminiContent[] contents;
-        public GeminiGenerationConfig generationConfig;
-    }
-    
-    [Serializable]
-    public class GeminiContent
-    {
-        public GeminiPart[] parts;
-    }
-    
-    [Serializable]
-    public class GeminiPart
-    {
-        public string text;
-    }
-    
-    [Serializable]
-    public class GeminiGenerationConfig
-    {
-        public float temperature;
-        public int maxOutputTokens;
-        public GeminiThinkingConfig thinkingConfig; // 可选
-    }
-    
-    [Serializable]
-    public class GeminiThinkingConfig
-    {
-        public int thinkingBudget;
-    }
+    // DTO 类已提取到独立文件：
+    // - DTO/OpenAITypes.cs (OpenAIRequest, OpenAIMessage, CacheControl)
+    // - DTO/GeminiTypes.cs (GeminiRequest, GeminiContent, GeminiPart, GeminiGenerationConfig, GeminiThinkingConfig)
     
     public static class IndependentAISummarizer
     {
@@ -390,30 +334,33 @@ namespace RimTalk.Memory.AI
                     apiUrl = (field2.GetValue(obj2) as string);
                 }
                 
+                // ⭐ v3.4.0: 修复 - 始终读取 Provider 字段（无论 apiUrl 是否为空）
+                // 这确保了使用自定义 BaseUrl（第三方中转）时也能正确识别 Provider
+                FieldInfo fieldProvider = type3.GetField("Provider");
+                if (fieldProvider != null)
+                {
+                    object value = fieldProvider.GetValue(obj2);
+                    provider = value?.ToString() ?? "";
+                }
+                
+                // 如果 URL 为空，根据 Provider 设置默认值
                 if (string.IsNullOrEmpty(apiUrl))
                 {
-                    FieldInfo field3 = type3.GetField("Provider");
-                    if (field3 != null)
+                    if (provider == "OpenAI")
                     {
-                        object value = field3.GetValue(obj2);
-                        provider = value.ToString();
-                        
-                        if (provider == "OpenAI")
-                        {
-                            apiUrl = "https://api.openai.com/v1/chat/completions";
-                        }
-                        else if (provider == "DeepSeek")
-                        {
-                            apiUrl = "https://api.deepseek.com/v1/chat/completions";
-                        }
-                        else if (provider == "Google")
-                        {
-                            apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/MODEL_PLACEHOLDER:generateContent?key=API_KEY_PLACEHOLDER";
-                        }
-                        else if (provider == "Player2")
-                        {
-                            apiUrl = "https://api.player2.live/v1/chat/completions";
-                        }
+                        apiUrl = "https://api.openai.com/v1/chat/completions";
+                    }
+                    else if (provider == "DeepSeek")
+                    {
+                        apiUrl = "https://api.deepseek.com/v1/chat/completions";
+                    }
+                    else if (provider == "Google")
+                    {
+                        apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/MODEL_PLACEHOLDER:generateContent?key=API_KEY_PLACEHOLDER";
+                    }
+                    else if (provider == "Player2")
+                    {
+                        apiUrl = "https://api.player2.live/v1/chat/completions";
                     }
                 }
                 
@@ -445,8 +392,13 @@ namespace RimTalk.Memory.AI
                 
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // 调试日志：帮助排查 RimTalk 配置加载失败的原因
+                if (Prefs.DevMode)
+                {
+                    Log.Warning($"[AI Summarizer] TryLoadFromRimTalk failed: {ex.Message}");
+                }
                 return false;
             }
         }
@@ -819,9 +771,8 @@ namespace RimTalk.Memory.AI
                     }
 
                     using (var response = (HttpWebResponse)await request.GetResponseAsync())
-                    using (var streamReader = new System.IO.StreamReader(response.GetResponseStream()))
                     {
-                        string responseText = await streamReader.ReadToEndAsync();
+                        string responseText = await ReadStreamAsTextAsync(response.GetResponseStream());
                         
                         // ? v3.3.7: 添加响应接收确认日志
                         Log.Message($"[AI Summarizer] ✅ Response received, length: {responseText.Length} chars");
@@ -857,10 +808,9 @@ namespace RimTalk.Memory.AI
 	                if (ex.Response != null)
 	                {
 	                    using (var errorResponse = (HttpWebResponse)ex.Response)
-	                    using (var streamReader = new System.IO.StreamReader(errorResponse.GetResponseStream()))
 	                    {
-	                        string errorText = streamReader.ReadToEnd();
 	                        statusCode = errorResponse.StatusCode; // ? 保存状态码
+	                        string errorText = ReadStreamAsText(errorResponse.GetResponseStream());
 	                        
 	                        // ? v3.3.3: 根据错误类型显示完整或截断的错误信息
 	                        if (errorResponse.StatusCode == HttpStatusCode.Unauthorized || // 401
@@ -895,7 +845,7 @@ namespace RimTalk.Memory.AI
 	                            shouldRetry = true;
 	                        }
 	                        
-	                        if (errorResponse.StatusCode != HttpStatusCode.Unauthorized && 
+	                        if (errorResponse.StatusCode != HttpStatusCode.Unauthorized &&
 	                            errorResponse.StatusCode != HttpStatusCode.Forbidden)
 	                        {
 	                            Log.Warning($"[AI Summarizer] ?? API Error (attempt {attempt}/{MAX_RETRIES}): {errorResponse.StatusCode} - {errorDetail}");
@@ -980,6 +930,48 @@ namespace RimTalk.Memory.AI
                 Log.Error($"[AI Summarizer] ?? Parse error: {ex.Message}");
             }
             return null;
+        }
+
+        private static string ReadStreamAsText(System.IO.Stream stream)
+        {
+            if (stream == null) return "";
+            
+            using (var memoryStream = new System.IO.MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                byte[] bytes = memoryStream.ToArray();
+                
+                try
+                {
+                    return Encoding.UTF8.GetString(bytes);
+                }
+                catch (ArgumentException)
+                {
+                    Log.Warning("[AI Summarizer] Failed to decode stream as UTF-8, falling back to default encoding.");
+                    return Encoding.Default.GetString(bytes);
+                }
+            }
+        }
+
+        private static async Task<string> ReadStreamAsTextAsync(System.IO.Stream stream)
+        {
+            if (stream == null) return "";
+            
+            using (var memoryStream = new System.IO.MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                byte[] bytes = memoryStream.ToArray();
+                
+                try
+                {
+                    return Encoding.UTF8.GetString(bytes);
+                }
+                catch (ArgumentException)
+                {
+                    Log.Warning("[AI Summarizer] Failed to decode stream as UTF-8, falling back to default encoding.");
+                    return Encoding.Default.GetString(bytes);
+                }
+            }
         }
         
         // ? v3.3.6: Player2 本地应用支持

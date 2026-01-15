@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+// SuperKeywordEngine 位于同一命名空间 RimTalk.Memory，无需额外 using
 using Verse;
 
 namespace RimTalk.Memory
@@ -215,29 +216,16 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// 提取关键词（简化版）
+        /// 提取关键词（使用 SuperKeywordEngine 统一算法）
         /// </summary>
         private static List<string> ExtractKeywords(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return new List<string>();
 
-            var keywords = new HashSet<string>();
-
-            // 分词：2-4字
-            for (int length = 2; length <= 4; length++)
-            {
-                for (int i = 0; i <= text.Length - length; i++)
-                {
-                    string word = text.Substring(i, length);
-                    if (word.Any(c => char.IsLetterOrDigit(c)))
-                    {
-                        keywords.Add(word);
-                    }
-                }
-            }
-
-            return keywords.Take(15).ToList();
+            // 使用 SuperKeywordEngine 的 TF-IDF 加权关键词提取
+            var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 15);
+            return weightedKeywords.Select(k => k.Word).ToList();
         }
 
         /// <summary>

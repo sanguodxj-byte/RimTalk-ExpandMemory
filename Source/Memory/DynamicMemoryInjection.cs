@@ -461,6 +461,7 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 格式化记忆用于注入到System Rule
+        /// ⭐ v3.4.0: ELS和CLPA使用游戏日期时间戳，SCM使用模糊时间
         /// </summary>
         private static string FormatMemoriesForInjection(List<ScoredMemory> scoredMemories)
         {
@@ -481,7 +482,18 @@ namespace RimTalk.Memory
                     
                     // 简洁格式，适合system rule
                     string typeTag = GetMemoryTypeTag(memory.type);
-                    string timeStr = memory.TimeAgoString;
+                    
+                    // ⭐ v3.4.0: ELS(EventLog)和CLPA(Archive)使用游戏日期时间戳
+                    // SCM(Situational)和ABM(Active)使用模糊时间
+                    string timeStr;
+                    if (memory.layer == MemoryLayer.EventLog || memory.layer == MemoryLayer.Archive)
+                    {
+                        timeStr = memory.GameDateString;
+                    }
+                    else
+                    {
+                        timeStr = memory.TimeAgoString;
+                    }
                     
                     sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
                     index++;

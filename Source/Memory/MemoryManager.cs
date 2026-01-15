@@ -140,21 +140,11 @@ namespace RimTalk.Memory
                     PawnStatusKnowledgeGenerator.UpdateAllColonistStatus();
                 }
                 
-                // ⭐ 每小时扫描PlayLog事件
-                if (RimTalkMemoryPatchMod.Settings.enableEventRecordKnowledge)
-                {
-                    EventRecordKnowledgeGenerator.ScanRecentPlayLog();
-                    
-                    // ⭐ 新增：检查活跃袭击状态
-                    Patches.IncidentPatch.CheckRaidStatus();
-                }
+                // ⭐ v3.4.0: 移除常识库自动生成事件历史功能
+                // 原有的 EventRecordKnowledgeGenerator.ScanRecentPlayLog() 调用已移除
                 
                 // 定期清理
                 PawnStatusKnowledgeGenerator.CleanupUpdateRecords();
-                EventRecordKnowledgeGenerator.CleanupProcessedRecords();
-                
-                // ⭐ 修复2：每小时更新事件常识的时间前缀
-                UpdateEventKnowledgeTimePrefixes();
             }
             
             // ⭐ 处理总结队列（每tick检查）
@@ -228,7 +218,8 @@ namespace RimTalk.Memory
                 {
                     foreach (var pawn in map.mapPawns.AllPawnsSpawned)
                     {
-                        if (pawn.IsColonist)
+                        // ⭐ v3.5.2: 扩展到殖民者 + 配置了链接催化剂的殖民地动物/机械体
+                        if (pawn.IsColonist || IsColonyAnimalWithVocalLink(pawn))
                         {
                             // 将总结任务加入队列
                             summarizationQueue.Enqueue(pawn);
@@ -257,7 +248,8 @@ namespace RimTalk.Memory
             {
                 foreach (var pawn in map.mapPawns.AllPawnsSpawned)
                 {
-                    if (pawn.IsColonist)
+                    // ⭐ v3.5.2: 扩展到殖民者 + 配置了链接催化剂的殖民地动物/机械体
+                    if (pawn.IsColonist || IsColonyAnimalWithVocalLink(pawn))
                     {
                         // 检查是否有需要总结的记忆
                         var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
@@ -481,7 +473,8 @@ namespace RimTalk.Memory
             {
                 foreach (var pawn in map.mapPawns.AllPawnsSpawned)
                 {
-                    if (pawn.IsColonist)
+                    // ⭐ v3.5.2: 扩展到殖民者 + 配置了链接催化剂的殖民地动物/机械体
+                    if (pawn.IsColonist || IsColonyAnimalWithVocalLink(pawn))
                     {
                         // 尝试新的四层记忆组件
                         var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
@@ -542,7 +535,8 @@ namespace RimTalk.Memory
             {
                 foreach (var pawn in map.mapPawns.AllPawnsSpawned)
                 {
-                    if (!pawn.IsColonist)
+                    // ⭐ v3.5.2: 扩展到殖民者 + 配置了链接催化剂的殖民地动物/机械体
+                    if (!pawn.IsColonist && !IsColonyAnimalWithVocalLink(pawn))
                         continue;
                     
                     var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
@@ -844,5 +838,26 @@ namespace RimTalk.Memory
                 Log.Message($"[RimTalk Memory] MemoryManager loaded successfully.");
             }
         }
+        
+        #region 辅助方法
+        /// <summary>
+        /// ⭐ v3.5.2: 检测是否为配置了链接催化剂的殖民地动物或机械体
+        /// </summary>
+        private static bool IsColonyAnimalWithVocalLink(Pawn pawn)
+        {
+            if (pawn == null || pawn.Faction != Faction.OfPlayer) return false;
+            if (pawn.RaceProps?.Humanlike == true) return false; // 人类已经被 IsColonist 覆盖
+            
+            try
+            {
+                var vocalLinkDef = DefDatabase<HediffDef>.GetNamed("VocalLinkImplant", false);
+                return vocalLinkDef != null && pawn.health?.hediffSet?.HasHediff(vocalLinkDef) == true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        #endregion
     }
 }

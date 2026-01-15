@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+// SuperKeywordEngine 位于同一命名空间 RimTalk.Memory，无需额外 using
 using Verse;
 
 namespace RimTalk.Memory
@@ -17,9 +18,9 @@ namespace RimTalk.Memory
     public static class AdvancedScoringSystem
     {
         /// <summary>
-        /// 场景类型（自动识别对话场景）
+        /// 对话场景类型（与 SceneAnalyzer.SceneType 环境场景类型区分）
         /// </summary>
-        public enum SceneType
+        public enum ConversationSceneType
         {
             Casual,         // 日常闲聊
             EmotionalTalk,  // 情感交流
@@ -62,7 +63,7 @@ namespace RimTalk.Memory
                 return new List<ScoredItem<MemoryEntry>>();
 
             // 1. 自动识别场景类型
-            SceneType scene = IdentifyScene(context);
+            ConversationSceneType scene = IdentifyScene(context);
 
             // 2. 根据场景调整权重
             ScoringWeights weights = AdjustWeightsForScene(scene, defaultWeights);
@@ -143,40 +144,40 @@ namespace RimTalk.Memory
         /// <summary>
         /// 自动识别对话场景
         /// </summary>
-        private static SceneType IdentifyScene(string context)
+        private static ConversationSceneType IdentifyScene(string context)
         {
             if (string.IsNullOrEmpty(context))
-                return SceneType.Casual;
+                return ConversationSceneType.Casual;
 
             context = context.ToLower();
 
             // 紧急情况关键词
             if (ContainsAny(context, new[] { "袭击", "敌人", "危险", "受伤", "死", "快", "救" }))
-                return SceneType.Emergency;
+                return ConversationSceneType.Emergency;
 
             // 历史回忆关键词
             if (ContainsAny(context, new[] { "过去", "以前", "曾经", "记得", "那时", "当时" }))
-                return SceneType.HistoryRecall;
+                return ConversationSceneType.HistoryRecall;
 
             // 情感交流关键词
             if (ContainsAny(context, new[] { "感觉", "心情", "难过", "开心", "想", "喜欢", "讨厌" }))
-                return SceneType.EmotionalTalk;
+                return ConversationSceneType.EmotionalTalk;
 
             // 工作讨论关键词
             if (ContainsAny(context, new[] { "工作", "任务", "建造", "种植", "研究", "搬运" }))
-                return SceneType.WorkDiscussion;
+                return ConversationSceneType.WorkDiscussion;
 
             // 自我介绍关键词
             if (ContainsAny(context, new[] { "你是", "叫什么", "来自", "背景", "擅长" }))
-                return SceneType.Introduction;
+                return ConversationSceneType.Introduction;
 
-            return SceneType.Casual;
+            return ConversationSceneType.Casual;
         }
 
         /// <summary>
         /// 根据场景调整权重
         /// </summary>
-        private static ScoringWeights AdjustWeightsForScene(SceneType scene, ScoringWeights baseWeights)
+        private static ScoringWeights AdjustWeightsForScene(ConversationSceneType scene, ScoringWeights baseWeights)
         {
             var adjusted = new ScoringWeights
             {
@@ -189,33 +190,33 @@ namespace RimTalk.Memory
 
             switch (scene)
             {
-                case SceneType.Emergency:
+                case ConversationSceneType.Emergency:
                     // 紧急情况：最新信息最重要
                     adjusted.Recency = 0.50f;
                     adjusted.ContextRelevance = 0.30f;
                     adjusted.Importance = 0.15f;
                     break;
 
-                case SceneType.HistoryRecall:
+                case ConversationSceneType.HistoryRecall:
                     // 回忆过去：降低时间因素，提高归档层级
                     adjusted.Recency = 0.10f;
                     adjusted.LayerPriority = 0.25f;
                     adjusted.ContextRelevance = 0.45f;
                     break;
 
-                case SceneType.EmotionalTalk:
+                case ConversationSceneType.EmotionalTalk:
                     // 情感交流：提高情感记忆权重
                     adjusted.EmotionalBoost = 1.5f;
                     adjusted.RelationshipBoost = 1.4f;
                     break;
 
-                case SceneType.WorkDiscussion:
+                case ConversationSceneType.WorkDiscussion:
                     // 工作讨论：行动记忆优先
                     adjusted.ContextRelevance = 0.50f;
                     adjusted.Recency = 0.25f;
                     break;
 
-                case SceneType.Introduction:
+                case ConversationSceneType.Introduction:
                     // 自我介绍：归档记忆（长期经历）更重要
                     adjusted.LayerPriority = 0.30f;
                     adjusted.ContextRelevance = 0.35f;
@@ -239,7 +240,7 @@ namespace RimTalk.Memory
             public List<string> Entities = new List<string>();      // 实体（人名、地名）
             public List<string> Topics = new List<string>();        // 主题标签
             public HashSet<string> EmotionWords = new HashSet<string>(); // 情感词
-            public SceneType Scene = SceneType.Casual;
+            public ConversationSceneType Scene = ConversationSceneType.Casual;
         }
 
         /// <summary>
@@ -274,33 +275,17 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// 提取重要关键词（改进版）
+        /// 提取重要关键词（使用 SuperKeywordEngine 统一算法）
         /// </summary>
         private static List<string> ExtractImportantKeywords(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return new List<string>();
 
-            var keywords = new HashSet<string>();
-            
-            // 提取2-4字词语
-            for (int length = 2; length <= 4; length++)
-            {
-                for (int i = 0; i <= text.Length - length; i++)
-                {
-                    string word = text.Substring(i, length);
-                    if (word.Any(c => char.IsLetterOrDigit(c)))
-                    {
-                        keywords.Add(word);
-                    }
-                }
-            }
-
-            // 过滤常见停用词
-            var stopWords = new HashSet<string> { "的", "了", "在", "是", "我", "你", "他", "她", "它", "们", "这", "那" };
-            keywords.RemoveWhere(k => stopWords.Contains(k));
-
-            return keywords.Take(30).ToList();
+            // 使用 SuperKeywordEngine 的 TF-IDF 加权关键词提取
+            // SuperKeywordEngine 已内置停用词过滤和长度权重
+            var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 30);
+            return weightedKeywords.Select(k => k.Word).ToList();
         }
 
         /// <summary>
