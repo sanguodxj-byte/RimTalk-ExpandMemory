@@ -136,8 +136,8 @@ namespace RimTalk.MemoryPatch
         public int maxChainingRounds = 2;
         
         // v4.1: 知识匹配源选择（用于选择哪些 Mustache 变量用于匹配）
-        // 默认勾选 prompt 和 context（RimTalk 的核心变量）
-        public List<string> knowledgeMatchingSources = new List<string> { "prompt", "context" };
+        // 默认勾选 Pawn 的核心属性：fullname、role、age、gender、backstory、traits、skills、relations
+        public List<string> knowledgeMatchingSources = new List<string> { "prompt", "fullname", "role", "age", "gender", "backstory", "traits", "skills", "relations" };
 
         // UI折叠状态
         private static bool expandDynamicInjection = true;
@@ -238,7 +238,7 @@ namespace RimTalk.MemoryPatch
             // 兼容性：如果加载后为 null 或空，初始化为默认值
             if (Scribe.mode == LoadSaveMode.PostLoadInit && (knowledgeMatchingSources == null || knowledgeMatchingSources.Count == 0))
             {
-                knowledgeMatchingSources = new List<string> { "prompt", "context" };
+                knowledgeMatchingSources = new List<string> { "prompt", "fullname", "role", "age", "gender", "backstory", "traits", "skills", "relations" };
             }
         }
 
