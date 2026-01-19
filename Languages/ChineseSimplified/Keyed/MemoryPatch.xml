@@ -228,4 +228,12 @@
   
   <RimTalk_Layer_ELS>ELS</RimTalk_Layer_ELS>
   <RimTalk_Layer_CLPA>CLPA</RimTalk_Layer_CLPA>
+  
+  <!-- ==================== 匹配源分类 ==================== -->
+  <RimTalk_MatchSource_CategoryDialogue>对话类</RimTalk_MatchSource_CategoryDialogue>
+  <RimTalk_MatchSource_CategoryPawn>Pawn 属性类</RimTalk_MatchSource_CategoryPawn>
+  <RimTalk_MatchSource_CategoryEnvironment>环境类</RimTalk_MatchSource_CategoryEnvironment>
+  <RimTalk_MatchSource_CategoryColony>殖民地类</RimTalk_MatchSource_CategoryColony>
+  <RimTalk_MatchSource_CategoryTime>时间类</RimTalk_MatchSource_CategoryTime>
+  <RimTalk_MatchSource_CategoryExtension>扩展类</RimTalk_MatchSource_CategoryExtension>
 </LanguageData>

@@ -490,5 +490,13 @@
     <RimTalk_Memory_ImportFailed>Import failed: {0}</RimTalk_Memory_ImportFailed>
     
     <RimTalk_MindStream_ShowingN>Showing {0} memories</RimTalk_MindStream_ShowingN>
+    
+    <!-- ==================== Matching Source Categories ==================== -->
+    <RimTalk_MatchSource_CategoryDialogue>Dialogue</RimTalk_MatchSource_CategoryDialogue>
+    <RimTalk_MatchSource_CategoryPawn>Pawn Properties</RimTalk_MatchSource_CategoryPawn>
+    <RimTalk_MatchSource_CategoryEnvironment>Environment</RimTalk_MatchSource_CategoryEnvironment>
+    <RimTalk_MatchSource_CategoryColony>Colony</RimTalk_MatchSource_CategoryColony>
+    <RimTalk_MatchSource_CategoryTime>Time</RimTalk_MatchSource_CategoryTime>
+    <RimTalk_MatchSource_CategoryExtension>Extensions</RimTalk_MatchSource_CategoryExtension>
 
 </LanguageData>

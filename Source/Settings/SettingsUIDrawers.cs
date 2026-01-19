@@ -2,7 +2,9 @@ using UnityEngine;
 using Verse;
 using RimWorld;
 using RimTalk.Memory;
+using RimTalk.Memory.API;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace RimTalk.MemoryPatch
 {
@@ -105,6 +107,212 @@ namespace RimTalk.MemoryPatch
             }
             
             GUI.color = Color.white;
+        }
+        
+        // ==================== 匹配源选择设置绘制 ====================
+        
+        // 缓存从 RimTalk 获取的分类变量列表
+        private static Dictionary<string, List<(string name, string description, bool isPawnProperty)>> _cachedCategorizedSources = null;
+        
+        // 滚动位置
+        private static Vector2 _matchingSourcesScrollPosition = Vector2.zero;
+        
+        /// <summary>
+        /// v4.1: 绘制知识匹配源选择 UI
+        /// 使用独立的 ScrollView 绘制，通过 GUI.BeginGroup 实现嵌套
+        /// </summary>
+        public static void DrawKnowledgeMatchingSourcesSettings(Listing_Standard listing, RimTalkMemoryPatchSettings settings)
+        {
+            GUI.color = new Color(0.8f, 1f, 0.8f);
+            listing.Label("知识匹配源选择");
+            GUI.color = Color.white;
+            
+            GUI.color = Color.gray;
+            listing.Label("  选择用于常识匹配的变量，Pawn 属性会自动匹配所有对话参与者");
+            GUI.color = Color.white;
+            listing.Gap();
+            
+            // 刷新按钮
+            Rect refreshRect = listing.GetRect(25f);
+            if (Widgets.ButtonText(new Rect(refreshRect.x, refreshRect.y, 120f, 25f), "刷新列表"))
+            {
+                MustacheVariableHelper.ClearCache();
+                _cachedCategorizedSources = null;
+                Messages.Message("已刷新变量列表", MessageTypeDefOf.NeutralEvent);
+            }
+            
+            // 获取分类数据
+            var categorizedSources = GetCachedCategorizedSources();
+            
+            // 统计信息
+            int totalVars = categorizedSources.Sum(c => c.Value.Count);
+            int pawnProps = categorizedSources.Sum(c => c.Value.Count(v => v.isPawnProperty));
+            Rect countRect = new Rect(refreshRect.x + 130f, refreshRect.y, 250f, 25f);
+            GUI.color = Color.gray;
+            Widgets.Label(countRect, $"共 {totalVars} 个变量 (Pawn 属性: {pawnProps})");
+            GUI.color = Color.white;
+            
+            listing.Gap();
+            
+            if (settings.knowledgeMatchingSources == null || settings.knowledgeMatchingSources.Count == 0)
+            {
+                settings.knowledgeMatchingSources = new List<string> { "dialogue", "context" };
+            }
+            
+            // 计算内容高度
+            float rowHeight = 22f;
+            float categoryHeaderHeight = 26f;
+            float contentHeight = 0f;
+            foreach (var category in categorizedSources)
+            {
+                contentHeight += categoryHeaderHeight;
+                contentHeight += category.Value.Count * rowHeight + 2f;
+            }
+            
+            // 固定显示区域高度，使用内部 ScrollView
+            float displayHeight = Mathf.Min(contentHeight + 10f, 320f);
+            Rect outerRect = listing.GetRect(displayHeight);
+            Widgets.DrawBoxSolid(outerRect, new Color(0.12f, 0.12f, 0.12f, 0.5f));
+            
+            // 使用 GUI.BeginGroup 创建独立的绘制区域
+            Rect innerRect = outerRect.ContractedBy(5f);
+            Rect viewRect = new Rect(0f, 0f, innerRect.width - 16f, contentHeight);
+            
+            // 开始 ScrollView
+            Widgets.BeginScrollView(innerRect, ref _matchingSourcesScrollPosition, viewRect);
+            
+            float curY = 0f;
+            float width = viewRect.width;
+            
+            foreach (var category in categorizedSources)
+            {
+                // 分类标题
+                Rect headerRect = new Rect(0f, curY, width, categoryHeaderHeight - 2f);
+                Widgets.DrawBoxSolid(headerRect, new Color(0.2f, 0.25f, 0.3f, 0.8f));
+                GUI.color = new Color(0.9f, 0.95f, 1f);
+                Widgets.Label(new Rect(8f, curY + 3f, width - 16f, 20f), $"{category.Key} ({category.Value.Count})");
+                GUI.color = Color.white;
+                curY += categoryHeaderHeight;
+                
+                // 绘制该分类下的变量
+                foreach (var variable in category.Value)
+                {
+                    bool isSelected = settings.knowledgeMatchingSources.Contains(variable.name);
+                    bool newValue = isSelected;
+                    
+                    Rect rowRect = new Rect(0f, curY, width, rowHeight - 2f);
+                    
+                    // 高亮选中行
+                    if (isSelected)
+                    {
+                        Widgets.DrawBoxSolid(rowRect, new Color(0.2f, 0.4f, 0.2f, 0.3f));
+                    }
+                    
+                    // 鼠标悬停高亮
+                    if (Mouse.IsOver(rowRect))
+                    {
+                        Widgets.DrawHighlight(rowRect);
+                    }
+                    
+                    // 复选框
+                    Widgets.Checkbox(new Vector2(8f, curY + 1f), ref newValue);
+                    
+                    // Pawn 属性标记
+                    float nameStartX = 32f;
+                    if (variable.isPawnProperty)
+                    {
+                        Rect tagRect = new Rect(nameStartX, curY + 2f, 45f, 18f);
+                        Widgets.DrawBoxSolid(tagRect, new Color(0.3f, 0.5f, 0.7f, 0.5f));
+                        GUI.color = new Color(0.7f, 0.9f, 1f);
+                        Text.Font = GameFont.Tiny;
+                        Widgets.Label(new Rect(tagRect.x + 3f, curY + 3f, 40f, 16f), "Pawn");
+                        Text.Font = GameFont.Small;
+                        GUI.color = Color.white;
+                        nameStartX += 50f;
+                    }
+                    
+                    // 变量名
+                    GUI.color = isSelected ? new Color(0.5f, 1f, 0.5f) : new Color(0.9f, 0.9f, 0.7f);
+                    Widgets.Label(new Rect(nameStartX, curY + 1f, 140f, 20f), variable.name);
+                    GUI.color = Color.white;
+                    
+                    // 描述
+                    Text.Font = GameFont.Tiny;
+                    GUI.color = Color.gray;
+                    string shortDesc = variable.description.Length > 30
+                        ? variable.description.Substring(0, 27) + "..."
+                        : variable.description;
+                    Widgets.Label(new Rect(nameStartX + 145f, curY + 2f, width - nameStartX - 150f, 18f), shortDesc);
+                    Text.Font = GameFont.Small;
+                    GUI.color = Color.white;
+                    
+                    // 工具提示
+                    string tooltip = variable.isPawnProperty
+                        ? $"属性: {variable.name}\n类型: Pawn 属性\n\n{variable.description}\n\n勾选后会自动匹配所有参与对话的 Pawn 的此属性"
+                        : $"变量: {variable.name}\n\n{variable.description}";
+                    TooltipHandler.TipRegion(rowRect, tooltip);
+                    
+                    // 更新选择状态
+                    if (newValue != isSelected)
+                    {
+                        if (newValue)
+                        {
+                            if (!settings.knowledgeMatchingSources.Contains(variable.name))
+                            {
+                                settings.knowledgeMatchingSources.Add(variable.name);
+                            }
+                        }
+                        else
+                        {
+                            settings.knowledgeMatchingSources.Remove(variable.name);
+                            if (settings.knowledgeMatchingSources.Count == 0)
+                            {
+                                settings.knowledgeMatchingSources.Add("dialogue");
+                                Messages.Message("至少需要选择一个匹配源", MessageTypeDefOf.RejectInput);
+                            }
+                        }
+                    }
+                    
+                    curY += rowHeight;
+                }
+                
+                curY += 2f;
+            }
+            
+            Widgets.EndScrollView();
+            
+            listing.Gap();
+            
+            // 显示当前选择统计
+            int selectedPawnProps = settings.knowledgeMatchingSources.Count(s =>
+                categorizedSources.Any(c => c.Value.Any(v => v.name == s && v.isPawnProperty)));
+            int selectedOther = settings.knowledgeMatchingSources.Count - selectedPawnProps;
+            
+            GUI.color = new Color(0.7f, 0.9f, 1f);
+            listing.Label($"已选择: {settings.knowledgeMatchingSources.Count} 个 (Pawn 属性: {selectedPawnProps}, 其他: {selectedOther})");
+            
+            // 显示选择的变量名
+            string selectedStr = settings.knowledgeMatchingSources.Count <= 4
+                ? string.Join(", ", settings.knowledgeMatchingSources)
+                : $"{string.Join(", ", settings.knowledgeMatchingSources.Take(3))}... (+{settings.knowledgeMatchingSources.Count - 3})";
+            GUI.color = Color.gray;
+            listing.Label($"  {selectedStr}");
+            GUI.color = Color.white;
+            
+            listing.Gap();
+            listing.GapLine();
+        }
+        
+        /// <summary>
+        /// 获取缓存的分类变量列表
+        /// </summary>
+        private static Dictionary<string, List<(string name, string description, bool isPawnProperty)>> GetCachedCategorizedSources()
+        {
+            if (_cachedCategorizedSources == null)
+            {
+                _cachedCategorizedSources = MustacheVariableHelper.GetCategorizedMatchingSources();
+            }
+            return _cachedCategorizedSources;
         }
         
         // ==================== 常识链设置绘制 ====================

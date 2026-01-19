@@ -3,8 +3,10 @@ using Verse;
 using RimWorld;
 using RimTalk.Memory;
 using RimTalk.Memory.UI;
-using System.Collections.Generic; // ? 添加
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace RimTalk.MemoryPatch
 {
@@ -133,8 +135,9 @@ namespace RimTalk.MemoryPatch
         public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
         public int maxChainingRounds = 2;
         
-        // ⭐ Context Injection Settings
-        public bool injectToContext = false; // 默认关闭，注入到Prompt；开启时注入到Context
+        // v4.1: 知识匹配源选择（用于选择哪些 Mustache 变量用于匹配）
+        // 默认勾选 prompt 和 context（RimTalk 的核心变量）
+        public List<string> knowledgeMatchingSources = new List<string> { "prompt", "context" };
 
         // UI折叠状态
         private static bool expandDynamicInjection = true;
@@ -229,8 +232,14 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
             Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
             
-            // Context Injection
-            Scribe_Values.Look(ref injectToContext, "injection_injectToContext", false);
+            // ⭐ v4.0: 知识匹配源
+            Scribe_Collections.Look(ref knowledgeMatchingSources, "knowledgeMatchingSources", LookMode.Value);
+            
+            // 兼容性：如果加载后为 null 或空，初始化为默认值
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && (knowledgeMatchingSources == null || knowledgeMatchingSources.Count == 0))
+            {
+                knowledgeMatchingSources = new List<string> { "prompt", "context" };
+            }
         }
 
         public void DoSettingsWindowContents(Rect inRect)
@@ -380,23 +389,6 @@ namespace RimTalk.MemoryPatch
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 listing.Label("  智能选择最相关的记忆和常识注入到AI对话中");
                 GUI.color = Color.white;
-                
-                listing.Gap();
-                
-                // ⭐ 注入位置选择
-                listing.CheckboxLabeled("注入到 Context (System Instruction)", ref injectToContext);
-                if (injectToContext)
-                {
-                    GUI.color = new Color(1f, 0.9f, 0.7f);
-                    listing.Label("  ✓ 记忆和常识将注入到 System Instruction");
-                    GUI.color = Color.white;
-                }
-                else
-                {
-                    GUI.color = Color.gray;
-                    listing.Label("  默认：注入到 Prompt (User Message)");
-                    GUI.color = Color.white;
-                }
                 
                 listing.Gap();
                 
@@ -633,6 +625,9 @@ namespace RimTalk.MemoryPatch
             
             listing.Gap();
             listing.GapLine();
+            
+            // ⭐ v4.0: 知识匹配源选择（动态从 RimTalk 获取 Mustache 变量）
+            SettingsUIDrawers.DrawKnowledgeMatchingSourcesSettings(listing, this);
             
             // ⭐ 常识链设置
             SettingsUIDrawers.DrawKnowledgeChainingSettings(listing, this);
