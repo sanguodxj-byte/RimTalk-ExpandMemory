@@ -172,25 +172,9 @@ namespace RimTalk.Memory.UI
         
         private void ShowOperationGuide()
         {
-            string guide = "=== Mind Stream 操作指南 ===\n\n" +
-                "【选择记忆】\n" +
-                "? 单击：选中单条记忆\n" +
-                "? Ctrl+单击：多选/取消选择\n" +
-                "? Shift+单击：范围选择\n" +
-                "? 拖拽框选：批量选择\n\n" +
-                "【批量操作】\n" +
-                "? 总结：将SCM记忆总结到ELS\n" +
-                "? 归档：将ELS记忆归档到CLPA\n" +
-                "? 删除：删除选中的记忆\n\n" +
-                "【右键功能】\n" +
-                "? ELS/CLPA复选框上右键可新建记忆\n\n" +
-                "【层级说明】\n" +
-                "? ABM (蓝色): 超短期记忆\n" +
-                "? SCM (绿色): 短期记忆\n" +
-                "? ELS (黄色): 事件日志\n" +
-                "? CLPA (紫色): 长期档案";
+            string guide = "RimTalk_MindStream_GuideContent".Translate();
             
-            Find.WindowStack.Add(new Dialog_MessageBox(guide, "关闭", null, "操作指南"));
+            Find.WindowStack.Add(new Dialog_MessageBox(guide, "RimTalk_Close".Translate(), null, "RimTalk_MindStream_OperationGuide".Translate()));
         }
     }
 }

@@ -265,13 +265,13 @@ namespace RimTalk.MemoryPatch
             listingStandard.GapLine();
 
             Text.Font = GameFont.Medium;
-            listingStandard.Label("API 配置");
+            listingStandard.Label("RimTalk_Settings_APIConfigTitle".Translate());
             Text.Font = GameFont.Small;
             DrawAIConfigSettings(listingStandard);
 
             listingStandard.GapLine();
             Rect advancedButtonRect = listingStandard.GetRect(40f);
-            if (Widgets.ButtonText(advancedButtonRect, "高级设置..."))
+            if (Widgets.ButtonText(advancedButtonRect, "RimTalk_Settings_AdvancedSettings".Translate()))
             {
                 Find.WindowStack.Add(new AdvancedSettingsWindow(this));
             }
@@ -283,10 +283,10 @@ namespace RimTalk.MemoryPatch
         private void DrawPresetConfiguration(Listing_Standard listing)
         {
             Text.Font = GameFont.Medium;
-            listing.Label("预设配置");
+            listing.Label("RimTalk_Settings_PresetConfig".Translate());
             Text.Font = GameFont.Small;
             GUI.color = Color.gray;
-            listing.Label("从记忆/常识注入数量少到多快速切换，并预估 token 消耗");
+            listing.Label("RimTalk_Settings_PresetConfigDesc".Translate());
             GUI.color = Color.white;
             listing.Gap(6f);
 
@@ -295,9 +295,9 @@ namespace RimTalk.MemoryPatch
             float cardWidth = (rowRect.width - spacing * 2f) / 3f;
             float cardHeight = rowRect.height;
 
-            DrawPresetCard(new Rect(rowRect.x, rowRect.y, cardWidth, cardHeight), "轻量", 3, 2, 250);
-            DrawPresetCard(new Rect(rowRect.x + cardWidth + spacing, rowRect.y, cardWidth, cardHeight), "平衡", 6, 4, 520);
-            DrawPresetCard(new Rect(rowRect.x + 2f * (cardWidth + spacing), rowRect.y, cardWidth, cardHeight), "强化", 10, 6, 850);
+            DrawPresetCard(new Rect(rowRect.x, rowRect.y, cardWidth, cardHeight), "RimTalk_Settings_PresetLight".Translate(), 3, 2, 250);
+            DrawPresetCard(new Rect(rowRect.x + cardWidth + spacing, rowRect.y, cardWidth, cardHeight), "RimTalk_Settings_PresetBalanced".Translate(), 6, 4, 520);
+            DrawPresetCard(new Rect(rowRect.x + 2f * (cardWidth + spacing), rowRect.y, cardWidth, cardHeight), "RimTalk_Settings_PresetEnhanced".Translate(), 10, 6, 850);
 
             listing.GapLine();
         }
@@ -309,25 +309,25 @@ namespace RimTalk.MemoryPatch
 
             Text.Anchor = TextAnchor.MiddleCenter;
             GUI.color = new Color(0.8f, 0.9f, 1f);
-            Widgets.Label(rect, $"{title}\n记忆 {memoryCount} | 常识 {knowledgeCount}\n~{tokenEstimate} tokens");
+            Widgets.Label(rect, "RimTalk_Settings_PresetCardContent".Translate(title, memoryCount, knowledgeCount, tokenEstimate));
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
 
-            TooltipHandler.TipRegion(rect, $"记忆 {memoryCount} 条 + 常识 {knowledgeCount} 条\n预计消耗 ~{tokenEstimate} tokens");
+            TooltipHandler.TipRegion(rect, "RimTalk_Settings_PresetCardTooltip".Translate(memoryCount, knowledgeCount, tokenEstimate));
 
             if (Widgets.ButtonInvisible(rect))
             {
                 useDynamicInjection = true;
                 maxInjectedMemories = memoryCount;
                 maxInjectedKnowledge = knowledgeCount;
-                Messages.Message($"已应用预设: {title} (记忆 {memoryCount}, 常识 {knowledgeCount})", MessageTypeDefOf.PositiveEvent);
+                Messages.Message("RimTalk_Settings_PresetApplied".Translate(title, memoryCount, knowledgeCount), MessageTypeDefOf.PositiveEvent);
             }
         }
 
         private void DrawQuickActionButtons(Listing_Standard listing)
         {
             Text.Font = GameFont.Medium;
-            listing.Label("功能入口");
+            listing.Label("RimTalk_Settings_FeatureEntries".Translate());
             Text.Font = GameFont.Small;
             listing.Gap(4f);
 
@@ -336,18 +336,18 @@ namespace RimTalk.MemoryPatch
             float buttonWidth = (rowRect.width - spacing * 2f) / 3f; // ⭐ 改回3个按钮
             float buttonHeight = rowRect.height;
 
-            DrawActionButton(new Rect(rowRect.x, rowRect.y, buttonWidth, buttonHeight), "常识库", "打开并管理全局常识库", delegate
+            DrawActionButton(new Rect(rowRect.x, rowRect.y, buttonWidth, buttonHeight), "RimTalk_Settings_KnowledgeLibrary".Translate(), "RimTalk_Settings_KnowledgeLibraryTip".Translate(), delegate
             {
                 OpenCommonKnowledgeDialog();
             });
 
             // ⭐ 恢复"提示词替换"按钮
-            DrawActionButton(new Rect(rowRect.x + buttonWidth + spacing, rowRect.y, buttonWidth, buttonHeight), "提示词替换", "编辑提示词替换/规范化规则", delegate
+            DrawActionButton(new Rect(rowRect.x + buttonWidth + spacing, rowRect.y, buttonWidth, buttonHeight), "RimTalk_Settings_PromptReplacement".Translate(), "RimTalk_Settings_PromptReplacementTip".Translate(), delegate
             {
                 Find.WindowStack.Add(new PromptNormalizationWindow(this));
             });
 
-            DrawActionButton(new Rect(rowRect.x + 2f * (buttonWidth + spacing), rowRect.y, buttonWidth, buttonHeight), "注入预览器", "实时查看记忆/常识注入效果", delegate
+            DrawActionButton(new Rect(rowRect.x + 2f * (buttonWidth + spacing), rowRect.y, buttonWidth, buttonHeight), "RimTalk_Settings_InjectionPreviewer".Translate(), "RimTalk_Settings_InjectionPreviewerTip".Translate(), delegate
             {
                 Find.WindowStack.Add(new Memory.Debug.Dialog_InjectionPreview());
             });
@@ -392,74 +392,74 @@ namespace RimTalk.MemoryPatch
 
         private void DrawDynamicInjectionSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("启用动态注入", ref useDynamicInjection);
+            listing.CheckboxLabeled("RimTalk_Settings_EnableDynamicInjection".Translate(), ref useDynamicInjection);
             
             if (useDynamicInjection)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  智能选择最相关的记忆和常识注入到AI对话中");
+                listing.Label("  " + "RimTalk_Settings_DynamicInjectionDesc".Translate());
                 GUI.color = Color.white;
                 
                 listing.Gap();
                 
-                listing.Label($"最大注入记忆数: {maxInjectedMemories}");
+                listing.Label("RimTalk_Settings_MaxInjectedMemoriesLabel".Translate(maxInjectedMemories));
                 maxInjectedMemories = (int)listing.Slider(maxInjectedMemories, 1, 20);
                 
-                listing.Label($"最大注入常识数: {maxInjectedKnowledge}");
+                listing.Label("RimTalk_Settings_MaxInjectedKnowledgeLabel".Translate(maxInjectedKnowledge));
                 maxInjectedKnowledge = (int)listing.Slider(maxInjectedKnowledge, 1, 10);
                 
                 listing.Gap();
                 
-                listing.Label($"记忆评分阈值: {memoryScoreThreshold:P0}");
+                listing.Label("RimTalk_Settings_MemoryScoreThresholdLabel".Translate(memoryScoreThreshold.ToString("P0")));
                 memoryScoreThreshold = listing.Slider(memoryScoreThreshold, 0f, 1f);
                 
-                listing.Label($"常识评分阈值: {knowledgeScoreThreshold:P0}");
+                listing.Label("RimTalk_Settings_KnowledgeScoreThresholdLabel".Translate(knowledgeScoreThreshold.ToString("P0")));
                 knowledgeScoreThreshold = listing.Slider(knowledgeScoreThreshold, 0f, 1f);
             }
         }
 
         private void DrawMemoryCapacitySettings(Listing_Standard listing)
         {
-            listing.Label($"SCM (短期记忆): {maxSituationalMemories} 条");
+            listing.Label("RimTalk_Settings_SCMCapacityLabel".Translate(maxSituationalMemories));
             maxSituationalMemories = (int)listing.Slider(maxSituationalMemories, 10, 50);
             
-            listing.Label($"ELS (中期记忆): {maxEventLogMemories} 条");
+            listing.Label("RimTalk_Settings_ELSCapacityLabel".Translate(maxEventLogMemories));
             maxEventLogMemories = (int)listing.Slider(maxEventLogMemories, 20, 100);
         }
 
         private void DrawDecaySettings(Listing_Standard listing)
         {
-            listing.Label($"SCM 衰减率: {scmDecayRate:P1}");
+            listing.Label("RimTalk_Settings_SCMDecayLabel".Translate(scmDecayRate.ToString("P1")));
             scmDecayRate = listing.Slider(scmDecayRate, 0.001f, 0.05f);
             
-            listing.Label($"ELS 衰减率: {elsDecayRate:P1}");
+            listing.Label("RimTalk_Settings_ELSDecayLabel".Translate(elsDecayRate.ToString("P1")));
             elsDecayRate = listing.Slider(elsDecayRate, 0.0005f, 0.02f);
             
-            listing.Label($"CLPA 衰减率: {clpaDecayRate:P1}");
+            listing.Label("RimTalk_Settings_CLPADecayLabel".Translate(clpaDecayRate.ToString("P1")));
             clpaDecayRate = listing.Slider(clpaDecayRate, 0.0001f, 0.01f);
         }
 
         private void DrawSummarizationSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("启用每日总结", ref enableDailySummarization);
+            listing.CheckboxLabeled("RimTalk_Settings_EnableDailySummarization".Translate(), ref enableDailySummarization);
             
             if (enableDailySummarization)
             {
-                listing.Label($"触发时间: {summarizationHour}时");
+                listing.Label("RimTalk_Settings_TriggerTimeLabel".Translate(summarizationHour));
                 summarizationHour = (int)listing.Slider(summarizationHour, 0, 23);
             }
             
-            listing.CheckboxLabeled("启用自动归档", ref enableAutoArchive);
+            listing.CheckboxLabeled("RimTalk_Settings_EnableAutoArchive".Translate(), ref enableAutoArchive);
         }
 
         private void DrawAIConfigSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("优先使用 RimTalk 配置", ref useRimTalkAIConfig);
+            listing.CheckboxLabeled("RimTalk_Settings_PreferRimTalkAI".Translate(), ref useRimTalkAIConfig);
             
             if (useRimTalkAIConfig)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  将自动跟随 RimTalk Mod 的 AI 配置");
+                listing.Label("  " + "RimTalk_Settings_WillFollowRimTalkConfig".Translate());
                 GUI.color = Color.white;
                 listing.Gap();
             }
@@ -472,13 +472,13 @@ namespace RimTalk.MemoryPatch
             listing.Gap();
             
             // API 配置
-            listing.Label("API Key:");
+            listing.Label("RimTalk_Settings_APIKey".Translate() + ":");
             independentApiKey = listing.TextEntry(independentApiKey);
             
-            listing.Label("API URL:");
+            listing.Label("RimTalk_Settings_APIURL".Translate() + ":");
             independentApiUrl = listing.TextEntry(independentApiUrl);
             
-            listing.Label("Model:");
+            listing.Label("RimTalk_Settings_ModelName".Translate() + ":");
             independentModel = listing.TextEntry(independentModel);
             
             listing.Gap();
@@ -488,7 +488,7 @@ namespace RimTalk.MemoryPatch
             
             if (canToggleCaching)
             {
-                listing.CheckboxLabeled("启用 Prompt Caching", ref enablePromptCaching);
+                listing.CheckboxLabeled("RimTalk_Settings_EnablePromptCaching".Translate(), ref enablePromptCaching);
             }
             else
             {
@@ -496,7 +496,7 @@ namespace RimTalk.MemoryPatch
                 enablePromptCaching = false;
                 GUI.color = Color.gray;
                 bool disabledCache = false;
-                listing.CheckboxLabeled("启用 Prompt Caching (不可用)", ref disabledCache);
+                listing.CheckboxLabeled("RimTalk_Settings_EnablePromptCachingUnavailable".Translate(), ref disabledCache);
                 GUI.color = Color.white;
             }
             
@@ -505,35 +505,35 @@ namespace RimTalk.MemoryPatch
                 if (independentProvider == "OpenAI")
                 {
                     GUI.color = new Color(0.8f, 1f, 0.8f);
-                    listing.Label("  ✓ OpenAI 支持 Prompt Caching (Beta)");
-                    listing.Label("  适用模型: gpt-4o, gpt-4-turbo");
+                    listing.Label("  " + "RimTalk_Settings_OpenAICachingSupport".Translate());
+                    listing.Label("  " + "RimTalk_Settings_OpenAICachingModels".Translate());
                     GUI.color = Color.white;
                 }
                 else if (independentProvider == "DeepSeek")
                 {
                     GUI.color = new Color(0.8f, 1f, 0.8f);
-                    listing.Label("  ✓ DeepSeek 支持 Prompt Caching");
-                    listing.Label("  可节省约 50% 费用");
+                    listing.Label("  " + "RimTalk_Settings_DeepSeekCachingSupport".Translate());
+                    listing.Label("  " + "RimTalk_Settings_DeepSeekCachingSavings".Translate());
                     GUI.color = Color.white;
                 }
                 else if (independentProvider == "Player2")
                 {
                     GUI.color = Color.gray;
-                    listing.Label("  ✗ Player2 不支持 Prompt Caching");
-                    listing.Label("  本地客户端无需缓存");
+                    listing.Label("  " + "RimTalk_Settings_Player2NoCaching".Translate());
+                    listing.Label("  " + "RimTalk_Settings_Player2LocalNoCache".Translate());
                     GUI.color = Color.white;
                 }
                 else if (independentProvider == "Google")
                 {
                     GUI.color = Color.gray;
-                    listing.Label("  ✗ Google Gemini 不支持 Prompt Caching");
+                    listing.Label("  " + "RimTalk_Settings_GoogleNoCaching".Translate());
                     GUI.color = Color.white;
                 }
                 else if (independentProvider == "Custom")
                 {
                     GUI.color = Color.gray;
-                    listing.Label("  ✗ 自定义API 不支持 Prompt Caching");
-                    listing.Label("  取决于您的 API 实现");
+                    listing.Label("  " + "RimTalk_Settings_CustomNoCaching".Translate());
+                    listing.Label("  " + "RimTalk_Settings_CustomCachingDepends".Translate());
                     GUI.color = Color.white;
                 }
             }
@@ -542,14 +542,14 @@ namespace RimTalk.MemoryPatch
             
             // 配置验证按钮
             Rect validateButtonRect = listing.GetRect(35f);
-            if (Widgets.ButtonText(validateButtonRect, "✓ 验证配置"))
+            if (Widgets.ButtonText(validateButtonRect, "RimTalk_Settings_ValidateConfig".Translate()))
             {
                 ValidateAIConfig();
             }
             
             // 提示信息
             GUI.color = Color.gray;
-            listing.Label("提示: 验证将测试 API 连接和配置");
+            listing.Label("RimTalk_Settings_ValidateConfigTip".Translate());
             GUI.color = Color.white;
         }
         
@@ -560,29 +560,29 @@ namespace RimTalk.MemoryPatch
         {
             if (useRimTalkAIConfig)
             {
-                Messages.Message("当前使用 RimTalk 配置，无需验证独立配置", MessageTypeDefOf.NeutralEvent);
+                Messages.Message("RimTalk_Settings_UsingRimTalkConfigNoValidation".Translate(), MessageTypeDefOf.NeutralEvent);
                 return;
             }
             
             if (string.IsNullOrEmpty(independentApiKey))
             {
-                Messages.Message("请先输入 API Key", MessageTypeDefOf.RejectInput);
+                Messages.Message("RimTalk_Settings_PleaseEnterAPIKey".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
             
             if (string.IsNullOrEmpty(independentApiUrl))
             {
-                Messages.Message("请先输入 API URL", MessageTypeDefOf.RejectInput);
+                Messages.Message("RimTalk_Settings_PleaseEnterAPIURL".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
             
             if (string.IsNullOrEmpty(independentModel))
             {
-                Messages.Message("请先输入 Model", MessageTypeDefOf.RejectInput);
+                Messages.Message("RimTalk_Settings_PleaseEnterModel".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
             
-            Messages.Message("配置验证中...", MessageTypeDefOf.NeutralEvent);
+            Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.NeutralEvent);
             
             // 强制重新初始化 AI Summarizer
             System.Threading.Tasks.Task.Run(() =>
@@ -595,14 +595,14 @@ namespace RimTalk.MemoryPatch
                     {
                         LongEventHandler.ExecuteWhenFinished(() =>
                         {
-                            Messages.Message($"? 配置验证成功！提供商: {independentProvider}", MessageTypeDefOf.PositiveEvent);
+                            Messages.Message("RimTalk_Settings_ValidationSuccess".Translate(independentProvider), MessageTypeDefOf.PositiveEvent);
                         });
                     }
                     else
                     {
                         LongEventHandler.ExecuteWhenFinished(() =>
                         {
-                            Messages.Message("? 配置验证失败，请检查 API Key 和 URL", MessageTypeDefOf.RejectInput);
+                            Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.RejectInput);
                         });
                     }
                 }
@@ -611,7 +611,7 @@ namespace RimTalk.MemoryPatch
                     Log.Error($"AI Config validation failed: {ex.Message}");
                     LongEventHandler.ExecuteWhenFinished(() =>
                     {
-                        Messages.Message($"? 验证失败: {ex.Message}", MessageTypeDefOf.RejectInput);
+                        Messages.Message("RimTalk_Settings_ValidationError".Translate(ex.Message), MessageTypeDefOf.RejectInput);
                     });
                 }
             });
@@ -619,17 +619,17 @@ namespace RimTalk.MemoryPatch
 
         private void DrawMemoryTypesSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("行动记忆", ref enableActionMemory);
-            listing.CheckboxLabeled("对话记忆", ref enableConversationMemory);
+            listing.CheckboxLabeled("RimTalk_Settings_ActionMemory".Translate(), ref enableActionMemory);
+            listing.CheckboxLabeled("RimTalk_Settings_ConversationMemory".Translate(), ref enableConversationMemory);
         }
 
         private void DrawExperimentalFeaturesSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("启用主动记忆召回", ref enableProactiveRecall);
+            listing.CheckboxLabeled("RimTalk_Settings_EnableProactiveRecall".Translate(), ref enableProactiveRecall);
             
             if (enableProactiveRecall)
             {
-                listing.Label($"触发概率: {recallTriggerChance:P0}");
+                listing.Label("RimTalk_Settings_TriggerChanceLabel".Translate(recallTriggerChance.ToString("P0")));
                 recallTriggerChance = listing.Slider(recallTriggerChance, 0.05f, 0.60f);
             }
             
@@ -653,14 +653,14 @@ namespace RimTalk.MemoryPatch
         {
             if (Current.Game == null)
             {
-                Messages.Message("请先进入游戏", MessageTypeDefOf.RejectInput);
+                Messages.Message("RimTalk_Settings_MustEnterGame".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
 
             var memoryManager = Find.World.GetComponent<MemoryManager>();
             if (memoryManager == null)
             {
-                Messages.Message("无法找到内存管理器", MessageTypeDefOf.RejectInput);
+                Messages.Message("RimTalk_Settings_CannotFindManager".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
 
@@ -700,29 +700,29 @@ namespace RimTalk.MemoryPatch
                 listing.Begin(viewRect);
 
                 Text.Font = GameFont.Medium;
-                listing.Label("高级设置");
+                listing.Label("RimTalk_Settings_AdvancedSettingsTitle".Translate());
                 Text.Font = GameFont.Small;
                 GUI.color = Color.gray;
-                listing.Label("包含注入、记忆容量、衰减等详细配置");
+                listing.Label("RimTalk_Settings_AdvancedSettingsDesc".Translate());
                 GUI.color = Color.white;
                 listing.GapLine();
 
-                settings.DrawCollapsibleSection(listing, "动态注入设置", ref expandDynamicInjection, delegate { settings.DrawDynamicInjectionSettings(listing); });
-                settings.DrawCollapsibleSection(listing, "记忆容量配置", ref expandMemoryCapacity, delegate { settings.DrawMemoryCapacitySettings(listing); });
-                settings.DrawCollapsibleSection(listing, "记忆衰减配置", ref expandDecayRates, delegate { settings.DrawDecaySettings(listing); });
-                settings.DrawCollapsibleSection(listing, "记忆总结设置", ref expandSummarization, delegate { settings.DrawSummarizationSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_DynamicInjectionSection".Translate(), ref expandDynamicInjection, delegate { settings.DrawDynamicInjectionSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_MemoryCapacitySection".Translate(), ref expandMemoryCapacity, delegate { settings.DrawMemoryCapacitySettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_MemoryDecaySection".Translate(), ref expandDecayRates, delegate { settings.DrawDecaySettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_SummarizationSection".Translate(), ref expandSummarization, delegate { settings.DrawSummarizationSettings(listing); });
 
                 if (settings.useAISummarization)
                 {
-                    settings.DrawCollapsibleSection(listing, "AI 配置", ref expandAIConfig, delegate { settings.DrawAIConfigSettings(listing); });
+                    settings.DrawCollapsibleSection(listing, "RimTalk_Settings_AIConfigSection".Translate(), ref expandAIConfig, delegate { settings.DrawAIConfigSettings(listing); });
                 }
 
-                settings.DrawCollapsibleSection(listing, "记忆类型开关", ref expandMemoryTypes, delegate { settings.DrawMemoryTypesSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_MemoryTypesSection".Translate(), ref expandMemoryTypes, delegate { settings.DrawMemoryTypesSettings(listing); });
                 
                 // ⭐ 添加向量增强设置
-                settings.DrawCollapsibleSection(listing, "🔬 向量增强设置", ref expandVectorEnhancement, delegate { settings.DrawVectorEnhancementSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_VectorEnhancementSection".Translate(), ref expandVectorEnhancement, delegate { settings.DrawVectorEnhancementSettings(listing); });
                 
-                settings.DrawCollapsibleSection(listing, "🚀 实验性功能", ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
+                settings.DrawCollapsibleSection(listing, "RimTalk_Settings_ExperimentalSection".Translate(), ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
 
                 listing.End();
                 Widgets.EndScrollView();
@@ -753,10 +753,10 @@ namespace RimTalk.MemoryPatch
                 listing.Begin(viewRect);
 
                 Text.Font = GameFont.Medium;
-                listing.Label("提示词替换");
+                listing.Label("RimTalk_Settings_PromptReplacementTitle".Translate());
                 Text.Font = GameFont.Small;
                 GUI.color = Color.gray;
-                listing.Label("在发送给 AI 前自动规范化提示词");
+                listing.Label("RimTalk_Settings_PromptReplacementDesc".Translate());
                 GUI.color = Color.white;
                 listing.Gap(6f);
 

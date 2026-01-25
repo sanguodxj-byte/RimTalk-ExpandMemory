@@ -65,12 +65,12 @@ namespace RimTalk.Memory.UI
         {
             Text.Font = GameFont.Medium;
             Rect titleRect = new Rect(0f, 0f, inRect.width, 35f);
-            Widgets.Label(titleRect, "总结提示词配置");
+            Widgets.Label(titleRect, "RimTalk_PromptEditor_Title".Translate());
             
             Text.Font = GameFont.Small;
             GUI.color = Color.gray;
             Rect descRect = new Rect(0f, 35f, inRect.width, 20f);
-            Widgets.Label(descRect, "自定义 AI 总结记忆时使用的提示词模板");
+            Widgets.Label(descRect, "RimTalk_PromptEditor_Desc".Translate());
             GUI.color = Color.white;
             
             // 内容区域
@@ -87,10 +87,10 @@ namespace RimTalk.Memory.UI
             
             // 恢复默认按钮（左侧）
             Rect resetRect = new Rect(0f, buttonY, buttonWidth, 35f);
-            if (Widgets.ButtonText(resetRect, "恢复默认"))
+            if (Widgets.ButtonText(resetRect, "RimTalk_PromptEditor_ResetDefault".Translate()))
             {
                 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                    "确定要恢复默认提示词吗？",
+                    "RimTalk_PromptEditor_ResetConfirm".Translate(),
                     delegate
                     {
                         editDailySummary = DEFAULT_DAILY_SUMMARY;
@@ -103,14 +103,14 @@ namespace RimTalk.Memory.UI
             // 取消和保存按钮（右侧）
             float rightX = inRect.width - buttonWidth;
             Rect saveRect = new Rect(rightX, buttonY, buttonWidth, 35f);
-            if (Widgets.ButtonText(saveRect, "保存"))
+            if (Widgets.ButtonText(saveRect, "RimTalk_Save".Translate()))
             {
                 SaveAndClose();
             }
             
             rightX -= buttonWidth + spacing;
             Rect cancelRect = new Rect(rightX, buttonY, buttonWidth, 35f);
-            if (Widgets.ButtonText(cancelRect, "取消"))
+            if (Widgets.ButtonText(cancelRect, "RimTalk_Cancel".Translate()))
             {
                 Close();
             }
@@ -127,12 +127,12 @@ namespace RimTalk.Memory.UI
             // 每日总结提示词
             Text.Font = GameFont.Small;
             GUI.color = new Color(0.8f, 0.9f, 1f);
-            listing.Label("每日总结提示词");
+            listing.Label("RimTalk_PromptEditor_DailySummary".Translate());
             GUI.color = Color.white;
             
             GUI.color = Color.gray;
-            listing.Label("用于 SCM → ELS 的每日总结（处理约20条记忆）");
-            listing.Label("占位符: {0}=殖民者名字, {1}=记忆列表");
+            listing.Label("RimTalk_PromptEditor_DailySummaryDesc".Translate());
+            listing.Label("RimTalk_PromptEditor_Placeholders".Translate());
             GUI.color = Color.white;
             listing.Gap(4f);
             
@@ -145,12 +145,12 @@ namespace RimTalk.Memory.UI
             
             // 深度归档提示词
             GUI.color = new Color(0.8f, 0.9f, 1f);
-            listing.Label("深度归档提示词");
+            listing.Label("RimTalk_PromptEditor_DeepArchive".Translate());
             GUI.color = Color.white;
             
             GUI.color = Color.gray;
-            listing.Label("用于 ELS → CLPA 的深度归档（处理约15条记忆）");
-            listing.Label("占位符: {0}=殖民者名字, {1}=记忆列表");
+            listing.Label("RimTalk_PromptEditor_DeepArchiveDesc".Translate());
+            listing.Label("RimTalk_PromptEditor_Placeholders".Translate());
             GUI.color = Color.white;
             listing.Gap(4f);
             
@@ -163,25 +163,25 @@ namespace RimTalk.Memory.UI
             
             // Max Tokens 滑块
             GUI.color = new Color(0.8f, 0.9f, 1f);
-            listing.Label("最大输出 Tokens");
+            listing.Label("RimTalk_PromptEditor_MaxTokens".Translate());
             GUI.color = Color.white;
             
             GUI.color = Color.gray;
-            listing.Label("控制 AI 生成总结的最大长度");
+            listing.Label("RimTalk_PromptEditor_MaxTokensDesc".Translate());
             GUI.color = Color.white;
             listing.Gap(4f);
             
-            listing.Label($"Max Tokens: {editMaxTokens}");
+            listing.Label("RimTalk_PromptEditor_MaxTokensLabel".Translate(editMaxTokens));
             editMaxTokens = (int)listing.Slider(editMaxTokens, 100, 8000);
             
             // 提示信息
             listing.Gap(10f);
             GUI.color = new Color(1f, 0.9f, 0.6f);
-            listing.Label("💡 提示:");
+            listing.Label("RimTalk_PromptEditor_Tips".Translate());
             GUI.color = Color.gray;
-            listing.Label("• 较小的值（100-500）适合简短总结");
-            listing.Label("• 较大的值（1000-4000）适合详细总结");
-            listing.Label("• 过大的值会增加 API 费用");
+            listing.Label("RimTalk_PromptEditor_Tip1".Translate());
+            listing.Label("RimTalk_PromptEditor_Tip2".Translate());
+            listing.Label("RimTalk_PromptEditor_Tip3".Translate());
             GUI.color = Color.white;
             
             listing.End();
@@ -205,7 +205,7 @@ namespace RimTalk.Memory.UI
             // 保存设置
             settings.Write();
             
-            Messages.Message("总结提示词配置已保存", MessageTypeDefOf.PositiveEvent, false);
+            Messages.Message("RimTalk_PromptEditor_Saved".Translate(), MessageTypeDefOf.PositiveEvent, false);
             
             Close();
         }
