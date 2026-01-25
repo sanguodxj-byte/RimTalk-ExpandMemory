@@ -57,27 +57,46 @@ namespace RimTalk.Memory.API
         }
         
         /// <summary>
-        /// 获取四层记忆系统的记忆
+        /// ⭐ v4.0: 获取四层记忆系统的记忆
+        /// 结构：ABM（最近记忆）+ ELS/CLPA（总结后的记忆）
+        /// 格式统一：序号. [类型] 内容 (时间)
         /// </summary>
         private static string GetFourLayerMemories(Pawn pawn, FourLayerMemoryComp comp, RimTalkMemoryPatchSettings settings)
         {
-            // 获取对话上下文（用于关键词匹配）
-            string dialogueContext = GetCurrentDialogueContext();
+            var sb = new StringBuilder();
             
-            // 使用 DynamicMemoryInjection 获取相关记忆
-            string memories = DynamicMemoryInjection.InjectMemories(
+            // ⭐ v4.0: 第一部分 - ABM（最近记忆，支持跨 Pawn 去重）
+            string abmContent = DynamicMemoryInjection.InjectABM(pawn, settings.maxABMInjectionRounds);
+            if (!string.IsNullOrEmpty(abmContent))
+            {
+                sb.AppendLine(abmContent);
+            }
+            
+            // ⭐ v4.0: 第二部分 - ELS/CLPA（总结后的记忆，通过关键词匹配）
+            string dialogueContext = GetCurrentDialogueContext();
+            string elsMemories = DynamicMemoryInjection.InjectMemories(
                 pawn,
                 dialogueContext,
                 settings.maxInjectedMemories
             );
             
-            if (string.IsNullOrEmpty(memories))
+            if (!string.IsNullOrEmpty(elsMemories))
             {
-                // 如果没有匹配的记忆，尝试获取最近的记忆
+                // 如果 ABM 有内容，加空行分隔
+                if (sb.Length > 0)
+                {
+                    sb.AppendLine();
+                }
+                sb.AppendLine(elsMemories);
+            }
+            
+            // 如果都为空，返回最近记忆
+            if (sb.Length == 0)
+            {
                 return GetRecentMemories(comp, settings.maxInjectedMemories);
             }
             
-            return memories;
+            return sb.ToString().TrimEnd();
         }
         
         /// <summary>

@@ -9,10 +9,14 @@ using RimWorld;
 namespace RimTalk.MemoryPatch.Patches
 {
     /// <summary>
-    /// Patch RimTalk's PlayLogEntry_RimTalkInteraction to capture conversations
+    /// ⚠️ v4.0: 此 Patch 已弃用
+    /// 旧的逐条对话捕获逻辑已被 Patch_AddResponsesToHistory 替代
+    /// 新方案：在对话完成时一次性捕获完整对话，为所有参与者添加记忆
+    ///
+    /// 保留此文件仅用于参考，Patch 功能已禁用
     /// </summary>
-    [HarmonyPatch]
-    public static class RimTalkConversationCapturePatch
+    // [HarmonyPatch] // ⭐ v4.0: 禁用此 Patch
+    public static class RimTalkConversationCapturePatch_DEPRECATED
     {
         // 缓存已处理的对话，避免重复记录
         private static HashSet<string> processedConversations = new HashSet<string>();
