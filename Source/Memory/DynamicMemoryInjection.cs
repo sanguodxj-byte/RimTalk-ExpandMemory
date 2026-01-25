@@ -28,11 +28,106 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
+        /// ⭐ v4.0: 跨 Pawn 去重用的 conversationId 集合
+        /// 在模板循环 {{ for p in pawns }} 中，用于避免同一轮对话被重复注入
+        /// </summary>
+        [ThreadStatic]
+        private static HashSet<string> _displayedConversationIds;
+        
+        /// <summary>
+        /// ⭐ v4.0: 开始新的对话上下文（在模板循环开始前调用）
+        /// </summary>
+        public static void BeginConversationContext()
+        {
+            _displayedConversationIds = new HashSet<string>();
+        }
+        
+        /// <summary>
+        /// ⭐ v4.0: 结束对话上下文（在模板循环结束后调用）
+        /// </summary>
+        public static void EndConversationContext()
+        {
+            _displayedConversationIds?.Clear();
+            _displayedConversationIds = null;
+        }
+
+        /// <summary>
         /// 动态注入记忆到对话提示词
         /// </summary>
         public static string InjectMemories(Pawn pawn, string context, int maxMemories = 10)
         {
             return InjectMemoriesWithDetails(pawn.TryGetComp<FourLayerMemoryComp>(), context, maxMemories, out _);
+        }
+        
+        /// <summary>
+        /// ⭐ v4.0: 注入 ABM（最近N轮记忆），支持跨 Pawn 去重
+        /// 格式: "1. [Type] Content (TimeAgo)"
+        /// </summary>
+        /// <param name="pawn">目标 Pawn</param>
+        /// <param name="maxRounds">最大注入条数（从设置读取）</param>
+        /// <returns>格式化的记忆文本</returns>
+        public static string InjectABM(Pawn pawn, int maxRounds = -1)
+        {
+            if (pawn == null) return string.Empty;
+            
+            var memoryComp = pawn.TryGetComp<FourLayerMemoryComp>();
+            if (memoryComp == null) return string.Empty;
+            
+            // 使用设置中的默认值
+            if (maxRounds < 0)
+            {
+                maxRounds = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 3;
+            }
+            
+            var abmList = memoryComp.ActiveMemories;
+            if (abmList == null || abmList.Count == 0) return string.Empty;
+            
+            // 初始化去重集合（如果还没有）
+            if (_displayedConversationIds == null)
+            {
+                _displayedConversationIds = new HashSet<string>();
+            }
+            
+            var sb = new StringBuilder();
+            int index = 1;
+            int roundsAdded = 0;
+            
+            // 按时间降序遍历 ABM
+            foreach (var memory in abmList.OrderByDescending(m => m.timestamp))
+            {
+                if (roundsAdded >= maxRounds) break;
+                
+                // ⭐ 跨 Pawn 去重：如果这个 conversationId 已经显示过，跳过
+                if (!string.IsNullOrEmpty(memory.conversationId))
+                {
+                    if (_displayedConversationIds.Contains(memory.conversationId))
+                    {
+                        if (Prefs.DevMode)
+                        {
+                            Log.Message($"[ABM Inject] Skipped duplicate conversation {memory.conversationId} for {pawn.LabelShort}");
+                        }
+                        continue;
+                    }
+                    
+                    // 标记为已显示
+                    _displayedConversationIds.Add(memory.conversationId);
+                }
+                
+                // ⭐ 使用统一格式：序号. [类型] 内容 (时间)
+                string typeTag = GetMemoryTypeTag(memory.type);
+                string timeStr = memory.TimeAgoString;
+                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
+                
+                index++;
+                roundsAdded++;
+            }
+            
+            if (Prefs.DevMode && roundsAdded > 0)
+            {
+                Log.Message($"[ABM Inject] Added {roundsAdded} ABM entries for {pawn.LabelShort}");
+            }
+            
+            return sb.ToString().TrimEnd();
         }
 
         /// <summary>

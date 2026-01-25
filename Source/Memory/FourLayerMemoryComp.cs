@@ -14,14 +14,19 @@ namespace RimTalk.Memory
     /// </summary>
     public class FourLayerMemoryComp : ThingComp
     {
-        // 四层记忆存储
-        private List<MemoryEntry> activeMemories = new List<MemoryEntry>();      // ABM: 2-3条
-        private List<MemoryEntry> situationalMemories = new List<MemoryEntry>(); // SCM: ~20条
+        // ⭐ v4.0: 三层记忆存储（移除 SCM）
+        // ABM: 完整对话记录，无容量限制，总结后转 ELS
+        // SCM: 已废弃，保留列表仅为兼容旧存档
+        // ELS: 总结后的记忆
+        // CLPA: 归档
+        private List<MemoryEntry> activeMemories = new List<MemoryEntry>();      // ABM: 无限制
+        private List<MemoryEntry> situationalMemories = new List<MemoryEntry>(); // SCM: ⭐ 已废弃，仅兼容旧存档
         private List<MemoryEntry> eventLogMemories = new List<MemoryEntry>();    // ELS: ~50条
         private List<MemoryEntry> archiveMemories = new List<MemoryEntry>();     // CLPA: 无限制
 
         // 容量限制（从设置中读取）
-        private int MAX_ACTIVE => RimTalkMemoryPatchMod.Settings.maxActiveMemories;
+        // ⭐ v4.0: 移除 MAX_ACTIVE（ABM 无限制）
+        // ⭐ v4.0: MAX_SITUATIONAL 仅用于兼容旧存档的显示
         private int MAX_SITUATIONAL => RimTalkMemoryPatchMod.Settings.maxSituationalMemories;
         private int MAX_EVENTLOG => RimTalkMemoryPatchMod.Settings.maxEventLogMemories;
         // CLPA 无限制
@@ -76,8 +81,39 @@ namespace RimTalk.Memory
         /// </summary>
         public void AddActiveMemory(string content, MemoryType type, float importance = 1f, string relatedPawn = null)
         {
-            // 去重检查
-            if (IsDuplicateMemory(content, relatedPawn, type))
+            AddActiveMemoryInternal(content, type, importance, relatedPawn, null);
+        }
+        
+        /// <summary>
+        /// ⭐ v4.0: 添加带有 conversationId 的记忆（用于跨Pawn去重）
+        /// </summary>
+        public void AddActiveMemoryWithConversationId(string content, MemoryType type, string conversationId, float importance = 1f, string relatedPawn = null)
+        {
+            AddActiveMemoryInternal(content, type, importance, relatedPawn, conversationId);
+        }
+        
+        /// <summary>
+        /// ⭐ v4.0: 内部方法，实际处理记忆添加
+        /// ⭐ v4.0: ABM 无容量限制，不再转移到 SCM
+        /// </summary>
+        private void AddActiveMemoryInternal(string content, MemoryType type, float importance, string relatedPawn, string conversationId)
+        {
+            // 去重检查（基于 conversationId 优先，否则用内容）
+            if (!string.IsNullOrEmpty(conversationId))
+            {
+                // ⭐ v4.0: 如果有 conversationId，用 conversationId 去重
+                if (activeMemories.Any(m => m.conversationId == conversationId))
+                {
+                    if (Prefs.DevMode)
+                    {
+                        var pawn = parent as Pawn;
+                        string pawnLabel = pawn?.LabelShort ?? "Unknown";
+                        Log.Message($"[Memory] Skipped duplicate conversation for {pawnLabel}: {conversationId}");
+                    }
+                    return;
+                }
+            }
+            else if (IsDuplicateMemory(content, relatedPawn, type))
             {
                 if (Prefs.DevMode)
                 {
@@ -90,28 +126,17 @@ namespace RimTalk.Memory
             
             var memory = new MemoryEntry(content, type, MemoryLayer.Active, importance, relatedPawn);
             
+            // ⭐ v4.0: 设置 conversationId（如果有）
+            if (!string.IsNullOrEmpty(conversationId))
+            {
+                memory.conversationId = conversationId;
+            }
+            
             ExtractKeywords(memory);
             activeMemories.Insert(0, memory);
 
-            // ⭐ v3.3.2.25: VectorDB已移除，不再需要异步同步
-            // 记忆现在完全通过关键词检索，无需向量化
-
-            // ⭐ 修复：超短期记忆满了，转移到短期（只排除固定的）
-            int nonPinnedCount = activeMemories.Count(m => !m.isPinned);
-            if (nonPinnedCount > MAX_ACTIVE)
-            {
-                // 找到最旧的非固定记忆
-                var oldest = activeMemories
-                    .Where(m => !m.isPinned)
-                    .OrderBy(m => m.timestamp)
-                    .FirstOrDefault();
-                    
-                if (oldest != null)
-                {
-                    activeMemories.Remove(oldest);
-                    PromoteToSituational(oldest);
-                }
-            }
+            // ⭐ v4.0: ABM 无容量限制，不再转移到 SCM
+            // 总结时会统一处理 ABM，生成 ELS
         }
         
         private bool IsDuplicateMemory(string content, string relatedPawn, MemoryType type)
@@ -136,16 +161,8 @@ namespace RimTalk.Memory
             return false;
         }
 
-        private void PromoteToSituational(MemoryEntry memory)
-        {
-            memory.layer = MemoryLayer.Situational;
-            situationalMemories.Insert(0, memory);
-
-            if (situationalMemories.Count > MAX_SITUATIONAL * 1.5f)
-            {
-                Log.Warning($"[Memory] {parent.LabelShort} SCM overflow ({situationalMemories.Count}), needs summarization");
-            }
-        }
+        // ⭐ v4.0: 已删除 PromoteToSituational 方法
+        // SCM 层已废弃，ABM 总结后直接转 ELS
 
         public void DailySummarization()
         {
@@ -625,19 +642,32 @@ namespace RimTalk.Memory
             }
         }
         
+        /// <summary>
+        /// ⭐ v4.0: 更新检索逻辑
+        /// - ABM: 按 conversationId 去重后返回所有
+        /// - SCM: 仅兼容旧存档，返回已有的
+        /// - ELS/CLPA: 保持原有逻辑
+        /// </summary>
         public List<MemoryEntry> RetrieveMemories(MemoryQuery query)
         {
             var results = new List<MemoryEntry>();
             
-            results.AddRange(activeMemories.Take(MAX_ACTIVE));
-            
-            // ⭐ v3.3.2.29: SCM 候选 - 确定性排序（分数降序 + ID 升序）
-            var scmCandidates = situationalMemories
+            // ⭐ v4.0: ABM 无容量限制，返回所有匹配的
+            var abmCandidates = activeMemories
                 .Where(m => MatchesQuery(m, query))
-                .OrderByDescending(m => m.CalculateRetrievalScore(null, query.keywords))
-                .ThenBy(m => m.id, StringComparer.Ordinal) // ⭐ 确定性 tie-breaker
-                .Take(5);
-            results.AddRange(scmCandidates);
+                .OrderByDescending(m => m.timestamp);
+            results.AddRange(abmCandidates);
+            
+            // ⭐ v4.0: SCM 仅兼容旧存档（不再生成新的）
+            if (situationalMemories.Count > 0)
+            {
+                var scmCandidates = situationalMemories
+                    .Where(m => MatchesQuery(m, query))
+                    .OrderByDescending(m => m.CalculateRetrievalScore(null, query.keywords))
+                    .ThenBy(m => m.id, StringComparer.Ordinal)
+                    .Take(5);
+                results.AddRange(scmCandidates);
+            }
             
             if (query.includeContext && results.Count < query.maxCount)
             {
@@ -645,18 +675,18 @@ namespace RimTalk.Memory
                 var elsCandidates = eventLogMemories
                     .Where(m => MatchesQuery(m, query))
                     .OrderByDescending(m => m.CalculateRetrievalScore(null, query.keywords))
-                    .ThenBy(m => m.id, StringComparer.Ordinal) // ⭐ 确定性 tie-breaker
+                    .ThenBy(m => m.id, StringComparer.Ordinal)
                     .Take(query.maxCount - results.Count);
                 results.AddRange(elsCandidates);
             }
             
             if (query.layer == MemoryLayer.Archive)
             {
-                // ⭐ v3.3.2.29: CLPA 候选 - 确定性排序（重要性降序 + ID 升序）
+            // ⭐ v3.3.2.29: CLPA 候选 - 确定性排序（重要性降序 + ID 升序）
                 var clpaCandidates = archiveMemories
                     .Where(m => MatchesQuery(m, query))
                     .OrderByDescending(m => m.importance)
-                    .ThenBy(m => m.id, StringComparer.Ordinal) // ⭐ 确定性 tie-breaker
+                    .ThenBy(m => m.id, StringComparer.Ordinal)
                     .Take(3);
                 results.AddRange(clpaCandidates);
             }
