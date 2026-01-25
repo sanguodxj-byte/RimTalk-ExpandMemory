@@ -539,7 +539,8 @@ namespace RimTalk.Memory.Debug
                 x = rect.x + 5f;
                 GUI.color = new Color(0.8f, 0.8f, 1f);
                 string configText = "RimTalk_Preview_InjectionConfig".Translate(
-                    settings.maxInjectedMemories);
+                    settings.maxInjectedMemories, 
+                    settings.maxABMInjectionRounds);
                 Widgets.Label(new Rect(x, rect.y + 25f, rect.width - 10f, lineHeight), configText);
                 GUI.color = Color.white;
             }
@@ -787,7 +788,7 @@ namespace RimTalk.Memory.Debug
                     if (ctx == null)
                     {
                         // 没有上次对话的上下文，返回提示信息
-                        return "RimTalk_Preview_NoContext".Translate();
+                        return "[无上下文，请先触发一次对话]";
                     }
                     
                     // 设置 IsPreview = true
