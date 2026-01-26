@@ -535,6 +535,8 @@
     <RimTalk_Settings_DynamicInjectionSection>Dynamic Injection Settings</RimTalk_Settings_DynamicInjectionSection>
     <RimTalk_Settings_EnableDynamicInjection>Enable Dynamic Injection</RimTalk_Settings_EnableDynamicInjection>
     <RimTalk_Settings_DynamicInjectionDesc>Intelligently select most relevant memories and knowledge for AI conversation</RimTalk_Settings_DynamicInjectionDesc>
+    <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM Injection Rounds: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
+    <RimTalk_Settings_MaxABMInjectionRoundsDesc>Control how many recent conversation rounds to inject into AI context</RimTalk_Settings_MaxABMInjectionRoundsDesc>
     <RimTalk_Settings_MaxInjectedMemoriesLabel>Max Injected Memories: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
     <RimTalk_Settings_MaxInjectedKnowledgeLabel>Max Injected Knowledge: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
     <RimTalk_Settings_MemoryScoreThresholdLabel>Memory Score Threshold: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>

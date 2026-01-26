@@ -265,6 +265,8 @@
   <RimTalk_Settings_DynamicInjectionSection>动态注入设置</RimTalk_Settings_DynamicInjectionSection>
   <RimTalk_Settings_EnableDynamicInjection>启用动态注入</RimTalk_Settings_EnableDynamicInjection>
   <RimTalk_Settings_DynamicInjectionDesc>智能选择最相关的记忆和常识注入到AI对话中</RimTalk_Settings_DynamicInjectionDesc>
+  <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM 注入轮数: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
+  <RimTalk_Settings_MaxABMInjectionRoundsDesc>控制注入多少轮最近的对话到 AI 上下文中</RimTalk_Settings_MaxABMInjectionRoundsDesc>
   <RimTalk_Settings_MaxInjectedMemoriesLabel>最大注入记忆数: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
   <RimTalk_Settings_MaxInjectedKnowledgeLabel>最大注入常识数: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
   <RimTalk_Settings_MemoryScoreThresholdLabel>记忆评分阈值: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
