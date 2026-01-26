@@ -402,6 +402,15 @@ namespace RimTalk.MemoryPatch
                 
                 listing.Gap();
                 
+                // ⭐ v4.0: ABM 注入轮数设置
+                listing.Label("RimTalk_Settings_MaxABMInjectionRoundsLabel".Translate(maxABMInjectionRounds));
+                maxABMInjectionRounds = (int)listing.Slider(maxABMInjectionRounds, 1, 10);
+                GUI.color = Color.gray;
+                listing.Label("  " + "RimTalk_Settings_MaxABMInjectionRoundsDesc".Translate());
+                GUI.color = Color.white;
+                
+                listing.Gap();
+                
                 listing.Label("RimTalk_Settings_MaxInjectedMemoriesLabel".Translate(maxInjectedMemories));
                 maxInjectedMemories = (int)listing.Slider(maxInjectedMemories, 1, 20);
                 
