@@ -47,14 +47,10 @@ namespace RimTalk.MemoryPatch
         // maxSituationalMemories 仅用于兼容旧存档显示
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
-<<<<<<< HEAD
-
-=======
         
         // ⭐ v4.0: ABM 注入轮数配置
         public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话
         
->>>>>>> 233f1db (改用轮次记忆)
         // 衰减速率设置
         public float scmDecayRate = 0.01f;
         public float elsDecayRate = 0.005f;
@@ -178,14 +174,10 @@ namespace RimTalk.MemoryPatch
             
             Scribe_Values.Look(ref maxSituationalMemories, "fourLayer_maxSituationalMemories", 20);
             Scribe_Values.Look(ref maxEventLogMemories, "fourLayer_maxEventLogMemories", 50);
-<<<<<<< HEAD
-                        
-=======
             
             // ⭐ v4.0: ABM 注入轮数
             Scribe_Values.Look(ref maxABMInjectionRounds, "fourLayer_maxABMInjectionRounds", 3);
             
->>>>>>> 233f1db (改用轮次记忆)
             Scribe_Values.Look(ref scmDecayRate, "fourLayer_scmDecayRate", 0.01f);
             Scribe_Values.Look(ref elsDecayRate, "fourLayer_elsDecayRate", 0.005f);
             Scribe_Values.Look(ref clpaDecayRate, "fourLayer_clpaDecayRate", 0.001f);
@@ -257,17 +249,6 @@ namespace RimTalk.MemoryPatch
             if (Scribe.mode == LoadSaveMode.PostLoadInit && (knowledgeMatchingSources == null || knowledgeMatchingSources.Count == 0))
             {
                 knowledgeMatchingSources = new List<string> { "prompt", "fullname", "role", "age", "gender", "backstory", "traits", "skills", "relations" };
-            }
-
-                        // ⭐ v5.1: 清除 knowledge 变量，防止自己匹配自己导致无限递归
-            if (Scribe.mode == LoadSaveMode.PostLoadInit && knowledgeMatchingSources != null)
-            {
-                int removedCount = knowledgeMatchingSources.RemoveAll(s =>
-                    s == "knowledge" || s.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase));
-                if (removedCount > 0)
-                {
-                    Log.Message($"[MemoryPatch] Removed {removedCount} 'knowledge' entries from matching sources to prevent self-referencing.");
-                }
             }
         }
 

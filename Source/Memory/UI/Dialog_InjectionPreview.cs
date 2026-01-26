@@ -788,7 +788,7 @@ namespace RimTalk.Memory.Debug
                     if (ctx == null)
                     {
                         // 没有上次对话的上下文，返回提示信息
-                        return "[无上下文，请先触发一次对话]";
+                        return "RimTalk_Preview_NoContext".Translate();
                     }
                     
                     // 设置 IsPreview = true
