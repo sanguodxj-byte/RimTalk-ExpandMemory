@@ -128,7 +128,7 @@ namespace RimTalk.Memory.UI
             // ? 添加工具提示提示用户可以右键
             if (rightClickLayer.HasValue && Mouse.IsOver(rect))
             {
-                TooltipHandler.TipRegion(rect, $"右键点击新建{GetLayerLabel(rightClickLayer.Value)}记忆");
+                TooltipHandler.TipRegion(rect, "RimTalk_MindStream_RightClickToCreate".Translate(GetLayerLabel(rightClickLayer.Value)));
             }
         }
         
@@ -228,30 +228,30 @@ namespace RimTalk.Memory.UI
             {
                 if (abmCount > 0 && scmCount > 0)
                 {
-                    summarizeLabel = $"总结选中 (ABM:{abmCount} + SCM:{scmCount})";
+                    summarizeLabel = "RimTalk_MindStream_SummarizeSelectedBoth".Translate(abmCount, scmCount);
                 }
                 else if (abmCount > 0)
                 {
-                    summarizeLabel = $"总结选中 (ABM:{abmCount})";
+                    summarizeLabel = "RimTalk_MindStream_SummarizeSelectedABM".Translate(abmCount);
                 }
                 else
                 {
-                    summarizeLabel = $"总结选中 (SCM:{scmCount})";
+                    summarizeLabel = "RimTalk_MindStream_SummarizeSelectedSCM".Translate(scmCount);
                 }
             }
             else
             {
                 if (abmCount > 0 && scmCount > 0)
                 {
-                    summarizeLabel = $"总结全部 (ABM:{abmCount} + SCM:{scmCount})";
+                    summarizeLabel = "RimTalk_MindStream_SummarizeAllBoth".Translate(abmCount, scmCount);
                 }
                 else if (abmCount > 0)
                 {
-                    summarizeLabel = $"总结全部 (ABM:{abmCount})";
+                    summarizeLabel = "RimTalk_MindStream_SummarizeAllABM".Translate(abmCount);
                 }
                 else
                 {
-                    summarizeLabel = $"总结全部 (SCM:{scmCount})";
+                    summarizeLabel = "RimTalk_MindStream_SummarizeAllSCM".Translate(scmCount);
                 }
             }
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), summarizeLabel))
@@ -271,7 +271,7 @@ namespace RimTalk.Memory.UI
             }
             else
             {
-                archiveLabel = $"归档全部 ({elsCount})";
+                archiveLabel = "RimTalk_MindStream_ArchiveAllCount".Translate(elsCount);
             }
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), archiveLabel))
             {
@@ -290,7 +290,7 @@ namespace RimTalk.Memory.UI
             }
             else
             {
-                deleteLabel = $"删除全部 ({targetCount})";
+                deleteLabel = "RimTalk_MindStream_DeleteAllCount".Translate(targetCount);
             }
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), deleteLabel))
             {
@@ -354,7 +354,7 @@ namespace RimTalk.Memory.UI
         {
             if (selectedPawn == null || currentMemoryComp == null)
             {
-                Messages.Message("请先选择一个殖民者", MessageTypeDefOf.RejectInput, false);
+                Messages.Message("RimTalk_MindStream_PleaseSelectColonist".Translate(), MessageTypeDefOf.RejectInput, false);
                 return;
             }
 
@@ -362,12 +362,12 @@ namespace RimTalk.Memory.UI
             
             string layerName = GetLayerLabel(layer);
             
-            options.Add(new FloatMenuOption($"添加对话记忆到 {layerName}", delegate
+            options.Add(new FloatMenuOption("RimTalk_MindStream_AddConversationTo".Translate(layerName), delegate
             {
                 Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp, layer, MemoryType.Conversation));
             }));
             
-            options.Add(new FloatMenuOption($"添加行动记忆到 {layerName}", delegate
+            options.Add(new FloatMenuOption("RimTalk_MindStream_AddActionTo".Translate(layerName), delegate
             {
                 Find.WindowStack.Add(new Dialog_CreateMemory(selectedPawn, currentMemoryComp, layer, MemoryType.Action));
             }));

@@ -6,27 +6,27 @@ using Verse;
 namespace RimTalk.Memory
 {
     /// <summary>
-    /// ³£Ê¶¿â¹«¹² API - ¹©ÆäËû Mod Ê¹ÓÃ
+    /// å¸¸è¯†åº“å…¬å…± API - ä¾›å…¶ä»– Mod ä½¿ç”¨
     /// 
-    /// Ê¹ÓÃ·½·¨£º
-    /// 1. Ìí¼Ó³£Ê¶£ºCommonKnowledgeAPI.AddKnowledge("±êÇ©", "ÄÚÈİ", 0.5f)
-    /// 2. ¸üĞÂ³£Ê¶£ºCommonKnowledgeAPI.UpdateKnowledge("id", "ĞÂÄÚÈİ")
-    /// 3. ²éÑ¯³£Ê¶£ºCommonKnowledgeAPI.FindKnowledge("±êÇ©")
-    /// 4. É¾³ı³£Ê¶£ºCommonKnowledgeAPI.RemoveKnowledge("id")
+    /// ä½¿ç”¨æ–¹æ³•ï¼š
+    /// 1. æ·»åŠ å¸¸è¯†ï¼šCommonKnowledgeAPI.AddKnowledge("æ ‡ç­¾", "å†…å®¹", 0.5f)
+    /// 2. æ›´æ–°å¸¸è¯†ï¼šCommonKnowledgeAPI.UpdateKnowledge("id", "æ–°å†…å®¹")
+    /// 3. æŸ¥è¯¢å¸¸è¯†ï¼šCommonKnowledgeAPI.FindKnowledge("æ ‡ç­¾")
+    /// 4. åˆ é™¤å¸¸è¯†ï¼šCommonKnowledgeAPI.RemoveKnowledge("id")
     /// 
-    /// °æ±¾£ºv3.3.x
+    /// ç‰ˆæœ¬ï¼šv3.3.x
     /// </summary>
     public static class CommonKnowledgeAPI
     {
-        #region Ìí¼Ó³£Ê¶
+        #region æ·»åŠ å¸¸è¯†
 
         /// <summary>
-        /// Ìí¼ÓÒ»Ìõ³£Ê¶£¨¼ò»¯°æ£©
+        /// æ·»åŠ ä¸€æ¡å¸¸è¯†ï¼ˆç®€åŒ–ç‰ˆï¼‰
         /// </summary>
-        /// <param name="tag">±êÇ©£¬Ö§³Ö¶à¸ö£¨ÓÃ¶ººÅ·Ö¸ô£©</param>
-        /// <param name="content">ÄÚÈİ</param>
-        /// <param name="importance">ÖØÒªĞÔ£¨0-1£©£¬Ä¬ÈÏ0.5</param>
-        /// <returns>ĞÂ³£Ê¶µÄID</returns>
+        /// <param name="tag">æ ‡ç­¾ï¼Œæ”¯æŒå¤šä¸ªï¼ˆç”¨é€—å·åˆ†éš”ï¼‰</param>
+        /// <param name="content">å†…å®¹</param>
+        /// <param name="importance">é‡è¦æ€§ï¼ˆ0-1ï¼‰ï¼Œé»˜è®¤0.5</param>
+        /// <returns>æ–°å¸¸è¯†çš„ID</returns>
         public static string AddKnowledge(string tag, string content, float importance = 0.5f)
         {
             try
@@ -42,7 +42,7 @@ namespace RimTalk.Memory
                 {
                     importance = UnityEngine.Mathf.Clamp01(importance),
                     isEnabled = true,
-                    isUserEdited = false // ±ê¼ÇÎª·ÇÓÃ»§±à¼­£¬¿ÉÒÔ±»×Ô¶¯´¦Àí
+                    isUserEdited = false // æ ‡è®°ä¸ºéç”¨æˆ·ç¼–è¾‘ï¼Œå¯ä»¥è¢«è‡ªåŠ¨å¤„ç†
                 };
 
                 library.AddEntry(entry);
@@ -57,16 +57,16 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// Ìí¼ÓÒ»Ìõ³£Ê¶£¨ÍêÕû°æ£©
+        /// æ·»åŠ ä¸€æ¡å¸¸è¯†ï¼ˆå®Œæ•´ç‰ˆï¼‰
         /// </summary>
-        /// <param name="tag">±êÇ©£¬Ö§³Ö¶à¸ö£¨ÓÃ¶ººÅ·Ö¸ô£©</param>
-        /// <param name="content">ÄÚÈİ</param>
-        /// <param name="importance">ÖØÒªĞÔ£¨0-1£©</param>
-        /// <param name="matchMode">Æ¥ÅäÄ£Ê½£¨Any=ÈÎÒâÒ»¸ö±êÇ©Æ¥Åä¼´¿É£¬All=ËùÓĞ±êÇ©±ØĞëÆ¥Åä£©</param>
-        /// <param name="targetPawnId">Ä¿±êPawn ID£¨-1=È«¾Ö£¬ÆäËû=½ö¶Ô¸ÃPawnÓĞĞ§£©</param>
-        /// <param name="canBeExtracted">ÊÇ·ñ¿ÉÒÔ±»ÌáÈ¡£¨ÓÃÓÚ³£Ê¶Á´£©</param>
-        /// <param name="canBeMatched">ÊÇ·ñ¿ÉÒÔ±»Æ¥Åä£¨ÓÃÓÚ³£Ê¶Á´£©</param>
-        /// <returns>ĞÂ³£Ê¶µÄID</returns>
+        /// <param name="tag">æ ‡ç­¾ï¼Œæ”¯æŒå¤šä¸ªï¼ˆç”¨é€—å·åˆ†éš”ï¼‰</param>
+        /// <param name="content">å†…å®¹</param>
+        /// <param name="importance">é‡è¦æ€§ï¼ˆ0-1ï¼‰</param>
+        /// <param name="matchMode">åŒ¹é…æ¨¡å¼ï¼ˆAny=ä»»æ„ä¸€ä¸ªæ ‡ç­¾åŒ¹é…å³å¯ï¼ŒAll=æ‰€æœ‰æ ‡ç­¾å¿…é¡»åŒ¹é…ï¼‰</param>
+        /// <param name="targetPawnId">ç›®æ ‡Pawn IDï¼ˆ-1=å…¨å±€ï¼Œå…¶ä»–=ä»…å¯¹è¯¥Pawnæœ‰æ•ˆï¼‰</param>
+        /// <param name="canBeExtracted">æ˜¯å¦å¯ä»¥è¢«æå–ï¼ˆç”¨äºå¸¸è¯†é“¾ï¼‰</param>
+        /// <param name="canBeMatched">æ˜¯å¦å¯ä»¥è¢«åŒ¹é…ï¼ˆç”¨äºå¸¸è¯†é“¾ï¼‰</param>
+        /// <returns>æ–°å¸¸è¯†çš„ID</returns>
         public static string AddKnowledgeEx(
             string tag, 
             string content, 
@@ -94,7 +94,7 @@ namespace RimTalk.Memory
                     isUserEdited = false
                 };
 
-                // ÉèÖÃÀ©Õ¹ÊôĞÔ
+                // è®¾ç½®æ‰©å±•å±æ€§
                 ExtendedKnowledgeEntry.SetCanBeExtracted(entry, canBeExtracted);
                 ExtendedKnowledgeEntry.SetCanBeMatched(entry, canBeMatched);
 
@@ -110,11 +110,11 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ÅúÁ¿Ìí¼Ó³£Ê¶
+        /// æ‰¹é‡æ·»åŠ å¸¸è¯†
         /// </summary>
-        /// <param name="knowledgeList">³£Ê¶ÁĞ±í£¨±êÇ©-ÄÚÈİ¶Ô£©</param>
-        /// <param name="importance">Ä¬ÈÏÖØÒªĞÔ</param>
-        /// <returns>³É¹¦Ìí¼ÓµÄÊıÁ¿</returns>
+        /// <param name="knowledgeList">å¸¸è¯†åˆ—è¡¨ï¼ˆæ ‡ç­¾-å†…å®¹å¯¹ï¼‰</param>
+        /// <param name="importance">é»˜è®¤é‡è¦æ€§</param>
+        /// <returns>æˆåŠŸæ·»åŠ çš„æ•°é‡</returns>
         public static int AddKnowledgeBatch(List<(string tag, string content)> knowledgeList, float importance = 0.5f)
         {
             if (knowledgeList == null || knowledgeList.Count == 0)
@@ -132,14 +132,14 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region ¸üĞÂ³£Ê¶
+        #region æ›´æ–°å¸¸è¯†
 
         /// <summary>
-        /// ¸üĞÂ³£Ê¶ÄÚÈİ
+        /// æ›´æ–°å¸¸è¯†å†…å®¹
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <param name="newContent">ĞÂÄÚÈİ</param>
-        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <param name="newContent">æ–°å†…å®¹</param>
+        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
         public static bool UpdateKnowledge(string id, string newContent)
         {
             try
@@ -154,7 +154,7 @@ namespace RimTalk.Memory
                 entry.content = newContent;
                 entry.InvalidateCache();
                 
-                // ´¥·¢ÏòÁ¿¸üĞÂ£¨Èç¹ûÆôÓÃ£©
+                // è§¦å‘å‘é‡æ›´æ–°ï¼ˆå¦‚æœå¯ç”¨ï¼‰
                 try
                 {
                     if (MemoryPatch.RimTalkMemoryPatchMod.Settings.enableVectorEnhancement)
@@ -177,11 +177,11 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¸üĞÂ³£Ê¶±êÇ©
+        /// æ›´æ–°å¸¸è¯†æ ‡ç­¾
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <param name="newTag">ĞÂ±êÇ©</param>
-        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <param name="newTag">æ–°æ ‡ç­¾</param>
+        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
         public static bool UpdateKnowledgeTag(string id, string newTag)
         {
             try
@@ -202,11 +202,11 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¸üĞÂ³£Ê¶ÖØÒªĞÔ
+        /// æ›´æ–°å¸¸è¯†é‡è¦æ€§
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <param name="newImportance">ĞÂÖØÒªĞÔ£¨0-1£©</param>
-        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <param name="newImportance">æ–°é‡è¦æ€§ï¼ˆ0-1ï¼‰</param>
+        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
         public static bool UpdateKnowledgeImportance(string id, float newImportance)
         {
             try
@@ -226,11 +226,11 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ÆôÓÃ/½ûÓÃ³£Ê¶
+        /// å¯ç”¨/ç¦ç”¨å¸¸è¯†
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <param name="enabled">ÊÇ·ñÆôÓÃ</param>
-        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <param name="enabled">æ˜¯å¦å¯ç”¨</param>
+        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
         public static bool SetKnowledgeEnabled(string id, bool enabled)
         {
             try
@@ -251,13 +251,13 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region ²éÑ¯³£Ê¶
+        #region æŸ¥è¯¢å¸¸è¯†
 
         /// <summary>
-        /// ¸ù¾İID²éÕÒ³£Ê¶
+        /// æ ¹æ®IDæŸ¥æ‰¾å¸¸è¯†
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <returns>³£Ê¶ÌõÄ¿£¬Î´ÕÒµ½·µ»Ønull</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <returns>å¸¸è¯†æ¡ç›®ï¼Œæœªæ‰¾åˆ°è¿”å›null</returns>
         public static CommonKnowledgeEntry FindKnowledgeById(string id)
         {
             try
@@ -276,10 +276,10 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¸ù¾İ±êÇ©²éÕÒ³£Ê¶£¨Ö§³Ö²¿·ÖÆ¥Åä£©
+        /// æ ¹æ®æ ‡ç­¾æŸ¥æ‰¾å¸¸è¯†ï¼ˆæ”¯æŒéƒ¨åˆ†åŒ¹é…ï¼‰
         /// </summary>
-        /// <param name="tag">±êÇ©£¨Ö§³Ö²¿·ÖÆ¥Åä£©</param>
-        /// <returns>Æ¥ÅäµÄ³£Ê¶ÁĞ±í</returns>
+        /// <param name="tag">æ ‡ç­¾ï¼ˆæ”¯æŒéƒ¨åˆ†åŒ¹é…ï¼‰</param>
+        /// <returns>åŒ¹é…çš„å¸¸è¯†åˆ—è¡¨</returns>
         public static List<CommonKnowledgeEntry> FindKnowledge(string tag)
         {
             try
@@ -300,10 +300,10 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¸ù¾İÄÚÈİ²éÕÒ³£Ê¶£¨Ö§³Ö²¿·ÖÆ¥Åä£©
+        /// æ ¹æ®å†…å®¹æŸ¥æ‰¾å¸¸è¯†ï¼ˆæ”¯æŒéƒ¨åˆ†åŒ¹é…ï¼‰
         /// </summary>
-        /// <param name="content">ÄÚÈİ¹Ø¼ü´Ê</param>
-        /// <returns>Æ¥ÅäµÄ³£Ê¶ÁĞ±í</returns>
+        /// <param name="content">å†…å®¹å…³é”®è¯</param>
+        /// <returns>åŒ¹é…çš„å¸¸è¯†åˆ—è¡¨</returns>
         public static List<CommonKnowledgeEntry> FindKnowledgeByContent(string content)
         {
             try
@@ -324,9 +324,9 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// »ñÈ¡ËùÓĞ³£Ê¶
+        /// è·å–æ‰€æœ‰å¸¸è¯†
         /// </summary>
-        /// <returns>ËùÓĞ³£Ê¶ÁĞ±í</returns>
+        /// <returns>æ‰€æœ‰å¸¸è¯†åˆ—è¡¨</returns>
         public static List<CommonKnowledgeEntry> GetAllKnowledge()
         {
             try
@@ -345,9 +345,9 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// »ñÈ¡³£Ê¶ÊıÁ¿
+        /// è·å–å¸¸è¯†æ•°é‡
         /// </summary>
-        /// <returns>³£Ê¶×ÜÊı</returns>
+        /// <returns>å¸¸è¯†æ€»æ•°</returns>
         public static int GetKnowledgeCount()
         {
             try
@@ -367,13 +367,13 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region É¾³ı³£Ê¶
+        #region åˆ é™¤å¸¸è¯†
 
         /// <summary>
-        /// ¸ù¾İIDÉ¾³ı³£Ê¶
+        /// æ ¹æ®IDåˆ é™¤å¸¸è¯†
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
         public static bool RemoveKnowledge(string id)
         {
             try
@@ -397,10 +397,10 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ¸ù¾İ±êÇ©É¾³ıËùÓĞÆ¥ÅäµÄ³£Ê¶
+        /// æ ¹æ®æ ‡ç­¾åˆ é™¤æ‰€æœ‰åŒ¹é…çš„å¸¸è¯†
         /// </summary>
-        /// <param name="tag">±êÇ©</param>
-        /// <returns>É¾³ıµÄÊıÁ¿</returns>
+        /// <param name="tag">æ ‡ç­¾</param>
+        /// <returns>åˆ é™¤çš„æ•°é‡</returns>
         public static int RemoveKnowledgeByTag(string tag)
         {
             try
@@ -430,9 +430,9 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// Çå¿ÕËùÓĞ³£Ê¶£¨Î£ÏÕ²Ù×÷£©
+        /// æ¸…ç©ºæ‰€æœ‰å¸¸è¯†ï¼ˆå±é™©æ“ä½œï¼‰
         /// </summary>
-        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
         public static bool ClearAllKnowledge()
         {
             try
@@ -453,14 +453,14 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region µ¼Èë/µ¼³ö
+        #region å¯¼å…¥/å¯¼å‡º
 
         /// <summary>
-        /// ´ÓÎÄ±¾µ¼Èë³£Ê¶
+        /// ä»æ–‡æœ¬å¯¼å…¥å¸¸è¯†
         /// </summary>
-        /// <param name="text">¸ñÊ½»¯µÄ³£Ê¶ÎÄ±¾£¨Ã¿ĞĞÒ»Ìõ£©</param>
-        /// <param name="clearExisting">ÊÇ·ñÇå¿ÕÏÖÓĞ³£Ê¶</param>
-        /// <returns>µ¼ÈëµÄÊıÁ¿</returns>
+        /// <param name="text">æ ¼å¼åŒ–çš„å¸¸è¯†æ–‡æœ¬ï¼ˆæ¯è¡Œä¸€æ¡ï¼‰</param>
+        /// <param name="clearExisting">æ˜¯å¦æ¸…ç©ºç°æœ‰å¸¸è¯†</param>
+        /// <returns>å¯¼å…¥çš„æ•°é‡</returns>
         public static int ImportFromText(string text, bool clearExisting = false)
         {
             try
@@ -479,9 +479,9 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// µ¼³öËùÓĞ³£Ê¶ÎªÎÄ±¾
+        /// å¯¼å‡ºæ‰€æœ‰å¸¸è¯†ä¸ºæ–‡æœ¬
         /// </summary>
-        /// <returns>¸ñÊ½»¯µÄ³£Ê¶ÎÄ±¾</returns>
+        /// <returns>æ ¼å¼åŒ–çš„å¸¸è¯†æ–‡æœ¬</returns>
         public static string ExportToText()
         {
             try
@@ -501,22 +501,22 @@ namespace RimTalk.Memory
 
         #endregion
 
-        #region ¸ß¼¶¹¦ÄÜ
+        #region é«˜çº§åŠŸèƒ½
 
         /// <summary>
-        /// ¼ì²é³£Ê¶ÊÇ·ñ´æÔÚ£¨¸ù¾İID£©
+        /// æ£€æŸ¥å¸¸è¯†æ˜¯å¦å­˜åœ¨ï¼ˆæ ¹æ®IDï¼‰
         /// </summary>
-        /// <param name="id">³£Ê¶ID</param>
-        /// <returns>ÊÇ·ñ´æÔÚ</returns>
+        /// <param name="id">å¸¸è¯†ID</param>
+        /// <returns>æ˜¯å¦å­˜åœ¨</returns>
         public static bool ExistsKnowledge(string id)
         {
             return FindKnowledgeById(id) != null;
         }
 
         /// <summary>
-        /// »ñÈ¡³£Ê¶¿âÍ³¼ÆĞÅÏ¢
+        /// è·å–å¸¸è¯†åº“ç»Ÿè®¡ä¿¡æ¯
         /// </summary>
-        /// <returns>Í³¼ÆĞÅÏ¢</returns>
+        /// <returns>ç»Ÿè®¡ä¿¡æ¯</returns>
         public static KnowledgeStats GetStats()
         {
             try
@@ -546,15 +546,15 @@ namespace RimTalk.Memory
     }
 
     /// <summary>
-    /// ³£Ê¶¿âÍ³¼ÆĞÅÏ¢
+    /// å¸¸è¯†åº“ç»Ÿè®¡ä¿¡æ¯
     /// </summary>
     public struct KnowledgeStats
     {
-        public int TotalCount;          // ×ÜÊı
-        public int EnabledCount;        // ÆôÓÃµÄÊıÁ¿
-        public int DisabledCount;       // ½ûÓÃµÄÊıÁ¿
-        public int UserEditedCount;     // ÓÃ»§±à¼­µÄÊıÁ¿
-        public int GlobalCount;         // È«¾Ö³£Ê¶ÊıÁ¿
-        public int PawnSpecificCount;   // Pawn×¨Êô³£Ê¶ÊıÁ¿
+        public int TotalCount;          // æ€»æ•°
+        public int EnabledCount;        // å¯ç”¨çš„æ•°é‡
+        public int DisabledCount;       // ç¦ç”¨çš„æ•°é‡
+        public int UserEditedCount;     // ç”¨æˆ·ç¼–è¾‘çš„æ•°é‡
+        public int GlobalCount;         // å…¨å±€å¸¸è¯†æ•°é‡
+        public int PawnSpecificCount;   // Pawnä¸“å±å¸¸è¯†æ•°é‡
     }
 }

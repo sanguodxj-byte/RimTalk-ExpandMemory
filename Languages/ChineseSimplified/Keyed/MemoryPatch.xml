@@ -236,4 +236,296 @@
   <RimTalk_MatchSource_CategoryColony>殖民地类</RimTalk_MatchSource_CategoryColony>
   <RimTalk_MatchSource_CategoryTime>时间类</RimTalk_MatchSource_CategoryTime>
   <RimTalk_MatchSource_CategoryExtension>扩展类</RimTalk_MatchSource_CategoryExtension>
+  
+  <!-- ==================== 设置界面 ==================== -->
+  <!-- 主界面 -->
+  <RimTalk_Settings_APIConfigTitle>API 配置</RimTalk_Settings_APIConfigTitle>
+  <RimTalk_Settings_AdvancedSettings>高级设置...</RimTalk_Settings_AdvancedSettings>
+  
+  <!-- 预设配置 -->
+  <RimTalk_Settings_PresetConfig>预设配置</RimTalk_Settings_PresetConfig>
+  <RimTalk_Settings_PresetConfigDesc>从记忆/常识注入数量少到多快速切换，并预估 token 消耗</RimTalk_Settings_PresetConfigDesc>
+  <RimTalk_Settings_PresetLight>轻量</RimTalk_Settings_PresetLight>
+  <RimTalk_Settings_PresetBalanced>平衡</RimTalk_Settings_PresetBalanced>
+  <RimTalk_Settings_PresetEnhanced>强化</RimTalk_Settings_PresetEnhanced>
+  <RimTalk_Settings_PresetCardContent>{0}\n记忆 {1} | 常识 {2}\n~{3} tokens</RimTalk_Settings_PresetCardContent>
+  <RimTalk_Settings_PresetCardTooltip>记忆 {0} 条 + 常识 {1} 条\n预计消耗 ~{2} tokens</RimTalk_Settings_PresetCardTooltip>
+  <RimTalk_Settings_PresetApplied>已应用预设: {0} (记忆 {1}, 常识 {2})</RimTalk_Settings_PresetApplied>
+  
+  <!-- 功能入口 -->
+  <RimTalk_Settings_FeatureEntries>功能入口</RimTalk_Settings_FeatureEntries>
+  <RimTalk_Settings_KnowledgeLibrary>常识库</RimTalk_Settings_KnowledgeLibrary>
+  <RimTalk_Settings_KnowledgeLibraryTip>打开并管理全局常识库</RimTalk_Settings_KnowledgeLibraryTip>
+  <RimTalk_Settings_PromptReplacement>提示词替换</RimTalk_Settings_PromptReplacement>
+  <RimTalk_Settings_PromptReplacementTip>编辑提示词替换/规范化规则</RimTalk_Settings_PromptReplacementTip>
+  <RimTalk_Settings_InjectionPreviewer>注入预览器</RimTalk_Settings_InjectionPreviewer>
+  <RimTalk_Settings_InjectionPreviewerTip>实时查看记忆/常识注入效果</RimTalk_Settings_InjectionPreviewerTip>
+  
+  <!-- 动态注入设置 -->
+  <RimTalk_Settings_DynamicInjectionSection>动态注入设置</RimTalk_Settings_DynamicInjectionSection>
+  <RimTalk_Settings_EnableDynamicInjection>启用动态注入</RimTalk_Settings_EnableDynamicInjection>
+  <RimTalk_Settings_DynamicInjectionDesc>智能选择最相关的记忆和常识注入到AI对话中</RimTalk_Settings_DynamicInjectionDesc>
+  <RimTalk_Settings_MaxInjectedMemoriesLabel>最大注入记忆数: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
+  <RimTalk_Settings_MaxInjectedKnowledgeLabel>最大注入常识数: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
+  <RimTalk_Settings_MemoryScoreThresholdLabel>记忆评分阈值: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
+  <RimTalk_Settings_KnowledgeScoreThresholdLabel>常识评分阈值: {0}</RimTalk_Settings_KnowledgeScoreThresholdLabel>
+  
+  <!-- 记忆容量设置 -->
+  <RimTalk_Settings_MemoryCapacitySection>记忆容量配置</RimTalk_Settings_MemoryCapacitySection>
+  <RimTalk_Settings_SCMCapacityLabel>SCM (短期记忆): {0} 条</RimTalk_Settings_SCMCapacityLabel>
+  <RimTalk_Settings_ELSCapacityLabel>ELS (中期记忆): {0} 条</RimTalk_Settings_ELSCapacityLabel>
+  
+  <!-- 衰减设置 -->
+  <RimTalk_Settings_MemoryDecaySection>记忆衰减配置</RimTalk_Settings_MemoryDecaySection>
+  <RimTalk_Settings_SCMDecayLabel>SCM 衰减率: {0}</RimTalk_Settings_SCMDecayLabel>
+  <RimTalk_Settings_ELSDecayLabel>ELS 衰减率: {0}</RimTalk_Settings_ELSDecayLabel>
+  <RimTalk_Settings_CLPADecayLabel>CLPA 衰减率: {0}</RimTalk_Settings_CLPADecayLabel>
+  
+  <!-- 总结设置 -->
+  <RimTalk_Settings_SummarizationSection>记忆总结设置</RimTalk_Settings_SummarizationSection>
+  <RimTalk_Settings_EnableDailySummarization>启用每日总结</RimTalk_Settings_EnableDailySummarization>
+  <RimTalk_Settings_TriggerTimeLabel>触发时间: {0}时</RimTalk_Settings_TriggerTimeLabel>
+  <RimTalk_Settings_EnableAutoArchive>启用自动归档</RimTalk_Settings_EnableAutoArchive>
+  
+  <!-- AI 配置 -->
+  <RimTalk_Settings_AIConfigSection>AI 配置</RimTalk_Settings_AIConfigSection>
+  <RimTalk_Settings_PreferRimTalkAI>优先使用 RimTalk 配置</RimTalk_Settings_PreferRimTalkAI>
+  <RimTalk_Settings_WillFollowRimTalkConfig>将自动跟随 RimTalk Mod 的 AI 配置</RimTalk_Settings_WillFollowRimTalkConfig>
+  <RimTalk_Settings_APIKey>API Key</RimTalk_Settings_APIKey>
+  <RimTalk_Settings_APIURL>API URL</RimTalk_Settings_APIURL>
+  <RimTalk_Settings_ModelName>Model</RimTalk_Settings_ModelName>
+  <RimTalk_Settings_EnablePromptCaching>启用 Prompt Caching</RimTalk_Settings_EnablePromptCaching>
+  <RimTalk_Settings_EnablePromptCachingUnavailable>启用 Prompt Caching (不可用)</RimTalk_Settings_EnablePromptCachingUnavailable>
+  <RimTalk_Settings_OpenAICachingSupport>✓ OpenAI 支持 Prompt Caching (Beta)</RimTalk_Settings_OpenAICachingSupport>
+  <RimTalk_Settings_OpenAICachingModels>适用模型: gpt-4o, gpt-4-turbo</RimTalk_Settings_OpenAICachingModels>
+  <RimTalk_Settings_DeepSeekCachingSupport>✓ DeepSeek 支持 Prompt Caching</RimTalk_Settings_DeepSeekCachingSupport>
+  <RimTalk_Settings_DeepSeekCachingSavings>可节省约 50% 费用</RimTalk_Settings_DeepSeekCachingSavings>
+  <RimTalk_Settings_Player2NoCaching>✗ Player2 不支持 Prompt Caching</RimTalk_Settings_Player2NoCaching>
+  <RimTalk_Settings_Player2LocalNoCache>本地客户端无需缓存</RimTalk_Settings_Player2LocalNoCache>
+  <RimTalk_Settings_GoogleNoCaching>✗ Google Gemini 不支持 Prompt Caching</RimTalk_Settings_GoogleNoCaching>
+  <RimTalk_Settings_CustomNoCaching>✗ 自定义API 不支持 Prompt Caching</RimTalk_Settings_CustomNoCaching>
+  <RimTalk_Settings_CustomCachingDepends>取决于您的 API 实现</RimTalk_Settings_CustomCachingDepends>
+  <RimTalk_Settings_ValidateConfig>✓ 验证配置</RimTalk_Settings_ValidateConfig>
+  <RimTalk_Settings_ValidateConfigTip>提示: 验证将测试 API 连接和配置</RimTalk_Settings_ValidateConfigTip>
+  <RimTalk_Settings_UsingRimTalkConfigNoValidation>当前使用 RimTalk 配置，无需验证独立配置</RimTalk_Settings_UsingRimTalkConfigNoValidation>
+  <RimTalk_Settings_PleaseEnterAPIKey>请先输入 API Key</RimTalk_Settings_PleaseEnterAPIKey>
+  <RimTalk_Settings_PleaseEnterAPIURL>请先输入 API URL</RimTalk_Settings_PleaseEnterAPIURL>
+  <RimTalk_Settings_PleaseEnterModel>请先输入 Model</RimTalk_Settings_PleaseEnterModel>
+  <RimTalk_Settings_Validating>配置验证中...</RimTalk_Settings_Validating>
+  <RimTalk_Settings_ValidationSuccess>✓ 配置验证成功！提供商: {0}</RimTalk_Settings_ValidationSuccess>
+  <RimTalk_Settings_ValidationFailed>✗ 配置验证失败，请检查 API Key 和 URL</RimTalk_Settings_ValidationFailed>
+  <RimTalk_Settings_ValidationError>✗ 验证失败: {0}</RimTalk_Settings_ValidationError>
+  
+  <!-- 记忆类型 -->
+  <RimTalk_Settings_MemoryTypesSection>记忆类型开关</RimTalk_Settings_MemoryTypesSection>
+  <RimTalk_Settings_ActionMemory>行动记忆</RimTalk_Settings_ActionMemory>
+  <RimTalk_Settings_ConversationMemory>对话记忆</RimTalk_Settings_ConversationMemory>
+  
+  <!-- 实验性功能 -->
+  <RimTalk_Settings_ExperimentalSection>🚀 实验性功能</RimTalk_Settings_ExperimentalSection>
+  <RimTalk_Settings_EnableProactiveRecall>启用主动记忆召回</RimTalk_Settings_EnableProactiveRecall>
+  <RimTalk_Settings_TriggerChanceLabel>触发概率: {0}</RimTalk_Settings_TriggerChanceLabel>
+  
+  <!-- 向量增强 -->
+  <RimTalk_Settings_VectorEnhancementSection>🔬 向量增强设置</RimTalk_Settings_VectorEnhancementSection>
+  
+  <!-- 高级设置窗口 -->
+  <RimTalk_Settings_AdvancedSettingsTitle>高级设置</RimTalk_Settings_AdvancedSettingsTitle>
+  <RimTalk_Settings_AdvancedSettingsDesc>包含注入、记忆容量、衰减等详细配置</RimTalk_Settings_AdvancedSettingsDesc>
+  
+  <!-- 提示词替换窗口 -->
+  <RimTalk_Settings_PromptReplacementTitle>提示词替换</RimTalk_Settings_PromptReplacementTitle>
+  <RimTalk_Settings_PromptReplacementDesc>在发送给 AI 前自动规范化提示词</RimTalk_Settings_PromptReplacementDesc>
+  
+  <!-- ==================== SettingsUIDrawers 翻译 ==================== -->
+  <!-- AI 提供商选择 -->
+  <RimTalk_Settings_AIProvider>AI 提供商</RimTalk_Settings_AIProvider>
+  <RimTalk_Settings_CurrentProvider>当前: {0}</RimTalk_Settings_CurrentProvider>
+  <RimTalk_Settings_SelectProvider>选择提供商</RimTalk_Settings_SelectProvider>
+  
+  <!-- 提供商描述 -->
+  <RimTalk_Settings_OpenAIDesc1>✦ OpenAI GPT 系列模型，稳定可靠</RimTalk_Settings_OpenAIDesc1>
+  <RimTalk_Settings_OpenAIDesc2>推荐模型: gpt-3.5-turbo, gpt-4</RimTalk_Settings_OpenAIDesc2>
+  <RimTalk_Settings_DeepSeekDesc1>✦ DeepSeek 中文优化模型，性价比高</RimTalk_Settings_DeepSeekDesc1>
+  <RimTalk_Settings_DeepSeekDesc2>推荐模型: deepseek-chat, deepseek-coder</RimTalk_Settings_DeepSeekDesc2>
+  <RimTalk_Settings_Player2Desc1>✦ Player2 游戏优化 AI，支持本地客户端</RimTalk_Settings_Player2Desc1>
+  <RimTalk_Settings_Player2Desc2>推荐模型: gpt-4o, gpt-4-turbo</RimTalk_Settings_Player2Desc2>
+  <RimTalk_Settings_GoogleDesc1>✦ Google Gemini 系列，多模态能力强</RimTalk_Settings_GoogleDesc1>
+  <RimTalk_Settings_GoogleDesc2>推荐模型: gemini-2.0-flash-exp</RimTalk_Settings_GoogleDesc2>
+  <RimTalk_Settings_CustomDesc1>✦ 自定义 API 端点，支持第三方代理</RimTalk_Settings_CustomDesc1>
+  <RimTalk_Settings_CustomDesc2>请手动配置 API URL 和 Model</RimTalk_Settings_CustomDesc2>
+  
+  <!-- 知识匹配源 -->
+  <RimTalk_Settings_KnowledgeMatchingSources>知识匹配源选择</RimTalk_Settings_KnowledgeMatchingSources>
+  <RimTalk_Settings_KnowledgeMatchingSourcesDesc>选择用于常识匹配的变量，Pawn 属性会自动匹配所有对话参与者</RimTalk_Settings_KnowledgeMatchingSourcesDesc>
+  <RimTalk_Settings_RefreshList>刷新列表</RimTalk_Settings_RefreshList>
+  <RimTalk_Settings_ListRefreshed>已刷新变量列表</RimTalk_Settings_ListRefreshed>
+  <RimTalk_Settings_VariableCount>共 {0} 个变量 (Pawn 属性: {1})</RimTalk_Settings_VariableCount>
+  <RimTalk_Settings_PawnPropertyTooltip>属性: {0}\n类型: Pawn 属性\n\n{1}\n\n勾选后会自动匹配所有参与对话的 Pawn 的此属性</RimTalk_Settings_PawnPropertyTooltip>
+  <RimTalk_Settings_VariableTooltip>变量: {0}\n\n{1}</RimTalk_Settings_VariableTooltip>
+  <RimTalk_Settings_AtLeastOneSource>至少需要选择一个匹配源</RimTalk_Settings_AtLeastOneSource>
+  <RimTalk_Settings_SelectedCount>已选择: {0} 个 (Pawn 属性: {1}, 其他: {2})</RimTalk_Settings_SelectedCount>
+  
+  <!-- 常识链设置 -->
+  <RimTalk_Settings_EnableKnowledgeChaining>启用常识链（实验性）</RimTalk_Settings_EnableKnowledgeChaining>
+  <RimTalk_Settings_KnowledgeChainingDesc>允许常识触发常识，进行多轮匹配</RimTalk_Settings_KnowledgeChainingDesc>
+  <RimTalk_Settings_MaxChainingRoundsLabel>最大轮数: {0}</RimTalk_Settings_MaxChainingRoundsLabel>
+  
+  <!-- 提示词规范化 -->
+  <RimTalk_Settings_ReplacementRulesList>替换规则列表</RimTalk_Settings_ReplacementRulesList>
+  <RimTalk_Settings_AddNewRule>+ 添加新规则</RimTalk_Settings_AddNewRule>
+  <RimTalk_Settings_EnabledRulesCount>已启用: {0} / {1} 条规则</RimTalk_Settings_EnabledRulesCount>
+  <RimTalk_Settings_RuleExample>✦ 示例：模式 \(Player\) → 替换 Master</RimTalk_Settings_RuleExample>
+  <RimTalk_Settings_RegexSupport>支持正则表达式（忽略大小写）</RimTalk_Settings_RegexSupport>
+  
+  <!-- 向量增强设置 -->
+  <RimTalk_Settings_EnableVectorEnhancement>启用向量增强</RimTalk_Settings_EnableVectorEnhancement>
+  <RimTalk_Settings_VectorEnhancementDesc>使用语义向量检索来增强常识匹配。</RimTalk_Settings_VectorEnhancementDesc>
+  <RimTalk_Settings_SimilarityThresholdLabel>相似度阈值: {0}</RimTalk_Settings_SimilarityThresholdLabel>
+  <RimTalk_Settings_MaxVectorResultsLabel>最大补充结果: {0}</RimTalk_Settings_MaxVectorResultsLabel>
+  <RimTalk_Settings_CloudEmbeddingConfig>云端 Embedding 配置</RimTalk_Settings_CloudEmbeddingConfig>
+  <RimTalk_Settings_EmbeddingAPIKey>API Key</RimTalk_Settings_EmbeddingAPIKey>
+  <RimTalk_Settings_EmbeddingAPIURL>API URL</RimTalk_Settings_EmbeddingAPIURL>
+  <RimTalk_Settings_EmbeddingModel>Model</RimTalk_Settings_EmbeddingModel>
+  <RimTalk_Settings_EmbeddingAPIKeyTip>提示: 留空 API Key 将使用上方 AI 配置中的 API Key</RimTalk_Settings_EmbeddingAPIKeyTip>
+  
+  <!-- ==================== MainTabWindow_Memory 翻译 ==================== -->
+  <!-- Controls -->
+  <RimTalk_MindStream_RightClickToCreate>右键点击新建{0}记忆</RimTalk_MindStream_RightClickToCreate>
+  <RimTalk_MindStream_SummarizeSelectedBoth>总结选中 (ABM:{0} + SCM:{1})</RimTalk_MindStream_SummarizeSelectedBoth>
+  <RimTalk_MindStream_SummarizeSelectedABM>总结选中 (ABM:{0})</RimTalk_MindStream_SummarizeSelectedABM>
+  <RimTalk_MindStream_SummarizeSelectedSCM>总结选中 (SCM:{0})</RimTalk_MindStream_SummarizeSelectedSCM>
+  <RimTalk_MindStream_SummarizeAllBoth>总结全部 (ABM:{0} + SCM:{1})</RimTalk_MindStream_SummarizeAllBoth>
+  <RimTalk_MindStream_SummarizeAllABM>总结全部 (ABM:{0})</RimTalk_MindStream_SummarizeAllABM>
+  <RimTalk_MindStream_SummarizeAllSCM>总结全部 (SCM:{0})</RimTalk_MindStream_SummarizeAllSCM>
+  <RimTalk_MindStream_ArchiveAllCount>归档全部 ({0})</RimTalk_MindStream_ArchiveAllCount>
+  <RimTalk_MindStream_DeleteAllCount>删除全部 ({0})</RimTalk_MindStream_DeleteAllCount>
+  <RimTalk_MindStream_PleaseSelectColonist>请先选择一个殖民者</RimTalk_MindStream_PleaseSelectColonist>
+  <RimTalk_MindStream_AddConversationTo>添加对话记忆到 {0}</RimTalk_MindStream_AddConversationTo>
+  <RimTalk_MindStream_AddActionTo>添加行动记忆到 {0}</RimTalk_MindStream_AddActionTo>
+  
+  <!-- TopBar -->
+  <RimTalk_MindStream_SummaryPrompt>总结提示词</RimTalk_MindStream_SummaryPrompt>
+  
+  <!-- Utilities -->
+  <RimTalk_Close>关闭</RimTalk_Close>
+  <RimTalk_MindStream_GuideContent>=== Mind Stream 操作指南 ===
+
+【选择记忆】
+• 单击：选中单条记忆
+• Ctrl+单击：多选/取消选择
+• Shift+单击：范围选择
+• 拖拽框选：批量选择
+
+【批量操作】
+• 总结：将SCM记忆总结到ELS
+• 归档：将ELS记忆归档到CLPA
+• 删除：删除选中的记忆
+
+【右键功能】
+• ELS/CLPA复选框上右键可新建记忆
+
+【层级说明】
+• ABM (蓝色): 超短期记忆
+• SCM (绿色): 短期记忆
+• ELS (黄色): 事件日志
+• CLPA (紫色): 长期档案</RimTalk_MindStream_GuideContent>
+  
+  <!-- ==================== Dialog_PromptEditor 翻译 ==================== -->
+  <RimTalk_PromptEditor_Title>总结提示词配置</RimTalk_PromptEditor_Title>
+  <RimTalk_PromptEditor_Desc>自定义 AI 总结记忆时使用的提示词模板</RimTalk_PromptEditor_Desc>
+  <RimTalk_PromptEditor_ResetDefault>恢复默认</RimTalk_PromptEditor_ResetDefault>
+  <RimTalk_PromptEditor_ResetConfirm>确定要恢复默认提示词吗？</RimTalk_PromptEditor_ResetConfirm>
+  <RimTalk_Save>保存</RimTalk_Save>
+  <RimTalk_Cancel>取消</RimTalk_Cancel>
+  <RimTalk_PromptEditor_DailySummary>每日总结提示词</RimTalk_PromptEditor_DailySummary>
+  <RimTalk_PromptEditor_DailySummaryDesc>用于 SCM → ELS 的每日总结（处理约20条记忆）</RimTalk_PromptEditor_DailySummaryDesc>
+  <RimTalk_PromptEditor_Placeholders>占位符: {0}=殖民者名字, {1}=记忆列表</RimTalk_PromptEditor_Placeholders>
+  <RimTalk_PromptEditor_DeepArchive>深度归档提示词</RimTalk_PromptEditor_DeepArchive>
+  <RimTalk_PromptEditor_DeepArchiveDesc>用于 ELS → CLPA 的深度归档（处理约15条记忆）</RimTalk_PromptEditor_DeepArchiveDesc>
+  <RimTalk_PromptEditor_MaxTokens>最大输出 Tokens</RimTalk_PromptEditor_MaxTokens>
+  <RimTalk_PromptEditor_MaxTokensDesc>控制 AI 生成总结的最大长度</RimTalk_PromptEditor_MaxTokensDesc>
+  <RimTalk_PromptEditor_MaxTokensLabel>Max Tokens: {0}</RimTalk_PromptEditor_MaxTokensLabel>
+  <RimTalk_PromptEditor_Tips>💡 提示:</RimTalk_PromptEditor_Tips>
+  <RimTalk_PromptEditor_Tip1>• 较小的值（100-500）适合简短总结</RimTalk_PromptEditor_Tip1>
+  <RimTalk_PromptEditor_Tip2>• 较大的值（1000-4000）适合详细总结</RimTalk_PromptEditor_Tip2>
+  <RimTalk_PromptEditor_Tip3>• 过大的值会增加 API 费用</RimTalk_PromptEditor_Tip3>
+  <RimTalk_PromptEditor_Saved>总结提示词配置已保存</RimTalk_PromptEditor_Saved>
+  
+  <!-- ==================== Dialog_InjectionPreview 翻译 ==================== -->
+  <RimTalk_Preview_Title>注入预览</RimTalk_Preview_Title>
+  <RimTalk_Preview_CurrentPawn>当前角色:</RimTalk_Preview_CurrentPawn>
+  <RimTalk_Preview_TargetPawn>目标角色:</RimTalk_Preview_TargetPawn>
+  <RimTalk_Preview_None>无</RimTalk_Preview_None>
+  <RimTalk_Preview_NoneClickToSelect>无 (点击选择)</RimTalk_Preview_NoneClickToSelect>
+  <RimTalk_Preview_Clear>清除</RimTalk_Preview_Clear>
+  <RimTalk_Preview_Refresh>刷新预览</RimTalk_Preview_Refresh>
+  <RimTalk_Preview_NoColonist>没有可用的殖民者</RimTalk_Preview_NoColonist>
+  
+  <RimTalk_Preview_KnowledgeSection>常识注入</RimTalk_Preview_KnowledgeSection>
+  <RimTalk_Preview_MatchingSource>匹配源</RimTalk_Preview_MatchingSource>
+  <RimTalk_Preview_ParsedMatchText>解析后的匹配文本:</RimTalk_Preview_ParsedMatchText>
+  <RimTalk_Preview_NoParsedText>(无解析文本)</RimTalk_Preview_NoParsedText>
+  <RimTalk_Preview_MatchedKnowledge>被匹配的常识:</RimTalk_Preview_MatchedKnowledge>
+  <RimTalk_Preview_NoMatchedKnowledge>没有匹配到常识</RimTalk_Preview_NoMatchedKnowledge>
+  <RimTalk_Preview_NoMatchingSources>没有配置匹配源</RimTalk_Preview_NoMatchingSources>
+  <RimTalk_Preview_Score>评分: {0:F2}</RimTalk_Preview_Score>
+  
+  <RimTalk_Preview_MemorySection>记忆注入</RimTalk_Preview_MemorySection>
+  <RimTalk_Preview_MemoryLayers>记忆层级:</RimTalk_Preview_MemoryLayers>
+  <RimTalk_Preview_InjectionConfig>注入配置:</RimTalk_Preview_InjectionConfig>
+  <RimTalk_Preview_ClickRefresh>点击"刷新预览"查看结果</RimTalk_Preview_ClickRefresh>
+  <RimTalk_Preview_NoMemoryComp>选中的角色没有记忆组件</RimTalk_Preview_NoMemoryComp>
+  <RimTalk_Preview_SelectedMemories>选中的记忆:</RimTalk_Preview_SelectedMemories>
+  <RimTalk_Preview_ScoreDetail>评分: {0:F2}</RimTalk_Preview_ScoreDetail>
+  <RimTalk_Preview_NoMemoriesAboveThreshold>没有超过阈值的记忆</RimTalk_Preview_NoMemoriesAboveThreshold>
+  <RimTalk_Preview_StaticMode>静态模式 (动态注入已禁用)</RimTalk_Preview_StaticMode>
+  <RimTalk_Preview_Error>错误: {0}</RimTalk_Preview_Error>
+  
+  <RimTalk_Preview_ABMCount>ABM: {0} 条对话</RimTalk_Preview_ABMCount>
+  <RimTalk_Preview_ELSCount>ELS: {0} 条</RimTalk_Preview_ELSCount>
+  <RimTalk_Preview_CLPACount>CLPA: {0} 条</RimTalk_Preview_CLPACount>
+  <RimTalk_Preview_MaxInjectedMemories>最大注入记忆: {0}</RimTalk_Preview_MaxInjectedMemories>
+  <RimTalk_Preview_MemoryThreshold>记忆阈值: {0}</RimTalk_Preview_MemoryThreshold>
+  <RimTalk_Preview_MaxInjectedKnowledge>最大注入常识: {0}</RimTalk_Preview_MaxInjectedKnowledge>
+  <RimTalk_Preview_KnowledgeThreshold>常识阈值: {0}</RimTalk_Preview_KnowledgeThreshold>
+  <RimTalk_Preview_DynamicEnabled>动态注入: 已启用</RimTalk_Preview_DynamicEnabled>
+  <RimTalk_Preview_DynamicDisabled>动态注入: 已禁用</RimTalk_Preview_DynamicDisabled>
+  
+  <RimTalk_Preview_Colonist>(殖民者)</RimTalk_Preview_Colonist>
+  <RimTalk_Preview_Prisoner>(囚犯)</RimTalk_Preview_Prisoner>
+  <RimTalk_Preview_Slave>(奴隶)</RimTalk_Preview_Slave>
+  <RimTalk_Preview_Guest>(客人)</RimTalk_Preview_Guest>
+  <RimTalk_Preview_SameAsCurrent>(与当前相同)</RimTalk_Preview_SameAsCurrent>
+  <RimTalk_Preview_NoHumanlikes>没有可选择的类人角色</RimTalk_Preview_NoHumanlikes>
+  <RimTalk_Preview_Help>使用帮助</RimTalk_Preview_Help>
+  <RimTalk_Preview_HelpContent>=== 注入预览器使用帮助 ===
+
+【功能说明】
+此工具用于预览记忆和常识注入效果，帮助你了解AI对话时会使用哪些信息。
+
+【常识注入】
+• 匹配源：选择用于常识匹配的变量
+• Pawn属性变量会同时解析所有参与者
+• 解析后的匹配文本用于与常识库进行关键词匹配
+• 匹配结果按评分排序显示
+
+【记忆注入】
+• ABM：超短期对话记忆（完整对话轮次）
+• SCM：短期记忆（已废弃，直接总结到ELS）
+• ELS：事件日志存储（AI总结后的记忆）
+• CLPA：长期档案（重要事件归档）
+
+【使用步骤】
+1. 选择当前角色（必须）
+2. 可选：选择目标角色（模拟对话场景）
+3. 勾选需要的匹配源
+4. 点击"刷新预览"查看结果
+
+【提示】
+• 匹配源设置会同步到全局设置
+• Pawn属性变量只需要角色信息即可解析
+• 环境类变量需要角色所在地图信息
+• 其他类变量需要至少生成一次对话后才可解析
+</RimTalk_Preview_HelpContent>
 </LanguageData>

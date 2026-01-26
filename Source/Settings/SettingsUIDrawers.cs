@@ -18,15 +18,15 @@ namespace RimTalk.MemoryPatch
         
         public static void DrawAIProviderSelection(Listing_Standard listing, RimTalkMemoryPatchSettings settings)
         {
-            listing.Label("AI 提供商:");
+            listing.Label("RimTalk_Settings_AIProvider".Translate() + ":");
             GUI.color = Color.gray;
-            listing.Label($"  当前: {settings.independentProvider}");
+            listing.Label("  " + "RimTalk_Settings_CurrentProvider".Translate(settings.independentProvider));
             GUI.color = Color.white;
             
             // 提供商选择按钮
             Rect providerHeaderRect = listing.GetRect(25f);
             Widgets.DrawBoxSolid(providerHeaderRect, new Color(0.15f, 0.15f, 0.15f, 0.5f));
-            Widgets.Label(providerHeaderRect.ContractedBy(5f), "选择提供商");
+            Widgets.Label(providerHeaderRect.ContractedBy(5f), "RimTalk_Settings_SelectProvider".Translate());
             
             Rect providerButtonRect1 = listing.GetRect(30f);
             float buttonWidth = (providerButtonRect1.width - 20f) / 3f;
@@ -85,24 +85,24 @@ namespace RimTalk.MemoryPatch
             switch (provider)
             {
                 case "OpenAI":
-                    listing.Label("? OpenAI GPT 系列模型，稳定可靠");
-                    listing.Label("   推荐模型: gpt-3.5-turbo, gpt-4");
+                    listing.Label("RimTalk_Settings_OpenAIDesc1".Translate());
+                    listing.Label("   " + "RimTalk_Settings_OpenAIDesc2".Translate());
                     break;
                 case "DeepSeek":
-                    listing.Label("? DeepSeek 中文优化模型，性价比高");
-                    listing.Label("   推荐模型: deepseek-chat, deepseek-coder");
+                    listing.Label("RimTalk_Settings_DeepSeekDesc1".Translate());
+                    listing.Label("   " + "RimTalk_Settings_DeepSeekDesc2".Translate());
                     break;
                 case "Player2":
-                    listing.Label("? Player2 游戏优化 AI，支持本地客户端");
-                    listing.Label("   推荐模型: gpt-4o, gpt-4-turbo");
+                    listing.Label("RimTalk_Settings_Player2Desc1".Translate());
+                    listing.Label("   " + "RimTalk_Settings_Player2Desc2".Translate());
                     break;
                 case "Google":
-                    listing.Label("? Google Gemini 系列，多模态能力强");
-                    listing.Label("   推荐模型: gemini-2.0-flash-exp");
+                    listing.Label("RimTalk_Settings_GoogleDesc1".Translate());
+                    listing.Label("   " + "RimTalk_Settings_GoogleDesc2".Translate());
                     break;
                 case "Custom":
-                    listing.Label("? 自定义 API 端点，支持第三方代理");
-                    listing.Label("   请手动配置 API URL 和 Model");
+                    listing.Label("RimTalk_Settings_CustomDesc1".Translate());
+                    listing.Label("   " + "RimTalk_Settings_CustomDesc2".Translate());
                     break;
             }
             
@@ -124,21 +124,21 @@ namespace RimTalk.MemoryPatch
         public static void DrawKnowledgeMatchingSourcesSettings(Listing_Standard listing, RimTalkMemoryPatchSettings settings)
         {
             GUI.color = new Color(0.8f, 1f, 0.8f);
-            listing.Label("知识匹配源选择");
+            listing.Label("RimTalk_Settings_KnowledgeMatchingSources".Translate());
             GUI.color = Color.white;
             
             GUI.color = Color.gray;
-            listing.Label("  选择用于常识匹配的变量，Pawn 属性会自动匹配所有对话参与者");
+            listing.Label("  " + "RimTalk_Settings_KnowledgeMatchingSourcesDesc".Translate());
             GUI.color = Color.white;
             listing.Gap();
             
             // 刷新按钮
             Rect refreshRect = listing.GetRect(25f);
-            if (Widgets.ButtonText(new Rect(refreshRect.x, refreshRect.y, 120f, 25f), "刷新列表"))
+            if (Widgets.ButtonText(new Rect(refreshRect.x, refreshRect.y, 120f, 25f), "RimTalk_Settings_RefreshList".Translate()))
             {
                 MustacheVariableHelper.ClearCache();
                 _cachedCategorizedSources = null;
-                Messages.Message("已刷新变量列表", MessageTypeDefOf.NeutralEvent);
+                Messages.Message("RimTalk_Settings_ListRefreshed".Translate(), MessageTypeDefOf.NeutralEvent);
             }
             
             // 获取分类数据
@@ -149,7 +149,7 @@ namespace RimTalk.MemoryPatch
             int pawnProps = categorizedSources.Sum(c => c.Value.Count(v => v.isPawnProperty));
             Rect countRect = new Rect(refreshRect.x + 130f, refreshRect.y, 250f, 25f);
             GUI.color = Color.gray;
-            Widgets.Label(countRect, $"共 {totalVars} 个变量 (Pawn 属性: {pawnProps})");
+            Widgets.Label(countRect, "RimTalk_Settings_VariableCount".Translate(totalVars, pawnProps));
             GUI.color = Color.white;
             
             listing.Gap();
@@ -248,8 +248,8 @@ namespace RimTalk.MemoryPatch
                     
                     // 工具提示
                     string tooltip = variable.isPawnProperty
-                        ? $"属性: {variable.name}\n类型: Pawn 属性\n\n{variable.description}\n\n勾选后会自动匹配所有参与对话的 Pawn 的此属性"
-                        : $"变量: {variable.name}\n\n{variable.description}";
+                        ? "RimTalk_Settings_PawnPropertyTooltip".Translate(variable.name, variable.description)
+                        : "RimTalk_Settings_VariableTooltip".Translate(variable.name, variable.description);
                     TooltipHandler.TipRegion(rowRect, tooltip);
                     
                     // 更新选择状态
@@ -268,7 +268,7 @@ namespace RimTalk.MemoryPatch
                             if (settings.knowledgeMatchingSources.Count == 0)
                             {
                                 settings.knowledgeMatchingSources.Add("dialogue");
-                                Messages.Message("至少需要选择一个匹配源", MessageTypeDefOf.RejectInput);
+                                Messages.Message("RimTalk_Settings_AtLeastOneSource".Translate(), MessageTypeDefOf.RejectInput);
                             }
                         }
                     }
@@ -289,7 +289,7 @@ namespace RimTalk.MemoryPatch
             int selectedOther = settings.knowledgeMatchingSources.Count - selectedPawnProps;
             
             GUI.color = new Color(0.7f, 0.9f, 1f);
-            listing.Label($"已选择: {settings.knowledgeMatchingSources.Count} 个 (Pawn 属性: {selectedPawnProps}, 其他: {selectedOther})");
+            listing.Label("RimTalk_Settings_SelectedCount".Translate(settings.knowledgeMatchingSources.Count, selectedPawnProps, selectedOther));
             
             // 显示选择的变量名
             string selectedStr = settings.knowledgeMatchingSources.Count <= 4
@@ -320,15 +320,15 @@ namespace RimTalk.MemoryPatch
         public static void DrawKnowledgeChainingSettings(Listing_Standard listing, RimTalkMemoryPatchSettings settings)
         {
             // 常识链设置（实验性功能）
-            listing.CheckboxLabeled("启用常识链（实验性）", ref settings.enableKnowledgeChaining);
+            listing.CheckboxLabeled("RimTalk_Settings_EnableKnowledgeChaining".Translate(), ref settings.enableKnowledgeChaining);
             if (settings.enableKnowledgeChaining)
             {
                 GUI.color = new Color(1f, 0.8f, 0.5f);
-                listing.Label("  允许常识触发常识，进行多轮匹配");
+                listing.Label("  " + "RimTalk_Settings_KnowledgeChainingDesc".Translate());
                 GUI.color = Color.white;
                 listing.Gap();
                 
-                listing.Label($"最大轮数: {settings.maxChainingRounds}");
+                listing.Label("RimTalk_Settings_MaxChainingRoundsLabel".Translate(settings.maxChainingRounds));
                 settings.maxChainingRounds = (int)listing.Slider(settings.maxChainingRounds, 1, 5);
             }
             
@@ -349,7 +349,7 @@ namespace RimTalk.MemoryPatch
             // 标题
             Text.Font = GameFont.Small;
             GUI.color = new Color(1f, 0.9f, 0.7f);
-            inner.Label("替换规则列表");
+            inner.Label("RimTalk_Settings_ReplacementRulesList".Translate());
             GUI.color = Color.white;
             
             inner.Gap(5f);
@@ -398,7 +398,7 @@ namespace RimTalk.MemoryPatch
             
             // 添加新规则按钮
             Rect addButtonRect = inner.GetRect(30f);
-            if (Widgets.ButtonText(addButtonRect, "+ 添加新规则"))
+            if (Widgets.ButtonText(addButtonRect, "RimTalk_Settings_AddNewRule".Translate()))
             {
                 settings.normalizationRules.Add(new RimTalkMemoryPatchSettings.ReplacementRule("", "", true));
             }
@@ -408,14 +408,14 @@ namespace RimTalk.MemoryPatch
             // 统计信息
             int enabledCount = settings.normalizationRules.Count(r => r.isEnabled);
             GUI.color = Color.gray;
-            inner.Label($"已启用: {enabledCount} / {settings.normalizationRules.Count} 条规则");
+            inner.Label("RimTalk_Settings_EnabledRulesCount".Translate(enabledCount, settings.normalizationRules.Count));
             GUI.color = Color.white;
             
             // 示例提示
             inner.Gap(3f);
             GUI.color = new Color(0.7f, 0.9f, 1f);
-            inner.Label("? 示例：模式 \\(Player\\) → 替换 Master");
-            inner.Label("   支持正则表达式（忽略大小写）");
+            inner.Label("RimTalk_Settings_RuleExample".Translate());
+            inner.Label("   " + "RimTalk_Settings_RegexSupport".Translate());
             GUI.color = Color.white;
             
             inner.End();
@@ -425,37 +425,37 @@ namespace RimTalk.MemoryPatch
         
         public static void DrawSiliconFlowSettings(Listing_Standard listing, RimTalkMemoryPatchSettings settings)
         {
-            listing.CheckboxLabeled("启用向量增强", ref settings.enableVectorEnhancement);
+            listing.CheckboxLabeled("RimTalk_Settings_EnableVectorEnhancement".Translate(), ref settings.enableVectorEnhancement);
             if (settings.enableVectorEnhancement)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
-                listing.Label("  使用语义向量检索来增强常识匹配。");
+                listing.Label("  " + "RimTalk_Settings_VectorEnhancementDesc".Translate());
                 GUI.color = Color.white;
                 listing.Gap();
                 
-                listing.Label($"相似度阈值: {settings.vectorSimilarityThreshold:F2}");
+                listing.Label("RimTalk_Settings_SimilarityThresholdLabel".Translate(settings.vectorSimilarityThreshold.ToString("F2")));
                 settings.vectorSimilarityThreshold = listing.Slider(settings.vectorSimilarityThreshold, 0.5f, 1.0f);
                 
-                listing.Label($"最大补充结果: {settings.maxVectorResults}");
+                listing.Label("RimTalk_Settings_MaxVectorResultsLabel".Translate(settings.maxVectorResults));
                 settings.maxVectorResults = (int)listing.Slider(settings.maxVectorResults, 1, 15);
                 
                 listing.Gap();
                 
                 GUI.color = new Color(1f, 0.9f, 0.7f);
-                listing.Label("云端 Embedding 配置");
+                listing.Label("RimTalk_Settings_CloudEmbeddingConfig".Translate());
                 GUI.color = Color.white;
                 
-                listing.Label("API Key:");
+                listing.Label("RimTalk_Settings_EmbeddingAPIKey".Translate() + ":");
                 settings.embeddingApiKey = listing.TextEntry(settings.embeddingApiKey);
                 
-                listing.Label("API URL:");
+                listing.Label("RimTalk_Settings_EmbeddingAPIURL".Translate() + ":");
                 settings.embeddingApiUrl = listing.TextEntry(settings.embeddingApiUrl);
                 
-                listing.Label("Model:");
+                listing.Label("RimTalk_Settings_EmbeddingModel".Translate() + ":");
                 settings.embeddingModel = listing.TextEntry(settings.embeddingModel);
                 
                 GUI.color = Color.gray;
-                listing.Label("提示: 留空 API Key 将使用上方 AI 配置中的 API Key");
+                listing.Label("RimTalk_Settings_EmbeddingAPIKeyTip".Translate());
                 GUI.color = Color.white;
             }
             

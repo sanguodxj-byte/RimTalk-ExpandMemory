@@ -50,7 +50,7 @@ namespace RimTalk.Memory.UI
             
             // ? 新增：总结提示词按钮
             rightX -= buttonWidth + spacing;
-            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "总结提示词"))
+            if (Widgets.ButtonText(new Rect(rightX, innerRect.y + 5f, buttonWidth, 35f), "RimTalk_MindStream_SummaryPrompt".Translate()))
             {
                 Find.WindowStack.Add(new Dialog_PromptEditor());
             }
