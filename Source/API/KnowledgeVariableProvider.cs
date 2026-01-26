@@ -166,6 +166,7 @@ namespace RimTalk.Memory.API
         /// 根据用户选择的匹配源构建匹配文本
         /// v4.1: 支持 Pawn 属性类别自动匹配所有参与对话的 pawn
         /// v5.0: 适配 PromptContext
+        /// v5.1: 过滤掉 knowledge 变量，防止自己匹配自己
         /// </summary>
         private static string BuildMatchText(object promptContext, RimTalkMemoryPatchSettings settings)
         {
@@ -175,7 +176,7 @@ namespace RimTalk.Memory.API
             // 如果没有配置匹配源，使用默认
             if (sources == null || sources.Count == 0)
             {
-                sources = new List<string> { "dialogue", "context" };
+                sources = new List<string> { "prompt" };
             }
             
             // 获取所有参与对话的 pawn
@@ -184,6 +185,12 @@ namespace RimTalk.Memory.API
             
             foreach (var source in sources)
             {
+                // ⭐ v5.1: 过滤掉 knowledge 变量，防止自己匹配自己导致无限递归
+                if (source == "knowledge" || source.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                
                 // 检查是否是 Pawn 属性（需要自动匹配所有 pawn）
                 if (MustacheVariableHelper.IsPawnProperty(source))
                 {

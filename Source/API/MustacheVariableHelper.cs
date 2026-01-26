@@ -92,6 +92,10 @@ namespace RimTalk.Memory.API
                     if (v.name == "json.format" || v.name == "chat.history" || v.name.StartsWith("#"))
                         continue;
                     
+                    // ⭐ 过滤掉 knowledge 变量，防止自己匹配自己导致无限递归
+                    if (v.name == "knowledge" || v.name.StartsWith("knowledge."))
+                        continue;
+                    
                     // 判断是否是 Pawn 属性
                     bool isPawn = v.name.StartsWith("pawn.") && !v.name.StartsWith("pawn.memory");
                     string varName = isPawn ? v.name.Substring(5) : v.name; // 去掉 "pawn." 前缀
