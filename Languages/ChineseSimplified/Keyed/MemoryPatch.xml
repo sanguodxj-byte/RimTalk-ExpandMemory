@@ -469,7 +469,7 @@
   <RimTalk_Preview_MatchedKnowledge>被匹配的常识:</RimTalk_Preview_MatchedKnowledge>
   <RimTalk_Preview_NoMatchedKnowledge>没有匹配到常识</RimTalk_Preview_NoMatchedKnowledge>
   <RimTalk_Preview_NoMatchingSources>没有配置匹配源</RimTalk_Preview_NoMatchingSources>
-  <RimTalk_Preview_Score>评分: {0:F2}</RimTalk_Preview_Score>
+  <RimTalk_Preview_Score>评分: {0}</RimTalk_Preview_Score>
   
   <RimTalk_Preview_MemorySection>记忆注入</RimTalk_Preview_MemorySection>
   <RimTalk_Preview_MemoryLayers>记忆层级:</RimTalk_Preview_MemoryLayers>
@@ -477,7 +477,7 @@
   <RimTalk_Preview_ClickRefresh>点击"刷新预览"查看结果</RimTalk_Preview_ClickRefresh>
   <RimTalk_Preview_NoMemoryComp>选中的角色没有记忆组件</RimTalk_Preview_NoMemoryComp>
   <RimTalk_Preview_SelectedMemories>选中的记忆:</RimTalk_Preview_SelectedMemories>
-  <RimTalk_Preview_ScoreDetail>评分: {0:F2}</RimTalk_Preview_ScoreDetail>
+  <RimTalk_Preview_ScoreDetail>评分: {0}</RimTalk_Preview_ScoreDetail>
   <RimTalk_Preview_NoMemoriesAboveThreshold>没有超过阈值的记忆</RimTalk_Preview_NoMemoriesAboveThreshold>
   <RimTalk_Preview_StaticMode>静态模式 (动态注入已禁用)</RimTalk_Preview_StaticMode>
   <RimTalk_Preview_Error>错误: {0}</RimTalk_Preview_Error>
@@ -499,6 +499,7 @@
   <RimTalk_Preview_SameAsCurrent>(与当前相同)</RimTalk_Preview_SameAsCurrent>
   <RimTalk_Preview_NoHumanlikes>没有可选择的类人角色</RimTalk_Preview_NoHumanlikes>
   <RimTalk_Preview_Help>使用帮助</RimTalk_Preview_Help>
+  <RimTalk_Preview_NoContext>[无上下文，请先触发一次对话]</RimTalk_Preview_NoContext>
   <RimTalk_Preview_HelpContent>=== 注入预览器使用帮助 ===
 
 【功能说明】

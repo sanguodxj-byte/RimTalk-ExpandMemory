@@ -739,7 +739,7 @@
     <RimTalk_Preview_MatchedKnowledge>Matched Knowledge:</RimTalk_Preview_MatchedKnowledge>
     <RimTalk_Preview_NoMatchedKnowledge>No knowledge matched</RimTalk_Preview_NoMatchedKnowledge>
     <RimTalk_Preview_NoMatchingSources>No matching sources configured</RimTalk_Preview_NoMatchingSources>
-    <RimTalk_Preview_Score>Score: {0:F2}</RimTalk_Preview_Score>
+    <RimTalk_Preview_Score>Score: {0}</RimTalk_Preview_Score>
     
     <RimTalk_Preview_MemorySection>Memory Injection</RimTalk_Preview_MemorySection>
     <RimTalk_Preview_MemoryLayers>Memory Layers:</RimTalk_Preview_MemoryLayers>
@@ -747,7 +747,7 @@
     <RimTalk_Preview_ClickRefresh>Click "Refresh Preview" to see results</RimTalk_Preview_ClickRefresh>
     <RimTalk_Preview_NoMemoryComp>Selected pawn has no memory component</RimTalk_Preview_NoMemoryComp>
     <RimTalk_Preview_SelectedMemories>Selected Memories:</RimTalk_Preview_SelectedMemories>
-    <RimTalk_Preview_ScoreDetail>Score: {0:F2}</RimTalk_Preview_ScoreDetail>
+    <RimTalk_Preview_ScoreDetail>Score: {0}</RimTalk_Preview_ScoreDetail>
     <RimTalk_Preview_NoMemoriesAboveThreshold>No memories above threshold</RimTalk_Preview_NoMemoriesAboveThreshold>
     <RimTalk_Preview_StaticMode>Static mode (Dynamic injection disabled)</RimTalk_Preview_StaticMode>
     <RimTalk_Preview_Error>Error: {0}</RimTalk_Preview_Error>
@@ -769,6 +769,7 @@
     <RimTalk_Preview_SameAsCurrent>(Same as current)</RimTalk_Preview_SameAsCurrent>
     <RimTalk_Preview_NoHumanlikes>No humanlikes available to select</RimTalk_Preview_NoHumanlikes>
     <RimTalk_Preview_Help>Help</RimTalk_Preview_Help>
+    <RimTalk_Preview_NoContext>[No Context, please trigger a dialogue first]</RimTalk_Preview_NoContext>
     <RimTalk_Preview_HelpContent>=== Injection Previewer Help ===
 
 【Overview】
