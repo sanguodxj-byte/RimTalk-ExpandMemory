@@ -250,6 +250,17 @@ namespace RimTalk.MemoryPatch
             {
                 knowledgeMatchingSources = new List<string> { "prompt", "fullname", "role", "age", "gender", "backstory", "traits", "skills", "relations" };
             }
+
+            // ⭐ v5.1: 清除 knowledge 变量，防止自己匹配自己导致无限递归
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && knowledgeMatchingSources != null)
+            {
+                int removedCount = knowledgeMatchingSources.RemoveAll(s =>
+                    s == "knowledge" || s.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase));
+                if (removedCount > 0)
+                {
+                    Log.Message($"[MemoryPatch] Removed {removedCount} 'knowledge' entries from matching sources to prevent self-referencing.");
+                }
+            }
         }
 
         public void DoSettingsWindowContents(Rect inRect)

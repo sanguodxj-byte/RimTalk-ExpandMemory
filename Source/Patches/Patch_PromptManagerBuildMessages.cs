@@ -96,9 +96,9 @@ namespace RimTalk.Memory.Patches
                 if (pawns == null || pawns.Count == 0)
                     return;
                 
-                // ⭐ v4.0: 初始化 ABM 跨 Pawn 去重上下文
-                // 这样在模板 {{ for p in pawns }} 循环时，同一轮对话不会重复注入
-                DynamicMemoryInjection.BeginConversationContext();
+                // ⭐ v4.2: 不再在这里调用 BeginConversationContext()
+                // 因为 BuildMessages 内部可能会预调用模板解析
+                // 改为在 InjectABM 内部基于时间戳自动管理上下文
                 
                 // 在主线程中提取所有参与者信息
                 var cached = new CachedParticipants
@@ -122,23 +122,6 @@ namespace RimTalk.Memory.Patches
             catch (Exception ex)
             {
                 Log.Error($"[RimTalk Memory] Error in BuildMessages Prefix: {ex}");
-            }
-        }
-        
-        /// <summary>
-        /// ⭐ v4.0: Postfix: 在 BuildMessages 执行后清理去重上下文
-        /// </summary>
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            try
-            {
-                // 清理 ABM 跨 Pawn 去重上下文
-                DynamicMemoryInjection.EndConversationContext();
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[RimTalk Memory] Error in BuildMessages Postfix: {ex}");
             }
         }
         
