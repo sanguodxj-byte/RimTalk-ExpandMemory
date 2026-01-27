@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib;
 using Verse;
 using RimWorld;
+using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory.Patches
 {
@@ -25,7 +26,7 @@ namespace RimTalk.Memory.Patches
                 return;
             
             // 检查设置是否启用
-            if (!RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings.enableEventRecordKnowledge)
+            if (!RimTalkMemoryPatchMod.Settings.enableEventRecordKnowledge)
                 return;
             
             try
@@ -155,7 +156,7 @@ namespace RimTalk.Memory.Patches
             
             try
             {
-                var library = RimTalk.Memory.MemoryManager.GetCommonKnowledge();
+                var library = MemoryManager.GetCommonKnowledge();
                 if (library == null)
                     return;
                 
@@ -263,7 +264,7 @@ namespace RimTalk.Memory.Patches
         /// </summary>
         private static CommonKnowledgeEntry AddOrUpdateKnowledge(string existingId, string eventText, float importance)
         {
-            var library = RimTalk.Memory.MemoryManager.GetCommonKnowledge();
+            var library = MemoryManager.GetCommonKnowledge();
             if (library == null)
                 return null;
             

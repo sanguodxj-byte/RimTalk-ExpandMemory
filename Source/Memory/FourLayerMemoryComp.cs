@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using Verse;
 using RimTalk.MemoryPatch;
+using RimTalkHistoryPlus;
 
 namespace RimTalk.Memory
 {
@@ -730,6 +730,11 @@ namespace RimTalk.Memory
         public void PinMemory(string memoryId, bool pinned)
         {
             var memory = FindMemoryById(memoryId);
+            if (memory is History history)
+            {
+                FourLayerMemoryComp_PinMemory_Patch.Prefix(this, history, memoryId); // 这里调用了外部方法，后续可以并入
+                return;
+            }
             if (memory != null)
             {
                 memory.isPinned = pinned;
