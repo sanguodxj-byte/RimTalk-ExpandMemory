@@ -423,15 +423,15 @@ namespace RimTalk.Memory.API
         private static string GetMemoryEntryContent()
         {
             return @"---
+# Memory Context
+{{-for p in pawns }}
+## {{ p.name }}'s Memories:
+{{ p.memory }}
+{{- end }}
 
-## Memory & Knowledge Context
-
-
-### {{pawn.name}}'s Memories:
-{{pawn.memory}}
-
-### World Knowledge:
-{{knowledge}}";
+# World Knowledge:
+{{knowledge}}
+---";
         }
         
         /// <summary>
