@@ -2,15 +2,15 @@
 using RimTalk;
 using RimTalk.Data;
 using RimTalk.Service;
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using RimTalkHistoryPlus;
 
-namespace RimTalkHistoryPlus
+namespace RimTalk.Memory.Patches
 {
 
     [HarmonyPatch(typeof(TalkService), "AddResponsesToHistory")]

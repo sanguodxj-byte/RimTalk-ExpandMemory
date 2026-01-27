@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
-namespace RimTalkHistoryPlus
+namespace RimTalkHistoryPlus // 等待接入主UI
 {
     public static class RimTalkHistoryPlusUI
     {
@@ -35,7 +35,7 @@ namespace RimTalkHistoryPlus
             listingStandard.Label("<b>注入设置 (Injection)</b>");
 
             // 注入条目数
-            listingStandard.Label($"注入到Prompt的最大历史条数: {settings.MaxHistoryInjected} （每一整轮对话算一条历史，可以在Pawn的记忆里查看和编辑）");
+            listingStandard.Label($"注入到Prompt的最大历史条数: {settings.MaxHistoryInjected} （本配置项无效，请使用主设置页面的注入上限配置项）");
             settings.MaxHistoryInjected = (int)listingStandard.Slider(settings.MaxHistoryInjected, min:1, max:20);
             listingStandard.Gap();
 

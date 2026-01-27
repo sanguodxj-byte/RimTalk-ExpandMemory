@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace RimTalkHistoryPlus
+namespace RimTalkHistoryPlus // 等待接入主UI后修改
 {
     public class RimTalkHistoryPlusMod : Mod
     {

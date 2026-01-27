@@ -12,6 +12,7 @@ namespace RimTalkHistoryPlus
 {
     [StaticConstructorOnStartup]
     // 注册变量到 RimTalkPromptAPI
+    // 这里用来注册隐藏变量，不会自动创建entry
     public static class RimTalkHistoryPlusApiAdapter
     {
         private const string ModId = "RimTalkHistoryPlus";

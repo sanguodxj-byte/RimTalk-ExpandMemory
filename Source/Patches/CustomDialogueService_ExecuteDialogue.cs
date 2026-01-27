@@ -9,8 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using RimTalkHistoryPlus;
 
-namespace RimTalkHistoryPlus
+namespace RimTalk.Memory.Patches
 {
 
     [HarmonyPatch(typeof(CustomDialogueService), "ExecuteDialogue")]

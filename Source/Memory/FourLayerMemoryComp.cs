@@ -1,10 +1,11 @@
-﻿using System;
+﻿using RimTalk.Memory.UI;
+using RimTalk.MemoryPatch;
+using RimTalkHistoryPlus;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Verse;
-using RimTalk.MemoryPatch;
-using RimTalkHistoryPlus;
 
 namespace RimTalk.Memory
 {
@@ -732,13 +733,59 @@ namespace RimTalk.Memory
             var memory = FindMemoryById(memoryId);
             if (memory is History history)
             {
-                FourLayerMemoryComp_PinMemory_Patch.Prefix(this, history, memoryId); // 这里调用了外部方法，后续可以并入
+                PinHistory(history, memoryId); // 已并入
                 return;
             }
             if (memory != null)
             {
                 memory.isPinned = pinned;
             }
+        }
+        // 轮次记忆入口
+        public void PinHistory(History history, string memoryId)
+        {
+            Log.Message("[RimTalkHistoryPlus] FourLayerMemoryComp.PinMemory: Pinning History");
+
+            // 是 History 类型，则创建一个新的 MemoryEntry 对象复制 History
+            var newMemory = new MemoryEntry(
+            content: string.Empty,
+            type: MemoryType.Conversation,
+            layer: MemoryLayer.Situational,
+            importance: 0.5f
+            )
+            {
+                content = history.content,
+                timestamp = history.timestamp,
+                relatedPawnId = history.relatedPawnId,
+                relatedPawnName = history.relatedPawnName,
+                location = history.location,
+                tags = new(history.tags ?? Enumerable.Empty<string>()),
+                keywords = new(history.keywords ?? Enumerable.Empty<string>()),
+                isUserEdited = true,
+                isPinned = true,
+                notes = history.notes,
+                aiCacheKey = history.aiCacheKey,
+            };
+            SituationalMemories?.Add(newMemory);
+            DeleteMemory(memoryId);
+            Log.Message("[RimTalkHistoryPlus] FourLayerMemoryComp.PinMemory: Pinned History as MemoryEntry");
+
+            history.isPinned = false; // 由于UI bug，这里强制回正一下
+            // 刷新UI
+            var memoryWindow = GetMemoryWindowInstance();
+            if (memoryWindow == null) return;
+            memoryWindow.LastMemoryCount = -1;
+            memoryWindow.FiltersDirty = true;
+            Log.Message("[RimTalkHistoryPlus] FourLayerMemoryComp.PinMemory: Refreshed Memory Window UI");
+
+            return;
+        }
+        // 获取 Memory 窗口实例
+        static MainTabWindow_Memory GetMemoryWindowInstance()
+        {
+            return Find.WindowStack.Windows
+                .OfType<MainTabWindow_Memory>()
+                .FirstOrDefault();
         }
 
         public void DeleteMemory(string memoryId)
