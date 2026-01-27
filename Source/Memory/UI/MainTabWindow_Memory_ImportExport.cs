@@ -172,14 +172,13 @@ namespace RimTalk.Memory.UI
                             switch (memory.layer)
                             {
                                 case MemoryLayer.Active:
-                                    if (currentMemoryComp.ActiveMemories.Count < RimTalkMemoryPatchMod.Settings.maxActiveMemories)
-                                    {
-                                        currentMemoryComp.ActiveMemories.Add(memory);
-                                        imported++;
-                                    }
+                                    // ⭐ v4.0: ABM 无容量限制
+                                    currentMemoryComp.ActiveMemories.Add(memory);
+                                    imported++;
                                     break;
                                     
                                 case MemoryLayer.Situational:
+                                    // ⭐ v4.0: SCM 已废弃，但仍支持导入旧数据
                                     if (currentMemoryComp.SituationalMemories.Count < RimTalkMemoryPatchMod.Settings.maxSituationalMemories)
                                     {
                                         currentMemoryComp.SituationalMemories.Add(memory);

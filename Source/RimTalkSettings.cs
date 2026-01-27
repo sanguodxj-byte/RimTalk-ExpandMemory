@@ -42,11 +42,15 @@ namespace RimTalk.MemoryPatch
         // ⭐ 提示词规范化规则列表（功能保留，默认为空）
         public List<ReplacementRule> normalizationRules = new List<ReplacementRule>();
         
-        // 四层记忆容量配置
-        public int maxActiveMemories = 6;
+        // ⭐ v4.0: 三层记忆容量配置（移除 SCM）
+        // maxActiveMemories 已废弃，ABM 无容量限制
+        // maxSituationalMemories 仅用于兼容旧存档显示
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
-
+        
+        // ⭐ v4.0: ABM 注入轮数配置
+        public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话
+        
         // 衰减速率设置
         public float scmDecayRate = 0.01f;
         public float elsDecayRate = 0.005f;
@@ -164,10 +168,16 @@ namespace RimTalk.MemoryPatch
                 normalizationRules = new List<ReplacementRule>();
             }
             
-            Scribe_Values.Look(ref maxActiveMemories, "fourLayer_maxActiveMemories", 6);
+            // ⭐ v4.0: maxActiveMemories 已废弃，保留序列化key以兼容旧存档（读取后忽略）
+            int _legacyMaxActive = 6;
+            Scribe_Values.Look(ref _legacyMaxActive, "fourLayer_maxActiveMemories", 6);
+            
             Scribe_Values.Look(ref maxSituationalMemories, "fourLayer_maxSituationalMemories", 20);
             Scribe_Values.Look(ref maxEventLogMemories, "fourLayer_maxEventLogMemories", 50);
-                        
+            
+            // ⭐ v4.0: ABM 注入轮数
+            Scribe_Values.Look(ref maxABMInjectionRounds, "fourLayer_maxABMInjectionRounds", 3);
+            
             Scribe_Values.Look(ref scmDecayRate, "fourLayer_scmDecayRate", 0.01f);
             Scribe_Values.Look(ref elsDecayRate, "fourLayer_elsDecayRate", 0.005f);
             Scribe_Values.Look(ref clpaDecayRate, "fourLayer_clpaDecayRate", 0.001f);
@@ -241,7 +251,7 @@ namespace RimTalk.MemoryPatch
                 knowledgeMatchingSources = new List<string> { "prompt", "fullname", "role", "age", "gender", "backstory", "traits", "skills", "relations" };
             }
 
-                        // ⭐ v5.1: 清除 knowledge 变量，防止自己匹配自己导致无限递归
+            // ⭐ v5.1: 清除 knowledge 变量，防止自己匹配自己导致无限递归
             if (Scribe.mode == LoadSaveMode.PostLoadInit && knowledgeMatchingSources != null)
             {
                 int removedCount = knowledgeMatchingSources.RemoveAll(s =>
@@ -399,6 +409,15 @@ namespace RimTalk.MemoryPatch
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 listing.Label("  " + "RimTalk_Settings_DynamicInjectionDesc".Translate());
+                GUI.color = Color.white;
+                
+                listing.Gap();
+                
+                // ⭐ v4.0: ABM 注入轮数设置
+                listing.Label("RimTalk_Settings_MaxABMInjectionRoundsLabel".Translate(maxABMInjectionRounds));
+                maxABMInjectionRounds = (int)listing.Slider(maxABMInjectionRounds, 1, 10);
+                GUI.color = Color.gray;
+                listing.Label("  " + "RimTalk_Settings_MaxABMInjectionRoundsDesc".Translate());
                 GUI.color = Color.white;
                 
                 listing.Gap();

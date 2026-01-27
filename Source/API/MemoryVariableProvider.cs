@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Verse;
 using RimTalk.MemoryPatch;
-using RimTalk.Memory.Patches;
+using RimTalkHistoryPlus;
 
 namespace RimTalk.Memory.API
 {
@@ -57,27 +57,93 @@ namespace RimTalk.Memory.API
         }
         
         /// <summary>
-        /// 获取四层记忆系统的记忆
+        /// ⭐ v4.2: 缓存每个 Pawn 的记忆结果，避免重复计算
+        /// Key: Pawn.ThingID, Value: 记忆文本
+        /// </summary>
+        [ThreadStatic]
+        private static Dictionary<string, string> _pawnMemoryCache;
+        
+        /// <summary>
+        /// ⭐ v4.2: 上次缓存的时间戳
+        /// </summary>
+        [ThreadStatic]
+        private static int _memoryCacheTick;
+        
+        /// <summary>
+        /// ⭐ v4.2: 缓存有效期（2秒 = 120 ticks）
+        /// </summary>
+        private const int MEMORY_CACHE_EXPIRE_TICKS = 120;
+        
+        /// <summary>
+        /// ⭐ v4.2: 获取四层记忆系统的记忆
+        /// 结构：ABM（最近记忆）+ ELS/CLPA（总结后的记忆）
+        /// 格式统一：序号. [类型] 内容 (时间)
         /// </summary>
         private static string GetFourLayerMemories(Pawn pawn, FourLayerMemoryComp comp, RimTalkMemoryPatchSettings settings)
         {
-            // 获取对话上下文（用于关键词匹配）
-            string dialogueContext = GetCurrentDialogueContext();
+            string pawnId = pawn.ThingID;
+            int currentTick = Find.TickManager?.TicksGame ?? 0;
             
-            // 使用 DynamicMemoryInjection 获取相关记忆
-            string memories = DynamicMemoryInjection.InjectMemories(
+            // ⭐ v4.2: 检查缓存是否有效
+            if (_pawnMemoryCache == null || currentTick - _memoryCacheTick > MEMORY_CACHE_EXPIRE_TICKS)
+            {
+                _pawnMemoryCache = new Dictionary<string, string>();
+                _memoryCacheTick = currentTick;
+            }
+            
+            // ⭐ v4.2: 如果缓存中有这个 Pawn 的结果，直接返回
+            if (_pawnMemoryCache.TryGetValue(pawnId, out string cachedResult))
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[Memory] Using cached result for {pawn.LabelShort}");
+                }
+                return cachedResult;
+            }
+            
+            var sb = new StringBuilder();
+            
+            // ⭐ v4.2: 第一部分 - ABM（最近记忆，支持跨 Pawn 去重）
+            string abmContent = HistoryManager.InjectABM(pawn);
+            
+            if (!string.IsNullOrEmpty(abmContent))
+            {
+                sb.AppendLine(abmContent);
+            }
+            
+            // ⭐ v4.0: 第二部分 - ELS/CLPA（总结后的记忆，通过关键词匹配）
+            string dialogueContext = GetCurrentDialogueContext();
+            string elsMemories = DynamicMemoryInjection.InjectMemories(
                 pawn,
                 dialogueContext,
                 settings.maxInjectedMemories
             );
             
-            if (string.IsNullOrEmpty(memories))
+            if (!string.IsNullOrEmpty(elsMemories))
             {
-                // 如果没有匹配的记忆，尝试获取最近的记忆
-                return GetRecentMemories(comp, settings.maxInjectedMemories);
+                // 如果 ABM 有内容，加空行分隔
+                if (sb.Length > 0)
+                {
+                    sb.AppendLine();
+                }
+                sb.AppendLine(elsMemories);
             }
             
-            return memories;
+            // 如果都为空，返回最近记忆
+            string result;
+            if (sb.Length == 0)
+            {
+                result = GetRecentMemories(comp, settings.maxInjectedMemories);
+            }
+            else
+            {
+                result = sb.ToString().TrimEnd();
+            }
+            
+            // ⭐ v4.2: 缓存结果
+            _pawnMemoryCache[pawnId] = result;
+            
+            return result;
         }
         
         /// <summary>

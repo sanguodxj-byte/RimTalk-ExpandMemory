@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Verse;
 using RimWorld;
+using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory
 {
@@ -28,12 +29,147 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
+        /// ⭐ v4.2: 跨 Pawn 去重用的 conversationId 集合
+        /// Key: conversationId, Value: 第一个显示该对话的 Pawn 的 ThingID
+        /// 在模板循环 {{ for p in pawns }} 中，用于避免同一轮对话被重复注入
+        /// </summary>
+        [ThreadStatic]
+        private static Dictionary<string, string> _displayedConversations;
+        
+        /// <summary>
+        /// ⭐ v4.2: 上一次调用的时间戳（用于自动检测新的对话上下文）
+        /// </summary>
+        [ThreadStatic]
+        private static int _lastContextTick;
+        
+        /// <summary>
+        /// ⭐ v4.2: 上下文有效期（2秒 = 120 ticks）
+        /// 如果距离上次调用超过这个时间，认为是新的对话上下文
+        /// </summary>
+        private const int CONTEXT_EXPIRE_TICKS = 120;
+        
+        /// <summary>
+        /// ⭐ v4.2: 检查并自动重置上下文（基于时间戳）
+        /// 如果距离上次调用超过 CONTEXT_EXPIRE_TICKS，重置去重集合
+        /// </summary>
+        private static void AutoResetContextIfNeeded()
+        {
+            int currentTick = Find.TickManager?.TicksGame ?? 0;
+            
+            // 如果距离上次调用超过阈值，或者集合为空，重置上下文
+            if (_displayedConversations == null ||
+                currentTick - _lastContextTick > CONTEXT_EXPIRE_TICKS)
+            {
+                _displayedConversations = new Dictionary<string, string>();
+                
+                if (Prefs.DevMode && _lastContextTick > 0)
+                {
+                    Log.Message($"[ABM Inject] Auto-reset context (last tick: {_lastContextTick}, current: {currentTick}, diff: {currentTick - _lastContextTick})");
+                }
+            }
+            
+            _lastContextTick = currentTick;
+        }
+        
+        /// <summary>
+        /// ⭐ v4.2: 兼容旧代码，但不再有实际作用
+        /// </summary>
+        public static void BeginConversationContext()
+        {
+            // 现在由 AutoResetContextIfNeeded() 自动管理
+        }
+
+        /// <summary>
         /// 动态注入记忆到对话提示词
         /// </summary>
         public static string InjectMemories(Pawn pawn, string context, int maxMemories = 10)
         {
             return InjectMemoriesWithDetails(pawn.TryGetComp<FourLayerMemoryComp>(), context, maxMemories, out _);
         }
+        
+        /// <summary>
+        /// ⭐ v4.2: 注入 ABM（最近N轮记忆），支持跨 Pawn 去重
+        /// 格式: "1. [Type] Content (TimeAgo)"
+        ///
+        /// 去重规则：
+        /// - 不同 Pawn 共享同一个 conversationId：只有第一个 Pawn 显示完整对话
+        /// - 同一个 Pawn 多次调用：每次都返回相同结果（不做 Pawn 级别去重）
+        /// </summary>
+        /// <param name="pawn">目标 Pawn</param>
+        /// <param name="maxRounds">最大注入条数（从设置读取）</param>
+        /// <returns>格式化的记忆文本</returns>
+        /*
+        public static string InjectABM(Pawn pawn, int maxRounds = -1)
+        {
+            if (pawn == null) return string.Empty;
+            
+            string pawnId = pawn.ThingID;
+            
+            // ⭐ v4.2: 自动检测并重置上下文
+            AutoResetContextIfNeeded();
+            
+            var memoryComp = pawn.TryGetComp<FourLayerMemoryComp>();
+            if (memoryComp == null) return string.Empty;
+            
+            // 使用设置中的默认值
+            if (maxRounds < 0)
+            {
+                maxRounds = RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 3;
+            }
+            
+            var abmList = memoryComp.ActiveMemories;
+            if (abmList == null || abmList.Count == 0) return string.Empty;
+            
+            var sb = new StringBuilder();
+            int index = 1;
+            int roundsAdded = 0;
+            
+            // 按时间降序遍历 ABM
+            foreach (var memory in abmList.OrderByDescending(m => m.timestamp))
+            {
+                if (roundsAdded >= maxRounds) break;
+                
+                // ⭐ v4.2: 跨 Pawn 去重：如果这个 conversationId 已经被其他 Pawn 显示过，跳过
+                if (!string.IsNullOrEmpty(memory.conversationId))
+                {
+                    if (_displayedConversations.TryGetValue(memory.conversationId, out string ownerPawnId))
+                    {
+                        // 如果是同一个 Pawn 的重复调用，允许显示
+                        if (ownerPawnId != pawnId)
+                        {
+                            // 这个对话已经被其他 Pawn 显示过了，跳过
+                            if (Prefs.DevMode)
+                            {
+                                Log.Message($"[ABM Inject] Skipped conversation {memory.conversationId} for {pawn.LabelShort} (already shown by {ownerPawnId})");
+                            }
+                            continue;
+                        }
+                        // 同一个 Pawn 的重复调用，继续显示（不跳过）
+                    }
+                    else
+                    {
+                        // 标记这个对话由当前 Pawn 显示
+                        _displayedConversations[memory.conversationId] = pawnId;
+                    }
+                }
+                
+                // ⭐ 使用统一格式：序号. [类型] 内容 (时间)
+                string typeTag = GetMemoryTypeTag(memory.type);
+                string timeStr = memory.TimeAgoString;
+                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
+                
+                index++;
+                roundsAdded++;
+            }
+            
+            if (Prefs.DevMode && roundsAdded > 0)
+            {
+                Log.Message($"[ABM Inject] Added {roundsAdded} ABM entries for {pawn.LabelShort}");
+            }
+            
+            return sb.ToString().TrimEnd();
+        }
+        */
 
         /// <summary>
         /// 动态注入记忆（带详细评分信息）- 用于预览
@@ -89,7 +225,7 @@ namespace RimTalk.Memory
                 return string.Empty;
 
             // 获取阈值设置
-            float threshold = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.15f;
+            float threshold = RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.15f;
 
             // ⭐ v3.3.16: 步骤4 - 使用动态权重计算评分
             var scoredMemories = allMemories

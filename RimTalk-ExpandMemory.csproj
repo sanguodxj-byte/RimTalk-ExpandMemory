@@ -3,7 +3,7 @@
     <PropertyGroup>
         <GameVersion Condition=" '$(GameVersion)' == '' ">1.6</GameVersion>
         <OutputType>Library</OutputType>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace>RimTalk.MemoryPatch</RootNamespace>
         <AssemblyName>RimTalkMemoryPatch</AssemblyName>
@@ -15,7 +15,7 @@
 
         <OutputPath>$(GameVersion)/Assemblies</OutputPath>
         <ModFolderName>RimTalk-ExpandMemory</ModFolderName>  <!-- ⭐ 修正为正确的 Mod 名称 -->
-        <LangVersion>7.3</LangVersion>
+        <LangVersion>latest</LangVersion>
         <EnableBubbles>true</EnableBubbles>
         
         <!-- Fix compiler crash -->
@@ -80,6 +80,10 @@
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Assembly-CSharp-firstpass.dll</HintPath>
             <Private>False</Private>
+        </Reference>
+        <Reference Include="RimTalk">
+          <HintPath>D:\Game\Steam\steamapps\workshop\content\294100\3551203752\1.6\Assemblies\RimTalk.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.CoreModule.dll</HintPath>

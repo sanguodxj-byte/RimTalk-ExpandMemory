@@ -6,6 +6,7 @@ using Verse;
 using RimWorld;
 using RimWorld.Planet;
 using RimTalk.MemoryPatch;
+using RimTalk.Memory.Patches;
 
 namespace RimTalk.Memory
 {
@@ -152,6 +153,9 @@ namespace RimTalk.Memory
             
             // ⭐ 处理手动总结队列
             ProcessManualSummarizationQueue();
+            
+            // ⭐ v4.0: 处理对话记忆队列（新的完整对话记忆系统）
+            //ProcessConversationQueue();
             
             // 每天 0 点触发总结
             CheckDailySummarization();
@@ -429,6 +433,143 @@ namespace RimTalk.Memory
             }
         }
         
+        /// <summary>
+        /// ⭐ v4.0: 处理对话记忆队列
+        /// 从异步线程的队列中取出完整对话，为所有参与者添加ABM记忆
+        /// </summary>
+        /*
+        private void ProcessConversationQueue()
+        {
+            const int MAX_PER_TICK = 5; // 每tick最多处理5个对话，避免卡顿
+            int processed = 0;
+            
+            while (processed < MAX_PER_TICK &&
+                   Patch_AddResponsesToHistory.ConversationQueue.TryDequeue(out var record))
+            {
+                RecordConversationToMemory(record);
+                processed++;
+            }
+            
+            // 定期清理过期的参与者缓存
+            if (Find.TickManager.TicksGame % 2500 == 0) // 每小时检查一次
+            {
+                Patch_PromptManagerBuildMessages.CleanupCache();
+            }
+        }
+        */
+        
+        /// <summary>
+        /// ⭐ v4.0: 将对话记录添加到所有参与者的ABM记忆中
+        /// </summary>
+        private void RecordConversationToMemory(PendingConversation record)
+        {
+            if (record == null || record.ParticipantThingIds == null || record.ParticipantThingIds.Count == 0)
+                return;
+            
+            if (record.RawDialogue == null || record.RawDialogue.Count == 0)
+                return;
+            
+            // 在主线程中格式化对话文本
+            string formattedText = FormatConversationText(record);
+            
+            if (string.IsNullOrEmpty(formattedText))
+                return;
+            
+            // 查找所有参与者的 Pawn
+            var pawns = FindPawnsByThingIds(record.ParticipantThingIds);
+            
+            if (pawns.Count == 0)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Warning("[RimTalk Memory] No pawns found for conversation");
+                }
+                return;
+            }
+            
+            // ⭐ 使用同一个 conversationId，用于跨Pawn去重
+            string conversationId = record.ConversationId;
+            
+            // 给每个参与者添加 ABM 记忆
+            int addedCount = 0;
+            foreach (var pawn in pawns)
+            {
+                var memoryComp = pawn.TryGetComp<FourLayerMemoryComp>();
+                if (memoryComp == null)
+                    continue;
+                
+                // 添加为对话类型的ABM记忆（带 conversationId）
+                memoryComp.AddActiveMemoryWithConversationId(
+                    formattedText,
+                    MemoryType.Conversation,
+                    conversationId
+                );
+                
+                addedCount++;
+            }
+            
+            if (Prefs.DevMode)
+            {
+                Log.Message($"[RimTalk Memory] ✅ Recorded conversation to {addedCount}/{pawns.Count} participants: {record.RawDialogue.Count} lines, convId={conversationId}");
+            }
+        }
+        
+        /// <summary>
+        /// ⭐ v4.0: 格式化对话文本
+        /// 格式: [对话参与者：张三、李四、王五]
+        ///       张三: "你好"
+        ///       李四: "你好啊"
+        /// </summary>
+        private string FormatConversationText(PendingConversation record)
+        {
+            var sb = new StringBuilder();
+            
+            // 第一行：参与者列表
+            if (record.ParticipantNames != null && record.ParticipantNames.Count > 0)
+            {
+                sb.AppendLine($"[对话参与者：{string.Join("、", record.ParticipantNames)}]");
+            }
+            
+            // 对话内容
+            foreach (var line in record.RawDialogue)
+            {
+                sb.AppendLine($"{line.SpeakerName}: \"{line.Text}\"");
+            }
+            
+            return sb.ToString().TrimEnd();
+        }
+        
+        /// <summary>
+        /// ⭐ v4.0: 通过 ThingID 列表查找 Pawn
+        /// </summary>
+        private List<Pawn> FindPawnsByThingIds(List<string> thingIds)
+        {
+            var result = new List<Pawn>();
+            
+            if (thingIds == null || thingIds.Count == 0)
+                return result;
+            
+            // 创建 HashSet 加速查找
+            var idSet = new HashSet<string>(thingIds);
+            
+            foreach (var map in Find.Maps)
+            {
+                foreach (var pawn in map.mapPawns.AllPawnsSpawned)
+                {
+                    if (idSet.Contains(pawn.ThingID))
+                    {
+                        result.Add(pawn);
+                        idSet.Remove(pawn.ThingID); // 找到后移除，避免重复
+                        
+                        if (idSet.Count == 0)
+                            return result; // 所有都找到了
+                    }
+                }
+            }
+            
+            return result;
+        }
+
         /// <summary>
         /// ⭐ 手动触发总结（批量）
         /// </summary>

@@ -539,7 +539,8 @@ namespace RimTalk.Memory.Debug
                 x = rect.x + 5f;
                 GUI.color = new Color(0.8f, 0.8f, 1f);
                 string configText = "RimTalk_Preview_InjectionConfig".Translate(
-                    settings.maxInjectedMemories);
+                    settings.maxInjectedMemories, 
+                    settings.maxABMInjectionRounds);
                 Widgets.Label(new Rect(x, rect.y + 25f, rect.width - 10f, lineHeight), configText);
                 GUI.color = Color.white;
             }

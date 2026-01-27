@@ -87,6 +87,9 @@ namespace RimTalk.Memory
         public MemoryLayer layer;           // 层级
         public int timestamp;               // 时间戳
         
+        // ⭐ v4.0: 对话ID（用于标记同一轮对话，支持跨Pawn去重）
+        public string conversationId;       // 对话ID（多个Pawn共享同一ID）
+        
         // 重要性和活跃度
         public float importance;            // 重要性 (0-1)
         public float activity;              // 活跃度 (随时间衰减)
@@ -164,6 +167,7 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref type, "type");
             Scribe_Values.Look(ref layer, "layer");
             Scribe_Values.Look(ref timestamp, "timestamp");
+            Scribe_Values.Look(ref conversationId, "conversationId");
             Scribe_Values.Look(ref importance, "importance");
             Scribe_Values.Look(ref activity, "activity");
             Scribe_Values.Look(ref relatedPawnId, "relatedPawnId");
