@@ -76,7 +76,7 @@ namespace RimTalkHistoryPlus
 
         public static int MaxHistory = 500; // 最大保存历史条目数，不对用户开放，留作防御性编程
         public static int MaxTextBlockLength = 10000; // 保存时单条轮次记忆最大文本长度
-        public static int MaxHistoryInjected => RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 4; // 最大注入轮次记忆条目数
+        public static int MaxHistoryInjected = 10; // 最大注入轮次记忆条目数
         public static int MaxTextBlockInjectedLength = 5000; // 注入时单条轮次记忆最大文本长度
         public static int MaxInjectedLength = 20000; // 注入时最大总文本长度
 
@@ -232,7 +232,7 @@ namespace RimTalkHistoryPlus
             // 这里不需要反转顺序
             // var stack = new Stack<string>();
             AutoReset();
-            int maxRounds = MaxHistoryInjected;
+            int maxRounds = RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 3;
             var stringList = new List<string>();
             int stackedLength = 0;
             int stackedCount = 0;
