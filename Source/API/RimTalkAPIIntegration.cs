@@ -1,8 +1,9 @@
+using RimTalk.API;
+using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Verse;
-using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory.API
 {
@@ -205,6 +206,27 @@ namespace RimTalk.Memory.API
                 catch (Exception ex)
                 {
                     Log.Warning($"[MemoryPatch] Failed to register knowledge: {ex.Message}");
+                }
+            }
+
+            // 3. 注册 {{RoundMemoryTogether}}
+            if (registerCtxVar != null) // 你看这里，如果要用反射来防止崩溃，像这样加个检测判断就行了，没必要后面每处都用反射
+            {
+                try
+                {
+                    if (typeof(RimTalkPromptAPI) == null) return; //这个分支永远不会被执行，用于在 RimTalkPromptAPI 不存在时抛出错误
+                    // 还有像这里，检测到类不存在就会直接抛出错误并立刻被下面catch
+
+                    RimTalkPromptAPI.RegisterContextVariable(
+                        MOD_ID,
+                        variableName: "RoundMemoryTogether",
+                        RoundMemoryManager.InjectRoundMemory,
+                        description: "RoundMemoryTogether");
+                    if (Prefs.DevMode) Log.Message("[MemoryPatch] ✓ Registered {{RoundMemoryTogether}} variable");
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning($"[MemoryPatch] Failed to register RoundMemoryTogether: {ex.Message}");
                 }
             }
         }
@@ -423,15 +445,15 @@ namespace RimTalk.Memory.API
         private static string GetMemoryEntryContent()
         {
             return @"---
-# Memory Context
-{{-for p in pawns }}
-## {{ p.name }}'s Memories:
-{{ p.memory }}
-{{- end }}
 
-# World Knowledge:
-{{knowledge}}
----";
+## Memory & Knowledge Context
+
+
+### {{pawn.name}}'s Memories:
+{{pawn.memory}}
+
+### World Knowledge:
+{{knowledge}}";
         }
         
         /// <summary>

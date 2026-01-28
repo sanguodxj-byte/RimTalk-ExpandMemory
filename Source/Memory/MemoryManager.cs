@@ -155,7 +155,7 @@ namespace RimTalk.Memory
             ProcessManualSummarizationQueue();
             
             // ⭐ v4.0: 处理对话记忆队列（新的完整对话记忆系统）
-            ProcessConversationQueue();
+            //ProcessConversationQueue();
             
             // 每天 0 点触发总结
             CheckDailySummarization();
@@ -437,6 +437,7 @@ namespace RimTalk.Memory
         /// ⭐ v4.0: 处理对话记忆队列
         /// 从异步线程的队列中取出完整对话，为所有参与者添加ABM记忆
         /// </summary>
+        /*
         private void ProcessConversationQueue()
         {
             const int MAX_PER_TICK = 5; // 每tick最多处理5个对话，避免卡顿
@@ -455,6 +456,7 @@ namespace RimTalk.Memory
                 Patch_PromptManagerBuildMessages.CleanupCache();
             }
         }
+        */
         
         /// <summary>
         /// ⭐ v4.0: 将对话记录添加到所有参与者的ABM记忆中

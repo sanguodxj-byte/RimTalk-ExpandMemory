@@ -1,3 +1,4 @@
+using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -204,7 +205,7 @@ namespace RimTalk.Memory
         /// </summary>
         public static void ApplyRecommendedThresholds()
         {
-            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+            var settings = RimTalkMemoryPatchMod.Settings;
             if (settings == null)
                 return;
 
@@ -226,7 +227,7 @@ namespace RimTalk.Memory
         /// </summary>
         private static float GetCurrentMemoryThreshold()
         {
-            return RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.20f;
+            return RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.20f;
         }
 
         /// <summary>
@@ -234,7 +235,7 @@ namespace RimTalk.Memory
         /// </summary>
         private static float GetCurrentKnowledgeThreshold()
         {
-            return RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.knowledgeScoreThreshold ?? 0.15f;
+            return RimTalkMemoryPatchMod.Settings?.knowledgeScoreThreshold ?? 0.15f;
         }
 
         /// <summary>

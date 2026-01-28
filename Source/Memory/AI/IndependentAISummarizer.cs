@@ -8,7 +8,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Verse;
 using UnityEngine;
-using RimWorld;  // ? v3.3.6: 添加 RimWorld 命名空间
+using RimWorld;
+using RimTalk.MemoryPatch;  // ? v3.3.6: 添加 RimWorld 命名空间
 
 namespace RimTalk.Memory.AI
 {
@@ -135,7 +136,7 @@ namespace RimTalk.Memory.AI
         {
             try
             {
-                var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+                var settings = RimTalkMemoryPatchMod.Settings;
                 
                 // ? 修复：严格按照用户设置决定是否跟随RimTalk
                 if (settings.useRimTalkAIConfig)
@@ -498,7 +499,7 @@ namespace RimTalk.Memory.AI
 
         private static string BuildPrompt(Pawn pawn, List<MemoryEntry> memories, string template)
         {
-            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+            var settings = RimTalkMemoryPatchMod.Settings;
             
             // 构建记忆列表
             var memoryListSb = new StringBuilder();
@@ -577,7 +578,7 @@ namespace RimTalk.Memory.AI
         private static string BuildJsonRequest(string prompt)
         {
             bool isGoogle = (provider == "Google");
-            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+            var settings = RimTalkMemoryPatchMod.Settings;
             bool enableCaching = settings != null && settings.enablePromptCaching;
             
             if (isGoogle)

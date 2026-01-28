@@ -1,3 +1,4 @@
+using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace RimTalk.Memory
     /// </summary>
     public static class PromptNormalizer
     {
-        private static List<RimTalk.MemoryPatch.RimTalkMemoryPatchSettings.ReplacementRule> activeRules = new List<RimTalk.MemoryPatch.RimTalkMemoryPatchSettings.ReplacementRule>();
+        private static List<RimTalkMemoryPatchSettings.ReplacementRule> activeRules = new List<RimTalkMemoryPatchSettings.ReplacementRule>();
         private static Dictionary<string, Regex> compiledRegexCache = new Dictionary<string, Regex>();
         
         /// <summary>
         /// 更新替换规则列表
         /// </summary>
-        public static void UpdateRules(List<RimTalk.MemoryPatch.RimTalkMemoryPatchSettings.ReplacementRule> rules)
+        public static void UpdateRules(List<RimTalkMemoryPatchSettings.ReplacementRule> rules)
         {
             if (rules == null)
             {
