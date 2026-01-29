@@ -54,7 +54,13 @@ namespace RimTalk.Memory.UI
         // ? v3.3.32: Filtered memories cache
         private List<MemoryEntry> cachedFilteredMemories;
         private bool filtersDirty = true;
-        
+        // 开放一个internal属性供外部访问
+        internal bool FiltersDirty
+        {
+            get => filtersDirty;
+            set => filtersDirty = value;
+        }
+
         // Layout constants
         private const float TOP_BAR_HEIGHT = 50f;
         private const float CONTROL_PANEL_WIDTH = 220f;
@@ -70,6 +76,12 @@ namespace RimTalk.Memory.UI
         
         // 脏检查状态 (用于检测是否需要刷新缓存)
         private int lastMemoryCount = -1;
+        // 开放一个internal属性供外部访问
+        internal int LastMemoryCount
+        {
+            get => lastMemoryCount;
+            set => lastMemoryCount = value;
+        }
         private bool lastShowABM;
         private bool lastShowSCM;
         private bool lastShowELS;

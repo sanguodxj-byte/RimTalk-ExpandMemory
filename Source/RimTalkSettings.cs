@@ -47,7 +47,9 @@ namespace RimTalk.MemoryPatch
         // maxSituationalMemories 仅用于兼容旧存档显示
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
-        
+
+        public bool IsPlayerDialogueInject = true; // 是否注入玩家发言
+
         // ⭐ v4.0: ABM 注入轮数配置
         public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话
         

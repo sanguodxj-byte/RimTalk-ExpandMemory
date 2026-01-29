@@ -1,3 +1,4 @@
+using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace RimTalk.Memory
         public static string TryRecallMemory(Pawn pawn, string context, Pawn listener = null)
         {
             // 检查是否启用
-            var settings = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings;
+            var settings = RimTalkMemoryPatchMod.Settings;
             if (settings?.enableProactiveRecall != true)
                 return null;
 
@@ -236,7 +237,7 @@ namespace RimTalk.Memory
             var diagnostics = new RecallDiagnostics
             {
                 PawnName = pawn?.LabelShort ?? "Unknown",
-                IsEnabled = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.enableProactiveRecall ?? false
+                IsEnabled = RimTalkMemoryPatchMod.Settings?.enableProactiveRecall ?? false
             };
 
             var memoryComp = pawn?.TryGetComp<FourLayerMemoryComp>();

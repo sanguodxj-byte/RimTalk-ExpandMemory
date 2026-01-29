@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Verse;
 using RimTalk.MemoryPatch;
-using RimTalk.Memory.Patches;
 
 namespace RimTalk.Memory.API
 {
@@ -104,7 +103,7 @@ namespace RimTalk.Memory.API
             var sb = new StringBuilder();
             
             // ⭐ v4.2: 第一部分 - ABM（最近记忆，支持跨 Pawn 去重）
-            string abmContent = DynamicMemoryInjection.InjectABM(pawn, settings.maxABMInjectionRounds);
+            string abmContent = RoundMemoryManager.InjectABM(pawn);
             
             if (!string.IsNullOrEmpty(abmContent))
             {

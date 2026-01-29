@@ -1,3 +1,4 @@
+/*
 using HarmonyLib;
 using System;
 using System.Collections;
@@ -281,3 +282,4 @@ namespace RimTalk.Memory.Patches
         }
     }
 }
+*/

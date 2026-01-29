@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Verse;
 using RimWorld;
+using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory
 {
@@ -97,6 +98,7 @@ namespace RimTalk.Memory
         /// <param name="pawn">目标 Pawn</param>
         /// <param name="maxRounds">最大注入条数（从设置读取）</param>
         /// <returns>格式化的记忆文本</returns>
+        /*
         public static string InjectABM(Pawn pawn, int maxRounds = -1)
         {
             if (pawn == null) return string.Empty;
@@ -112,7 +114,7 @@ namespace RimTalk.Memory
             // 使用设置中的默认值
             if (maxRounds < 0)
             {
-                maxRounds = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 3;
+                maxRounds = RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 3;
             }
             
             var abmList = memoryComp.ActiveMemories;
@@ -167,6 +169,7 @@ namespace RimTalk.Memory
             
             return sb.ToString().TrimEnd();
         }
+        */
 
         /// <summary>
         /// 动态注入记忆（带详细评分信息）- 用于预览
@@ -222,7 +225,7 @@ namespace RimTalk.Memory
                 return string.Empty;
 
             // 获取阈值设置
-            float threshold = RimTalk.MemoryPatch.RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.15f;
+            float threshold = RimTalkMemoryPatchMod.Settings?.memoryScoreThreshold ?? 0.15f;
 
             // ⭐ v3.3.16: 步骤4 - 使用动态权重计算评分
             var scoredMemories = allMemories
@@ -635,11 +638,12 @@ namespace RimTalk.Memory
 
             return sb.ToString();
         }
-        
+
         /// <summary>
         /// 获取记忆类型标签
         /// </summary>
-        private static string GetMemoryTypeTag(MemoryType type)
+        // 这个方法的功能其实和MemoryEntry的属性TypeName重合了，可以考虑直接替换哦
+        public static string GetMemoryTypeTag(MemoryType type)
         {
             switch (type)
             {

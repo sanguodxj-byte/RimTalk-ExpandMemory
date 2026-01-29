@@ -1,10 +1,10 @@
-﻿using System;
+﻿using RimTalk.Memory.UI;
+using RimTalk.MemoryPatch;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using Verse;
-using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory
 {
@@ -730,10 +730,61 @@ namespace RimTalk.Memory
         public void PinMemory(string memoryId, bool pinned)
         {
             var memory = FindMemoryById(memoryId);
+            if (memory is RoundMemory roundMemory)
+            {
+                PinRoundMemory(roundMemory, memoryId); // 已并入
+                return;
+            }
             if (memory != null)
             {
                 memory.isPinned = pinned;
             }
+        }
+        // 轮次记忆入口
+        public void PinRoundMemory(RoundMemory roundMemory, string memoryId)
+        {
+            Log.Message("[轮次记忆] FourLayerMemoryComp.PinMemory: Pinning 轮次记忆");
+
+            // 是 RoundMemory 类型，则创建一个新的 MemoryEntry 对象复制 RoundMemory
+            var newMemory = new MemoryEntry(
+            content: string.Empty,
+            type: MemoryType.Conversation,
+            layer: MemoryLayer.Situational,
+            importance: 0.5f
+            )
+            {
+                content = roundMemory.content,
+                timestamp = roundMemory.timestamp,
+                relatedPawnId = roundMemory.relatedPawnId,
+                relatedPawnName = roundMemory.relatedPawnName,
+                location = roundMemory.location,
+                tags = new(roundMemory.tags ?? Enumerable.Empty<string>()),
+                keywords = new(roundMemory.keywords ?? Enumerable.Empty<string>()),
+                isUserEdited = true,
+                isPinned = true,
+                notes = roundMemory.notes,
+                aiCacheKey = roundMemory.aiCacheKey,
+            };
+            SituationalMemories?.Add(newMemory);
+            DeleteMemory(memoryId);
+            Log.Message("[轮次记忆] FourLayerMemoryComp.PinMemory: Pinned 轮次记忆 as MemoryEntry");
+
+            roundMemory.isPinned = false; // 由于UI bug，这里强制回正一下
+            // 刷新UI
+            var memoryWindow = GetMemoryWindowInstance();
+            if (memoryWindow == null) return;
+            memoryWindow.LastMemoryCount = -1;
+            memoryWindow.FiltersDirty = true;
+            Log.Message("[轮次记忆] FourLayerMemoryComp.PinMemory: Refreshed Memory Window UI");
+
+            return;
+        }
+        // 获取 Memory 窗口实例
+        static MainTabWindow_Memory GetMemoryWindowInstance()
+        {
+            return Find.WindowStack.Windows
+                .OfType<MainTabWindow_Memory>()
+                .FirstOrDefault();
         }
 
         public void DeleteMemory(string memoryId)
