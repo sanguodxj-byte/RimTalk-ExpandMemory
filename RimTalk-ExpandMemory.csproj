@@ -2,8 +2,6 @@
 
 	<PropertyGroup>
 		<GameVersion Condition=" '$(GameVersion)' == '' ">1.6</GameVersion>
-		<!-- ⭐ 这里写自己本地的RimTalk目录 -->
-		<RimTalkDir>D:\Game\Steam\steamapps\workshop\content\294100\3551203752</RimTalkDir>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net48</TargetFramework>
 		<PlatformTarget>x64</PlatformTarget>
@@ -59,10 +57,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!-- Core RimWorld & UnityEngine libraries - 仅用于下载包，不自动引用 -->
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="$(GameVersion).*-*" ExcludeAssets="compile" />
+		<!-- Core RimWorld & UnityEngine libraries - 使用 PrivateAssets 让 NuGet 自动处理引用 -->
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="$(GameVersion).*-*" PrivateAssets="All" />
 		<!-- Harmony API -->
-		<PackageReference Include="Lib.Harmony.Ref" Version="2.*" ExcludeAssets="compile" />
+		<PackageReference Include="Lib.Harmony.Ref" Version="2.*" PrivateAssets="All" />
 		<!-- ⭐ 使用稳定版 Roslyn 编译器，兼容 SDK 9 -->
 		<PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.9.2" PrivateAssets="All" />
 		<!-- ⭐ Newtonsoft.Json: 用于向量 API，标准版本 13.0.3 -->
@@ -74,47 +72,14 @@
 		<!-- <PackageReference Include="System.Net.Http" Version="4.3.4" /> -->
 	</ItemGroup>
 
-	<!-- 手动添加所有必需的 RimWorld 和 Unity 引用 -->
+	<!-- RimTalk 核心引用：可通过命令行覆盖 -p:RimTalkDir=... -->
+	<PropertyGroup>
+		<RimTalkDir Condition=" '$(RimTalkDir)' == '' ">..\..\workshop\content\294100\3551203752</RimTalkDir>
+	</PropertyGroup>
+
 	<ItemGroup>
-		<Reference Include="Assembly-CSharp">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Assembly-CSharp.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="Assembly-CSharp-firstpass">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\Assembly-CSharp-firstpass.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="RimTalk">
+		<Reference Include="RimTalk" Condition="Exists('$(RimTalkDir)\$(GameVersion)\Assemblies\RimTalk.dll')">
 			<HintPath>$(RimTalkDir)\$(GameVersion)\Assemblies\RimTalk.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.CoreModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="UnityEngine.IMGUIModule">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.IMGUIModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="UnityEngine.TextRenderingModule">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.TextRenderingModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<!-- ⭐ v3.3.7: 添加音频和网络模块支持 TTS 播放 -->
-		<Reference Include="UnityEngine.AudioModule">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.AudioModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="UnityEngine.UnityWebRequestAudioModule">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="UnityEngine.UnityWebRequestModule">
-			<HintPath>$(USERPROFILE)\.nuget\packages\krafs.rimworld.ref\1.6.4633\ref\net472\UnityEngine.UnityWebRequestModule.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="0Harmony">
-			<HintPath>$(USERPROFILE)\.nuget\packages\lib.harmony.ref\2.4.2\ref\netstandard2.0\0Harmony.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<!-- ⭐ 修复：添加框架自带的 System.Net.Http 引用（用于向量API） -->

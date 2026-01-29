@@ -54,12 +54,6 @@ namespace RimTalk.Memory.UI
         // ? v3.3.32: Filtered memories cache
         private List<MemoryEntry> cachedFilteredMemories;
         private bool filtersDirty = true;
-        // 开放一个internal属性供外部访问
-        internal bool FiltersDirty
-        {
-            get => filtersDirty;
-            set => filtersDirty = value;
-        }
 
         // Layout constants
         private const float TOP_BAR_HEIGHT = 50f;
@@ -76,12 +70,6 @@ namespace RimTalk.Memory.UI
         
         // 脏检查状态 (用于检测是否需要刷新缓存)
         private int lastMemoryCount = -1;
-        // 开放一个internal属性供外部访问
-        internal int LastMemoryCount
-        {
-            get => lastMemoryCount;
-            set => lastMemoryCount = value;
-        }
         private bool lastShowABM;
         private bool lastShowSCM;
         private bool lastShowELS;
@@ -91,6 +79,16 @@ namespace RimTalk.Memory.UI
         private int lastRefreshTick = -1;
         
         public override Vector2 RequestedTabSize => new Vector2(1200f, 700f);
+
+        /// <summary>
+        /// 使 UI 缓存失效，强制下次绘制时刷新。
+        /// 当外部修改了记忆数据时调用此方法。
+        /// </summary>
+        public void InvalidateCache()
+        {
+            lastMemoryCount = -1;
+            filtersDirty = true;
+        }
 
         // ==================== Main Layout ====================
         

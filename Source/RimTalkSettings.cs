@@ -180,6 +180,9 @@ namespace RimTalk.MemoryPatch
             // ⭐ v4.0: ABM 注入轮数
             Scribe_Values.Look(ref maxABMInjectionRounds, "fourLayer_maxABMInjectionRounds", 3);
             
+            // ⭐ 是否注入玩家发言
+            Scribe_Values.Look(ref IsPlayerDialogueInject, "fourLayer_isPlayerDialogueInject", true);
+            
             Scribe_Values.Look(ref scmDecayRate, "fourLayer_scmDecayRate", 0.01f);
             Scribe_Values.Look(ref elsDecayRate, "fourLayer_elsDecayRate", 0.005f);
             Scribe_Values.Look(ref clpaDecayRate, "fourLayer_clpaDecayRate", 0.001f);
@@ -420,6 +423,14 @@ namespace RimTalk.MemoryPatch
                 maxABMInjectionRounds = (int)listing.Slider(maxABMInjectionRounds, 1, 10);
                 GUI.color = Color.gray;
                 listing.Label("  " + "RimTalk_Settings_MaxABMInjectionRoundsDesc".Translate());
+                GUI.color = Color.white;
+                
+                listing.Gap();
+                
+                // ⭐ 是否注入玩家发言
+                listing.CheckboxLabeled("RimTalk_Settings_IsPlayerDialogueInject".Translate(), ref IsPlayerDialogueInject);
+                GUI.color = Color.gray;
+                listing.Label("  " + "RimTalk_Settings_IsPlayerDialogueInjectDesc".Translate());
                 GUI.color = Color.white;
                 
                 listing.Gap();

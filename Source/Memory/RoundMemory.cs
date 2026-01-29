@@ -41,7 +41,7 @@ namespace RimTalk.Memory
         {
             if (responses == null || responses.Count == 0)
             {
-                Log.Warning("[轮次记忆] Attempted to Create 轮次记忆 with null.");
+                Log.Warning("[RoundMemory] Attempted to Create RoundMemory with null.");
                 return;
             }
 
@@ -49,14 +49,14 @@ namespace RimTalk.Memory
             var modifiedText = ModifyResponses(responses);
             if (string.IsNullOrWhiteSpace(modifiedText))
             {
-                Log.Warning("[轮次记忆] Attempted to Create 轮次记忆 with empty TextBlock.");
+                Log.Warning("[RoundMemory] Attempted to Create RoundMemory with empty TextBlock.");
                 return;
             }
             var maxTextBlockLength = RoundMemoryManager.MaxTextBlockLength;
             if (modifiedText.Length > maxTextBlockLength)
             {
                 modifiedText = modifiedText.Substring(0, maxTextBlockLength) + "...";
-                Log.Warning($"[轮次记忆] 轮次记忆字数超出{maxTextBlockLength}，已截短");
+                Log.Warning($"[RoundMemory] RoundMemory字数超出{maxTextBlockLength}，已截短");
             }
 
             // 创建参与者集合
@@ -71,7 +71,7 @@ namespace RimTalk.Memory
                 var manager = RoundMemoryManager.Instance;
                 Pawns.Add(manager?.Player);
                 modifiedText = $"{manager?.PlayerDialogue}\n{modifiedText}";
-                Log.Message("[轮次记忆] 成功插入玩家文本");
+                Log.Message("[RoundMemory] 成功插入玩家文本");
             }
             content = modifiedText;
 
@@ -86,7 +86,7 @@ namespace RimTalk.Memory
             // 因为RimTalk的问题，这里获取地点的方式很蛋疼，没辙，期待后续优化吧
             if (Pawns.Count == 0)
             {
-                Log.Error("[轮次记忆] 创建轮次记忆时发现不存在对话参与者，这应当是不可能的.");
+                Log.Error("[RoundMemory] 创建RoundMemory时发现不存在对话参与者");
                 return;
             }
             _planetTile = Pawns.First().Tile;
@@ -117,7 +117,7 @@ namespace RimTalk.Memory
             }
             catch
             {
-                Log.Warning($"[轮次记忆] 时间计算异常");
+                Log.Warning($"[RoundMemory] 时间计算异常");
                 return "Unknown Date";
             }
         }
@@ -156,7 +156,7 @@ namespace RimTalk.Memory
             return CommonUtil.StripFormattingTags(text).Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ").Trim();
         }
 
-        public new void ExposeData()
+        public override void ExposeData()
         {
             base.ExposeData();
 
@@ -177,7 +177,7 @@ namespace RimTalk.Memory
             // 确保集合不为 null
             if (Pawns == null)
             {
-                Log.Warning($"[轮次记忆] ExposeData for 轮次记忆: tick={AbsTick}时发现其Pawns为空");
+                Log.Warning($"[RoundMemory] ExposeData for RoundMemory: tick={AbsTick}时发现其Pawns为空");
                 Pawns = new HashSet<Pawn>();
             }
 

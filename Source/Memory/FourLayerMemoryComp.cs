@@ -740,10 +740,10 @@ namespace RimTalk.Memory
                 memory.isPinned = pinned;
             }
         }
-        // 轮次记忆入口
+        // RoundMemory入口
         public void PinRoundMemory(RoundMemory roundMemory, string memoryId)
         {
-            Log.Message("[轮次记忆] FourLayerMemoryComp.PinMemory: Pinning 轮次记忆");
+            Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Pinning RoundMemory");
 
             // 是 RoundMemory 类型，则创建一个新的 MemoryEntry 对象复制 RoundMemory
             var newMemory = new MemoryEntry(
@@ -767,17 +767,13 @@ namespace RimTalk.Memory
             };
             SituationalMemories?.Add(newMemory);
             DeleteMemory(memoryId);
-            Log.Message("[轮次记忆] FourLayerMemoryComp.PinMemory: Pinned 轮次记忆 as MemoryEntry");
+            Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Pinned RoundMemory as MemoryEntry");
 
             roundMemory.isPinned = false; // 由于UI bug，这里强制回正一下
-            // 刷新UI
-            var memoryWindow = GetMemoryWindowInstance();
-            if (memoryWindow == null) return;
-            memoryWindow.LastMemoryCount = -1;
-            memoryWindow.FiltersDirty = true;
-            Log.Message("[轮次记忆] FourLayerMemoryComp.PinMemory: Refreshed Memory Window UI");
-
-            return;
+            
+            // 刷新 UI 缓存
+            GetMemoryWindowInstance()?.InvalidateCache();
+            Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Refreshed Memory Window UI");
         }
         // 获取 Memory 窗口实例
         static MainTabWindow_Memory GetMemoryWindowInstance()

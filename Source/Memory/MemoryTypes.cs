@@ -160,7 +160,7 @@ namespace RimTalk.Memory
             }
         }
 
-        public void ExposeData()
+        public virtual void ExposeData()
         {
             Scribe_Values.Look(ref id, "id");
             Scribe_Values.Look(ref content, "content");

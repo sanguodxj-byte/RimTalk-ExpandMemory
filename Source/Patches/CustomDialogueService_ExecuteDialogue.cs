@@ -23,7 +23,7 @@ namespace RimTalk.Memory.Patches
             if (manager == null) return;
             manager.Player = initiator;
             manager.PlayerDialogue = $"{initiator?.LabelShort}: {message}";
-            Log.Message($"[轮次记忆] 成功捕获玩家发言"); // 别动，调试用，比原来的捕获日志频率还更低些。总之别删
+            Log.Message($"[RoundMemory] 成功捕获玩家发言"); 
         }
     }
 }
