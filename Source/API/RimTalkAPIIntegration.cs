@@ -208,10 +208,6 @@ namespace RimTalk.Memory.API
                     Log.Warning($"[MemoryPatch] Failed to register knowledge: {ex.Message}");
                 }
             }
-            
-            // ⭐ v4.0.1: 已删除 {{RoundMemoryTogether}} 注册
-            // 原因：{{pawn.memory}} 已经通过 InjectABM() 提供了跨 Pawn 去重的对话历史
-            // RoundMemoryTogether 功能完全冗余
         }
         
         // Chat History 条目的名称

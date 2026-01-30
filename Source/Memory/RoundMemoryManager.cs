@@ -17,7 +17,7 @@ namespace RimTalk.Memory
     /// - 去重缓存（防止同一对话被重复注入）
     /// - 玩家对话缓存（临时存储玩家输入）
     ///
-    /// 已移除：
+    /// 以下内容不能被移除：
     /// - _roundMemories 全局列表（RoundMemory 现在只存储在 FourLayerMemoryComp.ABM 中）
     /// - InjectRoundMemory 方法（被 InjectABM 替代）
     /// - FinalizeInit 指针修正（不再需要双重存储）
@@ -37,6 +37,23 @@ namespace RimTalk.Memory
                 }
                 return _instance;
             }
+        }
+
+        // 核心: 历史记录列表（按时间升序，最旧在前）
+        private List<RoundMemory> _roundMemories = new();
+        // 使用属性封装，确保不为 null，但不确定有没有必要
+        public List<RoundMemory> RoundMemories
+        {
+            get
+            {
+                if (_roundMemories == null)
+                {
+                    _roundMemories = new();
+                    Log.Warning("[RoundMemory] 检测到 _roundMemories 为空，创建新列表");
+                }
+                return _roundMemories;
+            }
+            set => _roundMemories = value;
         }
 
         // 玩家对话缓存
@@ -70,6 +87,7 @@ namespace RimTalk.Memory
 
         // 配置常量
         public static bool DevSwitch = false;
+        public static int MaxRoundMemory = 500; // 最大保存轮次记忆条目数
         public static int MaxTextBlockLength = 10000; // 创建时单条RoundMemory最大文本长度
         public static int MaxTextBlockInjectedLength = 5000; // 注入时单条RoundMemory最大文本长度
         public static int MaxInjectedLength = 20000; // 注入时最大总文本长度
@@ -78,7 +96,7 @@ namespace RimTalk.Memory
 
         public RoundMemoryManager(Game game) : base()
         {
-            _instance = this;
+            _instance = this; // 初始化时将自己赋值给静态实例
         }
 
         /// <summary>
@@ -95,8 +113,7 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// ⭐ v4.0.1: 简化版 - 只负责分发 RoundMemory 给各个 Pawn
-        /// 不再维护全局列表，RoundMemory 只存储在 FourLayerMemoryComp.ABM 中
+        /// 安全添加轮次记忆
         /// </summary>
         public static void AddRoundMemory(RoundMemory roundMemory)
         {
@@ -113,13 +130,22 @@ namespace RimTalk.Memory
                 return;
             }
 
-            // ⭐ v4.0.1: 只分发给各个 Pawn，不再保存到全局列表
+            // 当达到或超过上限时，移除最旧的条目，直到有空间，然后添加新条目
+            var roundMemories = Instance.RoundMemories;
+            while (roundMemories.Count >= MaxRoundMemory)
+            {
+                roundMemories.RemoveAt(0);
+            }
+
+            roundMemories.Add(roundMemory);
+
+            // 分配历史给各个Pawn
             var pawns = roundMemory.Pawns;
             if (pawns == null) return;
             foreach (var pawn in pawns)
             {
                 if (pawn == null) continue;
-                pawn.TryGetComp<FourLayerMemoryComp>()?.ActiveMemories?.Add(roundMemory);
+                pawn.TryGetComp<FourLayerMemoryComp>()?.ActiveMemories?.Add(roundMemory); // 直接访问属性并添加的写法不是很好，有待优化
             }
         }
 
@@ -143,6 +169,7 @@ namespace RimTalk.Memory
         /// </summary>
         public static string InjectABM(Pawn pawn)
         {
+            // 无效值判断
             if (Instance == null) return string.Empty;
             var abmList = pawn?.TryGetComp<FourLayerMemoryComp>()?.ActiveMemories;
             if (abmList == null || abmList.Count == 0) return string.Empty;
@@ -154,6 +181,7 @@ namespace RimTalk.Memory
             int stackedCount = 0;
 
             // 按timestamp降序排序，与UI面板保持一致
+            // 如果列表本身就是按时间顺序存储的，直接使用for循环而非ToList+OrderBy会更高效，更节省性能
             var sortedList = abmList.OrderByDescending(m => m.timestamp).ToList();
 
             foreach (var entry in sortedList)
@@ -179,18 +207,18 @@ namespace RimTalk.Memory
                 }
                 roundMemoryCache.Add(roundMemory);
 
+                // 开始构建文本
                 var textBlock = roundMemory.content;
                 if (textBlock == null)
                 {
                     Log.Warning("[RoundMemory] 检测到RoundMemory文本丢失");
                     continue;
                 }
-
                 if (textBlock.Length > MaxTextBlockInjectedLength)
                 {
                     textBlock = textBlock.Substring(0, MaxTextBlockInjectedLength) + "...";
                 }
-
+                // 你过关！录入列表！
                 stackedLength += textBlock.Length;
                 stackedCount++;
                 stringList.Add($"{stackedCount}. [{DynamicMemoryInjection.GetMemoryTypeTag(roundMemory.type)}]{textBlock}({roundMemory.TimeAgoString})");
@@ -203,23 +231,78 @@ namespace RimTalk.Memory
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look(ref _nextRoundMemoryId, "NextRoundMemoryId", 0);
-            
-            // ⭐ 兼容旧存档：读取但忽略旧的 _roundMemories
-            // 旧存档中的 RoundMemory 已经在各 Pawn 的 ABM 中，不需要再维护全局列表
-            if (Scribe.mode == LoadSaveMode.LoadingVars)
+            Scribe_Collections.Look(
+                ref _roundMemories,
+                "RoundMemories",
+                LookMode.Deep
+            );
+            Scribe_Values.Look(
+                ref _nextRoundMemoryId,
+                "NextRoundMemoryId",
+                0
+            );
+
+            // 确保加载后不为 null
+            if (_roundMemories == null)
             {
-                List<RoundMemory> legacyRoundMemories = null;
-                Scribe_Collections.Look(ref legacyRoundMemories, "RoundMemories", LookMode.Deep);
-                if (legacyRoundMemories != null && legacyRoundMemories.Count > 0)
+                _roundMemories = new();
+                Log.Warning($"[RoundMemory] 未找到已有 _roundMemories，新建空列表");
+            }
+
+            Log.Message($"[RoundMemory] ExposeData for RoundMemory: count={RoundMemories.Count}");
+        }
+
+        // 在读档后修正各 Pawn 上的指针
+        public override void FinalizeInit()
+        {
+            // 1. 建立去重索引
+            Dictionary<long, RoundMemory> managerMap = new Dictionary<long, RoundMemory>();
+            if (_roundMemories == null)
+            {
+                Log.Warning("[RoundMemory] RoundMemory为空，无法进行指针修正");
+                return;
+            }
+            foreach (var roundMemory in _roundMemories)
+            {
+                if (roundMemory == null)
                 {
-                    Log.Message($"[RoundMemory] 检测到旧存档格式，忽略 {legacyRoundMemories.Count} 条全局 RoundMemory（已在各 Pawn ABM 中）");
+                    Log.Warning("[RoundMemory] 检测到RoundMemory中有 null 条目，跳过");
+                    continue;
+                }
+                var roundMemoryUniqueID = roundMemory.RoundMemoryUniqueID;
+                if (!managerMap.ContainsKey(roundMemoryUniqueID))
+                {
+                    managerMap.Add(roundMemoryUniqueID, roundMemory);
+                }
+            }
+
+            // 2. 获取Pawn
+            var allPawns = PawnsFinder.All_AliveOrDead;
+
+            // 3. 开始去重(O(N))
+            foreach (var pawn in allPawns)
+            {
+                // --- 剪枝 1：TryGetComp ---
+                var comp = pawn.TryGetComp<FourLayerMemoryComp>();
+                if (comp == null) continue;
+
+                // --- 剪枝 2：列表为空 ---
+                var ABMs = comp.ActiveMemories;
+                if (ABMs == null || ABMs.Count == 0) continue;
+                // --- 只有少部分有数据的 Pawn 会进入这里 ---
+                // 4. 指针替换
+                for (int i = 0; i < ABMs.Count; i++)
+                {
+                    var ABM = ABMs[i];
+
+                    // 如果是 null 或者不为 History 或者 ID 不在主表里或者和manager指向的就是同一个（一般不可能），不管它
+                    if (ABM == null || ABM is not RoundMemory ABMRef || !managerMap.TryGetValue(ABMRef.RoundMemoryUniqueID, out RoundMemory managerRef) || ABMRef == managerRef) continue;
+                    // ★ 核心动作：狸猫换太子
+                    // 替换后，localRef 变成垃圾，等待 GC 回收
+                    ABMs[i] = managerRef;
+                    if (Prefs.DevMode) Log.Message("[RoundMemory] ABM指针已修正");
                 }
             }
         }
-
-        // ⭐ v4.0.1: 已删除 FinalizeInit 指针修正
-        // 原因：不再维护全局 _roundMemories 列表，RoundMemory 只存在于各 Pawn 的 ABM 中
-        // 每个 Pawn 独立序列化自己的 ABM，不需要跨 Pawn 共享引用
     }
 }

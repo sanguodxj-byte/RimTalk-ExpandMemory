@@ -98,8 +98,6 @@ namespace RimTalk.Memory
             }
             _mapId = map != null ? map.uniqueID : -1;
             IsHomeMap = map != null && map.IsPlayerHome;
-
-            // Log.Message($"[RimTalkHistoryPlus] Created History: pawns={Pawns.Count}, tick={AbsTick}, IsHomeMap={IsHomeMap}, MapId={_mapId}");
         }
 
         // 计算并返回历史的日期时间字符串
@@ -180,8 +178,6 @@ namespace RimTalk.Memory
                 Log.Warning($"[RoundMemory] ExposeData for RoundMemory: tick={AbsTick}时发现其Pawns为空");
                 Pawns = new HashSet<Pawn>();
             }
-
-            // Log.Message($"[RimTalkHistoryPlus] ExposeData for History: tick={AbsTick}");
         }
 
         public string GetUniqueLoadID()
