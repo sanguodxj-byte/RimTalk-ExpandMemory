@@ -439,7 +439,22 @@ namespace RimTalk.MemoryPatch
                 maxInjectedMemories = (int)listing.Slider(maxInjectedMemories, 1, 20);
                 
                 listing.Label("RimTalk_Settings_MaxInjectedKnowledgeLabel".Translate(maxInjectedKnowledge));
-                maxInjectedKnowledge = (int)listing.Slider(maxInjectedKnowledge, 1, 10);
+                
+                // 滑条和输入框组合
+                Rect knowledgeSliderRect = listing.GetRect(28f);
+                Rect sliderRect = new Rect(knowledgeSliderRect.x, knowledgeSliderRect.y, knowledgeSliderRect.width - 70f, 28f);
+                Rect inputRect = new Rect(knowledgeSliderRect.xMax - 60f, knowledgeSliderRect.y, 60f, 24f);
+                
+                // 滑条
+                maxInjectedKnowledge = (int)Widgets.HorizontalSlider(sliderRect, maxInjectedKnowledge, 0f, 100f, true);
+                
+                // 输入框
+                string knowledgeInput = maxInjectedKnowledge.ToString();
+                knowledgeInput = Widgets.TextField(inputRect, knowledgeInput);
+                if (int.TryParse(knowledgeInput, out int parsedKnowledge))
+                {
+                    maxInjectedKnowledge = Mathf.Clamp(parsedKnowledge, 0, 100);
+                }
                 
                 listing.Gap();
                 
