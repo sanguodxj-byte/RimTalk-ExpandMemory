@@ -164,68 +164,9 @@ namespace RimTalk.Memory
             Instance.LastContextTick = currentTick;
         }
 
-        /// <summary>
-        /// 注入 Pawn 的 ABM 记忆（支持跨 Pawn 去重）
-        /// </summary>
-        public static string InjectABM(Pawn pawn)
-        {
-            // 无效值判断
-            if (Instance == null) return string.Empty;
-            var abmList = pawn?.TryGetComp<FourLayerMemoryComp>()?.ActiveMemories;
-            if (abmList == null || abmList.Count == 0) return string.Empty;
-
-            AutoReset();
-            int maxRounds = RimTalkMemoryPatchMod.Settings?.maxABMInjectionRounds ?? 3;
-            var stringList = new List<string>();
-            int stackedLength = 0;
-            int stackedCount = 0;
-
-            // 按timestamp降序排序，与UI面板保持一致
-            // 如果列表本身就是按时间顺序存储的，直接使用for循环而非ToList+OrderBy会更高效，更节省性能
-            var sortedList = abmList.OrderByDescending(m => m.timestamp).ToList();
-
-            foreach (var entry in sortedList)
-            {
-                if (stackedCount >= maxRounds || stackedLength > MaxInjectedLength) break;
-
-                if (entry is not RoundMemory roundMemory)
-                {
-                    // 不是RoundMemory，直接添加
-                    stackedCount++;
-                    stringList.Add($"{stackedCount}. [{DynamicMemoryInjection.GetMemoryTypeTag(entry.type)}] {entry?.content} ({entry?.TimeAgoString})");
-                    continue;
-                }
-
-                if (DevSwitch) continue;
-
-                // 跨 Pawn 去重
-                var roundMemoryCache = Instance.RoundMemoryCache;
-                if (roundMemoryCache.Contains(roundMemory))
-                {
-                    if (Prefs.DevMode) Log.Message("[RoundMemory] 检测到重复RoundMemory，跳过注入");
-                    continue;
-                }
-                roundMemoryCache.Add(roundMemory);
-
-                // 开始构建文本
-                var textBlock = roundMemory.content;
-                if (textBlock == null)
-                {
-                    Log.Warning("[RoundMemory] 检测到RoundMemory文本丢失");
-                    continue;
-                }
-                if (textBlock.Length > MaxTextBlockInjectedLength)
-                {
-                    textBlock = textBlock.Substring(0, MaxTextBlockInjectedLength) + "...";
-                }
-                // 你过关！录入列表！
-                stackedLength += textBlock.Length;
-                stackedCount++;
-                stringList.Add($"{stackedCount}. [{DynamicMemoryInjection.GetMemoryTypeTag(roundMemory.type)}]{textBlock}({roundMemory.TimeAgoString})");
-            }
-
-            return string.Join("\n", stringList);
-        }
+        // ⭐ v5.0: InjectABM 方法已移动到 RimTalk.Memory.Injection.ABMCollector
+        // 旧代码已删除，去重逻辑通过 AutoReset() 和 RoundMemoryCache 继续提供
+        // ABMCollector 直接调用这些方法/属性
 
         // ⭐ v4.0.1: 简化存档 - 只保存发号机状态
         public override void ExposeData()

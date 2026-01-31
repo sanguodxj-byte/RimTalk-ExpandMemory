@@ -6,6 +6,7 @@ using System.Reflection;
 using Verse;
 using RimWorld;
 using RimTalk.MemoryPatch;
+using RimTalk.Memory.Injection;
 
 namespace RimTalk.Memory.Patches
 {
@@ -145,12 +146,8 @@ namespace RimTalk.Memory.Patches
                 var memoryComp = pawn.TryGetComp<FourLayerMemoryComp>();
                 if (memoryComp != null)
                 {
-                    // 动态注入记忆
-                    memoryContext = DynamicMemoryInjection.InjectMemories(
-                        pawn, 
-                        basePrompt, 
-                        RimTalkMemoryPatchMod.Settings.maxInjectedMemories
-                    );
+                    // ⭐ v5.0: 使用 UnifiedMemoryInjector 统一注入
+                    memoryContext = UnifiedMemoryInjector.Inject(pawn, basePrompt);
                     
                     // 注入常识库
                     var memoryManager = Find.World?.GetComponent<MemoryManager>();

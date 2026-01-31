@@ -28,79 +28,12 @@ namespace RimTalk.Memory
             public static float UserEditedBonus = 0.3f;  // 用户编辑加成（绝对优先级）
         }
 
-        /// <summary>
-        /// ⭐ v4.2: 跨 Pawn 去重用的 conversationId 集合
-        /// Key: conversationId, Value: 第一个显示该对话的 Pawn 的 ThingID
-        /// 在模板循环 {{ for p in pawns }} 中，用于避免同一轮对话被重复注入
-        /// </summary>
-        [ThreadStatic]
-        private static Dictionary<string, string> _displayedConversations;
-        
-        /// <summary>
-        /// ⭐ v4.2: 上一次调用的时间戳（用于自动检测新的对话上下文）
-        /// </summary>
-        [ThreadStatic]
-        private static int _lastContextTick;
-        
-        /// <summary>
-        /// ⭐ v4.2: 上下文有效期（2秒 = 120 ticks）
-        /// 如果距离上次调用超过这个时间，认为是新的对话上下文
-        /// </summary>
-        private const int CONTEXT_EXPIRE_TICKS = 120;
-        
-        /// <summary>
-        /// ⭐ v4.2: 检查并自动重置上下文（基于时间戳）
-        /// 如果距离上次调用超过 CONTEXT_EXPIRE_TICKS，重置去重集合
-        /// </summary>
-        private static void AutoResetContextIfNeeded()
-        {
-            int currentTick = Find.TickManager?.TicksGame ?? 0;
-            
-            // 如果距离上次调用超过阈值，或者集合为空，重置上下文
-            if (_displayedConversations == null ||
-                currentTick - _lastContextTick > CONTEXT_EXPIRE_TICKS)
-            {
-                _displayedConversations = new Dictionary<string, string>();
-                
-                if (Prefs.DevMode && _lastContextTick > 0)
-                {
-                    Log.Message($"[ABM Inject] Auto-reset context (last tick: {_lastContextTick}, current: {currentTick}, diff: {currentTick - _lastContextTick})");
-                }
-            }
-            
-            _lastContextTick = currentTick;
-        }
-        
-        /// <summary>
-        /// ⭐ v4.2: 兼容旧代码，但不再有实际作用
-        /// </summary>
-        public static void BeginConversationContext()
-        {
-            // 现在由 AutoResetContextIfNeeded() 自动管理
-        }
+        // ⭐ v5.0: 去重逻辑已移动到 RoundMemoryManager
+        // ⭐ v5.0: InjectMemories 方法已删除，统一入口改为 UnifiedMemoryInjector.Inject
 
         /// <summary>
-        /// 动态注入记忆到对话提示词
-        /// </summary>
-        public static string InjectMemories(Pawn pawn, string context, int maxMemories = 10)
-        {
-            return InjectMemoriesWithDetails(pawn.TryGetComp<FourLayerMemoryComp>(), context, maxMemories, out _);
-        }
-        
-        /// <summary>
-        /// ⭐ v4.2: 注入 ABM（最近N轮记忆），支持跨 Pawn 去重
-        /// 格式: "1. [Type] Content (TimeAgo)"
-        ///
-        /// 去重规则：
-        /// - 不同 Pawn 共享同一个 conversationId：只有第一个 Pawn 显示完整对话
-        /// - 同一个 Pawn 多次调用：每次都返回相同结果（不做 Pawn 级别去重）
-        /// </summary>
-        /// <param name="pawn">目标 Pawn</param>
-        /// <param name="maxRounds">最大注入条数（从设置读取）</param>
-        /// <returns>格式化的记忆文本</returns>
-
-        /// <summary>
-        /// 动态注入记忆（带详细评分信息）- 用于预览
+        /// 动态注入记忆（带详细评分信息）- 用于 ELSCollector 评分
+        /// ⭐ v5.0: 不再格式化输出，只返回评分数据
         /// ⭐ v3.3.16: 使用SceneAnalyzer + 游戏状态感知
         /// </summary>
         public static string InjectMemoriesWithDetails(
@@ -207,8 +140,9 @@ namespace RimTalk.Memory
                 });
             }
 
-            // 构建注入文本
-            return FormatMemoriesForInjection(scoredMemories);
+            // ⭐ v5.0: 不再格式化输出，格式化由 MemoryFormatter 负责
+            // ELSCollector 通过 scores 参数获取评分数据后自行调用 MemoryFormatter
+            return string.Empty;
         }
         
         /// <summary>
@@ -523,74 +457,7 @@ namespace RimTalk.Memory
             return finalKeywords;
         }
 
-        /// <summary>
-        /// 格式化记忆用于注入到System Rule
-        /// ⭐ v3.4.0: ELS和CLPA使用游戏日期时间戳，SCM使用模糊时间
-        /// </summary>
-        private static string FormatMemoriesForInjection(List<ScoredMemory> scoredMemories)
-        {
-            if (scoredMemories == null || scoredMemories.Count == 0)
-                return string.Empty;
-
-            var sb = new StringBuilder();
-
-            // 按层级分组显示
-            var byLayer = scoredMemories.GroupBy(sm => sm.Memory.layer);
-
-            int index = 1;
-            foreach (var group in byLayer.OrderBy(g => g.Key))
-            {
-                foreach (var scored in group)
-                {
-                    var memory = scored.Memory;
-                    
-                    // 简洁格式，适合system rule
-                    string typeTag = GetMemoryTypeTag(memory.type);
-                    
-                    // ⭐ v3.4.0: ELS(EventLog)和CLPA(Archive)使用游戏日期时间戳
-                    // SCM(Situational)和ABM(Active)使用模糊时间
-                    string timeStr;
-                    if (memory.layer == MemoryLayer.EventLog || memory.layer == MemoryLayer.Archive)
-                    {
-                        timeStr = memory.GameDateString;
-                    }
-                    else
-                    {
-                        timeStr = memory.TimeAgoString;
-                    }
-                    
-                    sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
-                    index++;
-                }
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// 获取记忆类型标签
-        /// </summary>
-        // 这个方法的功能其实和MemoryEntry的属性TypeName重合了，可以考虑直接替换哦
-        public static string GetMemoryTypeTag(MemoryType type)
-        {
-            switch (type)
-            {
-                case MemoryType.Conversation:
-                    return "Conversation";
-                case MemoryType.Action:
-                    return "Action";
-                case MemoryType.Observation:
-                    return "Observation";
-                case MemoryType.Event:
-                    return "Event";
-                case MemoryType.Emotion:
-                    return "Emotion";
-                case MemoryType.Relationship:
-                    return "Relationship";
-                default:
-                    return "Memory";
-            }
-        }
+        // ⭐ v5.0: FormatMemoriesForInjection 和 GetMemoryTypeTag 已移动到 MemoryFormatter
 
         /// <summary>
         /// 评分后的记忆

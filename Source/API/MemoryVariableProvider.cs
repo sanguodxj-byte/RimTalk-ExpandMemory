@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Verse;
 using RimTalk.MemoryPatch;
+using RimTalk.Memory.Injection;
 
 namespace RimTalk.Memory.API
 {
@@ -74,9 +75,12 @@ namespace RimTalk.Memory.API
         private const int MEMORY_CACHE_EXPIRE_TICKS = 120;
         
         /// <summary>
-        /// ⭐ v4.2: 获取四层记忆系统的记忆
-        /// 结构：ABM（最近记忆）+ ELS/CLPA（总结后的记忆）
-        /// 格式统一：序号. [类型] 内容 (时间)
+        /// ⭐ v5.0: 获取四层记忆系统的记忆（重构版）
+        ///
+        /// 使用 UnifiedMemoryInjector 统一调度：
+        /// 1. 对话记忆优先
+        /// 2. ABM 占用总配额
+        /// 3. 序号连续
         /// </summary>
         private static string GetFourLayerMemories(Pawn pawn, FourLayerMemoryComp comp, RimTalkMemoryPatchSettings settings)
         {
@@ -100,43 +104,14 @@ namespace RimTalk.Memory.API
                 return cachedResult;
             }
             
-            var sb = new StringBuilder();
-            
-            // ⭐ v4.2: 第一部分 - ABM（最近记忆，支持跨 Pawn 去重）
-            string abmContent = RoundMemoryManager.InjectABM(pawn);
-            
-            if (!string.IsNullOrEmpty(abmContent))
-            {
-                sb.AppendLine(abmContent);
-            }
-            
-            // ⭐ v4.0: 第二部分 - ELS/CLPA（总结后的记忆，通过关键词匹配）
+            // ⭐ v5.0: 使用 UnifiedMemoryInjector 统一注入
             string dialogueContext = GetCurrentDialogueContext();
-            string elsMemories = DynamicMemoryInjection.InjectMemories(
-                pawn,
-                dialogueContext,
-                settings.maxInjectedMemories
-            );
+            string result = UnifiedMemoryInjector.Inject(pawn, dialogueContext);
             
-            if (!string.IsNullOrEmpty(elsMemories))
-            {
-                // 如果 ABM 有内容，加空行分隔
-                if (sb.Length > 0)
-                {
-                    sb.AppendLine();
-                }
-                sb.AppendLine(elsMemories);
-            }
-            
-            // 如果都为空，返回最近记忆
-            string result;
-            if (sb.Length == 0)
+            // 如果结果为空，回退到最近记忆
+            if (string.IsNullOrEmpty(result))
             {
                 result = GetRecentMemories(comp, settings.maxInjectedMemories);
-            }
-            else
-            {
-                result = sb.ToString().TrimEnd();
             }
             
             // ⭐ v4.2: 缓存结果
@@ -164,9 +139,11 @@ namespace RimTalk.Memory.API
             // 按时间排序
             var sortedMemories = recentMemories
                 .OrderByDescending(m => m.timestamp)
-                .Take(maxCount);
+                .Take(maxCount)
+                .ToList();
             
-            return FormatMemories(sortedMemories);
+            // ⭐ v5.0: 使用 MemoryFormatter 格式化
+            return MemoryFormatter.Format(sortedMemories);
         }
         
         /// <summary>
@@ -193,47 +170,8 @@ namespace RimTalk.Memory.API
             return sb.ToString().TrimEnd();
         }
         
-        /// <summary>
-        /// 格式化记忆列表
-        /// </summary>
-        private static string FormatMemories(IEnumerable<MemoryEntry> memories)
-        {
-            var sb = new StringBuilder();
-            int index = 1;
-            
-            foreach (var memory in memories)
-            {
-                string typeTag = GetMemoryTypeTag(memory.type);
-                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({memory.TimeAgoString})");
-                index++;
-            }
-            
-            return sb.ToString().TrimEnd();
-        }
-        
-        /// <summary>
-        /// 获取记忆类型标签
-        /// </summary>
-        private static string GetMemoryTypeTag(MemoryType type)
-        {
-            switch (type)
-            {
-                case MemoryType.Conversation:
-                    return "Conversation";
-                case MemoryType.Action:
-                    return "Action";
-                case MemoryType.Observation:
-                    return "Observation";
-                case MemoryType.Event:
-                    return "Event";
-                case MemoryType.Emotion:
-                    return "Emotion";
-                case MemoryType.Relationship:
-                    return "Relationship";
-                default:
-                    return "Memory";
-            }
-        }
+        // ⭐ v5.0: FormatMemories 和 GetMemoryTypeTag 已移动到 MemoryFormatter
+        // 保留此注释以便追踪代码变更历史
         
         /// <summary>
         /// 获取当前对话上下文（用于关键词匹配）
@@ -268,6 +206,7 @@ namespace RimTalk.Memory.API
         /// <summary>
         /// 获取 Pawn 的 ABM 层记忆（超短期记忆）
         /// 由 RimTalk Mustache Parser 在解析 {{pawnN.ABM}} 时调用
+        /// ⭐ v5.0: 使用 UnifiedMemoryInjector.InjectABMOnly
         /// </summary>
         public static string GetPawnABM(Pawn pawn)
         {
@@ -275,15 +214,8 @@ namespace RimTalk.Memory.API
             
             try
             {
-                // 直接复用现有的 RoundMemoryManager.InjectABM
-                string abmContent = RoundMemoryManager.InjectABM(pawn);
-                
-                if (string.IsNullOrEmpty(abmContent))
-                {
-                    return "(No ABM memories)";
-                }
-                
-                return abmContent;
+                // ⭐ v5.0: 使用新的统一注入器
+                return UnifiedMemoryInjector.InjectABMOnly(pawn);
             }
             catch (Exception ex)
             {
@@ -344,7 +276,7 @@ namespace RimTalk.Memory.API
         
         /// <summary>
         /// 格式化记忆列表（用于 ELS/CLPA 输出）
-        /// 格式: "序号. [类型] 内容 (游戏日期)"
+        /// ⭐ v5.0: 使用 MemoryFormatter 格式化
         /// </summary>
         private static string FormatMemoryList(List<MemoryEntry> memories, MemoryLayer layer)
         {
@@ -356,24 +288,14 @@ namespace RimTalk.Memory.API
             var settings = RimTalkMemoryPatchMod.Settings;
             int maxCount = settings?.maxInjectedMemories ?? 10;
             
-            var sb = new StringBuilder();
-            int index = 1;
-            
             // 按时间降序排序（最新的在前）
             var sortedMemories = memories
                 .OrderByDescending(m => m.timestamp)
-                .Take(maxCount);
+                .Take(maxCount)
+                .ToList();
             
-            foreach (var memory in sortedMemories)
-            {
-                string typeTag = GetMemoryTypeTag(memory.type);
-                // ELS/CLPA 使用游戏日期时间戳
-                string timeStr = memory.GameDateString;
-                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
-                index++;
-            }
-            
-            return sb.ToString().TrimEnd();
+            // ⭐ v5.0: 使用 MemoryFormatter 格式化
+            return MemoryFormatter.Format(sortedMemories);
         }
         
         /// <summary>
@@ -467,6 +389,7 @@ namespace RimTalk.Memory.API
         /// <summary>
         /// 获取特定层级的匹配记忆
         /// 复用 DynamicMemoryInjection 的评分逻辑，但只针对指定层级
+        /// ⭐ v5.0: 使用 MemoryFormatter 格式化
         /// </summary>
         private static string GetMatchedMemoriesForLayer(
             Pawn pawn,
@@ -482,7 +405,7 @@ namespace RimTalk.Memory.API
             }
             
             // 使用 DynamicMemoryInjection 的匹配逻辑
-            string result = DynamicMemoryInjection.InjectMemoriesWithDetails(
+            DynamicMemoryInjection.InjectMemoriesWithDetails(
                 comp,
                 context,
                 maxCount,
@@ -495,27 +418,20 @@ namespace RimTalk.Memory.API
                 return null;
             }
             
-            var layerScores = scores.Where(s => s.Memory.layer == layer).ToList();
+            var layerMemories = scores
+                .Where(s => s.Memory.layer == layer)
+                .OrderByDescending(s => s.TotalScore)
+                .Take(maxCount)
+                .Select(s => s.Memory)
+                .ToList();
             
-            if (layerScores.Count == 0)
+            if (layerMemories.Count == 0)
             {
                 return null;
             }
             
-            // 格式化输出
-            var sb = new StringBuilder();
-            int index = 1;
-            
-            foreach (var score in layerScores.OrderByDescending(s => s.TotalScore).Take(maxCount))
-            {
-                var memory = score.Memory;
-                string typeTag = GetMemoryTypeTag(memory.type);
-                string timeStr = memory.GameDateString;
-                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
-                index++;
-            }
-            
-            return sb.ToString().TrimEnd();
+            // ⭐ v5.0: 使用 MemoryFormatter 格式化
+            return MemoryFormatter.Format(layerMemories);
         }
     }
 }
