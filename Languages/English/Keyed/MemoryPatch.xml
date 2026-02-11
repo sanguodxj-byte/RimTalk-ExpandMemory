@@ -539,6 +539,8 @@
     <RimTalk_Settings_MaxABMInjectionRoundsDesc>Control how many recent conversation rounds to inject into AI context</RimTalk_Settings_MaxABMInjectionRoundsDesc>
     <RimTalk_Settings_IsPlayerDialogueInject>Record Player Dialogue</RimTalk_Settings_IsPlayerDialogueInject>
     <RimTalk_Settings_IsPlayerDialogueInjectDesc>When enabled, player messages sent via dialogue box will be recorded in conversation memory</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+	<RimTalk_Settings_IsRoundMemoryActive>Whether to enable round memory</RimTalk_Settings_IsRoundMemoryActive>
+	<RimTalk_Settings_IsRoundMemoryActiveDesc>After activation, memory expansion will switch to capturing and injecting memories on a round-by-round basis</RimTalk_Settings_IsRoundMemoryActiveDesc>
     <RimTalk_Settings_MaxInjectedMemoriesLabel>Max Injected Memories: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
     <RimTalk_Settings_MaxInjectedKnowledgeLabel>Max Injected Knowledge: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
     <RimTalk_Settings_MemoryScoreThresholdLabel>Memory Score Threshold: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>

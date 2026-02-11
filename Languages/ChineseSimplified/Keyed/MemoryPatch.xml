@@ -268,7 +268,9 @@
   <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM 注入轮数: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
   <RimTalk_Settings_MaxABMInjectionRoundsDesc>控制注入多少轮最近的对话到 AI 上下文中</RimTalk_Settings_MaxABMInjectionRoundsDesc>
   <RimTalk_Settings_IsPlayerDialogueInject>记录玩家发言</RimTalk_Settings_IsPlayerDialogueInject>
-  <RimTalk_Settings_IsPlayerDialogueInjectDesc>开启后，玩家通过对话框发送的消息也会被记录到对话记忆中</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+  <RimTalk_Settings_IsPlayerDialogueInjectDesc>开启后，玩家通过对话框发送的消息也会被记录到轮次记忆中</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+  <RimTalk_Settings_IsRoundMemoryActive>是否开启轮次记忆</RimTalk_Settings_IsRoundMemoryActive>
+  <RimTalk_Settings_IsRoundMemoryActiveDesc>开启后，记忆拓展会改为以轮次记忆为单位捕获和注入记忆</RimTalk_Settings_IsRoundMemoryActiveDesc>
   <RimTalk_Settings_MaxInjectedMemoriesLabel>最大注入记忆数: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
   <RimTalk_Settings_MaxInjectedKnowledgeLabel>最大注入常识数: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
   <RimTalk_Settings_MemoryScoreThresholdLabel>记忆评分阈值: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
