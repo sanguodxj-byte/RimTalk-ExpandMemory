@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
     <!-- BioTabPersonalityPatch.cs -->
     <RimTalk.BioTab.RimTalkPersona>Persona</RimTalk.BioTab.RimTalkPersona>
@@ -196,6 +196,8 @@
 
     <!-- Memory System -->
     <RimTalk_GeminiAPIKey>Gemini API Key</RimTalk_GeminiAPIKey>
+    <RimTalk_GeminiAPIKeyDesc>Get your free API key from Google AI Studio</RimTalk_GeminiAPIKeyDesc>
+    <RimTalk_GetFreeAPIKey>Get Free API Key</RimTalk_GetFreeAPIKey>
     <RimTalk_TalkInterval>Talk Interval</RimTalk_TalkInterval>
     <RimTalk_SuppressUnprocessed>Suppress Unprocessed Messages</RimTalk_SuppressUnprocessed>
     <RimTalk_MemorySettings>Memory Settings</RimTalk_MemorySettings>
@@ -302,7 +304,7 @@
     <RimTalk_UI_MemoriesSummarizedCount>{0} colonists have been queued for summarization</RimTalk_UI_MemoriesSummarizedCount>
     <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
     <RimTalk_UI_MemoryArchived>{0}'s mid-term memories have been archived to long-term memory</RimTalk_UI_MemoryArchived>
-    <RimTalk_UI_MemoriesArchivedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
+    <RimTalk_UI_MemoriesSummarizedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
     
     <!-- Knowledge Library Management UI -->
     <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
@@ -331,22 +333,5 @@
     <RimTalk_Knowledge_Confirm>Confirm</RimTalk_Knowledge_Confirm>
     
     <RimTalk_Knowledge_Tag>Tag:</RimTalk_Knowledge_Tag>
-
-    <!-- UI Buttons 界面按钮 -->
-    <RimTalk_UI_Preview>Preview</RimTalk_UI_Preview>
-    <RimTalk_UI_Knowledge>Knowledge</RimTalk_UI_Knowledge>
-    <RimTalk_UI_ImmediateSummarize>Summarize Now (SCM→ELS)</RimTalk_UI_ImmediateSummarize>
-    <RimTalk_UI_ImmediateSummarizeNoMemory>Summarize Now (No SCM)</RimTalk_UI_ImmediateSummarizeNoMemory>
-    <RimTalk_UI_SummarizeAll>Summarize All Colonists</RimTalk_UI_SummarizeAll>
-    <RimTalk_UI_ImmediateArchive>Archive Now (ELS→CLPA)</RimTalk_UI_ImmediateArchive>
-    <RimTalk_UI_ImmediateArchiveNoMemory>Archive Now (No ELS)</RimTalk_UI_ImmediateArchiveNoMemory>
-    <RimTalk_UI_ArchiveAll>Archive All Colonists</RimTalk_UI_ArchiveAll>
-    
-    <!-- UI Messages 界面消息 -->
-    <RimTalk_UI_MemorySummarized>{0}'s short-term memories have been summarized to mid-term memory</RimTalk_UI_MemorySummarized>
-    <RimTalk_UI_MemoriesSummarizedCount>{0} colonists have been queued for summarization</RimTalk_UI_MemoriesSummarizedCount>
-    <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
-    <RimTalk_UI_MemoryArchived>{0}'s mid-term memories have been archived to long-term memory</RimTalk_UI_MemoryArchived>
-    <RimTalk_UI_MemoriesArchivedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
 
 </LanguageData>

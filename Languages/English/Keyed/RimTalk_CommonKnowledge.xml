@@ -222,19 +222,6 @@ A: Check if knowledge is enabled, matching mode is correct, importance isn't too
 
 Q: How to make AI use certain knowledge only in specific scenarios?
 A: Use precise compound tags (e.g., [Rules,Combat,RangedWeapons]) and moderate importance
-
-✓ Tags must be triggerable by conversations
-  • Problem: Tag [Rules-CombatSystem] won't trigger in "shooting" "melee" conversations
-  • Solution: Use [Combat,Shooting,Melee,Dodge] to add trigger keywords
-  • Or: [Rules-Combat,Shooting] keeps categorization while adding triggers
-
-✓ Avoid using skill names as single tags
-  • Problem: [Shooting] triggers in ALL conversations of pawns with Shooting skill (≥10)
-  • Reason: Match text includes pawn's high-level skill names
-  • Bad: [Shooting], [Melee], [Construction] (frequent false matches)
-  • Good: [Rules-ShootingCombat,Aim], [Tips-Melee,Brawl] (requires explicit mention)
-
-✓ Make content specific and actionable
 </RimTalk_Knowledge_HelpContent>
 
     <!-- Tag Testing Tool -->
