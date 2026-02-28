@@ -1,9 +1,8 @@
-using RimTalk.API;
-using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Verse;
+using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory.API
 {
@@ -72,13 +71,9 @@ namespace RimTalk.Memory.API
                 RegisterPromptEntry();
                 
                 Log.Message("[MemoryPatch] ✓ Integrated via RimTalk API v4.0+");
-                Log.Message("[MemoryPatch]   - Registered {{pawn.memory}} variable (combined memories)");
-                Log.Message("[MemoryPatch]   - Registered {{pawn.ABM}} variable (active buffer - raw)");
-                Log.Message("[MemoryPatch]   - Registered {{pawn.ELS}} variable (event log - raw)");
-                Log.Message("[MemoryPatch]   - Registered {{pawn.CLPA}} variable (archive - raw)");
-                Log.Message("[MemoryPatch]   - Registered {{pawn.matchELS}} variable (event log - matched)");
-                Log.Message("[MemoryPatch]   - Registered {{pawn.matchCLPA}} variable (archive - matched)");
+                Log.Message("[MemoryPatch]   - Registered {{pawn.memory}} variable");
                 Log.Message("[MemoryPatch]   - Registered {{knowledge}} variable");
+                Log.Message("[MemoryPatch]   - Registered {{knowledge_grouped/rules/lore/status/history/other}} variables");
                 Log.Message("[MemoryPatch]   - Added PromptEntry: " + ENTRY_NAME);
             }
             catch (Exception ex)
@@ -152,7 +147,7 @@ namespace RimTalk.Memory.API
         /// </summary>
         private static void RegisterVariables()
         {
-            // 1. 注册 {{pawn.memory}} - Pawn 变量（综合记忆）
+            // 1. 注册 {{pawn.memory}} - Pawn 变量
             // 使用 Func<Pawn, string> 委托
             var registerPawnVar = _promptAPIType.GetMethod("RegisterPawnVariable");
             if (registerPawnVar != null)
@@ -163,10 +158,10 @@ namespace RimTalk.Memory.API
                     Func<Pawn, string> memoryProvider = MemoryVariableProvider.GetPawnMemory;
                     
                     // 调用 RegisterPawnVariable(modId, variableName, provider, description, priority)
-                    registerPawnVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "memory",
+                    registerPawnVar.Invoke(null, new object[] 
+                    { 
+                        MOD_ID, 
+                        "memory", 
                         memoryProvider,
                         "Character's personal memories and experiences",
                         100 // priority
@@ -181,162 +176,63 @@ namespace RimTalk.Memory.API
                 {
                     Log.Warning($"[MemoryPatch] Failed to register pawn.memory: {ex.Message}");
                 }
-                
-                // 2. 注册 {{pawn.ABM}} - ABM 层记忆（超短期记忆）
-                try
-                {
-                    Func<Pawn, string> abmProvider = MemoryVariableProvider.GetPawnABM;
-                    
-                    registerPawnVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "ABM",
-                        abmProvider,
-                        "Character's active buffer memories (recent conversations)",
-                        100
-                    });
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[MemoryPatch] ✓ Registered {{pawn.ABM}} variable");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[MemoryPatch] Failed to register pawn.ABM: {ex.Message}");
-                }
-                
-                // 3. 注册 {{pawn.ELS}} - ELS 层记忆（中期记忆）
-                try
-                {
-                    Func<Pawn, string> elsProvider = MemoryVariableProvider.GetPawnELS;
-                    
-                    registerPawnVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "ELS",
-                        elsProvider,
-                        "Character's event log summary (mid-term memories)",
-                        100
-                    });
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[MemoryPatch] ✓ Registered {{pawn.ELS}} variable");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[MemoryPatch] Failed to register pawn.ELS: {ex.Message}");
-                }
-                
-                // 4. 注册 {{pawn.CLPA}} - CLPA 层记忆（长期记忆）
-                try
-                {
-                    Func<Pawn, string> clpaProvider = MemoryVariableProvider.GetPawnCLPA;
-                    
-                    registerPawnVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "CLPA",
-                        clpaProvider,
-                        "Character's persona archive (long-term memories)",
-                        100
-                    });
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[MemoryPatch] ✓ Registered {{pawn.CLPA}} variable");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[MemoryPatch] Failed to register pawn.CLPA: {ex.Message}");
-                }
-                
-                // 5. 注册 {{pawn.matchELS}} - 匹配后的 ELS 层记忆
-                try
-                {
-                    Func<Pawn, string> matchElsProvider = MemoryVariableProvider.GetPawnMatchELS;
-                    
-                    registerPawnVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "matchELS",
-                        matchElsProvider,
-                        "Context-matched event log memories (mid-term)",
-                        100
-                    });
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[MemoryPatch] ✓ Registered {{pawn.matchELS}} variable");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[MemoryPatch] Failed to register pawn.matchELS: {ex.Message}");
-                }
-                
-                // 6. 注册 {{pawn.matchCLPA}} - 匹配后的 CLPA 层记忆
-                try
-                {
-                    Func<Pawn, string> matchClpaProvider = MemoryVariableProvider.GetPawnMatchCLPA;
-                    
-                    registerPawnVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "matchCLPA",
-                        matchClpaProvider,
-                        "Context-matched archive memories (long-term)",
-                        100
-                    });
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[MemoryPatch] ✓ Registered {{pawn.matchCLPA}} variable");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[MemoryPatch] Failed to register pawn.matchCLPA: {ex.Message}");
-                }
             }
             
-            // 7. 注册 {{knowledge}} - Context 变量
+            // 2. 注册 {{knowledge}} - Context 变量（保持原有格式不变）
             var registerCtxVar = _promptAPIType.GetMethod("RegisterContextVariable");
             if (registerCtxVar != null)
             {
-                try
-                {
-                    // 创建委托 - 使用 object 类型接收 MustacheContext
-                    // 因为我们无法直接引用 RimTalk 的类型
-                    Func<object, string> knowledgeProvider = KnowledgeVariableProvider.GetMatchedKnowledge;
-                    
-                    // 调用 RegisterContextVariable(modId, variableName, provider, description, priority)
-                    registerCtxVar.Invoke(null, new object[]
-                    {
-                        MOD_ID,
-                        "knowledge",
-                        knowledgeProvider,
-                        "World knowledge matched to conversation context",
-                        100 // priority
-                    });
-                    
-                    if (Prefs.DevMode)
-                    {
-                        Log.Message("[MemoryPatch] ✓ Registered {{knowledge}} variable");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning($"[MemoryPatch] Failed to register knowledge: {ex.Message}");
-                }
+                // 原有变量 {{knowledge}} — 保持 "1. [tag] content" 格式，兼容旧预设
+                RegisterOneContextVariable(registerCtxVar, "knowledge",
+                    new Func<object, string>(KnowledgeVariableProvider.GetMatchedKnowledge),
+                    "World knowledge matched to conversation context", 100);
+                
+                // 新增：按分类分组的完整输出
+                RegisterOneContextVariable(registerCtxVar, "knowledge_grouped",
+                    new Func<object, string>(KnowledgeVariableProvider.GetGroupedKnowledge),
+                    "World knowledge grouped by category headers", 101);
+                
+                // 新增：按分类拆分的独立变量
+                RegisterOneContextVariable(registerCtxVar, "knowledge_rules",
+                    new Func<object, string>(KnowledgeVariableProvider.GetKnowledgeRules),
+                    "Knowledge: rules and instructions", 102);
+                
+                RegisterOneContextVariable(registerCtxVar, "knowledge_lore",
+                    new Func<object, string>(KnowledgeVariableProvider.GetKnowledgeLore),
+                    "Knowledge: world lore and background", 103);
+                
+                RegisterOneContextVariable(registerCtxVar, "knowledge_status",
+                    new Func<object, string>(KnowledgeVariableProvider.GetKnowledgeStatus),
+                    "Knowledge: pawn/colonist status", 104);
+                
+                RegisterOneContextVariable(registerCtxVar, "knowledge_history",
+                    new Func<object, string>(KnowledgeVariableProvider.GetKnowledgeHistory),
+                    "Knowledge: historical events", 105);
+                
+                RegisterOneContextVariable(registerCtxVar, "knowledge_other",
+                    new Func<object, string>(KnowledgeVariableProvider.GetKnowledgeOther),
+                    "Knowledge: uncategorized", 106);
             }
         }
         
-        // Chat History 条目的名称
-        private const string CHAT_HISTORY_ENTRY_NAME = "Chat History";
+        /// <summary>
+        /// 注册单个 Context 变量的辅助方法
+        /// </summary>
+        private static void RegisterOneContextVariable(MethodInfo registerMethod, string name, Func<object, string> provider, string description, int priority)
+        {
+            try
+            {
+                registerMethod.Invoke(null, new object[] { MOD_ID, name, provider, description, priority });
+                if (Prefs.DevMode)
+                {
+                    Log.Message($"[MemoryPatch] ✓ Registered {{{{{name}}}}} variable");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[MemoryPatch] Failed to register {name}: {ex.Message}");
+            }
+        }
         
         /// <summary>
         /// 注册 PromptEntry
@@ -345,7 +241,6 @@ namespace RimTalk.Memory.API
         /// - 必须先设置 SourceModId 再设置 Name（因为 Name setter 会触发 ID 更新）
         /// - ID 会自动生成为 mod_{sanitized_mod_id}_{sanitized_name}
         /// ⭐ v4.1: 支持更新现有条目内容，无需重置默认
-        /// ⭐ v5.0: 在 Chat History 条目后插入，并自动禁用 Chat History
         /// </summary>
         private static void RegisterPromptEntry()
         {
@@ -356,10 +251,9 @@ namespace RimTalk.Memory.API
                 
                 // 获取 ActivePreset
                 var getPresetMethod = _promptAPIType.GetMethod("GetActivePreset");
-                object preset = null;
                 if (getPresetMethod != null)
                 {
-                    preset = getPresetMethod.Invoke(null, null);
+                    var preset = getPresetMethod.Invoke(null, null);
                     if (preset != null)
                     {
                         // 尝试获取现有条目
@@ -372,9 +266,6 @@ namespace RimTalk.Memory.API
                                 // ⭐ 条目已存在 → 直接更新 Content
                                 SetProperty(existingEntry, "Content", GetMemoryEntryContent());
                                 Log.Message($"[MemoryPatch] ✓ Updated existing PromptEntry: {ENTRY_NAME}");
-                                
-                                // ⭐ v5.0: 仍然检查并禁用 Chat History
-                                DisableChatHistoryIfEnabled(preset);
                                 return;
                             }
                         }
@@ -401,7 +292,7 @@ namespace RimTalk.Memory.API
                 // 设置 Role = System
                 if (_promptRoleType != null)
                 {
-                    var systemRole = Enum.Parse(_promptRoleType, "System");
+                    var systemRole = Enum.Parse(_promptRoleType, "User");
                     SetProperty(entry, "Role", systemRole);
                 }
                 
@@ -412,40 +303,25 @@ namespace RimTalk.Memory.API
                     SetProperty(entry, "Position", relativePos);
                 }
                 
-                // ⭐ v5.0: 在 Chat History 条目后插入（而不是添加到末尾）
-                var insertAfterNameMethod = _promptAPIType.GetMethod("InsertPromptEntryAfterName");
-                if (insertAfterNameMethod != null)
+                // 添加到 Preset 末尾
+                // ⭐ 新 API 会自动去重：如果已存在相同 ID 的条目，会返回 false
+                var addMethod = _promptAPIType.GetMethod("AddPromptEntry");
+                if (addMethod != null)
                 {
-                    var result = insertAfterNameMethod.Invoke(null, new object[] { entry, CHAT_HISTORY_ENTRY_NAME });
+                    var result = addMethod.Invoke(null, new[] { entry });
                     if (result is bool success)
                     {
                         if (success)
                         {
-                            Log.Message($"[MemoryPatch] ✓ Inserted PromptEntry after '{CHAT_HISTORY_ENTRY_NAME}': {ENTRY_NAME}");
+                            Log.Message($"[MemoryPatch] ✓ Added PromptEntry: {ENTRY_NAME}");
                         }
                         else
                         {
-                            // Chat History 未找到，已添加到末尾
-                            Log.Message($"[MemoryPatch] ✓ Added PromptEntry at end ('{CHAT_HISTORY_ENTRY_NAME}' not found): {ENTRY_NAME}");
-                        }
-                        
-                        // ⭐ v5.0: 禁用 Chat History
-                        if (preset != null)
-                        {
-                            DisableChatHistoryIfEnabled(preset);
-                        }
-                    }
-                }
-                else
-                {
-                    // 回退：使用旧的 AddPromptEntry 方法
-                    var addMethod = _promptAPIType.GetMethod("AddPromptEntry");
-                    if (addMethod != null)
-                    {
-                        var result = addMethod.Invoke(null, new[] { entry });
-                        if (result is bool success && success)
-                        {
-                            Log.Message($"[MemoryPatch] ✓ Added PromptEntry: {ENTRY_NAME}");
+                            // 返回 false 可能是因为被用户删除（在黑名单中）
+                            if (Prefs.DevMode)
+                            {
+                                Log.Message($"[MemoryPatch] PromptEntry blacklisted by user: {ENTRY_NAME}");
+                            }
                         }
                     }
                 }
@@ -457,107 +333,20 @@ namespace RimTalk.Memory.API
         }
         
         /// <summary>
-        /// ⭐ v5.0: 检查并禁用 Chat History 条目（如果它是开启的）
-        /// 这样可以避免与我们的记忆系统冲突
-        /// </summary>
-        private static void DisableChatHistoryIfEnabled(object preset)
-        {
-            try
-            {
-                if (preset == null) return;
-                
-                // 查找 Chat History 条目
-                var findEntryByNameMethod = preset.GetType().GetMethod("FindEntryIdByName");
-                if (findEntryByNameMethod == null)
-                {
-                    if (Prefs.DevMode) Log.Warning("[MemoryPatch] FindEntryIdByName method not found");
-                    return;
-                }
-                
-                var chatHistoryId = findEntryByNameMethod.Invoke(preset, new object[] { CHAT_HISTORY_ENTRY_NAME }) as string;
-                if (string.IsNullOrEmpty(chatHistoryId))
-                {
-                    if (Prefs.DevMode) Log.Message($"[MemoryPatch] '{CHAT_HISTORY_ENTRY_NAME}' entry not found in preset");
-                    return;
-                }
-                
-                var getEntryMethod = preset.GetType().GetMethod("GetEntry");
-                if (getEntryMethod == null)
-                {
-                    if (Prefs.DevMode) Log.Warning("[MemoryPatch] GetEntry method not found");
-                    return;
-                }
-                
-                var chatHistoryEntry = getEntryMethod.Invoke(preset, new object[] { chatHistoryId });
-                if (chatHistoryEntry == null)
-                {
-                    if (Prefs.DevMode) Log.Warning("[MemoryPatch] Chat History entry is null");
-                    return;
-                }
-                
-                // ⭐ 修复：Enabled 是字段（field），不是属性（property）
-                // 先尝试属性，如果没有则尝试字段
-                var enabledProp = chatHistoryEntry.GetType().GetProperty("Enabled");
-                var enabledField = chatHistoryEntry.GetType().GetField("Enabled");
-                
-                bool isEnabled = false;
-                if (enabledProp != null)
-                {
-                    isEnabled = (bool)enabledProp.GetValue(chatHistoryEntry);
-                }
-                else if (enabledField != null)
-                {
-                    isEnabled = (bool)enabledField.GetValue(chatHistoryEntry);
-                }
-                else
-                {
-                    if (Prefs.DevMode) Log.Warning("[MemoryPatch] Enabled property/field not found on PromptEntry");
-                    return;
-                }
-                
-                if (isEnabled)
-                {
-                    // 禁用 Chat History
-                    if (enabledProp != null)
-                    {
-                        enabledProp.SetValue(chatHistoryEntry, false);
-                    }
-                    else if (enabledField != null)
-                    {
-                        enabledField.SetValue(chatHistoryEntry, false);
-                    }
-                    Log.Message($"[MemoryPatch] ✓ Disabled '{CHAT_HISTORY_ENTRY_NAME}' to avoid conflict with Memory & Knowledge injection");
-                }
-                else
-                {
-                    if (Prefs.DevMode) Log.Message($"[MemoryPatch] '{CHAT_HISTORY_ENTRY_NAME}' is already disabled");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[MemoryPatch] Failed to disable Chat History: {ex.Message}");
-                if (Prefs.DevMode)
-                {
-                    Log.Warning($"[MemoryPatch] Stack trace: {ex.StackTrace}");
-                }
-            }
-        }
-        
-        /// <summary>
         /// 获取 Memory Entry 的模板内容
         /// </summary>
         private static string GetMemoryEntryContent()
         {
             return @"---
-# Memory Context
-{{-for p in pawns }}
-## {{ p.name }}'s Memories:
-{{ p.memory }}
-{{- end }}
 
-# World Knowledge:
-{{knowledge}}
----";
+## Memory & Knowledge Context
+
+
+### {{pawn.name}}'s Memories:
+{{pawn.memory}}
+
+### World Knowledge:
+{{knowledge}}";
         }
         
         /// <summary>

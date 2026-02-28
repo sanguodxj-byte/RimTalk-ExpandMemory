@@ -193,12 +193,9 @@ namespace RimTalk.Memory.UI
             
             Rect innerRect = rect.ContractedBy(8f);
             
-            // ? 计算按钮区域（用于检测是否点击在按钮上）
+            // ? 计算按钮区域
             float buttonSize = 24f;
             float buttonSpacing = 4f;
-            float buttonAreaX = innerRect.xMax - (buttonSize * 2 + buttonSpacing + 8f);
-            Rect buttonAreaRect = new Rect(buttonAreaX, innerRect.y, buttonSize * 2 + buttonSpacing + 8f, buttonSize);
-            bool clickedOnButton = false;
             
             // Top-right action buttons
             float buttonX = innerRect.xMax - buttonSize;
@@ -218,7 +215,6 @@ namespace RimTalk.Memory.UI
                     currentMemoryComp.PinMemory(memory.id, memory.isPinned);
                 }
                 // ? v3.3.32: No need to mark dirty for pin/unpin as it doesn't affect filtering
-                clickedOnButton = true;
                 Event.current.Use();
             }
             TooltipHandler.TipRegion(pinButtonRect, memory.isPinned ? "RimTalk_MindStream_Unpin".Translate() : "RimTalk_MindStream_Pin".Translate());
@@ -239,16 +235,12 @@ namespace RimTalk.Memory.UI
                     // User might change layer or type which affects filtering
                     filtersDirty = true;
                 }
-                clickedOnButton = true;
                 Event.current.Use();
             }
             TooltipHandler.TipRegion(editButtonRect, "RimTalk_MindStream_Edit".Translate());
             
-            // ? 只在非按钮区域处理点击选择
-            if (!clickedOnButton && Widgets.ButtonInvisible(rect) && !isDragging && !buttonAreaRect.Contains(Event.current.mousePosition))
-            {
-                HandleMemoryClick(memory);
-            }
+            // ⭐ 点击选择现在由 DoWindowContents 的 MouseUp 统一处理
+            // 不再使用 ButtonInvisible（它会和拖拽框选冲突）
             
             // Content area (avoid button overlap)
             Rect contentRect = new Rect(innerRect.x, innerRect.y, innerRect.width - (buttonSize * 2 + buttonSpacing + 8f), innerRect.height);
@@ -353,60 +345,65 @@ namespace RimTalk.Memory.UI
         {
             Event e = Event.current;
             
-            // ? 修复：在viewport坐标系中开始拖拽
+            // 左键按下：记录起始位置
             if (e.type == EventType.MouseDown && e.button == 0 && listRect.Contains(e.mousePosition))
             {
-                isDragging = true;
-                // 转换为viewport坐标（相对于listRect）
+                isMouseDown = true;
+                mouseDownScreenPos = e.mousePosition;
                 dragStartPos = e.mousePosition - listRect.position;
                 dragCurrentPos = dragStartPos;
-                e.Use();
+                // ⭐ 不 Use 事件，不设 isDragging，等超过阈值再设
             }
             
-            if (isDragging && e.type == EventType.MouseDrag)
+            // 鼠标移动中：判断是否超过拖拽阈值
+            if (isMouseDown && e.type == EventType.MouseDrag && e.button == 0)
             {
-                // ? 修复：同样在viewport坐标系中
-                dragCurrentPos = e.mousePosition - listRect.position;
+                float distance = Vector2.Distance(mouseDownScreenPos, e.mousePosition);
                 
-                // Select memories that intersect with drag box
-                // ? 修复：转换为content坐标（加上scroll offset）
-                Rect selectionBoxViewport = GetSelectionBox();
-                Rect selectionBoxContent = new Rect(
-                    selectionBoxViewport.x, 
-                    selectionBoxViewport.y + timelineScrollPosition.y,
-                    selectionBoxViewport.width,
-                    selectionBoxViewport.height
-                );
-                
-                var filteredMemories = GetFilteredMemories();
-                
-                bool ctrl = Event.current.control;
-                if (!ctrl)
+                if (!isDragging && distance >= DRAG_THRESHOLD)
                 {
-                    selectedMemories.Clear();
+                    // 超过阈值，正式进入框选模式
+                    isDragging = true;
                 }
                 
-                float y = 0f;
-                foreach (var memory in filteredMemories)
+                if (isDragging)
                 {
-                    float height = GetCardHeight(memory.layer);
-                    Rect cardRect = new Rect(0f, y, viewRect.width, height);
+                    // ⭐ 在viewport坐标系中
+                    dragCurrentPos = e.mousePosition - listRect.position;
                     
-                    if (selectionBoxContent.Overlaps(cardRect))
+                    // 转换为content坐标（加上scroll offset）
+                    Rect selectionBoxViewport = GetSelectionBox();
+                    Rect selectionBoxContent = new Rect(
+                        selectionBoxViewport.x, 
+                        selectionBoxViewport.y + timelineScrollPosition.y,
+                        selectionBoxViewport.width,
+                        selectionBoxViewport.height
+                    );
+                    
+                    var filteredMemories = GetFilteredMemories();
+                    
+                    bool ctrl = Event.current.control;
+                    if (!ctrl)
                     {
-                        selectedMemories.Add(memory);
+                        selectedMemories.Clear();
                     }
                     
-                    y += height + CARD_SPACING;
+                    float y = 0f;
+                    foreach (var memory in filteredMemories)
+                    {
+                        float height = GetCardHeight(memory.layer);
+                        Rect cardRect = new Rect(0f, y, viewRect.width, height);
+                        
+                        if (selectionBoxContent.Overlaps(cardRect))
+                        {
+                            selectedMemories.Add(memory);
+                        }
+                        
+                        y += height + CARD_SPACING;
+                    }
+                    
+                    e.Use();
                 }
-                
-                e.Use();
-            }
-            
-            if (e.type == EventType.MouseUp && e.button == 0 && isDragging)
-            {
-                isDragging = false;
-                e.Use();
             }
         }
         

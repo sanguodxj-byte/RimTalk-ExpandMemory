@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,8 +23,16 @@ namespace RimTalk.Memory.UI
         
         // Drag selection
         private bool isDragging = false;
+        private bool isMouseDown = false;           // ⭐ 左键已按下但尚未判定为拖拽
         private Vector2 dragStartPos = Vector2.zero;
         private Vector2 dragCurrentPos = Vector2.zero;
+        private Vector2 mouseDownScreenPos = Vector2.zero; // ⭐ 按下时的屏幕坐标（用于阈值判定）
+        private const float DRAG_THRESHOLD = 5f;    // ⭐ 拖拽判定阈值（像素）
+        
+        // ⭐ 拖拽排序
+        private bool isDragReordering = false;      // 是否处于拖拽排序模式
+        private int dragReorderInsertIndex = -1;    // 插入位置索引
+        private bool mouseDownOnSelected = false;   // 按下时是否在已选中条目上
         
         // UI State
         private Vector2 listScrollPosition = Vector2.zero;
@@ -48,6 +56,7 @@ namespace RimTalk.Memory.UI
         private float editImportance = 0.5f;
         private int editTargetPawnId = -1;
         private KeywordMatchMode editMatchMode = KeywordMatchMode.Any;
+        private KnowledgeEntryCategory editCategory = KnowledgeEntryCategory.None;
         
         // Layout constants
         private const float TOOLBAR_HEIGHT = 45f;
@@ -109,9 +118,49 @@ namespace RimTalk.Memory.UI
             }
             
             // Handle input events (must be after all UI drawing)
-            if (Event.current.type == EventType.MouseUp && isDragging)
+            if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
             {
+                if (isMouseDown && isDragReordering && dragReorderInsertIndex >= 0)
+                {
+                    // ⭐ 拖拽排序完成：将选中条目移动到目标位置
+                    ExecuteDragReorder();
+                }
+                else if (isMouseDown && !isDragging)
+                {
+                    // ⭐ 没有进入拖拽模式 → 当作单击处理
+                    // 找到鼠标下方的条目
+                    float centerX2 = SIDEBAR_WIDTH + SPACING;
+                    float centerWidth2 = showRightPanel ? 
+                        (inRect.width - SIDEBAR_WIDTH - RIGHT_PANEL_WIDTH - SPACING * 3) : 
+                        (inRect.width - SIDEBAR_WIDTH - SPACING * 2);
+                    Rect centerRect2 = new Rect(centerX2, contentY, centerWidth2, contentHeight);
+                    Rect innerRect2 = centerRect2.ContractedBy(5f);
+                    
+                    if (innerRect2.Contains(Event.current.mousePosition))
+                    {
+                        // 转换为 content 坐标
+                        float mouseContentY = Event.current.mousePosition.y - innerRect2.y + listScrollPosition.y;
+                        var filteredEntries2 = GetFilteredEntries();
+                        int clickedIndex = (int)(mouseContentY / ENTRY_HEIGHT);
+                        
+                        if (clickedIndex >= 0 && clickedIndex < filteredEntries2.Count)
+                        {
+                            HandleEntryClick(filteredEntries2[clickedIndex]);
+                        }
+                        else
+                        {
+                            // 点击空白区域，清除选择
+                            selectedEntries.Clear();
+                            lastSelectedEntry = null;
+                        }
+                    }
+                }
+                
+                isMouseDown = false;
                 isDragging = false;
+                isDragReordering = false;
+                dragReorderInsertIndex = -1;
+                mouseDownOnSelected = false;
                 Event.current.Use();
             }
         }
@@ -357,10 +406,21 @@ namespace RimTalk.Memory.UI
                 y += ENTRY_HEIGHT;
             }
             
-            // ⭐ 修复：在EndScrollView之前绘制选择框
+            // ⭐ 修复：在EndScrollView之前绘制选择框或拖拽排序指示线
             if (isDragging)
             {
                 DrawSelectionBox();
+            }
+            else if (isDragReordering && dragReorderInsertIndex >= 0)
+            {
+                // ⭐ 绘制拖拽排序的插入指示线
+                float insertY = dragReorderInsertIndex * ENTRY_HEIGHT;
+                Rect lineRect = new Rect(0f, insertY - 2f, viewRect.width, 4f);
+                Widgets.DrawBoxSolid(lineRect, new Color(0.3f, 0.8f, 1f, 0.8f));
+                
+                // 绘制小三角指示
+                Rect arrowRect = new Rect(-2f, insertY - 6f, 12f, 12f);
+                Widgets.DrawBoxSolid(arrowRect, new Color(0.3f, 0.8f, 1f, 0.9f));
             }
             
             Widgets.EndScrollView();
@@ -398,11 +458,8 @@ namespace RimTalk.Memory.UI
                 Widgets.DrawLightHighlight(rect);
             }
             
-            // Handle click (without drag)
-            if (Widgets.ButtonInvisible(rect) && !isDragging)
-            {
-                HandleEntryClick(entry);
-            }
+            // ⭐ 点击选择现在由 DoWindowContents 的 MouseUp 统一处理
+            // 不再使用 ButtonInvisible（它会和拖拽框选冲突）
             
             Rect innerRect = rect.ContractedBy(5f);
             float x = innerRect.x;
@@ -531,6 +588,79 @@ namespace RimTalk.Memory.UI
                 editMode = false;
             }
         }
+
+        /// <summary>
+        /// 执行拖拽排序：将选中的条目移动到 dragReorderInsertIndex 位置
+        /// 操作的是 library.Entries（主列表），不是 filteredEntries
+        /// </summary>
+        private void ExecuteDragReorder()
+        {
+            var filteredEntries = GetFilteredEntries();
+            if (filteredEntries.Count == 0 || selectedEntries.Count == 0) return;
+            
+            // 1. 确定插入目标在主列表中的位置
+            int targetMainIndex;
+            if (dragReorderInsertIndex >= filteredEntries.Count)
+            {
+                // 插入到末尾：找到最后一个过滤条目在主列表中的位置之后
+                var lastFiltered = filteredEntries[filteredEntries.Count - 1];
+                targetMainIndex = library.Entries.IndexOf(lastFiltered) + 1;
+            }
+            else if (dragReorderInsertIndex <= 0)
+            {
+                // 插入到开头：找到第一个过滤条目在主列表中的位置
+                var firstFiltered = filteredEntries[0];
+                targetMainIndex = library.Entries.IndexOf(firstFiltered);
+            }
+            else
+            {
+                // 插入到中间：找到目标位置条目在主列表中的位置
+                var targetEntry = filteredEntries[dragReorderInsertIndex];
+                targetMainIndex = library.Entries.IndexOf(targetEntry);
+            }
+            
+            // 2. 收集选中的条目（保持原有顺序）
+            var entriesToMove = new List<CommonKnowledgeEntry>();
+            foreach (var entry in library.Entries)
+            {
+                if (selectedEntries.Contains(entry))
+                {
+                    entriesToMove.Add(entry);
+                }
+            }
+            
+            if (entriesToMove.Count == 0) return;
+            
+            // 3. 从主列表中移除选中的条目
+            foreach (var entry in entriesToMove)
+            {
+                library.Entries.Remove(entry);
+            }
+            
+            // 4. 重新计算插入位置（因为移除了条目，索引可能变化）
+            // 找到目标位置：如果目标条目还在列表中，插入到它前面
+            if (dragReorderInsertIndex < filteredEntries.Count)
+            {
+                var targetEntry = filteredEntries[dragReorderInsertIndex];
+                int newIdx = library.Entries.IndexOf(targetEntry);
+                if (newIdx >= 0)
+                {
+                    targetMainIndex = newIdx;
+                }
+                else
+                {
+                    targetMainIndex = library.Entries.Count;
+                }
+            }
+            else
+            {
+                targetMainIndex = library.Entries.Count;
+            }
+            
+            // 5. 在目标位置插入
+            targetMainIndex = Mathf.Clamp(targetMainIndex, 0, library.Entries.Count);
+            library.Entries.InsertRange(targetMainIndex, entriesToMove);
+        }
         
         private void DrawSelectionBox()
         {
@@ -549,58 +679,105 @@ namespace RimTalk.Memory.UI
             return new Rect(minX, minY, maxX - minX, maxY - minY);
         }
         
-        // ⭐ 新方法：处理拖拽事件（不绘制选择框）
+        // ⭐ 重写：鼠标事件处理（左键点选 + 拖拽框选共存）
+        // MouseDown → 记录起始位置，不吞事件
+        // MouseDrag → 超过阈值才进入框选模式
+        // MouseUp → 未进入框选则当作单击
         private void HandleDragSelectionEvents(Rect listRect, Rect viewRect)
         {
             Event e = Event.current;
-            
-            // 开始拖拽
+
+            // 左键按下：记录起始位置，判断是否在已选中条目上
             if (e.type == EventType.MouseDown && e.button == 0 && listRect.Contains(e.mousePosition))
             {
-                isDragging = true;
-                // 转换为viewport坐标
+                isMouseDown = true;
+                mouseDownScreenPos = e.mousePosition;
                 dragStartPos = e.mousePosition - listRect.position;
                 dragCurrentPos = dragStartPos;
-                e.Use();
-            }
-            
-            // 拖拽中
-            if (isDragging && e.type == EventType.MouseDrag)
-            {
-                dragCurrentPos = e.mousePosition - listRect.position;
-                
-                // 转换为content坐标
-                Rect selectionBoxViewport = GetSelectionBox();
-                Rect selectionBoxContent = new Rect(
-                    selectionBoxViewport.x,
-                    selectionBoxViewport.y + listScrollPosition.y,
-                    selectionBoxViewport.width,
-                    selectionBoxViewport.height
-                );
-                
+
+                // ⭐ 判断按下位置是否在已选中的条目上
+                Vector2 localPos = e.mousePosition - listRect.position;
+                float mouseContentY = localPos.y + listScrollPosition.y;
                 var filteredEntries = GetFilteredEntries();
-                
-                bool ctrl = Event.current.control;
-                if (!ctrl)
+                int clickedIdx = (int)(mouseContentY / ENTRY_HEIGHT);
+
+                mouseDownOnSelected = false;
+                if (clickedIdx >= 0 && clickedIdx < filteredEntries.Count)
                 {
-                    selectedEntries.Clear();
+                    mouseDownOnSelected = selectedEntries.Contains(filteredEntries[clickedIdx]);
                 }
-                
-                // 检查哪些条目在选择框内
-                float y = 0f;
-                foreach (var entry in filteredEntries)
+            }
+
+            // 鼠标移动中：判断是否超过拖拽阈值
+            if (isMouseDown && e.type == EventType.MouseDrag && e.button == 0)
+            {
+                float distance = Vector2.Distance(mouseDownScreenPos, e.mousePosition);
+
+                if (!isDragging && !isDragReordering && distance >= DRAG_THRESHOLD)
                 {
-                    Rect entryRect = new Rect(0f, y, viewRect.width, ENTRY_HEIGHT);
-                    
-                    if (selectionBoxContent.Overlaps(entryRect))
+                    if (mouseDownOnSelected && selectedEntries.Count > 0)
                     {
-                        selectedEntries.Add(entry);
+                        // ⭐ 在已选中条目上拖拽 → 拖拽排序模式
+                        isDragReordering = true;
                     }
-                    
-                    y += ENTRY_HEIGHT;
+                    else
+                    {
+                        // ⭐ 在未选中区域拖拽 → 框选模式
+                        isDragging = true;
+                    }
                 }
-                
-                e.Use();
+
+                if (isDragReordering)
+                {
+                    // ⭐ 拖拽排序：计算插入位置
+                    Vector2 localMousePos = e.mousePosition - listRect.position;
+                    float contentMouseY = localMousePos.y + listScrollPosition.y;
+                    var filteredEntries = GetFilteredEntries();
+
+                    // 计算最近的插入线位置（在条目之间）
+                    dragReorderInsertIndex = Mathf.Clamp(
+                        Mathf.RoundToInt(contentMouseY / ENTRY_HEIGHT),
+                        0, filteredEntries.Count);
+
+                    e.Use();
+                }
+                else if (isDragging)
+                {
+                    dragCurrentPos = e.mousePosition - listRect.position;
+
+                    // 转换为content坐标
+                    Rect selectionBoxViewport = GetSelectionBox();
+                    Rect selectionBoxContent = new Rect(
+                        selectionBoxViewport.x,
+                        selectionBoxViewport.y + listScrollPosition.y,
+                        selectionBoxViewport.width,
+                        selectionBoxViewport.height
+                    );
+
+                    var filteredEntries = GetFilteredEntries();
+
+                    bool ctrl = Event.current.control;
+                    if (!ctrl)
+                    {
+                        selectedEntries.Clear();
+                    }
+
+                    // 检查哪些条目在选择框内
+                    float y = 0f;
+                    foreach (var entry in filteredEntries)
+                    {
+                        Rect entryRect = new Rect(0f, y, viewRect.width, ENTRY_HEIGHT);
+
+                        if (selectionBoxContent.Overlaps(entryRect))
+                        {
+                            selectedEntries.Add(entry);
+                        }
+
+                        y += ENTRY_HEIGHT;
+                    }
+
+                    e.Use();
+                }
             }
         }
 
@@ -772,6 +949,18 @@ namespace RimTalk.Memory.UI
             );
             scrollY += 55f;
             
+            // ⭐ Category
+            var entryCat = CommonKnowledgeUIHelpers.GetEntryCategory(entry);
+            string catDisplay = CommonKnowledgeUIHelpers.GetCategoryLabel(entryCat);
+            if (entry.category == KnowledgeEntryCategory.None)
+                catDisplay += " (自动)";
+            CommonKnowledgeUIHelpers.DrawDetailField(
+                new Rect(0f, scrollY, scrollViewRect.width, 25f),
+                "分类",
+                catDisplay
+            );
+            scrollY += 30f;
+            
             // Importance
             CommonKnowledgeUIHelpers.DrawDetailField(
                 new Rect(0f, scrollY, scrollViewRect.width, 25f), 
@@ -872,13 +1061,38 @@ namespace RimTalk.Memory.UI
             
             // Tag
             Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
-                CommonKnowledgeTranslationKeys.Tag.Translate() + ":");
+                CommonKnowledgeUIHelpers.EnsureColon(CommonKnowledgeTranslationKeys.Tag.Translate()));
             editTag = Widgets.TextField(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), editTag);
+            y += 30f;
+            
+            // ⭐ Category dropdown (after tag)
+            Widgets.Label(new Rect(rect.x, y, 100f, 25f), "分类:");
+            string catLabel = CommonKnowledgeUIHelpers.GetExplicitCategoryLabel(editCategory);
+            // 显示推断提示
+            if (editCategory == KnowledgeEntryCategory.None && !string.IsNullOrEmpty(editTag))
+            {
+                var inferred = CommonKnowledgeUIHelpers.GetEntryCategory(
+                    new CommonKnowledgeEntry(editTag, "") { category = KnowledgeEntryCategory.None });
+                string inferredName = CommonKnowledgeUIHelpers.GetCategoryLabel(inferred);
+                catLabel = "自动推断 → " + inferredName;
+            }
+            if (Widgets.ButtonText(new Rect(rect.x + 100f, y, rect.width - 100f, 25f), catLabel))
+            {
+                List<FloatMenuOption> options = new List<FloatMenuOption>();
+                foreach (KnowledgeEntryCategory cat in Enum.GetValues(typeof(KnowledgeEntryCategory)))
+                {
+                    KnowledgeEntryCategory localCat = cat;
+                    options.Add(new FloatMenuOption(
+                        CommonKnowledgeUIHelpers.GetExplicitCategoryLabel(cat),
+                        delegate { editCategory = localCat; }));
+                }
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
             y += 30f;
             
             // Importance
             Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
-                CommonKnowledgeTranslationKeys.Importance.Translate() + ":");
+                CommonKnowledgeUIHelpers.EnsureColon(CommonKnowledgeTranslationKeys.Importance.Translate()));
             editImportance = Widgets.HorizontalSlider(
                 new Rect(rect.x + 100f, y, rect.width - 150f, 25f), 
                 editImportance, 0f, 1f
@@ -888,7 +1102,7 @@ namespace RimTalk.Memory.UI
             
             // Pawn selection (simplified)
             Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
-                CommonKnowledgeTranslationKeys.Visibility.Translate() + ":");
+                CommonKnowledgeUIHelpers.EnsureColon(CommonKnowledgeTranslationKeys.Visibility.Translate()));
             string pawnLabel = editTargetPawnId == -1 
                 ? CommonKnowledgeTranslationKeys.Global.Translate().ToString() 
                 : $"Pawn #{editTargetPawnId}";
@@ -914,7 +1128,7 @@ namespace RimTalk.Memory.UI
             
             // Content
             Widgets.Label(new Rect(rect.x, y, 100f, 25f), 
-                CommonKnowledgeTranslationKeys.Content.Translate() + ":");
+                CommonKnowledgeUIHelpers.EnsureColon(CommonKnowledgeTranslationKeys.Content.Translate()));
             y += 27f;
             
             float contentHeight = rect.yMax - y - 80f;
@@ -1019,6 +1233,7 @@ namespace RimTalk.Memory.UI
             editImportance = 0.5f;
             editTargetPawnId = -1;
             editMatchMode = KeywordMatchMode.Any;
+            editCategory = KnowledgeEntryCategory.None;
             lastSelectedEntry = null;
             selectedEntries.Clear();
             editMode = true;
@@ -1034,6 +1249,7 @@ namespace RimTalk.Memory.UI
                 editImportance = entry.importance;
                 editTargetPawnId = entry.targetPawnId;
                 editMatchMode = entry.matchMode;
+                editCategory = entry.category;
                 lastSelectedEntry = entry;
                 editMode = true;
             }
@@ -1056,7 +1272,8 @@ namespace RimTalk.Memory.UI
                     importance = editImportance,
                     targetPawnId = editTargetPawnId,
                     isUserEdited = true,  // ⭐ 新创建的条目标记为用户编辑
-                    matchMode = editMatchMode
+                    matchMode = editMatchMode,
+                    category = editCategory
                 };
                 library.AddEntry(newEntry);
                 selectedEntries.Clear();
@@ -1073,6 +1290,7 @@ namespace RimTalk.Memory.UI
                 // ⭐ 移除：不再每次保存都设置 isUserEdited = true
                 // lastSelectedEntry.isUserEdited = true;
                 lastSelectedEntry.matchMode = editMatchMode;
+                lastSelectedEntry.category = editCategory;
                 
                 // 清除缓存，确保新标签生效
                 lastSelectedEntry.InvalidateCache();

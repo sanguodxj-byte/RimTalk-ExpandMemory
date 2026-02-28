@@ -70,11 +70,16 @@ namespace RimTalk.Memory.UI
         
         /// <summary>
         /// 根据标签判断条目分类
-        /// ⭐ 新规则：只要标签中包含分类关键词，即归入该分类
-        /// 例如："规则-世界观"、"常识规则"、"规则，鼠族" 都归入"规则"分类
+        /// ⭐ 优先使用显式分类（用户在UI中选择的），未设置时回退到标签关键词推断
         /// </summary>
         public static KnowledgeCategory GetEntryCategory(CommonKnowledgeEntry entry)
         {
+            // ⭐ 优先使用显式分类
+            if (entry.category != KnowledgeEntryCategory.None)
+            {
+                return ExplicitCategoryToKnowledgeCategory(entry.category);
+            }
+            
             if (string.IsNullOrEmpty(entry.tag))
                 return KnowledgeCategory.Other;
 
@@ -116,6 +121,55 @@ namespace RimTalk.Memory.UI
             return KnowledgeCategory.Other;
         }
         
+        /// <summary>
+        /// 将显式分类枚举转换为 UI 分类枚举
+        /// </summary>
+        public static KnowledgeCategory ExplicitCategoryToKnowledgeCategory(KnowledgeEntryCategory cat)
+        {
+            switch (cat)
+            {
+                case KnowledgeEntryCategory.Instructions: return KnowledgeCategory.Instructions;
+                case KnowledgeEntryCategory.Lore: return KnowledgeCategory.Lore;
+                case KnowledgeEntryCategory.PawnStatus: return KnowledgeCategory.PawnStatus;
+                case KnowledgeEntryCategory.History: return KnowledgeCategory.History;
+                case KnowledgeEntryCategory.Other: return KnowledgeCategory.Other;
+                default: return KnowledgeCategory.Other;
+            }
+        }
+        
+        /// <summary>
+        /// 将 UI 分类枚举转换为显式分类枚举
+        /// </summary>
+        public static KnowledgeEntryCategory KnowledgeCategoryToExplicit(KnowledgeCategory cat)
+        {
+            switch (cat)
+            {
+                case KnowledgeCategory.Instructions: return KnowledgeEntryCategory.Instructions;
+                case KnowledgeCategory.Lore: return KnowledgeEntryCategory.Lore;
+                case KnowledgeCategory.PawnStatus: return KnowledgeEntryCategory.PawnStatus;
+                case KnowledgeCategory.History: return KnowledgeEntryCategory.History;
+                case KnowledgeCategory.Other: return KnowledgeEntryCategory.Other;
+                default: return KnowledgeEntryCategory.None;
+            }
+        }
+        
+        /// <summary>
+        /// 获取显式分类的中文显示名称
+        /// </summary>
+        public static string GetExplicitCategoryLabel(KnowledgeEntryCategory cat)
+        {
+            switch (cat)
+            {
+                case KnowledgeEntryCategory.None: return "自动推断";
+                case KnowledgeEntryCategory.Instructions: return "指令规则";
+                case KnowledgeEntryCategory.Lore: return "世界观设定";
+                case KnowledgeEntryCategory.PawnStatus: return "殖民者状态";
+                case KnowledgeEntryCategory.History: return "历史记录";
+                case KnowledgeEntryCategory.Other: return "其他";
+                default: return "未知";
+            }
+        }
+        
         // ==================== 可见性相关 ====================
         
         /// <summary>
@@ -146,12 +200,22 @@ namespace RimTalk.Memory.UI
             
             Text.Font = GameFont.Tiny;
             GUI.color = new Color(0.7f, 0.7f, 0.7f);
-            Widgets.Label(new Rect(rect.x, rect.y, labelWidth, rect.height), label + ":");
+            Widgets.Label(new Rect(rect.x, rect.y, labelWidth, rect.height), EnsureColon(label));
             GUI.color = Color.white;
             Text.Font = GameFont.Small;
             
             Widgets.Label(new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, rect.height), value);
         }
+
+        /// <summary>
+        /// 确保标签文本以冒号结尾（兼容不同语言翻译文件中冒号有无不一致的情况）
+        /// </summary>
+        public static string EnsureColon(string label)
+        {
+            if (string.IsNullOrEmpty(label)) return ":";
+            return label.EndsWith(":") || label.EndsWith("：") ? label : label + ":";
+        }
+
         
         // ==================== 绘制带颜色的复选框 ====================
         

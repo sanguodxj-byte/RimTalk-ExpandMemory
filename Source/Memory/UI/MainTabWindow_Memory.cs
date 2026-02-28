@@ -38,8 +38,11 @@ namespace RimTalk.Memory.UI
         
         // Drag selection
         private bool isDragging = false;
+        private bool isMouseDown = false;           // ⭐ 左键已按下但尚未判定为拖拽
         private Vector2 dragStartPos = Vector2.zero;
         private Vector2 dragCurrentPos = Vector2.zero;
+        private Vector2 mouseDownScreenPos = Vector2.zero; // ⭐ 按下时的屏幕坐标（用于阈值判定）
+        private const float DRAG_THRESHOLD = 5f;    // ⭐ 拖拽判定阈值（像素）
         
         // UI State
         private Vector2 timelineScrollPosition = Vector2.zero;
@@ -54,7 +57,7 @@ namespace RimTalk.Memory.UI
         // ? v3.3.32: Filtered memories cache
         private List<MemoryEntry> cachedFilteredMemories;
         private bool filtersDirty = true;
-
+        
         // Layout constants
         private const float TOP_BAR_HEIGHT = 50f;
         private const float CONTROL_PANEL_WIDTH = 220f;
@@ -79,16 +82,6 @@ namespace RimTalk.Memory.UI
         private int lastRefreshTick = -1;
         
         public override Vector2 RequestedTabSize => new Vector2(1200f, 700f);
-
-        /// <summary>
-        /// 使 UI 缓存失效，强制下次绘制时刷新。
-        /// 当外部修改了记忆数据时调用此方法。
-        /// </summary>
-        public void InvalidateCache()
-        {
-            lastMemoryCount = -1;
-            filtersDirty = true;
-        }
 
         // ==================== Main Layout ====================
         
@@ -130,9 +123,48 @@ namespace RimTalk.Memory.UI
             Rect timelineRect = new Rect(timelineX, contentY, timelineWidth, contentHeight);
             DrawTimeline(timelineRect);
             
-            // Handle drag end
-            if (Event.current.type == EventType.MouseUp && isDragging)
+            // Handle drag end / single click
+            if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
             {
+                if (isMouseDown && !isDragging)
+                {
+                    // ⭐ 没有进入拖拽模式 → 当作单击处理
+                    // 找到鼠标下方的记忆卡片
+                    float timelineX2 = CONTROL_PANEL_WIDTH + SPACING;
+                    float timelineWidth2 = inRect.width - timelineX2;
+                    Rect timelineRect2 = new Rect(timelineX2, contentY, timelineWidth2, contentHeight);
+                    Rect innerRect2 = timelineRect2.ContractedBy(5f);
+                    
+                    if (innerRect2.Contains(Event.current.mousePosition))
+                    {
+                        float mouseContentY = Event.current.mousePosition.y - innerRect2.y + timelineScrollPosition.y;
+                        
+                        // 在缓存的 Y 位置中查找点击的卡片
+                        MemoryEntry clickedMemory = null;
+                        for (int i = 0; i < cachedMemories.Count; i++)
+                        {
+                            float cardY = cachedCardYPositions[i];
+                            float cardH = cachedCardHeights[i];
+                            if (mouseContentY >= cardY && mouseContentY < cardY + cardH)
+                            {
+                                clickedMemory = cachedMemories[i];
+                                break;
+                            }
+                        }
+                        
+                        if (clickedMemory != null)
+                        {
+                            HandleMemoryClick(clickedMemory);
+                        }
+                        else
+                        {
+                            selectedMemories.Clear();
+                            lastSelectedMemory = null;
+                        }
+                    }
+                }
+                
+                isMouseDown = false;
                 isDragging = false;
                 Event.current.Use();
             }

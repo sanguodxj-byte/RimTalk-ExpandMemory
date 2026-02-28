@@ -7,6 +7,7 @@ using Verse;
 using RimWorld;
 using RimTalk.MemoryPatch;
 using RimTalk.Memory;
+using RimTalk.Memory.UI;
 
 namespace RimTalk.Memory.API
 {
@@ -161,6 +162,220 @@ namespace RimTalk.Memory.API
                 return "";
             }
         }
+
+        /// <summary>
+        /// 获取按分类分组的常识内容（改进版 {{knowledge}}）
+        /// 输出格式：按分类分组，每组有标题，条目只显示分类标签
+        /// </summary>
+        public static string GetGroupedKnowledge(object promptContext)
+        {
+            if (promptContext == null) return "";
+
+            try
+            {
+                var matchedScores = GetMatchedScores(promptContext);
+                if (matchedScores == null || matchedScores.Count == 0)
+                    return "(No matching knowledge found)";
+
+                return FormatGroupedKnowledge(matchedScores);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[MemoryPatch] Error getting grouped knowledge: {ex.Message}");
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// 获取指定分类的常识内容
+        /// </summary>
+        public static string GetKnowledgeByCategory(object promptContext, KnowledgeCategory category)
+        {
+            if (promptContext == null) return "";
+
+            try
+            {
+                var matchedScores = GetMatchedScores(promptContext);
+                if (matchedScores == null || matchedScores.Count == 0)
+                    return "";
+
+                var filtered = matchedScores
+                    .Where(s => CommonKnowledgeUIHelpers.GetEntryCategory(s.Entry) == category)
+                    .ToList();
+
+                if (filtered.Count == 0) return "";
+
+                return FormatCategoryEntries(filtered);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[MemoryPatch] Error getting knowledge for category {category}: {ex.Message}");
+                return "";
+            }
+        }
+
+        // 分类变量的便捷包装方法
+        public static string GetKnowledgeRules(object ctx) => GetKnowledgeByCategory(ctx, KnowledgeCategory.Instructions);
+        public static string GetKnowledgeLore(object ctx) => GetKnowledgeByCategory(ctx, KnowledgeCategory.Lore);
+        public static string GetKnowledgeStatus(object ctx) => GetKnowledgeByCategory(ctx, KnowledgeCategory.PawnStatus);
+        public static string GetKnowledgeHistory(object ctx) => GetKnowledgeByCategory(ctx, KnowledgeCategory.History);
+        public static string GetKnowledgeOther(object ctx) => GetKnowledgeByCategory(ctx, KnowledgeCategory.Other);
+
+        // 缓存匹配结果，避免同一渲染周期内多次匹配
+        private static List<KnowledgeScore> _cachedScores;
+        private static int _cachedTick = -1;
+        private static readonly object _cacheLock = new object();
+        
+        /// <summary>
+        /// 核心匹配逻辑：获取匹配的常识评分列表（复用 GetMatchedKnowledge 的逻辑）
+        /// 同一 tick 内的多次调用会复用缓存结果
+        /// </summary>
+        private static List<KnowledgeScore> GetMatchedScores(object promptContext)
+        {
+            int currentTick = Find.TickManager?.TicksGame ?? 0;
+            
+            // 同一 tick 内复用缓存
+            lock (_cacheLock)
+            {
+                if (_cachedScores != null && _cachedTick == currentTick)
+                    return _cachedScores;
+            }
+            
+            var settings = RimTalkMemoryPatchMod.Settings;
+
+            string matchText = BuildMatchText(promptContext, settings);
+            if (string.IsNullOrEmpty(matchText))
+                return null;
+
+            Pawn speaker = GetPropertyValue<Pawn>(promptContext, "CurrentPawn");
+            Pawn listener = null;
+            var allPawns = GetPropertyValue<List<Pawn>>(promptContext, "AllPawns");
+            if (allPawns != null && allPawns.Count > 1)
+                listener = allPawns[1];
+
+            var memoryManager = Find.World?.GetComponent<MemoryManager>();
+            if (memoryManager?.CommonKnowledge == null)
+                return null;
+
+            List<KnowledgeScore> matchedScores;
+            memoryManager.CommonKnowledge.InjectKnowledgeWithDetails(
+                matchText,
+                settings.maxInjectedKnowledge,
+                out matchedScores,
+                speaker,
+                listener
+            );
+
+            // 同步更新 _lastContext（保持与 GetMatchedKnowledge 一致）
+            string dialogueType = GetVariableValue(promptContext, "dialogue.type");
+            lock (_contextLock)
+            {
+                _lastContext = new KnowledgeInjectionContext
+                {
+                    MatchText = matchText,
+                    DialogueType = dialogueType,
+                    KeywordKnowledge = FormatCategoryEntries(matchedScores),
+                    Speaker = speaker,
+                    Listener = listener,
+                    Tick = currentTick
+                };
+            }
+            
+            // 缓存结果
+            lock (_cacheLock)
+            {
+                _cachedScores = matchedScores;
+                _cachedTick = currentTick;
+            }
+
+            return matchedScores;
+        }
+
+        /// <summary>
+        /// 获取分类的中文显示名称
+        /// </summary>
+        private static string GetCategoryDisplayName(KnowledgeCategory category)
+        {
+            switch (category)
+            {
+                case KnowledgeCategory.Instructions: return "规则";
+                case KnowledgeCategory.Lore: return "世界观";
+                case KnowledgeCategory.PawnStatus: return "殖民者状态";
+                case KnowledgeCategory.History: return "历史";
+                case KnowledgeCategory.Other: return "其他";
+                default: return "未知";
+            }
+        }
+
+        /// <summary>
+        /// 获取条目的第一个标签（分类标签），用于简化显示
+        /// </summary>
+        private static string GetFirstTag(CommonKnowledgeEntry entry)
+        {
+            if (string.IsNullOrEmpty(entry.tag)) return "";
+            var tags = entry.GetTags();
+            return tags.Count > 0 ? tags[0] : entry.tag;
+        }
+
+        /// <summary>
+        /// 格式化分组输出（用于 {{knowledge}}）
+        /// </summary>
+        private static string FormatGroupedKnowledge(List<KnowledgeScore> scores)
+        {
+            if (scores == null || scores.Count == 0) return "";
+
+            // 按分类分组
+            var groups = new Dictionary<KnowledgeCategory, List<KnowledgeScore>>();
+            foreach (var score in scores)
+            {
+                var cat = CommonKnowledgeUIHelpers.GetEntryCategory(score.Entry);
+                if (!groups.ContainsKey(cat))
+                    groups[cat] = new List<KnowledgeScore>();
+                groups[cat].Add(score);
+            }
+
+            // 按固定顺序输出：规则 → 世界观 → 殖民者状态 → 历史 → 其他
+            var order = new KnowledgeCategory[]
+            {
+                KnowledgeCategory.Instructions,
+                KnowledgeCategory.Lore,
+                KnowledgeCategory.PawnStatus,
+                KnowledgeCategory.History,
+                KnowledgeCategory.Other
+            };
+
+            var sb = new StringBuilder();
+            foreach (var cat in order)
+            {
+                if (!groups.ContainsKey(cat)) continue;
+                var entries = groups[cat];
+
+                sb.AppendLine($"## {GetCategoryDisplayName(cat)}");
+                foreach (var score in entries)
+                {
+                    sb.AppendLine($"- {score.Entry.content}");
+                }
+                sb.AppendLine();
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        /// <summary>
+        /// 格式化单分类条目列表（用于 {{knowledge_xxx}} 变量）
+        /// </summary>
+        private static string FormatCategoryEntries(List<KnowledgeScore> scores)
+        {
+            if (scores == null || scores.Count == 0) return "";
+
+            var sb = new StringBuilder();
+            foreach (var score in scores)
+            {
+                sb.AppendLine($"- {score.Entry.content}");
+            }
+            return sb.ToString().TrimEnd();
+        }
+
         
         /// <summary>
         /// 根据用户选择的匹配源构建匹配文本
