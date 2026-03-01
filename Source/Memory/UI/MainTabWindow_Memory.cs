@@ -83,6 +83,16 @@ namespace RimTalk.Memory.UI
         
         public override Vector2 RequestedTabSize => new Vector2(1200f, 700f);
 
+        /// <summary>
+        /// 使 UI 缓存失效，强制下次绘制时刷新。
+        /// 当外部修改了记忆数据时调用此方法。
+        /// </summary>
+        public void InvalidateCache()
+        {
+            lastMemoryCount = -1;
+            filtersDirty = true;
+        }
+
         // ==================== Main Layout ====================
         
         public override void DoWindowContents(Rect inRect)

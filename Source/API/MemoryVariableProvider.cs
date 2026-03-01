@@ -87,8 +87,12 @@ namespace RimTalk.Memory.API
             string pawnId = pawn.ThingID;
             int currentTick = Find.TickManager?.TicksGame ?? 0;
             
-            // ⭐ v4.2: 检查缓存是否有效
-            if (_pawnMemoryCache == null || currentTick - _memoryCacheTick > MEMORY_CACHE_EXPIRE_TICKS)
+            // ⭐ v4.2 / v5.0.1: 检查缓存是否有效
+            // 修复：加载新存档时，currentTick 可能小于 _memoryCacheTick，导致差值为负数
+            // 使用 Math.Abs 或者检查 currentTick < _memoryCacheTick 来处理这种情况
+            if (_pawnMemoryCache == null ||
+                currentTick < _memoryCacheTick ||  // 新存档加载，tick 重置
+                currentTick - _memoryCacheTick > MEMORY_CACHE_EXPIRE_TICKS)
             {
                 _pawnMemoryCache = new Dictionary<string, string>();
                 _memoryCacheTick = currentTick;

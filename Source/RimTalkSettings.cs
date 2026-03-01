@@ -49,7 +49,7 @@ namespace RimTalk.MemoryPatch
         public int maxEventLogMemories = 50;
 
         public bool IsPlayerDialogueInject = true; // 是否注入玩家发言
-        public bool IsRoundMemoryActive = false; // 是否启用轮次记忆
+        public bool IsRoundMemoryActive = true; // 是否启用轮次记忆
 
         // ⭐ v4.0: ABM 注入轮数配置
         public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话

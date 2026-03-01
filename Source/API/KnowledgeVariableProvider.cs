@@ -400,8 +400,12 @@ namespace RimTalk.Memory.API
             
             foreach (var source in sources)
             {
-                // ⭐ v5.1: 过滤掉 knowledge 变量，防止自己匹配自己导致无限递归
-                if (source == "knowledge" || source.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase))
+                // ⭐ v5.1: 过滤掉所有 knowledge 相关变量，防止自己匹配自己导致无限递归
+                // 包括: knowledge, knowledge_grouped, knowledge_rules, knowledge_lore,
+                //       knowledge_status, knowledge_history, knowledge_other, knowledge.xxx 等
+                if (source.Equals("knowledge", StringComparison.OrdinalIgnoreCase) ||
+                    source.StartsWith("knowledge_", StringComparison.OrdinalIgnoreCase) ||
+                    source.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }

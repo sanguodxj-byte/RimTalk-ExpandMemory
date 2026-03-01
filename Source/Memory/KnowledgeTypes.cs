@@ -8,6 +8,20 @@ using RimTalk.MemoryPatch;
 namespace RimTalk.Memory
 {
     /// <summary>
+    /// 常识条目显式分类（用户可在UI中手动选择）
+    /// ⭐ None = 自动推断（根据标签关键词）
+    /// </summary>
+    public enum KnowledgeEntryCategory
+    {
+        None,           // 自动推断
+        Instructions,   // 指令规则
+        Lore,           // 世界观设定
+        PawnStatus,     // 殖民者状态
+        History,        // 历史记录
+        Other           // 其他
+    }
+
+    /// <summary>
     /// 关键词匹配模式
     /// </summary>
     public enum KeywordMatchMode
@@ -48,6 +62,9 @@ namespace RimTalk.Memory
 
         // 匹配控制属性
         public KeywordMatchMode matchMode = KeywordMatchMode.Any; // 关键词匹配模式（默认Any）
+        
+        // 显式分类（用户在UI中手动选择，None表示自动推断）
+        public KnowledgeEntryCategory category = KnowledgeEntryCategory.None;
         
         private List<string> cachedTags; // 缓存分割后的标签列表
 
@@ -91,6 +108,7 @@ namespace RimTalk.Memory
             Scribe_Collections.Look(ref keywords, "keywords", LookMode.Value);
             
             Scribe_Values.Look(ref matchMode, "matchMode", KeywordMatchMode.Any);
+            Scribe_Values.Look(ref category, "category", KnowledgeEntryCategory.None);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
