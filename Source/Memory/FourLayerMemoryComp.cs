@@ -55,14 +55,14 @@ namespace RimTalk.Memory
                 if (archiveMemories == null) archiveMemories = new List<MemoryEntry>();
             }
         }
-        
+
         /// <summary>
         /// ⭐ 修复3: 定期检查并清理工作会话（Pawn死亡/离开时）
         /// </summary>
         public override void CompTick()
         {
             base.CompTick();
-            
+
             // 每5秒检查一次
             if (Find.TickManager.TicksGame % 300 == 0)
             {
@@ -129,18 +129,18 @@ namespace RimTalk.Memory
                 }
             }
         }
-        
+
         private bool IsDuplicateMemory(string content, string relatedPawn, MemoryType type)
         {
             if (string.IsNullOrEmpty(content))
                 return false;
-            
+
             foreach (var memory in activeMemories)
             {
                 if (memory.type == type && memory.content == content && memory.relatedPawnName == relatedPawn)
                     return true;
             }
-            
+
             int checkCount = Math.Min(5, situationalMemories.Count);
             for (int i = 0; i < checkCount; i++)
             {
@@ -148,7 +148,7 @@ namespace RimTalk.Memory
                 if (memory.type == type && memory.content == content && memory.relatedPawnName == relatedPawn)
                     return true;
             }
-            
+
             return false;
         }
 
@@ -174,12 +174,12 @@ namespace RimTalk.Memory
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
-            // ⭐ 修复：合并ABM和SCM作为总结池，排除固定的记忆
+            // ⭐ 修复：合并ABM和SCM作为总结池，排除总结过的记忆（即旧的固定记忆）
             var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.isPinned));
-            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.isPinned));
+            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.IsSummarized));
+            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.IsSummarized));
 
-            // 如果没有非固定记忆，不需要总结
+            // 如果没有未总结过的记忆，不需要总结
             if (allMemoriesToSummarize.Count == 0)
             {
                 if (Prefs.DevMode)
@@ -190,7 +190,7 @@ namespace RimTalk.Memory
             }
 
             // MemoryType.Conversation即总结得到的ELS的记忆类型，可以根据需要调整为其他类型，建议改为总结独有类型
-            var byType = allMemoriesToSummarize.GroupBy(m => MemoryType.Conversation); 
+            var byType = allMemoriesToSummarize.GroupBy(m => MemoryType.Conversation);
 
             foreach (var typeGroup in byType)
             {
@@ -206,7 +206,7 @@ namespace RimTalk.Memory
                     layer: MemoryLayer.EventLog,
                     importance: memories.Average(m => m.importance) + 0.2f
                 );
-                
+
                 // ⭐ 修复：覆盖默认的timestamp（MemoryEntry构造函数会自动设置为当前时间）
                 summaryEntry.timestamp = latestTimestamp;
 
@@ -217,7 +217,7 @@ namespace RimTalk.Memory
                 if (RimTalkMemoryPatchMod.Settings.useAISummarization && AI.IndependentAISummarizer.IsAvailable())
                 {
                     string cacheKey = AI.IndependentAISummarizer.ComputeCacheKey(pawn, memories);
-                    
+
                     AI.IndependentAISummarizer.RegisterCallback(cacheKey, (aiSummary) =>
                     {
                         if (!string.IsNullOrEmpty(aiSummary))
@@ -230,7 +230,7 @@ namespace RimTalk.Memory
                     });
 
                     AI.IndependentAISummarizer.SummarizeMemories(pawn, memories, "daily_summary");
-                    
+
                     summaryEntry.AddTag("待AI更新");
                     summaryEntry.notes = "AI 总结正在后台处理中...";
                 }
@@ -239,23 +239,29 @@ namespace RimTalk.Memory
                 InsertMemoryByTimestamp(eventLogMemories, summaryEntry);
             }
 
+            foreach (var memory in allMemoriesToSummarize)
+            {
+                memory?.IsSummarized = true; // 标记为已总结
+            }
+
             // ⭐ 修复：清空ABM（总结后不再需要保留）
             activeMemories.Clear();
-            
+
             // ⭐ 修复：清空SCM（移除 isUserEdited 检查，只保留固定记忆）
             int beforeCount = situationalMemories.Count;
             situationalMemories.RemoveAll(m => !m.isPinned);
             int removedCount = beforeCount - situationalMemories.Count;
-            
+
             if (Prefs.DevMode && removedCount > 0)
             {
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} daily summarization: " +
                            $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned");
             }
-            
+
             TrimEventLog();
         }
 
+        // 经过艰辛的排查，终于确定此方法用于【一键总结所有殖民者】
         public void ManualSummarization()
         {
             // ⭐ 修复：同时检查ABM和SCM是否有内容
@@ -264,10 +270,10 @@ namespace RimTalk.Memory
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
-            // ⭐ 修复：合并ABM和SCM作为总结池，排除固定的记忆
+            // ⭐ 修复：合并ABM和SCM作为总结池，排除总结过的记忆（即旧的固定记忆）
             var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.isPinned));
-            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.isPinned));
+            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.IsSummarized));
+            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.IsSummarized));
 
             // 如果没有非固定记忆，不需要总结
             if (allMemoriesToSummarize.Count == 0)
@@ -296,7 +302,7 @@ namespace RimTalk.Memory
                     layer: MemoryLayer.EventLog,
                     importance: memories.Average(m => m.importance) + 0.2f
                 );
-                
+
                 // ⭐ 修复：覆盖默认的timestamp
                 summaryEntry.timestamp = latestTimestamp;
 
@@ -308,7 +314,7 @@ namespace RimTalk.Memory
                 if (RimTalkMemoryPatchMod.Settings.useAISummarization && AI.IndependentAISummarizer.IsAvailable())
                 {
                     string cacheKey = AI.IndependentAISummarizer.ComputeCacheKey(pawn, memories);
-                    
+
                     AI.IndependentAISummarizer.RegisterCallback(cacheKey, (aiSummary) =>
                     {
                         if (!string.IsNullOrEmpty(aiSummary))
@@ -321,7 +327,7 @@ namespace RimTalk.Memory
                     });
 
                     AI.IndependentAISummarizer.SummarizeMemories(pawn, memories, "daily_summary");
-                    
+
                     summaryEntry.AddTag("待AI更新");
                     summaryEntry.notes = "AI 总结正在后台处理中...";
                 }
@@ -330,20 +336,25 @@ namespace RimTalk.Memory
                 InsertMemoryByTimestamp(eventLogMemories, summaryEntry);
             }
 
+            foreach (var memory in allMemoriesToSummarize)
+            {
+                memory?.IsSummarized = true; // 标记为已总结
+            }
+
             // ⭐ 修复：清空ABM（总结后不再需要保留）
             activeMemories.Clear();
-            
+
             // ⭐ 修复：清空SCM（移除 isUserEdited 检查，只保留固定记忆）
             int beforeCount = situationalMemories.Count;
             situationalMemories.RemoveAll(m => !m.isPinned);
             int removedCount = beforeCount - situationalMemories.Count;
-            
+
             if (Prefs.DevMode && removedCount > 0)
             {
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} manual summarization: " +
                            $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned");
             }
-            
+
             TrimEventLog();
         }
 
@@ -361,7 +372,7 @@ namespace RimTalk.Memory
 
             // 使用二分查找找到插入位置（降序排列，新的在前）
             int insertIndex = list.FindIndex(m => m.timestamp < entry.timestamp);
-            
+
             // 如果没找到（所有记忆都比新记忆新），添加到末尾
             if (insertIndex == -1)
             {
@@ -379,14 +390,14 @@ namespace RimTalk.Memory
                 return null;
 
             var summary = new StringBuilder();
-            
+
             if (type == MemoryType.Conversation)
             {
                 var byPerson = memories
                     .Where(m => !string.IsNullOrEmpty(m.relatedPawnName))
                     .GroupBy(m => m.relatedPawnName)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in byPerson.Take(5))
                 {
@@ -394,7 +405,7 @@ namespace RimTalk.Memory
                     summary.Append($"与{group.Key}对话×{group.Count()}");
                     shown++;
                 }
-                
+
                 if (shown == 0)
                 {
                     summary.Append($"对话{memories.Count}次");
@@ -408,11 +419,11 @@ namespace RimTalk.Memory
                     string action = m.content.Length > 15 ? m.content.Substring(0, 15) : m.content;
                     actions.Add(action);
                 }
-                
+
                 var grouped = actions
                     .GroupBy(a => a)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in grouped.Take(3))
                 {
@@ -438,11 +449,11 @@ namespace RimTalk.Memory
                 foreach (var group in grouped.Take(5))
                 {
                     if (shown > 0) summary.Append("；");
-                    
+
                     string content = group.First().content;
                     if (content.Length > 40)
                         content = content.Substring(0, 40) + "...";
-                    
+
                     if (group.Count() > 1)
                     {
                         summary.Append($"{content}×{group.Count()}");
@@ -462,7 +473,7 @@ namespace RimTalk.Memory
 
             return summary.Length > 0 ? summary.ToString() : $"{type}记忆{memories.Count}条";
         }
-        
+
         private void TrimEventLog()
         {
             if (eventLogMemories.Count <= MAX_EVENTLOG)
@@ -470,7 +481,7 @@ namespace RimTalk.Memory
 
             // ⭐ 修复：只计算非固定的记忆数量（移除 isUserEdited 检查）
             int nonPinnedCount = eventLogMemories.Count(m => !m.isPinned);
-            
+
             // 如果非固定记忆没超过上限，则不需要trim
             if (nonPinnedCount <= MAX_EVENTLOG)
                 return;
@@ -482,7 +493,7 @@ namespace RimTalk.Memory
                 .OrderBy(m => m.timestamp)
                 .Take(toRemoveCount)
                 .ToList();
-            
+
             foreach (var memory in toRemove)
             {
                 eventLogMemories.Remove(memory);
@@ -527,14 +538,14 @@ namespace RimTalk.Memory
 
             foreach (var memory in archiveMemories)
                 memory.Decay(clpaRate);
-            
+
             // ⭐ 步骤2：清理极低activity的"死亡"记忆（方案1）
             CleanupLowActivityMemories();
-            
+
             // ⭐ 步骤3：强制执行容量限制（方案3）
             EnforceMemoryLimits();
         }
-        
+
         /// <summary>
         /// ⭐ v3.3.14: 清理极低activity的记忆（方案1）
         /// 当activity < 0.01时，认为记忆已"死亡"，可以安全删除
@@ -543,35 +554,35 @@ namespace RimTalk.Memory
         private void CleanupLowActivityMemories()
         {
             const float ACTIVITY_THRESHOLD = 0.01f; // activity < 0.01视为"死亡"
-            
+
             int removedSCM = 0;
             int removedELS = 0;
             int removedCLPA = 0;
-            
+
             // 清理SCM中的低activity记忆（移除 isUserEdited 检查）
             int beforeSCM = situationalMemories.Count;
-            situationalMemories.RemoveAll(m => 
-                m.activity < ACTIVITY_THRESHOLD && 
+            situationalMemories.RemoveAll(m =>
+                m.activity < ACTIVITY_THRESHOLD &&
                 !m.isPinned
             );
             removedSCM = beforeSCM - situationalMemories.Count;
-            
+
             // 清理ELS中的低activity记忆（移除 isUserEdited 检查）
             int beforeELS = eventLogMemories.Count;
-            eventLogMemories.RemoveAll(m => 
-                m.activity < ACTIVITY_THRESHOLD && 
+            eventLogMemories.RemoveAll(m =>
+                m.activity < ACTIVITY_THRESHOLD &&
                 !m.isPinned
             );
             removedELS = beforeELS - eventLogMemories.Count;
-            
+
             // ⭐ 清理CLPA中的低activity记忆（移除 isUserEdited 检查）
             int beforeCLPA = archiveMemories.Count;
-            archiveMemories.RemoveAll(m => 
-                m.activity < ACTIVITY_THRESHOLD && 
+            archiveMemories.RemoveAll(m =>
+                m.activity < ACTIVITY_THRESHOLD &&
                 !m.isPinned
             );
             removedCLPA = beforeCLPA - archiveMemories.Count;
-            
+
             // 开发模式日志
             if (Prefs.DevMode && (removedSCM > 0 || removedELS > 0 || removedCLPA > 0))
             {
@@ -580,7 +591,7 @@ namespace RimTalk.Memory
                            $"{removedSCM} SCM + {removedELS} ELS + {removedCLPA} CLPA memories (activity < {ACTIVITY_THRESHOLD})");
             }
         }
-        
+
         /// <summary>
         /// ⭐ v3.3.14: 强制执行容量限制（方案3）
         /// 当层级超过容量时，删除最低activity的记忆
@@ -590,11 +601,11 @@ namespace RimTalk.Memory
         {
             int removedSCM = 0;
             int removedELS = 0;
-            
+
             // ⭐ 修复：只计算非固定的记忆数量（移除 isUserEdited 检查）
             int scmNonPinnedCount = situationalMemories.Count(m => !m.isPinned);
             int elsNonPinnedCount = eventLogMemories.Count(m => !m.isPinned);
-            
+
             // ⭐ 处理SCM容量限制（移除 isUserEdited 检查）
             if (scmNonPinnedCount > MAX_SITUATIONAL)
             {
@@ -606,14 +617,14 @@ namespace RimTalk.Memory
                     .ThenBy(m => m.timestamp) // 相同activity时，删除更旧的
                     .Take(toRemoveCount)
                     .ToList();
-                
+
                 foreach (var memory in toRemove)
                 {
                     situationalMemories.Remove(memory);
                     removedSCM++;
                 }
             }
-            
+
             // ⭐ 处理ELS容量限制（移除 isUserEdited 检查）
             if (elsNonPinnedCount > MAX_EVENTLOG)
             {
@@ -625,27 +636,27 @@ namespace RimTalk.Memory
                     .ThenBy(m => m.timestamp)
                     .Take(toRemoveCount)
                     .ToList();
-                
+
                 foreach (var memory in toRemove)
                 {
                     eventLogMemories.Remove(memory);
                     removedELS++;
                 }
             }
-            
+
             // 开发模式日志
             if (Prefs.DevMode && (removedSCM > 0 || removedELS > 0))
             {
                 var pawn = parent as Pawn;
                 int scmPinnedCount = situationalMemories.Count(m => m.isPinned);
                 int elsPinnedCount = eventLogMemories.Count(m => m.isPinned);
-                
+
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} enforced limits: " +
                            $"removed {removedSCM} SCM (non-pinned: {scmNonPinnedCount - removedSCM}, pinned: {scmPinnedCount}, max: {MAX_SITUATIONAL}) + " +
                            $"{removedELS} ELS (non-pinned: {elsNonPinnedCount - removedELS}, pinned: {elsPinnedCount}, max: {MAX_EVENTLOG})");
             }
         }
-        
+
         /// <summary>
         /// ⭐ v4.0: 更新检索逻辑
         /// - ABM: 按 conversationId 去重后返回所有
@@ -655,13 +666,13 @@ namespace RimTalk.Memory
         public List<MemoryEntry> RetrieveMemories(MemoryQuery query)
         {
             var results = new List<MemoryEntry>();
-            
+
             // ⭐ v4.0: ABM 无容量限制，返回所有匹配的
             var abmCandidates = activeMemories
                 .Where(m => MatchesQuery(m, query))
                 .OrderByDescending(m => m.timestamp);
             results.AddRange(abmCandidates);
-            
+
             // ⭐ v4.0: SCM 仅兼容旧存档（不再生成新的）
             if (situationalMemories.Count > 0)
             {
@@ -672,7 +683,7 @@ namespace RimTalk.Memory
                     .Take(5);
                 results.AddRange(scmCandidates);
             }
-            
+
             if (query.includeContext && results.Count < query.maxCount)
             {
                 // ⭐ v3.3.2.29: ELS 候选 - 确定性排序（分数降序 + ID 升序）
@@ -683,10 +694,10 @@ namespace RimTalk.Memory
                     .Take(query.maxCount - results.Count);
                 results.AddRange(elsCandidates);
             }
-            
+
             if (query.layer == MemoryLayer.Archive)
             {
-            // ⭐ v3.3.2.29: CLPA 候选 - 确定性排序（重要性降序 + ID 升序）
+                // ⭐ v3.3.2.29: CLPA 候选 - 确定性排序（重要性降序 + ID 升序）
                 var clpaCandidates = archiveMemories
                     .Where(m => MatchesQuery(m, query))
                     .OrderByDescending(m => m.importance)
@@ -697,7 +708,7 @@ namespace RimTalk.Memory
 
             return results.Take(query.maxCount).ToList();
         }
-        
+
         private bool MatchesQuery(MemoryEntry memory, MemoryQuery query)
         {
             if (query.type.HasValue && memory.type != query.type.Value)
@@ -780,7 +791,7 @@ namespace RimTalk.Memory
             Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Pinned RoundMemory as MemoryEntry");
 
             roundMemory.isPinned = false; // 由于UI bug，这里强制回正一下
-            
+
             // 刷新 UI 缓存
             GetMemoryWindowInstance()?.InvalidateCache();
             Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Refreshed Memory Window UI");
@@ -819,6 +830,7 @@ namespace RimTalk.Memory
             return all;
         }
 
+        // 此方法未正确处理固定的记忆
         public void ManualArchive()
         {
             if (eventLogMemories.Count == 0) return;
@@ -827,7 +839,7 @@ namespace RimTalk.Memory
             if (pawn == null) return;
 
             var byType = eventLogMemories.GroupBy(m => m.type);
-            
+
             int archivedCount = 0;
             foreach (var typeGroup in byType)
             {
@@ -849,7 +861,7 @@ namespace RimTalk.Memory
                     archivedCount++;
                 }
             }
-            
+
             if (archivedCount > 0)
             {
                 eventLogMemories.Clear();

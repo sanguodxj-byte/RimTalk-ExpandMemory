@@ -22,8 +22,8 @@ namespace RimTalk.Memory.UI
             List<MemoryEntry> targetList,
             string promptTemplate)
         {
-            // ⭐ 修复：过滤掉固定记忆（不应该被总结）
-            var memoriesToSummarize = memories.Where(m => !m.isPinned).ToList();
+            // ⭐ 修复：过滤掉已总结记忆（不应该被总结）（memories在输入前就已经过滤过了，这一步其实是多余的，但先留着吧）
+            var memoriesToSummarize = memories.Where(m => !m.IsSummarized).ToList();
             
             if (memoriesToSummarize.Count == 0)
             {
@@ -34,7 +34,8 @@ namespace RimTalk.Memory.UI
                 return;
             }
             
-            var byType = memoriesToSummarize.GroupBy(m => m.type);
+            // 修复分组总结的bug
+            var byType = memoriesToSummarize.GroupBy(m => MemoryType.Conversation);
             
             foreach (var typeGroup in byType)
             {
@@ -94,8 +95,14 @@ namespace RimTalk.Memory.UI
                 InsertMemoryByTimestamp(targetList, aggregated);
             }
             
-            // ⭐ 修复：只从源列表中移除非固定记忆
             foreach (var memory in memoriesToSummarize)
+            {
+                memory?.IsSummarized = true;
+            }
+
+            // ⭐ 修复：只从源列表中移除非固定记忆
+            var toRemove = memoriesToSummarize.Where(m => !m?.isPinned ?? false).ToList();
+            foreach (var memory in toRemove)
             {
                 sourceList.Remove(memory);
             }

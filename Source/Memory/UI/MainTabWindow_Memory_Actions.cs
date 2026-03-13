@@ -21,13 +21,13 @@ namespace RimTalk.Memory.UI
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
             
-            // ? 修复：同时收集 ABM 和 SCM（只排除固定的记忆）
+            // ? 修复：同时收集 ABM 和 SCM（只排除总结过的记忆）
             var abmMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.Active && !m.isPinned)
+                .Where(m => m.layer == MemoryLayer.Active && !m.IsSummarized)
                 .ToList();
                 
             var scmMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.Situational && !m.isPinned)
+                .Where(m => m.layer == MemoryLayer.Situational && !m.IsSummarized)
                 .ToList();
             
             var allMemoriesToSummarize = new List<MemoryEntry>();
@@ -84,9 +84,9 @@ namespace RimTalk.Memory.UI
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
             
-            // ? 修复：排除固定的和用户编辑的记忆
+            // ? 修复：排除总结过的记忆
             var elsMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.EventLog && !m.isPinned && !m.isUserEdited)
+                .Where(m => m.layer == MemoryLayer.EventLog && !m.IsSummarized)
                 .ToList();
                 
             if (elsMemories.Count == 0)
@@ -174,7 +174,7 @@ namespace RimTalk.Memory.UI
                     var comp = pawn.TryGetComp<PawnMemoryComp>();
                     if (comp != null && comp.GetEventLogMemoryCount() > 0)
                     {
-                        comp.ManualArchive();
+                        comp.ManualArchive(); // 此方法高度危险，完全没有正确处理固定的记忆
                         count++;
                     }
                 }

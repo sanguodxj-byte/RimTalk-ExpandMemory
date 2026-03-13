@@ -104,6 +104,7 @@ namespace RimTalk.Memory
         // 元数据
         public bool isUserEdited;           // 是否被用户编辑过
         public bool isPinned;               // 是否固定（不会被删除）
+        public bool IsSummarized = false;   // 是否已被AI总结过，新生成的记忆默认为false
         public string notes;                // 用户备注
         public string aiCacheKey;           // AI总结的缓存键
 
@@ -177,6 +178,7 @@ namespace RimTalk.Memory
             Scribe_Collections.Look(ref keywords, "keywords", LookMode.Value);
             Scribe_Values.Look(ref isUserEdited, "isUserEdited");
             Scribe_Values.Look(ref isPinned, "isPinned", false);
+            Scribe_Values.Look(ref IsSummarized, "IsSummarized", true); // 旧存档中的记忆默认为true以向后兼容
             Scribe_Values.Look(ref notes, "notes");
             Scribe_Values.Look(ref aiCacheKey, "aiCacheKey");
 

@@ -323,14 +323,16 @@ namespace RimTalk.Memory.UI
                 SummarizeAll();
             }
             y += buttonHeight + spacing;
-            
+
+            /* 此方法高度危险，完全没有正确处理固定的记忆！
             // Archive All
             if (Widgets.ButtonText(new Rect(parentRect.x, y, parentRect.width, buttonHeight), "RimTalk_MindStream_ArchiveAll".Translate()))
             {
                 ArchiveAll();
             }
             y += buttonHeight + spacing * 2;
-            
+            */
+
             // ? 导出/导入按钮（并排显示）
             float halfWidth = (parentRect.width - spacing) / 2f;
             
