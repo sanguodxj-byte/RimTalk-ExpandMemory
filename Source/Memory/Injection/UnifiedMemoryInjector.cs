@@ -36,8 +36,9 @@ namespace RimTalk.Memory.Injection
             var settings = RimTalkMemoryPatchMod.Settings;
             int maxABMRounds = settings?.maxABMInjectionRounds ?? 3;
             int maxTotalMemories = settings?.maxInjectedMemories ?? 10;
-            
+
             // Step 1: 采集 ABM（对话优先 + 行为补位）
+            // 【ABM全额注入】开关的作用由 maxABMInjectionRounds 配置项接管
             var abmList = ABMCollector.Collect(pawn, maxABMRounds);
             
             if (Prefs.DevMode)

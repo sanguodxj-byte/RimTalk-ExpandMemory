@@ -41,9 +41,11 @@ namespace RimTalk.MemoryPatch
         
         // ⭐ 提示词规范化规则列表（功能保留，默认为空）
         public List<ReplacementRule> normalizationRules = new List<ReplacementRule>();
-        
+
         // ⭐ v4.0: 三层记忆容量配置（移除 SCM）
         // maxActiveMemories 已废弃，ABM 无容量限制
+        // 恢复为可选项
+        public int maxActiveMemories = 6;
         // maxSituationalMemories 仅用于兼容旧存档显示
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
@@ -179,7 +181,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref maxEventLogMemories, "fourLayer_maxEventLogMemories", 50);
             
             // ⭐ v4.0: ABM 注入轮数
-            Scribe_Values.Look(ref maxABMInjectionRounds, "fourLayer_maxABMInjectionRounds", 3);
+            Scribe_Values.Look(ref maxABMInjectionRounds, "fourLayer_maxABMInjectionRounds", 0); // 默认不注入 ABM 以向后兼容
             
             // ⭐ 是否注入玩家发言
             Scribe_Values.Look(ref IsPlayerDialogueInject, "fourLayer_isPlayerDialogueInject", true);
@@ -439,10 +441,26 @@ namespace RimTalk.MemoryPatch
                 listing.Gap();
 
                 // ⭐ 是否启用轮次记忆
+                // 防呆设计：拨动开关时会自动调整ABM注入轮数
+                bool oldIsActive = IsRoundMemoryActive;
                 listing.CheckboxLabeled("RimTalk_Settings_IsRoundMemoryActive".Translate(), ref IsRoundMemoryActive);
                 GUI.color = Color.gray;
                 listing.Label("  " + "RimTalk_Settings_IsRoundMemoryActiveDesc".Translate());
                 GUI.color = Color.white;
+                if (oldIsActive != IsRoundMemoryActive)
+                {
+                    // 如果开关状态发生了改变，即时改变ABM注入轮数
+                    if (IsRoundMemoryActive)
+                    {
+                        // 开关被【打开】时，设为默认值3
+                        maxABMInjectionRounds = 3;
+                    }
+                    else
+                    {
+                        // 开关被【关闭】时，设为0
+                        maxABMInjectionRounds = 0;
+                    }
+                }
 
                 listing.Gap();
 

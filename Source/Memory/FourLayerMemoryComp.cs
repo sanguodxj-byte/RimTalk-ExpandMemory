@@ -26,6 +26,9 @@ namespace RimTalk.Memory
 
         // 容量限制（从设置中读取）
         // ⭐ v4.0: 移除 MAX_ACTIVE（ABM 无限制）
+        // 恢复为可选项
+        private int MAX_ACTIVE => RimTalkMemoryPatchMod.Settings.maxActiveMemories;
+        public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
         // ⭐ v4.0: MAX_SITUATIONAL 仅用于兼容旧存档的显示
         private int MAX_SITUATIONAL => RimTalkMemoryPatchMod.Settings.maxSituationalMemories;
         private int MAX_EVENTLOG => RimTalkMemoryPatchMod.Settings.maxEventLogMemories;
@@ -79,64 +82,52 @@ namespace RimTalk.Memory
         /// 添加记忆到超短期记忆（ABM）
         /// ⭐ v3.3.2.25: 移除向量化同步
         /// </summary>
+        // 使用工坊版 AddActiveMemory
         public void AddActiveMemory(string content, MemoryType type, float importance = 1f, string relatedPawn = null)
         {
-            AddActiveMemoryInternal(content, type, importance, relatedPawn, null);
-        }
-        
-        /// <summary>
-        /// ⭐ v4.0: 添加带有 conversationId 的记忆（用于跨Pawn去重）
-        /// </summary>
-        public void AddActiveMemoryWithConversationId(string content, MemoryType type, string conversationId, float importance = 1f, string relatedPawn = null)
-        {
-            AddActiveMemoryInternal(content, type, importance, relatedPawn, conversationId);
-        }
-        
-        /// <summary>
-        /// ⭐ v4.0: 内部方法，实际处理记忆添加
-        /// ⭐ v4.0: ABM 无容量限制，不再转移到 SCM
-        /// </summary>
-        private void AddActiveMemoryInternal(string content, MemoryType type, float importance, string relatedPawn, string conversationId)
-        {
-            // 去重检查（基于 conversationId 优先，否则用内容）
-            if (!string.IsNullOrEmpty(conversationId))
+            bool flag = IsDuplicateMemory(content, relatedPawn, type);
+            if (flag)
             {
-                // ⭐ v4.0: 如果有 conversationId，用 conversationId 去重
-                if (activeMemories.Any(m => m.conversationId == conversationId))
+                bool devMode = Prefs.DevMode;
+                if (devMode)
                 {
-                    if (Prefs.DevMode)
-                    {
-                        var pawn = parent as Pawn;
-                        string pawnLabel = pawn?.LabelShort ?? "Unknown";
-                        Log.Message($"[Memory] Skipped duplicate conversation for {pawnLabel}: {conversationId}");
-                    }
-                    return;
+                    Pawn pawn = parent as Pawn;
+                    string pawnLabel = ((pawn != null) ? pawn.LabelShort : null) ?? "Unknown";
+                    Log.Message(string.Concat(
+                    [
+                        "[Memory] Skipped duplicate memory for ",
+                        pawnLabel,
+                        ": ",
+                        content.Substring(0, Math.Min(50, content.Length)),
+                        "..."
+                    ]));
                 }
             }
-            else if (IsDuplicateMemory(content, relatedPawn, type))
+            else
             {
-                if (Prefs.DevMode)
-                {
-                    var pawn = parent as Pawn;
-                    string pawnLabel = pawn?.LabelShort ?? "Unknown";
-                    Log.Message($"[Memory] Skipped duplicate memory for {pawnLabel}: {content.Substring(0, Math.Min(50, content.Length))}...");
-                }
-                return;
-            }
-            
-            var memory = new MemoryEntry(content, type, MemoryLayer.Active, importance, relatedPawn);
-            
-            // ⭐ v4.0: 设置 conversationId（如果有）
-            if (!string.IsNullOrEmpty(conversationId))
-            {
-                memory.conversationId = conversationId;
-            }
-            
-            ExtractKeywords(memory);
-            activeMemories.Insert(0, memory);
+                MemoryEntry memory = new MemoryEntry(content, type, MemoryLayer.Active, importance, relatedPawn);
+                ExtractKeywords(memory);
+                activeMemories.Insert(0, memory);
 
-            // ⭐ v4.0: ABM 无容量限制，不再转移到 SCM
-            // 总结时会统一处理 ABM，生成 ELS
+                // 开启轮次记忆时，ABM不再有容量限制，且不再自动转移到SCM
+                if (IsRoundMemoryEnabled) return;
+
+                int nonPinnedCount = activeMemories.Count((MemoryEntry m) => !m.isPinned);
+                bool flag2 = nonPinnedCount > MAX_ACTIVE;
+                if (flag2)
+                {
+                    MemoryEntry oldest = (from m in activeMemories
+                                          where !m.isPinned
+                                          orderby m.timestamp
+                                          select m).FirstOrDefault();
+                    bool flag3 = oldest != null;
+                    if (flag3)
+                    {
+                        activeMemories.Remove(oldest);
+                        PromoteToSituational(oldest);
+                    }
+                }
+            }
         }
         
         private bool IsDuplicateMemory(string content, string relatedPawn, MemoryType type)
@@ -163,6 +154,17 @@ namespace RimTalk.Memory
 
         // ⭐ v4.0: 已删除 PromoteToSituational 方法
         // SCM 层已废弃，ABM 总结后直接转 ELS
+        // 恢复，改为可选
+        private void PromoteToSituational(MemoryEntry memory)
+        {
+            memory.layer = MemoryLayer.Situational;
+            situationalMemories.Insert(0, memory);
+            bool flag = situationalMemories.Count > MAX_SITUATIONAL * 1.5f;
+            if (flag)
+            {
+                Log.Warning(string.Format("[Memory] {0} SCM overflow ({1}), needs summarization", parent.LabelShort, situationalMemories.Count));
+            }
+        }
 
         public void DailySummarization()
         {
@@ -187,7 +189,8 @@ namespace RimTalk.Memory
                 return;
             }
 
-            var byType = allMemoriesToSummarize.GroupBy(m => MemoryType.Conversation); // MemoryType.Conversation即总结得到的ELS的记忆类型，可以根据需要调整为其他类型
+            // MemoryType.Conversation即总结得到的ELS的记忆类型，可以根据需要调整为其他类型，建议改为总结独有类型
+            var byType = allMemoriesToSummarize.GroupBy(m => MemoryType.Conversation); 
 
             foreach (var typeGroup in byType)
             {
@@ -276,7 +279,8 @@ namespace RimTalk.Memory
                 return;
             }
 
-            var byType = allMemoriesToSummarize.GroupBy(m => MemoryType.Conversation); // MemoryType.Conversation即总结得到的ELS的记忆类型，可以根据需要调整为其他类型
+            // MemoryType.Conversation即总结得到的ELS的记忆类型，可以根据需要调整为其他类型，建议改为总结独有类型
+            var byType = allMemoriesToSummarize.GroupBy(m => MemoryType.Conversation);
 
             foreach (var typeGroup in byType)
             {

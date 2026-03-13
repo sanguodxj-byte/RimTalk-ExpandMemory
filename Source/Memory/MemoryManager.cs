@@ -458,6 +458,7 @@ namespace RimTalk.Memory
         }
         */
         
+        /*
         /// <summary>
         /// ⭐ v4.0: 将对话记录添加到所有参与者的ABM记忆中
         /// </summary>
@@ -513,6 +514,7 @@ namespace RimTalk.Memory
                 Log.Message($"[RimTalk Memory] ✅ Recorded conversation to {addedCount}/{pawns.Count} participants: {record.RawDialogue.Count} lines, convId={conversationId}");
             }
         }
+        */
         
         /// <summary>
         /// ⭐ v4.0: 格式化对话文本
