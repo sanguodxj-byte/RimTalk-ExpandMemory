@@ -16,7 +16,7 @@ namespace RimTalk.Memory.UI
         /// ⭐ v3.3.2.35: 修复时间戳继承和插入位置问题
         /// </summary>
         private void AggregateMemories(
-            List<MemoryEntry> memories, 
+            List<MemoryEntry> memories,
             MemoryLayer targetLayer,
             List<MemoryEntry> sourceList,
             List<MemoryEntry> targetList,
@@ -24,7 +24,7 @@ namespace RimTalk.Memory.UI
         {
             // ⭐ 修复：过滤掉已总结记忆（不应该被总结）（memories在输入前就已经过滤过了，这一步其实是多余的，但先留着吧）
             var memoriesToSummarize = memories.Where(m => !m.IsSummarized).ToList();
-            
+
             if (memoriesToSummarize.Count == 0)
             {
                 if (Prefs.DevMode)
@@ -33,30 +33,30 @@ namespace RimTalk.Memory.UI
                 }
                 return;
             }
-            
+
             // 修复分组总结的bug
             var byType = memoriesToSummarize.GroupBy(m => MemoryType.Conversation);
-            
+
             foreach (var typeGroup in byType)
             {
                 var items = typeGroup.ToList();
-                
+
                 // ⭐ 修复：使用被总结记忆中最晚（最新）的timestamp
                 int latestTimestamp = items.Max(m => m.timestamp);
-                
+
                 // 创建聚合条目
                 var aggregated = new MemoryEntry(
-                    content: targetLayer == MemoryLayer.Archive 
+                    content: targetLayer == MemoryLayer.Archive
                         ? CreateArchiveSummary(items, typeGroup.Key)
                         : CreateSimpleSummary(items, typeGroup.Key),
                     type: typeGroup.Key,
                     layer: targetLayer,
                     importance: items.Average(m => m.importance) + (targetLayer == MemoryLayer.Archive ? 0.3f : 0.2f)
                 );
-                
+
                 // ⭐ 修复：覆盖默认的timestamp（MemoryEntry构造函数会自动设置为当前时间）
                 aggregated.timestamp = latestTimestamp;
-                
+
                 // 合并元数据
                 aggregated.keywords.AddRange(items.SelectMany(m => m.keywords).Distinct());
                 aggregated.tags.AddRange(items.SelectMany(m => m.tags).Distinct());
@@ -65,13 +65,13 @@ namespace RimTalk.Memory.UI
                 {
                     aggregated.AddTag($"源自{items.Count}条ELS");
                 }
-                
+
                 // ⭐ AI总结（如果可用）
                 var settings = RimTalkMemoryPatchMod.Settings;
                 if (settings.useAISummarization && AI.IndependentAISummarizer.IsAvailable())
                 {
                     string cacheKey = AI.IndependentAISummarizer.ComputeCacheKey(selectedPawn, items);
-                    
+
                     AI.IndependentAISummarizer.RegisterCallback(cacheKey, (aiSummary) =>
                     {
                         if (!string.IsNullOrEmpty(aiSummary))
@@ -83,31 +83,27 @@ namespace RimTalk.Memory.UI
                             aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "深度归档" : "总结")}已完成";
                         }
                     });
-                    
+
                     AI.IndependentAISummarizer.SummarizeMemories(selectedPawn, items, promptTemplate);
-                    
+
                     aggregated.AddTag("简单" + (targetLayer == MemoryLayer.Archive ? "归档" : "总结"));
                     aggregated.AddTag("待AI更新");
                     aggregated.notes = $"AI {(targetLayer == MemoryLayer.Archive ? "深度归档" : "总结")}正在后台处理中...";
                 }
-                
+
                 // ⭐ 修复：根据时间戳插入到正确位置，而不是总是插入到开头
                 InsertMemoryByTimestamp(targetList, aggregated);
             }
-            
+
             foreach (var memory in memoriesToSummarize)
             {
                 memory?.IsSummarized = true;
             }
 
             // ⭐ 修复：只从源列表中移除非固定记忆
-            var toRemove = memoriesToSummarize.Where(m => !m?.isPinned ?? false).ToList();
-            foreach (var memory in toRemove)
-            {
-                sourceList.Remove(memory);
-            }
+            sourceList.RemoveAll(m => m == null || !m.isPinned);
         }
-        
+
         /// <summary>
         /// ⭐ 新方法：根据时间戳将记忆插入到正确的位置（保持列表按时间降序排序）
         /// </summary>
@@ -122,7 +118,7 @@ namespace RimTalk.Memory.UI
 
             // 使用二分查找找到插入位置（降序排列，新的在前）
             int insertIndex = list.FindIndex(m => m.timestamp < entry.timestamp);
-            
+
             // 如果没找到（所有记忆都比新记忆新），添加到末尾
             if (insertIndex == -1)
             {
@@ -133,7 +129,7 @@ namespace RimTalk.Memory.UI
                 list.Insert(insertIndex, entry);
             }
         }
-        
+
         /// <summary>
         /// 创建简单总结（用于手动总结时的占位符）
         /// </summary>
@@ -141,16 +137,16 @@ namespace RimTalk.Memory.UI
         {
             if (memories == null || memories.Count == 0)
                 return "";
-            
+
             var sb = new System.Text.StringBuilder();
-            
+
             if (type == MemoryType.Conversation)
             {
                 var byPerson = memories
                     .Where(m => !string.IsNullOrEmpty(m.relatedPawnName))
                     .GroupBy(m => m.relatedPawnName)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in byPerson.Take(5))
                 {
@@ -158,7 +154,7 @@ namespace RimTalk.Memory.UI
                     sb.Append($"与{group.Key}对话×{group.Count()}");
                     shown++;
                 }
-                
+
                 if (shown == 0)
                     sb.Append($"对话{memories.Count}次");
             }
@@ -168,7 +164,7 @@ namespace RimTalk.Memory.UI
                     .Select(m => m.content.Length > 15 ? m.content.Substring(0, 15) : m.content)
                     .GroupBy(a => a)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in grouped.Take(3))
                 {
@@ -182,27 +178,27 @@ namespace RimTalk.Memory.UI
                 var grouped = memories
                     .GroupBy(m => m.content.Length > 20 ? m.content.Substring(0, 20) : m.content)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in grouped.Take(5))
                 {
                     if (shown > 0) sb.Append("；");
-                    
+
                     string content = group.First().content;
                     if (content.Length > 40)
                         content = content.Substring(0, 40) + "...";
-                    
+
                     sb.Append(group.Count() > 1 ? $"{content}×{group.Count()}" : content);
                     shown++;
                 }
             }
-            
+
             if (sb.Length > 0 && memories.Count > 3)
                 sb.Append($"（共{memories.Count}条）");
-            
+
             return sb.Length > 0 ? sb.ToString() : $"{type}记忆{memories.Count}条";
         }
-        
+
         /// <summary>
         /// 创建归档摘要（用于手动归档时的占位符）
         /// </summary>
@@ -210,17 +206,17 @@ namespace RimTalk.Memory.UI
         {
             if (memories == null || memories.Count == 0)
                 return "";
-            
+
             var sb = new System.Text.StringBuilder();
             sb.Append($"{(type == MemoryType.Conversation ? "对话" : type == MemoryType.Action ? "行动" : type.ToString())}归档（{memories.Count}条）：");
-            
+
             if (type == MemoryType.Conversation)
             {
                 var byPerson = memories
                     .Where(m => !string.IsNullOrEmpty(m.relatedPawnName))
                     .GroupBy(m => m.relatedPawnName)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in byPerson.Take(10))
                 {
@@ -235,7 +231,7 @@ namespace RimTalk.Memory.UI
                     .Select(m => m.content.Length > 20 ? m.content.Substring(0, 20) : m.content)
                     .GroupBy(a => a)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in grouped.Take(5))
                 {
@@ -249,21 +245,21 @@ namespace RimTalk.Memory.UI
                 var grouped = memories
                     .GroupBy(m => m.content.Length > 30 ? m.content.Substring(0, 30) : m.content)
                     .OrderByDescending(g => g.Count());
-                
+
                 int shown = 0;
                 foreach (var group in grouped.Take(8))
                 {
                     if (shown > 0) sb.Append("；");
-                    
+
                     string content = group.First().content;
                     if (content.Length > 60)
                         content = content.Substring(0, 60) + "...";
-                    
+
                     sb.Append(group.Count() > 1 ? $"{content}×{group.Count()}" : content);
                     shown++;
                 }
             }
-            
+
             return sb.ToString();
         }
     }
