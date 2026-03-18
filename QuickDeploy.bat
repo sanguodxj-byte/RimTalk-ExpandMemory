@@ -9,7 +9,7 @@ echo.
 set "TARGET=D:\steam\steamapps\common\RimWorld\Mods\RimTalk-ExpandMemory"
 
 echo Compiling project...
-dotnet build RimTalk-ExpandMemory.csproj --configuration Release
+dotnet build RimTalk-ExpandMemory.csproj --configuration Release -p:RimTalkDir="D:\steam\steamapps\workshop\content\294100\3551203752"
 if errorlevel 1 (
     echo Build failed!
     pause

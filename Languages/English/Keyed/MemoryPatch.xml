@@ -213,6 +213,8 @@
   <RimTalk_Tooltip_Notes>Additional notes</RimTalk_Tooltip_Notes>
   <RimTalk_Tooltip_Tags>Tags: {0}</RimTalk_Tooltip_Tags>
   
+  <RimTalk_Cancel>Cancel</RimTalk_Cancel>
+  <RimTalk_Save>Save</RimTalk_Save>
   <RimTalk_With>with</RimTalk_With>
   <RimTalk_MemoryType_Conversation>Conversation</RimTalk_MemoryType_Conversation>
   <RimTalk_MemoryType_Action>Action</RimTalk_MemoryType_Action>
@@ -317,6 +319,12 @@
   <RimTalk_Settings_ValidationError>✗ Validation failed: {0}</RimTalk_Settings_ValidationError>
   
   <!-- Memory Types -->
+  <RimTalk_Settings_IsRoundMemoryActive>Enable Round Memory</RimTalk_Settings_IsRoundMemoryActive>
+  <RimTalk_Settings_IsRoundMemoryActiveDesc>When enabled, memory extension captures and injects memories per conversation round instead of individual messages</RimTalk_Settings_IsRoundMemoryActiveDesc>
+  <RimTalk_Settings_IsPlayerDialogueInject>Record Player Dialogue</RimTalk_Settings_IsPlayerDialogueInject>
+  <RimTalk_Settings_IsPlayerDialogueInjectDesc>When enabled, messages sent by the player via the dialogue box will also be recorded into round memory</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+  <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM Injection Rounds: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
+  <RimTalk_Settings_MaxABMInjectionRoundsDesc>Controls how many recent conversation rounds are injected into the AI context</RimTalk_Settings_MaxABMInjectionRoundsDesc>
   <RimTalk_Settings_MemoryTypesSection>Memory Type Toggles</RimTalk_Settings_MemoryTypesSection>
   <RimTalk_Settings_ActionMemory>Action Memory</RimTalk_Settings_ActionMemory>
   <RimTalk_Settings_ConversationMemory>Conversation Memory</RimTalk_Settings_ConversationMemory>

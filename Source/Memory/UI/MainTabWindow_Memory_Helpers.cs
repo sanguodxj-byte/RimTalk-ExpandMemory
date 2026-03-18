@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using RimTalk.Memory;
 using RimTalk.MemoryPatch;
@@ -97,7 +97,7 @@ namespace RimTalk.Memory.UI
 
             foreach (var memory in memoriesToSummarize)
             {
-                memory?.IsSummarized = true;
+                if (memory != null) memory.IsSummarized = true;
             }
 
             // ⭐ 修复：只从源列表中移除非固定记忆

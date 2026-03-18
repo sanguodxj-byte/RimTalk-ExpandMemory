@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Verse;
 using RimTalk.MemoryPatch;
+using RimTalk.Memory;
 using RimTalk.Memory.Injection;
 
 namespace RimTalk.Memory.API
@@ -37,6 +38,7 @@ namespace RimTalk.Memory.API
                 var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
                 if (fourLayerComp != null)
                 {
+                    // ⭐ v5.1: 规范化在 GetFourLayerMemories 内部已处理（缓存后规范化）
                     return GetFourLayerMemories(pawn, fourLayerComp, settings);
                 }
 
@@ -44,7 +46,8 @@ namespace RimTalk.Memory.API
                 var memoryComp = pawn.TryGetComp<PawnMemoryComp>();
                 if (memoryComp != null)
                 {
-                    return GetLegacyMemories(memoryComp, settings);
+                    // ⭐ v5.1: 旧版路径补规范化
+                    return PromptNormalizer.Normalize(GetLegacyMemories(memoryComp, settings));
                 }
 
                 return "(No memory component)";
@@ -118,7 +121,11 @@ namespace RimTalk.Memory.API
                 result = GetRecentMemories(comp, settings.maxInjectedMemories);
             }
 
-            // ⭐ v4.2: 缓存结果
+            // ⭐ v5.1: 应用提示词规范化规则（迁移自 SmartInjectionManager）
+            // 注意：必须先规范化，再缓存，否则缓存命中时会绕过规范化
+            result = PromptNormalizer.Normalize(result);
+
+            // ⭐ v4.2: 缓存结果（存规范化后的内容）
             _pawnMemoryCache[pawnId] = result;
 
             return result;
@@ -218,8 +225,8 @@ namespace RimTalk.Memory.API
 
             try
             {
-                // ⭐ v5.0: 使用新的统一注入器
-                return UnifiedMemoryInjector.InjectABMOnly(pawn);
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(UnifiedMemoryInjector.InjectABMOnly(pawn));
             }
             catch (Exception ex)
             {
@@ -244,7 +251,8 @@ namespace RimTalk.Memory.API
                     return "(No ELS memories)";
                 }
 
-                return FormatMemoryList(comp.EventLogMemories, MemoryLayer.EventLog);
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(FormatMemoryList(comp.EventLogMemories, MemoryLayer.EventLog));
             }
             catch (Exception ex)
             {
@@ -269,7 +277,8 @@ namespace RimTalk.Memory.API
                     return "(No CLPA memories)";
                 }
 
-                return FormatMemoryList(comp.ArchiveMemories, MemoryLayer.Archive);
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(FormatMemoryList(comp.ArchiveMemories, MemoryLayer.Archive));
             }
             catch (Exception ex)
             {
@@ -337,7 +346,8 @@ namespace RimTalk.Memory.API
                     return "(No matched ELS memories)";
                 }
 
-                return result;
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(result);
             }
             catch (Exception ex)
             {
@@ -381,7 +391,8 @@ namespace RimTalk.Memory.API
                     return "(No matched CLPA memories)";
                 }
 
-                return result;
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(result);
             }
             catch (Exception ex)
             {

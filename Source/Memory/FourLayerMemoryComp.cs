@@ -241,7 +241,7 @@ namespace RimTalk.Memory
 
             foreach (var memory in allMemoriesToSummarize)
             {
-                memory?.IsSummarized = true; // 标记为已总结
+                if (memory != null) memory.IsSummarized = true; // 标记为已总结
             }
 
             // ⭐ 修复：清空ABM（总结后不再需要保留）
@@ -338,7 +338,7 @@ namespace RimTalk.Memory
 
             foreach (var memory in allMemoriesToSummarize)
             {
-                memory?.IsSummarized = true; // 标记为已总结
+                if (memory != null) memory.IsSummarized = true; // 标记为已总结
             }
 
             // ⭐ 修复：清空ABM（总结后不再需要保留）

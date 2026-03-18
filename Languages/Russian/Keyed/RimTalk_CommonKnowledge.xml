@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <!-- Библиотека знаний - Русский перевод (v3.4.0) -->
+    <RimTalk_Knowledge_New>Новый</RimTalk_Knowledge_New>
+    <RimTalk_Knowledge_Import>Импорт</RimTalk_Knowledge_Import>
+    <RimTalk_Knowledge_Export>Экспорт</RimTalk_Knowledge_Export>
+    <RimTalk_Knowledge_Delete>Удалить</RimTalk_Knowledge_Delete>
+    <RimTalk_Knowledge_ClearAll>Очистить всё</RimTalk_Knowledge_ClearAll>
+    <RimTalk_Knowledge_TotalAndEnabled>Всего: {0} | Включено: {1}</RimTalk_Knowledge_TotalAndEnabled>
+    <RimTalk_Knowledge_AutoGenerate>Автогенерация знаний</RimTalk_Knowledge_AutoGenerate>
+    <RimTalk_Knowledge_PawnStatus>Знания о состоянии колонистов</RimTalk_Knowledge_PawnStatus>
+    <RimTalk_Knowledge_PawnStatusDesc>Ежедневно обновляет состояние колонистов (стаж, отношения и т.д.)</RimTalk_Knowledge_PawnStatusDesc>
+    <RimTalk_Knowledge_EventRecord>Знания о записях событий</RimTalk_Knowledge_EventRecord>
+    <RimTalk_Knowledge_EventRecordDesc>Ежедневно извлекает важные события из журнала игры</RimTalk_Knowledge_EventRecordDesc>
+    <RimTalk_Knowledge_GenerateNow>Сгенерировать сейчас (вручную)</RimTalk_Knowledge_GenerateNow>
+    <RimTalk_Knowledge_GenerateNowDesc>Немедленно генерирует все включённые типы знаний</RimTalk_Knowledge_GenerateNowDesc>
+    <RimTalk_Knowledge_EnableAtLeastOne>Включите хотя бы один тип генерации знаний</RimTalk_Knowledge_EnableAtLeastOne>
+    <RimTalk_Knowledge_MustEnterGame>Сначала войдите в игру</RimTalk_Knowledge_MustEnterGame>
+    <RimTalk_Knowledge_GeneratedCount>Сгенерировано {0} записей о состоянии колонистов</RimTalk_Knowledge_GeneratedCount>
+    <RimTalk_Knowledge_AllExist>Все записи уже существуют</RimTalk_Knowledge_AllExist>
+    <RimTalk_Knowledge_EventGeneratedCount>Сгенерировано {0} записей событий</RimTalk_Knowledge_EventGeneratedCount>
+    <RimTalk_Knowledge_NoNewEvents>Новые события не найдены</RimTalk_Knowledge_NoNewEvents>
+    <RimTalk_Knowledge_EventGenerateFailed>Ошибка генерации событий: {0}</RimTalk_Knowledge_EventGenerateFailed>
+    <RimTalk_Knowledge_SelectEntry>Выберите запись знания</RimTalk_Knowledge_SelectEntry>
+    <RimTalk_Knowledge_Tag>Тег:</RimTalk_Knowledge_Tag>
+    <RimTalk_Knowledge_Importance>Важность:</RimTalk_Knowledge_Importance>
+    <RimTalk_Knowledge_Status>Статус:</RimTalk_Knowledge_Status>
+    <RimTalk_Knowledge_Enabled>Включено</RimTalk_Knowledge_Enabled>
+    <RimTalk_Knowledge_Disabled>Отключено</RimTalk_Knowledge_Disabled>
+    <RimTalk_Knowledge_Keywords>Ключевые слова:</RimTalk_Knowledge_Keywords>
+    <RimTalk_Knowledge_Content>Содержание:</RimTalk_Knowledge_Content>
+    <RimTalk_Knowledge_Edit>Редактировать</RimTalk_Knowledge_Edit>
+    <RimTalk_Knowledge_KeywordsHint>Ключевые слова (через запятую, оставьте пустым для автоизвлечения):</RimTalk_Knowledge_KeywordsHint>
+    <RimTalk_Knowledge_Save>Сохранить</RimTalk_Knowledge_Save>
+    <RimTalk_Knowledge_Cancel>Отмена</RimTalk_Knowledge_Cancel>
+    <RimTalk_Knowledge_NewTag>Новый тег</RimTalk_Knowledge_NewTag>
+    <RimTalk_Knowledge_ContentRequired>Содержание не может быть пустым</RimTalk_Knowledge_ContentRequired>
+    <RimTalk_Knowledge_SaveSuccess>Успешно сохранено</RimTalk_Knowledge_SaveSuccess>
+    <RimTalk_Knowledge_DeleteConfirm>Удалить {0} записей знаний?</RimTalk_Knowledge_DeleteConfirm>
+    <RimTalk_Knowledge_Deleted>Удалено {0} записей</RimTalk_Knowledge_Deleted>
+    <RimTalk_Knowledge_ClearAllConfirm>Очистить все {0} записей? Необратимо!</RimTalk_Knowledge_ClearAllConfirm>
+    <RimTalk_Knowledge_Cleared>Библиотека знаний очищена</RimTalk_Knowledge_Cleared>
+    <RimTalk_Knowledge_ImportTitle>Импорт знаний</RimTalk_Knowledge_ImportTitle>
+    <RimTalk_Knowledge_ImportDesc>Введите текст знаний\nФормат: [Тег]Содержание\nПо одному на строку</RimTalk_Knowledge_ImportDesc>
+    <RimTalk_Knowledge_ImportSuccess>Успешно импортировано {0} записей знаний</RimTalk_Knowledge_ImportSuccess>
+    <RimTalk_Knowledge_Confirm>Подтвердить</RimTalk_Knowledge_Confirm>
+    <RimTalk_Knowledge_NoContent>Нет содержимого для экспорта</RimTalk_Knowledge_NoContent>
+    <RimTalk_Knowledge_ExportSuccess>Экспортировано в: {0}</RimTalk_Knowledge_ExportSuccess>
+    <RimTalk_Knowledge_ExportFailed>Ошибка экспорта: {0}</RimTalk_Knowledge_ExportFailed>
+    <RimTalk_Memory_AddToLayer>Добавить {0} в {1} для {2}</RimTalk_Memory_AddToLayer>
+    <RimTalk_Memory_Content>Содержание воспоминания:</RimTalk_Memory_Content>
+    <RimTalk_Memory_TagsOptional>Теги (через запятую, необязательно):</RimTalk_Memory_TagsOptional>
+    <RimTalk_Memory_NotesOptional>Заметки (необязательно):</RimTalk_Memory_NotesOptional>
+    <RimTalk_Memory_ImportanceLabel>Важность: {0}</RimTalk_Memory_ImportanceLabel>
+    <RimTalk_Memory_PinMemory>Закрепить (не будет удалено автоматически)</RimTalk_Memory_PinMemory>
+    <RimTalk_Memory_ContentRequired>Содержание не может быть пустым</RimTalk_Memory_ContentRequired>
+    <RimTalk_Memory_AddedToELS>Добавлено в ELS {0} (Среднесрочная память)</RimTalk_Memory_AddedToELS>
+    <RimTalk_Memory_AddedToCLPA>Добавлено в CLPA {0} (Долгосрочная память)</RimTalk_Memory_AddedToCLPA>
+    <RimTalk_Layer_ELS>ELS (Среднесрочная память)</RimTalk_Layer_ELS>
+    <RimTalk_Layer_CLPA>CLPA (Долгосрочная память)</RimTalk_Layer_CLPA>
+    <RimTalk_Type_Action>Воспоминание о действии</RimTalk_Type_Action>
+    <RimTalk_Type_Conversation>Воспоминание о разговоре</RimTalk_Type_Conversation>
+    <RimTalk_ExtendedProperties>Расширенные свойства</RimTalk_ExtendedProperties>
+    <RimTalk_CanBeExtracted>Можно извлечь: </RimTalk_CanBeExtracted>
+    <RimTalk_CanBeMatched>Можно сопоставить: </RimTalk_CanBeMatched>
+    <RimTalk_Yes>Да (✓)</RimTalk_Yes>
+    <RimTalk_No>Нет (×)</RimTalk_No>
+    <RimTalk_EnableAllExtract>Включить все извлечения</RimTalk_EnableAllExtract>
+    <RimTalk_DisableAllExtract>Отключить все извлечения</RimTalk_DisableAllExtract>
+    <RimTalk_EnableAllMatch>Включить все сопоставления</RimTalk_EnableAllMatch>
+    <RimTalk_DisableAllMatch>Отключить все сопоставления</RimTalk_DisableAllMatch>
+    <RimTalk_CanBeExtractedEnabled>Извлечение включено (нажмите для отключения)</RimTalk_CanBeExtractedEnabled>
+    <RimTalk_CanBeExtractedDisabled>Извлечение отключено (нажмите для включения)</RimTalk_CanBeExtractedDisabled>
+    <RimTalk_CanBeMatchedEnabled>Сопоставление включено (нажмите для отключения)</RimTalk_CanBeMatchedEnabled>
+    <RimTalk_CanBeMatchedDisabled>Сопоставление отключено (нажмите для включения)</RimTalk_CanBeMatchedDisabled>
+    <RimTalk_Knowledge_Categories>Категории</RimTalk_Knowledge_Categories>
+    <RimTalk_Knowledge_CategoryAll>Все</RimTalk_Knowledge_CategoryAll>
+    <RimTalk_Knowledge_CategoryInstructions>Правила</RimTalk_Knowledge_CategoryInstructions>
+    <RimTalk_Knowledge_CategoryLore>Лор</RimTalk_Knowledge_CategoryLore>
+    <RimTalk_Knowledge_CategoryPawnStatus>Состояние персонажа</RimTalk_Knowledge_CategoryPawnStatus>
+    <RimTalk_Knowledge_CategoryHistory>История</RimTalk_Knowledge_CategoryHistory>
+    <RimTalk_Knowledge_CategoryOther>Другое</RimTalk_Knowledge_CategoryOther>
+    <RimTalk_Knowledge_CategoryUnknown>Неизвестно</RimTalk_Knowledge_CategoryUnknown>
+    <RimTalk_Knowledge_TagTest>🔍 Тест тегов</RimTalk_Knowledge_TagTest>
+    <RimTalk_Knowledge_TagTestTitle>Инструмент тестирования тегов</RimTalk_Knowledge_TagTestTitle>
+    <RimTalk_Knowledge_TagTestInputTag>Тестовые теги (через запятую):</RimTalk_Knowledge_TagTestInputTag>
+    <RimTalk_Knowledge_TagTestInputContext>Содержание разговора:</RimTalk_Knowledge_TagTestInputContext>
+    <RimTalk_Knowledge_TagTestSelectPawn>Выбрать персонажа (необязательно):</RimTalk_Knowledge_TagTestSelectPawn>
+    <RimTalk_Knowledge_TagTestNoPawn>Нет (только разговор)</RimTalk_Knowledge_TagTestNoPawn>
+    <RimTalk_Knowledge_TagTestResult>Результат совпадения:</RimTalk_Knowledge_TagTestResult>
+    <RimTalk_Knowledge_TagTestMatched>✅ Совпало</RimTalk_Knowledge_TagTestMatched>
+    <RimTalk_Knowledge_TagTestNotMatched>❌ Не совпало</RimTalk_Knowledge_TagTestNotMatched>
+    <RimTalk_Knowledge_TagTestMatchText>Фактический текст совпадения:</RimTalk_Knowledge_TagTestMatchText>
+    <RimTalk_Knowledge_TagTestClear>Очистить</RimTalk_Knowledge_TagTestClear>
+    <RimTalk_Knowledge_Help>Помощь</RimTalk_Knowledge_Help>
+    <RimTalk_Knowledge_HelpTitle>Руководство по библиотеке знаний</RimTalk_Knowledge_HelpTitle>
+    <RimTalk_Knowledge_HelpContent>Библиотека знаний автоматически инъецирует релевантные знания во время AI-разговоров.\n\nИспользуйте теги через запятую для точного совпадения.\nИзбегайте коротких тегов (менее 3 символов).\nУстанавливайте важность 0.8-1.0 для ключевых правил.</RimTalk_Knowledge_HelpContent>
+</LanguageData>

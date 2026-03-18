@@ -154,7 +154,8 @@ namespace RimTalk.Memory.API
                     return "(No matching knowledge found)";
                 }
                 
-                return keywordKnowledge;
+                // ⭐ v5.1: 应用提示词规范化规则（迁移自 SmartInjectionManager）
+                return PromptNormalizer.Normalize(keywordKnowledge);
             }
             catch (Exception ex)
             {
@@ -177,7 +178,8 @@ namespace RimTalk.Memory.API
                 if (matchedScores == null || matchedScores.Count == 0)
                     return "(No matching knowledge found)";
 
-                return FormatGroupedKnowledge(matchedScores);
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(FormatGroupedKnowledge(matchedScores));
             }
             catch (Exception ex)
             {
@@ -205,7 +207,8 @@ namespace RimTalk.Memory.API
 
                 if (filtered.Count == 0) return "";
 
-                return FormatCategoryEntries(filtered);
+                // ⭐ v5.1: 应用提示词规范化规则
+                return PromptNormalizer.Normalize(FormatCategoryEntries(filtered));
             }
             catch (Exception ex)
             {
