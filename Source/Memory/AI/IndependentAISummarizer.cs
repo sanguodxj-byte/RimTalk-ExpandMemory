@@ -763,7 +763,21 @@ namespace RimTalk.Memory.AI
                     request.Timeout = 120000; // 原来是30000（30秒）
 
                     string json = BuildJsonRequest(prompt);
-                    byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+
+                    // 显式使用更宽容的转码方式
+                    var tolerantUtf8 = new UTF8Encoding(false, false);
+                    byte[] bodyRaw;
+                    try
+                    {
+                        bodyRaw = tolerantUtf8.GetBytes(json);
+                    }
+                    catch
+                    {
+                        // 如果依然报错，使用正则表达式强制剔除无效的代理对字符(Surrogate pairs)
+                        string safeJson = Regex.Replace(json, @"\p{Cs}", "?");
+                        bodyRaw = Encoding.UTF8.GetBytes(safeJson);
+                    }
+
                     request.ContentLength = bodyRaw.Length;
 
                     using (var stream = await request.GetRequestStreamAsync())
