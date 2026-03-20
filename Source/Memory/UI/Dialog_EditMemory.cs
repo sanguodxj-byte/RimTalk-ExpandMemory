@@ -16,10 +16,11 @@ namespace RimTalk.Memory.UI
         private string editedContent;
         private string editedNotes;
         private Vector2 scrollPosition;
+        private Vector2 contentScrollPosition; // 记忆内容滚动位置
         private List<string> availableTags;
         private string newTagInput = "";
 
-        public override Vector2 InitialSize => new Vector2(600f, 500f);
+        public override Vector2 InitialSize => new Vector2(600f, 650f);
 
         public Dialog_EditMemory(MemoryEntry memory, FourLayerMemoryComp comp)
         {
@@ -66,10 +67,20 @@ namespace RimTalk.Memory.UI
             Widgets.Label(new Rect(0f, curY, inRect.width, 25f), "内容:");
             curY += 25f;
             
-            Rect contentRect = new Rect(0f, curY, inRect.width, 80f);
-            // 使用 TextArea 代替 TextAreaScrollable（RimWorld 1.5+）
-            editedContent = Widgets.TextArea(contentRect, editedContent);
-            curY += 85f;
+            // 内容区域扩大并增加滑条
+            // 外层的固定显示区域
+            Rect contentRect = new Rect(0f, curY, inRect.width, 150f);
+
+            // 计算内层区域高度和显示区域
+            float textHeight = Mathf.Max(contentRect.height, Text.CalcHeight(editedContent, contentRect.width - 20f) + 10f);
+            Rect viewRect = new Rect(0f, 0f, contentRect.width - 20f, textHeight);
+
+            // 使用 ScrollView 包裹 TextArea
+            Widgets.BeginScrollView(contentRect, ref contentScrollPosition, viewRect);
+            editedContent = Widgets.TextArea(viewRect, editedContent);
+            Widgets.EndScrollView();
+
+            curY += 155f;
 
             // 备注编辑
             Widgets.Label(new Rect(0f, curY, inRect.width, 25f), "备注:");
