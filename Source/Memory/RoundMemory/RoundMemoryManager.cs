@@ -78,7 +78,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 构建并添加轮次记忆
         /// </summary>
-        public static void BuildRoundMemory(HashSet<Pawn> pawns, string content, bool isPlayerInitiate)
+        public static void BuildRoundMemory(HashSet<Pawn> pawns, string content, bool isPlayerInitiate = false)
         {
             if (Instance is null)
             {
