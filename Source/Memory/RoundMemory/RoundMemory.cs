@@ -1,103 +1,98 @@
-﻿using RimTalk.Util;
-using RimWorld;
+﻿using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace RimTalk.Memory
 {
-    public class RoundMemory : MemoryEntry, IExposable //ILoadReferenceable 暂时用不到引用保存的接口 // 继承为MemoryEntry的子类以便接入记忆拓展
+
+    // 轮次记忆
+    // 表面是Pawn的记忆（继承MemoryEntry），实际是编剧（LLM）的记忆
+    public class RoundMemory : MemoryEntry, IExposable
     {
+        // 唯一编号
         public long RoundMemoryUniqueID = -1;
         // 时间
-        public int GameTick = -1; // 这个其实没用了，但考虑兼容记忆拓展先留着
-        public long AbsTick = -1;
+        private long AbsTick = -1;
         // 地点
-        private PlanetTile _planetTile = PlanetTile.Invalid; // 这个字段以及一些其他字段其实都可以甚至应该作为MemoryEntry的字段
-        private int _mapId = -1; // 总之先留着
+        private PlanetTile planetTile = PlanetTile.Invalid;
         public bool IsHomeMap = false;
         // 人物
         public HashSet<Pawn> Pawns = new();
 
-        // 对话内容
-        // public string TextBlock; 改用 MemoryEntry 自带的 content 字段
-
         public RoundMemory() { }
-        public RoundMemory(string content, HashSet<Pawn> pawns) : base(
+        public RoundMemory(HashSet<Pawn> pawns, string content) : base(
             content: string.Empty,
             type: MemoryType.Conversation,
             layer: MemoryLayer.Active,
             importance: 0.5f
             )
         {
-            // 创建文本
-            var maxTextBlockLength = RoundMemoryManager.MaxTextBlockLength;
-            if (content.Length > maxTextBlockLength)
+            // 构建参与者集合，可能为空集合
+            Pawns = pawns ?? new();
+            Pawns.RemoveWhere(p => p is null);
+
+            // 构建文本
+            // 截短超限文本
+            var maxContentLength = RoundMemoryManager.MaxContentLength;
+            if (content.Length > maxContentLength)
             {
-                content = content.Substring(0, maxTextBlockLength) + "...";
-                Log.Warning($"[RoundMemory] RoundMemory字数超出{maxTextBlockLength}，已截短");
+                content = content.Substring(0, maxContentLength) + "...";
+                Log.Warning($"[RoundMemory] RoundMemory字数超出{maxContentLength}，已截短");
             }
-            this.content = content;
+            // 显式显示参与者名单，完成文本构建
+            this.content = $"[对话参与者: {GetParticipants()}]\n{content}";
 
-            // 创建参与者集合
-            Pawns = pawns;
-
-            // 应强烈要求，显式显示名单
-            this.content = $"[对话参与者: {GetParticipants()}]\n{this.content}";
-
-            // 初始化其余字段
+            // 构建唯一ID和时间
             RoundMemoryUniqueID = RoundMemoryManager.GetNewRoundMemoryId();
-            GameTick = (Find.TickManager != null) ? Find.TickManager.TicksGame : -1;
-            AbsTick = (Find.TickManager != null) ? Find.TickManager.TicksAbs : -1;
+            AbsTick = Find.TickManager?.TicksAbs ?? -1;
 
-            // 因为RimTalk的问题，这里获取地点的方式很蛋疼，没辙，期待后续优化吧
+            // 构建地点
+            // 因为RimTalk的问题，这里获取地点的方式很蛋疼，没辙
             if (Pawns.Count == 0)
             {
-                Log.Error("[RoundMemory] 创建RoundMemory时发现不存在对话参与者");
+                Log.Warning("[RoundMemory] 创建RoundMemory时发现不存在对话参与者");
                 return;
             }
-            _planetTile = Pawns.First().Tile;
-            Map map = null;
-            foreach (var pawn in Pawns)
-            {
-                map = pawn.Map;
-                if (map != null) break;
-            }
-            _mapId = map != null ? map.uniqueID : -1;
-            IsHomeMap = map != null && map.IsPlayerHome;
+            planetTile = Pawns.FirstOrDefault()?.Tile ?? PlanetTile.Invalid;
+            IsHomeMap = Pawns.Select(p => p.Map).FirstOrDefault(m => m is not null)?.IsPlayerHome ?? false;
         }
 
         // 计算并返回历史的日期时间字符串
         public string GetDateAndTime()
         {
             // 若信息缺失，返回未知
-            if (!_planetTile.Valid || AbsTick == -1) return "Unknown Date";
+            if (!planetTile.Valid || AbsTick == -1) return "Unknown Date";
 
-            // 保护性检查：WorldGrid 访问可能抛出异常，捕获并返回 Unknown Date
-            try
-            {
-                // 使用本体方法得到日期，RimTalk方法得到时间
-                var location = Find.WorldGrid.LongLatOf(_planetTile);
-                return $"{GenDate.DateFullStringAt(AbsTick, location)} {CommonUtil.GetInGameHour12HString(AbsTick, location)}";
-            }
-            catch
-            {
-                Log.Warning($"[RoundMemory] 时间计算异常");
-                return "Unknown Date";
-            }
+            // 若位置获取异常，则使用默认值
+            var location = Find.WorldGrid?.LongLatOf(planetTile) ?? Vector2.zero;
+
+            // 使用本体方法得到日期，RimTalk方法得到时间
+            return $"{GenDate.DateFullStringAt(AbsTick, location)} {GetInGameHour12HString(AbsTick, location)}";
+        }
+
+        // 考虑未来将此方法放在一个公共工具类中
+        private static string GetInGameHour12HString(long absTicks, Vector2 longLat)
+        {
+            int hour24 = GenDate.HourOfDay(absTicks, longLat.x);
+            int hour12 = hour24 % 12;
+            if (hour12 == 0) hour12 = 12;
+            string arg = (hour24 < 12) ? "am" : "pm";
+            return $"{hour12}{arg}";
         }
 
         // 返回历史参与者名单，逗号分隔
         public string GetParticipants()
         {
-            if (Pawns == null || Pawns.Count == 0) return string.Empty;
-            Pawns.RemoveWhere(p => p == null); // 清理 null 项，顺手的事
-            var names = Pawns
-                .Select(p => p.LabelShort ?? string.Empty);
-            return string.Join(", ", names);
+            return string.Join(", ", Pawns
+                .Select(p => p?.LabelShort)
+                .Where(n => n is not null)
+            );
         }
 
+        // 存档读写
         public override void ExposeData()
         {
             base.ExposeData();
@@ -105,22 +100,23 @@ namespace RimTalk.Memory
             // 保存/加载字段
             Scribe_Values.Look(ref RoundMemoryUniqueID, "RoundMemoryUniqueID", -1);
 
-            Scribe_Values.Look(ref GameTick, "GameTick", -1);
             Scribe_Values.Look(ref AbsTick, "AbsTick", -1);
 
-            Scribe_Values.Look(ref _planetTile, "Tile", PlanetTile.Invalid);
-            Scribe_Values.Look(ref _mapId, "MapId", -1);
+            Scribe_Values.Look(ref planetTile, "Tile", PlanetTile.Invalid);
             Scribe_Values.Look(ref IsHomeMap, "IsHomeMap", false);
 
             Scribe_Collections.Look(ref Pawns, "Pawns", LookMode.Reference);
 
-            // Scribe_Values.Look(ref TextBlock, "TextBlock", string.Empty);
-
             // 确保集合不为 null
-            if (Pawns == null)
+            if (Pawns is null)
             {
                 Log.Warning($"[RoundMemory] ExposeData for RoundMemory: tick={AbsTick}时发现其Pawns为空");
-                Pawns = new HashSet<Pawn>();
+                Pawns = new();
+            }
+            // 清理Pawns中的null条目
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                Pawns.RemoveWhere(p => p is null);
             }
         }
 
@@ -129,4 +125,5 @@ namespace RimTalk.Memory
             return $"RoundMemory_{RoundMemoryUniqueID}"; // 考虑进一步唯一化？
         }
     }
+
 }

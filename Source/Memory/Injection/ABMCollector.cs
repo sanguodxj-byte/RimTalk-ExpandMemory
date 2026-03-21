@@ -38,6 +38,10 @@ namespace RimTalk.Memory.Injection
             }
             set => _roundMemoryCache = value;
         }
+
+        // 单次注入总字数上限
+        private const int MaxInjectedLength = 5000;
+
         public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false; // 不启用轮次记忆时不注入轮次记忆
         public static List<MemoryEntry> Collect(Pawn pawn, int maxRounds)
         {
@@ -83,7 +87,7 @@ namespace RimTalk.Memory.Injection
                     break;
                 
                 // 达到长度上限
-                if (stackedLength > RoundMemoryManager.MaxInjectedLength)
+                if (stackedLength > MaxInjectedLength)
                     break;
                 
                 // ⭐ 关键：只对 RoundMemory 类型做去重（与旧代码逻辑一致）
