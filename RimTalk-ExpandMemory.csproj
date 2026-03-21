@@ -103,7 +103,6 @@
 	<ItemGroup>
 		<Folder Include="Source\Memory\Debug\" />
 		<Folder Include="Source\Memory\DevTools\" />
-		<Folder Include="Source\Memory\RoundMemory\" />
 		<Folder Include="Source\Memory\TTS\" />
 	</ItemGroup>
 
