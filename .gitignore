@@ -15,6 +15,7 @@ auto_push_github.ps1
 # ? 本地配置文件（包含用户特定路径，不应提交）
 .rimworld.config
 deploy.ps1
+ManTuoLuoDeploy.bat
 
 # ? GitHub Copilot 个人配置（不应提交）
 .github/

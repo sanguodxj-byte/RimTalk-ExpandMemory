@@ -66,8 +66,6 @@ namespace RimTalk.Memory
         }
 
         // 查重缓存（用于 InjectABM 跨 Pawn 去重）
-        public int LastContextTick = -1;
-        private const int CONTEXT_EXPIRE_TICKS = 120;
         private HashSet<RoundMemory> _roundMemoryCache;
         public HashSet<RoundMemory> RoundMemoryCache
         {
@@ -150,18 +148,12 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// 重置去重缓存（每 120 ticks 自动过期）
+        /// 重置去重缓存
         /// </summary>
-        public static void AutoReset()
+        public static void ResetDuplicateCache()
         {
-            if (Instance == null) return;
-            int currentTick = Find.TickManager?.TicksGame ?? -1;
-            if (currentTick - Instance.LastContextTick > CONTEXT_EXPIRE_TICKS)
-            {
-                Instance.RoundMemoryCache.Clear();
-                if (Prefs.DevMode) Log.Message($"[RoundMemory] 重置查重缓存");
-            }
-            Instance.LastContextTick = currentTick;
+            Instance?.RoundMemoryCache.Clear();
+            if (Prefs.DevMode) Log.Message($"[RoundMemory] 重置查重缓存");
         }
 
         // ⭐ v5.0: InjectABM 方法已移动到 RimTalk.Memory.Injection.ABMCollector

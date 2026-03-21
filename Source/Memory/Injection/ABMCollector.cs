@@ -40,10 +40,11 @@ namespace RimTalk.Memory.Injection
                 }
                 return result;
             }
-            
+
             // 触发 RoundMemoryManager 的去重缓存自动重置
-            RoundMemoryManager.AutoReset();
-            
+            // 改为patch scriban渲染方法，在每次渲染前重置
+            // RoundMemoryManager.AutoReset();
+
             // ⭐ v5.0: 对话优先排序
             // 先按类型排序（Conversation 在前），再按时间降序
             var sortedList = comp.ActiveMemories
