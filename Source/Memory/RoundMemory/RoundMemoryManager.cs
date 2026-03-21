@@ -1,10 +1,6 @@
-﻿using RimTalk.Data;
-using RimTalk.Memory;
-using RimTalk.MemoryPatch;
+﻿using RimTalk.MemoryPatch;
 using RimWorld;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Verse;
 
 namespace RimTalk.Memory
@@ -98,13 +94,23 @@ namespace RimTalk.Memory
         /// <summary>
         /// 安全添加轮次记忆
         /// </summary>
-        public static void AddRoundMemory(RoundMemory roundMemory)
+        public static void BuildRoundMemory(string content, HashSet<Pawn> pawns, bool isPlayerInitiate)
         {
             if (Instance == null)
             {
-                Log.Error("[RoundMemory] 警告：成功捕获对话，但尝试添加对象时发现RoundMemory中控台不存在，无法添加");
+                Log.Error("[RoundMemory] 警告：构建轮次记忆时发现RoundMemory中控台不存在");
                 return;
             }
+
+            // 如果为玩家发起的对话，则插入玩家发言
+            if (isPlayerInitiate)
+            {
+                pawns.Add(Instance.Player);
+                content = $"{Instance.PlayerDialogue}\n{content}";
+                Log.Message("[RoundMemory] 成功插入玩家文本");
+            }
+
+            var roundMemory = new RoundMemory(content, pawns);
 
             // 空值/无效检查
             if (roundMemory == null || string.IsNullOrWhiteSpace(roundMemory.content) || roundMemory.RoundMemoryUniqueID == -1)
@@ -123,7 +129,6 @@ namespace RimTalk.Memory
             roundMemories.Add(roundMemory);
 
             // 分配历史给各个Pawn
-            var pawns = roundMemory.Pawns;
             if (pawns == null) return;
             foreach (var pawn in pawns)
             {
