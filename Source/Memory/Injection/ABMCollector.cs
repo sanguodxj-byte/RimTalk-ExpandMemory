@@ -23,6 +23,21 @@ namespace RimTalk.Memory.Injection
         /// <param name="pawn">目标 Pawn</param>
         /// <param name="maxRounds">最大采集轮数</param>
         /// <returns>采集到的记忆列表</returns>
+
+        // 查重缓存（用于 InjectABM 跨 Pawn 去重）
+        private static HashSet<RoundMemory> _roundMemoryCache;
+        public static HashSet<RoundMemory> RoundMemoryCache
+        {
+            get
+            {
+                if (_roundMemoryCache == null)
+                {
+                    _roundMemoryCache = new();
+                }
+                return _roundMemoryCache;
+            }
+            set => _roundMemoryCache = value;
+        }
         public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false; // 不启用轮次记忆时不注入轮次记忆
         public static List<MemoryEntry> Collect(Pawn pawn, int maxRounds)
         {
@@ -52,14 +67,13 @@ namespace RimTalk.Memory.Injection
                 .ThenByDescending(m => m.timestamp)  // 然后按时间降序
                 .ToList();
             
-            var cache = RoundMemoryManager.Instance?.RoundMemoryCache;
             int stackedLength = 0;
             int stackedCount = 0;
             int skippedDuplicate = 0;
             
             if (Prefs.DevMode)
             {
-                Log.Message($"[ABMCollector] {pawn.LabelShort}: Processing {sortedList.Count} memories, cache size={cache?.Count ?? 0}");
+                Log.Message($"[ABMCollector] {pawn.LabelShort}: Processing {sortedList.Count} memories, cache size={RoundMemoryCache?.Count ?? 0}");
             }
             
             foreach (var entry in sortedList)
@@ -77,7 +91,7 @@ namespace RimTalk.Memory.Injection
                 {
                     if (!IsRoundMemoryEnabled) continue;
                     // 跨 Pawn 去重
-                    if (cache != null && cache.Contains(roundMemory))
+                    if (RoundMemoryCache != null && RoundMemoryCache.Contains(roundMemory))
                     {
                         if (Prefs.DevMode)
                         {
@@ -85,9 +99,9 @@ namespace RimTalk.Memory.Injection
                         }
                         continue;
                     }
-                    
+
                     // 添加到去重缓存
-                    cache?.Add(roundMemory);
+                    RoundMemoryCache?.Add(roundMemory);
                 }
                 // 非 RoundMemory 不做去重，直接添加（与旧代码一致）
                 
@@ -101,7 +115,16 @@ namespace RimTalk.Memory.Injection
             
             return result;
         }
-        
+
+        /// <summary>
+        /// 重置去重缓存
+        /// </summary>
+        public static void ResetDuplicateCache()
+        {
+            RoundMemoryCache.Clear();
+            if (Prefs.DevMode) Log.Message($"[RoundMemory] 重置查重缓存");
+        }
+
         /// <summary>
         /// 获取采集到的 ABM 数量（用于计算剩余配额）
         /// 这是一个便捷方法，实际采集在 Collect 中完成

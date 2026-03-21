@@ -65,21 +65,6 @@ namespace RimTalk.Memory
             set => _playerDialogue = value;
         }
 
-        // 查重缓存（用于 InjectABM 跨 Pawn 去重）
-        private HashSet<RoundMemory> _roundMemoryCache;
-        public HashSet<RoundMemory> RoundMemoryCache
-        {
-            get
-            {
-                if (_roundMemoryCache == null)
-                {
-                    _roundMemoryCache = new();
-                }
-                return _roundMemoryCache;
-            }
-            set => _roundMemoryCache = value;
-        }
-
         // 发号机
         public long _nextRoundMemoryId = 0;
 
@@ -145,15 +130,6 @@ namespace RimTalk.Memory
                 if (pawn == null) continue;
                 pawn.TryGetComp<FourLayerMemoryComp>()?.ActiveMemories?.Add(roundMemory); // 直接访问属性并添加的写法不是很好，有待优化
             }
-        }
-
-        /// <summary>
-        /// 重置去重缓存
-        /// </summary>
-        public static void ResetDuplicateCache()
-        {
-            Instance?.RoundMemoryCache.Clear();
-            if (Prefs.DevMode) Log.Message($"[RoundMemory] 重置查重缓存");
         }
 
         // ⭐ v5.0: InjectABM 方法已移动到 RimTalk.Memory.Injection.ABMCollector
