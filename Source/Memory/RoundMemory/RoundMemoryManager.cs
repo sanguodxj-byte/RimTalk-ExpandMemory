@@ -10,14 +10,14 @@ namespace RimTalk.Memory
     public class RoundMemoryManager : GameComponent
     {
         // Manager实例，供静态方法访问，仅在存档内有效
-        private static RoundMemoryManager instance;
+        private static RoundMemoryManager _instance;
         // 只读使用
         public static RoundMemoryManager Instance
         {
             get
             {
                 if (Current.Game is null) Log.Error("[RoundMemory] 尝试在存档外访问RoundMemory中控台");
-                return instance; // 存档外时会返回null
+                return _instance; // 存档外时会返回null
             }
         }
 
@@ -25,15 +25,15 @@ namespace RimTalk.Memory
         // List尚有优化空间
         // 环形缓冲区就很不错，我甚至都写完了
         // 但环世界的存档系统不好存这个，遂放弃
-        private List<RoundMemory> roundMemories = new();
-        public List<RoundMemory> RoundMemories => roundMemories;
+        private List<RoundMemory> _roundMemories = new();
+        public List<RoundMemory> RoundMemories => _roundMemories;
 
         // 发号机
-        private long nextRoundMemoryId = 0;
+        private long _nextRoundMemoryId = 0;
 
         // 玩家对话相关缓存
-        private Pawn playerPawn; // 调用时为空是正常的，需要在调用端进行空值检查
-        private string playerDialogue = string.Empty;
+        private Pawn _playerPawn; // 调用时为空是正常的，需要在调用端进行空值检查
+        private string _playerDialogue = string.Empty;
 
         // 配置常量
         private const int MaxRoundMemory = 256; // 最大保存轮次记忆条目数
@@ -41,7 +41,7 @@ namespace RimTalk.Memory
 
         public RoundMemoryManager(Game game) : base()
         {
-            instance = this; // 初始化时将自己赋值给静态实例
+            _instance = this; // 初始化时将自己赋值给静态实例
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace RimTalk.Memory
                 Log.Error("[RoundMemory] 警告：发号时发现RoundMemory中控台不存在，返回-1");
                 return -1;
             }
-            return System.Threading.Interlocked.Increment(ref Instance.nextRoundMemoryId);
+            return System.Threading.Interlocked.Increment(ref Instance._nextRoundMemoryId);
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace RimTalk.Memory
                 Log.Error("[RoundMemory] 警告：捕获玩家对话时发现RoundMemory中控台不存在");
                 return;
             }
-            Instance.playerPawn = playerPawn;
+            Instance._playerPawn = playerPawn;
 
             string playerName = playerPawn?.LabelShort;
-            Instance.playerDialogue = $"{(string.IsNullOrWhiteSpace(playerName) ? "Player" : playerName)}: {playerDialogue}";
+            Instance._playerDialogue = $"{(string.IsNullOrWhiteSpace(playerName) ? "Player" : playerName)}: {playerDialogue}";
 
             Log.Message($"[RoundMemory] 成功捕获玩家发言");
         }
@@ -89,8 +89,8 @@ namespace RimTalk.Memory
             // 如果对话为玩家发起且启用相关配置项，则提前修饰数据
             if (isPlayerInitiate && (RimTalkMemoryPatchMod.Settings?.IsPlayerDialogueInject ?? true))
             {
-                pawns?.Add(Instance.playerPawn);
-                content = $"{Instance.playerDialogue}\n{content}";
+                pawns?.Add(Instance._playerPawn);
+                content = $"{Instance._playerDialogue}\n{content}";
                 Log.Message("[RoundMemory] 成功插入玩家文本");
             }
 
@@ -98,7 +98,7 @@ namespace RimTalk.Memory
             var roundMemory = new RoundMemory(pawns, content);
 
             // 当达到或超过上限时，移除最旧的条目，直到有空间，然后添加新条目
-            var roundMemories = Instance.roundMemories;
+            var roundMemories = Instance._roundMemories;
             while (roundMemories.Count >= MaxRoundMemory)
             {
                 roundMemories.RemoveAt(0);
@@ -120,24 +120,24 @@ namespace RimTalk.Memory
         {
             base.ExposeData();
             Scribe_Collections.Look(
-                ref roundMemories,
+                ref _roundMemories,
                 "RoundMemories",
                 LookMode.Deep
             );
             Scribe_Values.Look(
-                ref nextRoundMemoryId,
+                ref _nextRoundMemoryId,
                 "NextRoundMemoryId",
                 0
             );
 
             // 确保集合不为null
-            if (roundMemories is null)
+            if (_roundMemories is null)
             {
-                roundMemories = new();
+                _roundMemories = new();
                 Log.Warning($"[RoundMemory] 未找到已有 roundMemories，新建空列表");
             }
 
-            Log.Message($"[RoundMemory] ExposeData for RoundMemory: count={roundMemories.Count}");
+            Log.Message($"[RoundMemory] ExposeData for RoundMemory: count={_roundMemories.Count}");
         }
 
         // 在读档后修正各 Pawn 上的指针
@@ -145,12 +145,12 @@ namespace RimTalk.Memory
         {
             // 1. 建立去重索引
             Dictionary<long, RoundMemory> managerMap = new();
-            if (roundMemories is null)
+            if (_roundMemories is null)
             {
                 Log.Warning("[RoundMemory] RoundMemory为空，无法进行指针修正");
                 return;
             }
-            foreach (var roundMemory in roundMemories)
+            foreach (var roundMemory in _roundMemories)
             {
                 if (roundMemory is null)
                 {
