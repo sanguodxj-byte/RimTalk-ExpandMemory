@@ -16,7 +16,11 @@ namespace RimTalk.Memory
         {
             get
             {
-                if (Current.Game is null) Log.Error("[RoundMemory] 尝试在存档外访问RoundMemory中控台");
+                if (Current.Game is null)
+                {
+                    _instance = null; // 存档外时强制置空，避免误用
+                    Log.Error("[RoundMemory] 尝试在存档外访问RoundMemory中控台");
+                }
                 return _instance; // 存档外时会返回null
             }
         }
