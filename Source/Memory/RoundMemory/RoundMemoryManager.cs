@@ -1,4 +1,5 @@
-﻿using RimTalk.MemoryPatch;
+﻿using RimTalk.Memory.Utils;
+using RimTalk.MemoryPatch;
 using RimWorld;
 using System.Collections.Generic;
 using Verse;
@@ -25,12 +26,16 @@ namespace RimTalk.Memory
             }
         }
 
-        // 核心: 轮次记忆列表（按时间升序，最旧在前）
-        // List尚有优化空间
-        // 环形缓冲区就很不错，我甚至都写完了
-        // 但环世界的存档系统不好存这个，遂放弃
-        private List<RoundMemory> _roundMemories = new();
-        public List<RoundMemory> RoundMemories => _roundMemories;
+        // 配置常量
+        private const int MaxRoundMemory = 256; // 最大保存轮次记忆条目数
+        public const int MaxContentLength = 16384; // 创建时单条RoundMemory最大文本长度
+
+        // 核心: 轮次记忆环形缓冲区（按时间升序，最旧在前）
+        private RimRingBuffer<RoundMemory> _roundMemories = new(MaxRoundMemory);
+        public RimRingBuffer<RoundMemory> RoundMemories => _roundMemories;
+
+        // 存读档用的临时list
+        private List<RoundMemory> _tmpRoundMemories;
 
         // 发号机
         private long _nextRoundMemoryId = 0;
@@ -38,10 +43,6 @@ namespace RimTalk.Memory
         // 玩家对话相关缓存
         private Pawn _playerPawn; // 调用时为空是正常的，需要在调用端进行空值检查
         private string _playerDialogue = string.Empty;
-
-        // 配置常量
-        private const int MaxRoundMemory = 256; // 最大保存轮次记忆条目数
-        public const int MaxContentLength = 16384; // 创建时单条RoundMemory最大文本长度
 
         public RoundMemoryManager(Game game) : base()
         {
@@ -101,14 +102,8 @@ namespace RimTalk.Memory
             // 构建新的 RoundMemory 实例
             var roundMemory = new RoundMemory(pawns, content);
 
-            // 当达到或超过上限时，移除最旧的条目，直到有空间，然后添加新条目
-            var roundMemories = Instance._roundMemories;
-            while (roundMemories.Count >= MaxRoundMemory)
-            {
-                roundMemories.RemoveAt(0);
-            }
-
-            roundMemories.Add(roundMemory);
+            // 直接向环形缓冲区添加，RimRingBuffer 内部会自动高效处理超出容量时的覆盖逻辑
+            Instance._roundMemories.Add(roundMemory);
 
             // 分配历史给各个Pawn
             if (pawns is null) return;
@@ -123,25 +118,54 @@ namespace RimTalk.Memory
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Collections.Look(
-                ref _roundMemories,
-                "RoundMemories",
-                LookMode.Deep
-            );
+
             Scribe_Values.Look(
                 ref _nextRoundMemoryId,
                 "NextRoundMemoryId",
                 0
             );
 
-            // 确保集合不为null
-            if (_roundMemories is null)
+            LookRoundMemories();
+
+            Log.Message($"[RoundMemory] ExposeData for RoundMemory: count={_roundMemories.Count}; NextRoundMemoryId: {_nextRoundMemoryId}");
+        }
+
+        // 读写_roundMemories
+        private void LookRoundMemories()
+        {
+            // 存档时，按从老到新的顺序提取出来，放到临时列表里交给 Scribe_Collections 来处理
+            if (Scribe.mode == LoadSaveMode.Saving)
             {
-                _roundMemories = new();
-                Log.Warning($"[RoundMemory] 未找到已有 roundMemories，新建空列表");
+                _tmpRoundMemories = new();
+                for (int i = 0; i < _roundMemories.Count; i++)
+                {
+                    _tmpRoundMemories.Add(_roundMemories[i]);
+                }
             }
 
-            Log.Message($"[RoundMemory] ExposeData for RoundMemory: count={_roundMemories.Count}");
+            // look look
+            Scribe_Collections.Look(
+                ref _tmpRoundMemories,
+                "RoundMemories",
+                LookMode.Deep
+            );
+
+            // 读档的最后一个阶段，tmpRoundMemories加载完成，把数据转移到真正的环形缓冲区里
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                if (_tmpRoundMemories is null) return; // 注意这里直接跳出了方法，如果后续有更多数据=null，可以把这里改成if
+                // 把旧数据按顺序灌入已经基于当前编译尺寸初始化的缓冲区
+                foreach (var roundMemory in _tmpRoundMemories)
+                {
+                    _roundMemories.Add(roundMemory);
+                }
+            }
+
+            // 释放临时列表
+            if (Scribe.mode == LoadSaveMode.Saving || Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                _tmpRoundMemories = null;
+            }
         }
 
         // 在读档后修正各 Pawn 上的指针
@@ -154,8 +178,9 @@ namespace RimTalk.Memory
                 Log.Warning("[RoundMemory] RoundMemory为空，无法进行指针修正");
                 return;
             }
-            foreach (var roundMemory in _roundMemories)
+            for (int i = 0; i < _roundMemories.Count; i++)
             {
+                var roundMemory = _roundMemories[i];
                 if (roundMemory is null)
                 {
                     Log.Warning("[RoundMemory] 检测到RoundMemory中有 null 条目，跳过");
