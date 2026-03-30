@@ -21,6 +21,7 @@ namespace RimTalk.Memory.Patches.RimChat
         private static bool IsEnable => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
 
         // 通过Prepare方法控制补丁启用，并初始化访问器
+        [HarmonyPrepare]
         static bool Prepare()
         {
             try
