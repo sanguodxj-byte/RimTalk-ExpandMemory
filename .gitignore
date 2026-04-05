@@ -8,7 +8,6 @@ bin
 .vs/
 PublishedFileId.txt
 Folder.DotSettings.user
-Directory.Build.props
 *.sh
 auto_push_github.ps1
 
