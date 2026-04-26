@@ -23,11 +23,11 @@ namespace RimTalk.Memory.UI
             
             // ? 修复：同时收集 ABM 和 SCM（只排除总结过的记忆）
             var abmMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.Active && !m.IsSummarized)
+                .Where(m => m.layer == MemoryLayer.Active && m.CanBeSummarized)
                 .ToList();
                 
             var scmMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.Situational && !m.IsSummarized)
+                .Where(m => m.layer == MemoryLayer.Situational && m.CanBeSummarized)
                 .ToList();
             
             var allMemoriesToSummarize = new List<MemoryEntry>();
@@ -86,7 +86,7 @@ namespace RimTalk.Memory.UI
             
             // ? 修复：排除总结过的记忆
             var elsMemories = targetMemories
-                .Where(m => m.layer == MemoryLayer.EventLog && !m.IsSummarized)
+                .Where(m => m.layer == MemoryLayer.EventLog && m.CanBeSummarized)
                 .ToList();
                 
             if (elsMemories.Count == 0)

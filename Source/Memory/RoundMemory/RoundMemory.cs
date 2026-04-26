@@ -22,6 +22,8 @@ namespace RimTalk.Memory
         // 人物
         public HashSet<Pawn> Pawns = new();
 
+        public override bool CanBeSummarized => true; // 总是可以被总结
+
         public RoundMemory() { }
         public RoundMemory(HashSet<Pawn> pawns, string content) : base(
             content: string.Empty,
