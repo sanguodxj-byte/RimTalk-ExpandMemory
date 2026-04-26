@@ -176,8 +176,8 @@ namespace RimTalk.Memory
 
             // ⭐ 修复：合并ABM和SCM作为总结池，排除总结过的记忆（即旧的固定记忆）
             var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.IsSummarized));
-            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.IsSummarized));
+            allMemoriesToSummarize.AddRange(activeMemories.Where(m => m.CanBeSummarized));
+            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => m.CanBeSummarized));
 
             // 如果没有未总结过的记忆，不需要总结
             if (allMemoriesToSummarize.Count == 0)
@@ -272,8 +272,8 @@ namespace RimTalk.Memory
 
             // ⭐ 修复：合并ABM和SCM作为总结池，排除总结过的记忆（即旧的固定记忆）
             var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(activeMemories.Where(m => !m.IsSummarized));
-            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => !m.IsSummarized));
+            allMemoriesToSummarize.AddRange(activeMemories.Where(m => m.CanBeSummarized));
+            allMemoriesToSummarize.AddRange(situationalMemories.Where(m => m.CanBeSummarized));
 
             // 如果没有非固定记忆，不需要总结
             if (allMemoriesToSummarize.Count == 0)

@@ -105,6 +105,7 @@ namespace RimTalk.Memory
         public bool isUserEdited;           // 是否被用户编辑过
         public bool isPinned;               // 是否固定（不会被删除）
         public bool IsSummarized = false;   // 是否已被AI总结过，新生成的记忆默认为false
+        public virtual bool CanBeSummarized => !IsSummarized; // 是否可以被总结
         public string notes;                // 用户备注
         public string aiCacheKey;           // AI总结的缓存键
 

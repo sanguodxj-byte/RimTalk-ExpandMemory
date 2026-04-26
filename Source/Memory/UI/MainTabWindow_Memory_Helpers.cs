@@ -23,7 +23,7 @@ namespace RimTalk.Memory.UI
             string promptTemplate)
         {
             // ⭐ 修复：过滤掉已总结记忆（不应该被总结）（memories在输入前就已经过滤过了，这一步其实是多余的，但先留着吧）
-            var memoriesToSummarize = memories.Where(m => !m.IsSummarized).ToList();
+            var memoriesToSummarize = memories.Where(m => m.CanBeSummarized).ToList();
 
             if (memoriesToSummarize.Count == 0)
             {
