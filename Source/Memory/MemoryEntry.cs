@@ -6,74 +6,6 @@ using Verse;
 
 namespace RimTalk.Memory
 {
-    /// <summary>
-    /// 记忆层级
-    /// </summary>
-    public enum MemoryLayer
-    {
-        Active,         // 超短期记忆 (Active Buffer Memory)
-        Situational,    // 短期记忆 (Situational Context Memory)
-        EventLog,       // 中期记忆 (Event Log Summary)
-        Archive         // 长期记忆 (Colony Lore & Persona Archive)
-    }
-
-    /// <summary>
-    /// 记忆类型
-    /// </summary>
-    public enum MemoryType
-    {
-        Conversation,   // 对话（RimTalk生成的完整对话内容）
-        [System.Obsolete("互动记忆已废弃，保留此枚举值仅为兼容旧存档")]
-        Interaction,    // 互动（已废弃 - 无具体内容，已被Conversation替代）
-        Action,         // 行动（工作、战斗等）
-        Observation,    // 观察（未实现）
-        Event,          // 事件
-        Emotion,        // 情绪
-        Relationship,   // 关系
-        Internal        // ⭐ v3.3.2: 内部上下文（数据库查询结果，不显示给用户）
-    }
-
-    /// <summary>
-    /// 常用标签（中文）
-    /// </summary>
-    public static class MemoryTags
-    {
-        // 情绪标签
-        public const string 开心 = "开心";
-        public const string 悲伤 = "悲伤";
-        public const string 愤怒 = "愤怒";
-        public const string 焦虑 = "焦虑";
-        public const string 平静 = "平静";
-        
-        // 事件标签
-        public const string 战斗 = "战斗";
-        public const string 袭击 = "袭击";
-        public const string 受伤 = "受伤";
-        public const string 死亡 = "死亡";
-        public const string 完成任务 = "完成任务";
-        
-        // 社交标签
-        public const string 闲聊 = "闲聊";
-        public const string 深谈 = "深谈";
-        public const string 争吵 = "争吵";
-        public const string 表白 = "表白";
-        public const string 友好 = "友好";
-        public const string 敌对 = "敌对";
-        
-        // 工作标签
-        public const string 烹饪 = "烹饪";
-        public const string 建造 = "建造";
-        public const string 种植 = "种植";
-        public const string 采矿 = "采矿";
-        public const string 研究 = "研究";
-        public const string 医疗 = "医疗";
-        
-        // 特殊标签
-        public const string 重要 = "重要";
-        public const string 紧急 = "紧急";
-        public const string 深度归档 = "深度归档";
-        public const string 用户编辑 = "用户编辑";
-    }
 
     /// <summary>
     /// 新的记忆条目 - 支持标签化和编辑
@@ -86,21 +18,21 @@ namespace RimTalk.Memory
         public MemoryType type;             // 类型
         public MemoryLayer layer;           // 层级
         public int timestamp;               // 时间戳
-        
+
         // ⭐ v4.0: 对话ID（用于标记同一轮对话，支持跨Pawn去重）
         public string conversationId;       // 对话ID（多个Pawn共享同一ID）
-        
+
         // 重要性和活跃度
         public float importance;            // 重要性 (0-1)
         public float activity;              // 活跃度 (随时间衰减)
-        
+
         // 关联信息
         public string relatedPawnId;        // 相关小人ID
         public string relatedPawnName;      // 相关小人名字
         public string location;             // 地点
         public List<string> tags;           // 标签（中文）
         public List<string> keywords;       // 关键词
-        
+
         // 元数据
         public bool isUserEdited;           // 是否被用户编辑过
         public bool isPinned;               // 是否固定（不会被删除）
@@ -126,7 +58,7 @@ namespace RimTalk.Memory
             this.layer = layer;
             this.importance = importance;
             this.relatedPawnName = relatedPawn;
-            
+
             // 自动添加类型标签
             AddTypeTag();
         }
@@ -207,18 +139,18 @@ namespace RimTalk.Memory
                 {
                     // 获取年份
                     int year = GenDate.Year(timestamp, 0);
-                    
+
                     // 获取日期（0-59，每年60天）
                     int dayOfYear = GenDate.DayOfYear(timestamp, 0);
-                    
+
                     // RimWorld 使用 Quadrum（季度）：0=春, 1=夏, 2=秋, 3=冬
                     // 每个季度15天
                     int quadrumIndex = dayOfYear / 15; // 0-3
                     int dayOfQuadrum = (dayOfYear % 15) + 1; // 1-15
-                    
+
                     string[] quadrumNames = { "春", "夏", "秋", "冬" };
                     string quadrumName = quadrumNames[quadrumIndex % 4];
-                    
+
                     return $"{year}年{quadrumName}{dayOfQuadrum}日";
                 }
                 catch (Exception ex)
@@ -239,34 +171,34 @@ namespace RimTalk.Memory
             get
             {
                 int age = Age;
-                
+
                 // 超短期（<1小时 = <2500 ticks）
                 if (age < 2500) return "刚才";
-                
+
                 // 短期（1-6小时）
                 if (age < 15000) return "不久前";
-                
+
                 // 当天（6-24小时）
                 if (age < 60000) return "今天";
-                
+
                 // 昨天
                 if (age < 120000) return "昨天";
-                
+
                 // 前天
                 if (age < 180000) return "前天";
-                
+
                 // 前几天（3-7天）
                 if (age < 420000) return "前几天";
-                
+
                 // 上周（7-15天）
                 if (age < 900000) return "上周";
-                
+
                 // 最近（15-30天）
                 if (age < 1800000) return "最近";
-                
+
                 // 之前（30天-1年）
                 if (age < 3600000) return "之前";
-                
+
                 // 很久以前（>1年）
                 return "很久以前";
             }
@@ -392,7 +324,7 @@ namespace RimTalk.Memory
             string prefix = $"[{LayerName}] {TypeName}";
             string timeStr = TimeAgoString;
             string contentPreview = content.Length > 40 ? content.Substring(0, 40) + "..." : content;
-            
+
             return $"{prefix} · {timeStr} · {contentPreview}";
         }
     }
@@ -416,4 +348,5 @@ namespace RimTalk.Memory
             keywords = new List<string>();
         }
     }
+
 }
