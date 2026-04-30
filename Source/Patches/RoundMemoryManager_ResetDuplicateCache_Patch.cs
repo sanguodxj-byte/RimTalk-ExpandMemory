@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using RimTalk.Memory.Injection;
 using RimTalk.Prompt;
 
 namespace RimTalk.Memory.Patches
@@ -13,7 +14,7 @@ namespace RimTalk.Memory.Patches
         [HarmonyPrefix]
         static void Prefix()
         {
-            RoundMemoryManager.ResetDuplicateCache();
+            ABMCollector.ResetDuplicateCache();
         }
     }
 
@@ -24,7 +25,7 @@ namespace RimTalk.Memory.Patches
         [HarmonyPrefix]
         static void Prefix()
         {
-            RoundMemoryManager.ResetDuplicateCache();
+            ABMCollector.ResetDuplicateCache();
         }
     }
 }

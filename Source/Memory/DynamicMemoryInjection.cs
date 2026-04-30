@@ -37,11 +37,12 @@ namespace RimTalk.Memory
         /// ⭐ v3.3.16: 使用SceneAnalyzer + 游戏状态感知
         /// </summary>
         public static string InjectMemoriesWithDetails(
-            FourLayerMemoryComp memoryComp, 
-            string context, 
+            FourLayerMemoryComp memoryComp,
+            string context,
             int maxMemories,
             out List<MemoryScore> scores,
-            MemoryLayer? layer = null) // 新增一个可选参数，用于指定只注入特定层级的记忆（如果需要）
+            MemoryLayer? layerA = null, // 新增一个可选参数，用于指定只注入特定层级的记忆（如果需要）
+            MemoryLayer? layerB = null) // 支持同时指定两个层级
         {
             scores = new List<MemoryScore>();
 
@@ -55,11 +56,11 @@ namespace RimTalk.Memory
 
             // ⭐ v3.3.16: 步骤2 - 综合场景识别（游戏状态 + 文本分析）
             SceneType sceneType = DetermineScene(pawn, context);
-            
+
             // ⭐ v3.3.16: 步骤3 - 获取动态权重
             var analysis = SceneAnalyzer.AnalyzeScene(context);
             DynamicWeights sceneWeights = SceneAnalyzer.GetDynamicWeights(sceneType, analysis.Confidence);
-            
+
             // 开发模式日志
             if (Prefs.DevMode)
             {
@@ -73,12 +74,15 @@ namespace RimTalk.Memory
 
             // 收集记忆：跳过超短期记忆(ABM)，根据layer参数决定收集SCM、ELS、CLPA
             var allMemories = new List<MemoryEntry>();
-            if (layer == null || layer == MemoryLayer.Situational) allMemories.AddRange(memoryComp.SituationalMemories);
-            if (layer == null || layer == MemoryLayer.EventLog) allMemories.AddRange(memoryComp.EventLogMemories);
+            bool IsMatch(MemoryLayer target) => (layerA ?? layerB) == null || layerA == target || layerB == target;
+
+            // 开始收集
+            if (IsMatch(MemoryLayer.Situational)) allMemories.AddRange(memoryComp.SituationalMemories);
+            if (IsMatch(MemoryLayer.EventLog)) allMemories.AddRange(memoryComp.EventLogMemories);
 
             // 根据场景决定是否包含归档记忆
             // 社交/事件场景更倾向于包含长期记忆（讲故事模式）
-            if (layer == null || layer == MemoryLayer.Archive)
+            if (IsMatch(MemoryLayer.Archive))
             {
                 if (sceneType == SceneType.Social || sceneType == SceneType.Event || ShouldIncludeArchive(context))
                 {
@@ -120,17 +124,17 @@ namespace RimTalk.Memory
                 float timeScore = CalculateTimeDecayScore(scored.Memory, sceneWeights.TimeDecay, sceneWeights.RecencyWindow);
                 float importanceScore = scored.Memory.importance * sceneWeights.Importance;
                 float keywordScore = CalculateKeywordMatchScore(scored.Memory, contextKeywords) * sceneWeights.KeywordMatch;
-                
+
                 float bonusScore = GetLayerBonus(scored.Memory.layer) * Weights.LayerBonus;
-                
+
                 // 关系加成
                 float relationshipScore = CalculateRelationshipBonus(scored.Memory, pawn) * sceneWeights.RelationshipBonus;
                 bonusScore += relationshipScore;
-                
+
                 // ⭐ 用户覆盖：绝对优先级（不受场景影响）
-                if (scored.Memory.isPinned) 
+                if (scored.Memory.isPinned)
                     bonusScore += Weights.PinnedBonus;
-                if (scored.Memory.isUserEdited) 
+                if (scored.Memory.isUserEdited)
                     bonusScore += Weights.UserEditedBonus;
 
                 scores.Add(new MemoryScore
@@ -148,7 +152,7 @@ namespace RimTalk.Memory
             // ELSCollector 通过 scores 参数获取评分数据后自行调用 MemoryFormatter
             return string.Empty;
         }
-        
+
         /// <summary>
         /// ⭐ v3.3.16: 综合场景识别（游戏状态优先 + 文本分析回退）
         /// </summary>
@@ -156,70 +160,70 @@ namespace RimTalk.Memory
         {
             if (pawn == null)
                 return SceneType.Neutral;
-            
+
             // ⭐ 优先级1：游戏状态检查（实时状态覆盖文本分析）
-            
+
             // 1.1 战斗状态检查
             if (pawn.Drafted || (pawn.mindState?.enemyTarget != null))
             {
                 return SceneType.Combat;
             }
-            
+
             // 1.2 医疗状态检查
             if (pawn.Downed || pawn.health?.State == PawnHealthState.Down)
             {
                 return SceneType.Medical;
             }
-            
+
             // 1.3 社交状态检查（Lovin任务）
             if (pawn.CurJob?.def?.defName != null && pawn.CurJob.def.defName.Contains("Lovin"))
             {
                 return SceneType.Social;
             }
-            
+
             // 1.4 工作状态检查（当前Job）
             if (pawn.CurJob?.def != null)
             {
                 string jobDefName = pawn.CurJob.def.defName;
-                
+
                 // 研究任务
                 if (jobDefName.Contains("Research"))
                 {
                     return SceneType.Research;
                 }
-                
+
                 // 医疗任务
                 if (jobDefName.Contains("Doctor") || jobDefName.Contains("Tend") || jobDefName.Contains("Surgery"))
                 {
                     return SceneType.Medical;
                 }
-                
+
                 // 工作任务（建造、种植、搬运等）
-                if (jobDefName.Contains("Construct") || jobDefName.Contains("Plant") || 
+                if (jobDefName.Contains("Construct") || jobDefName.Contains("Plant") ||
                     jobDefName.Contains("Haul") || jobDefName.Contains("Cook") ||
                     jobDefName.Contains("Mine") || jobDefName.Contains("Clean"))
                 {
                     return SceneType.Work;
                 }
             }
-            
+
             // ⭐ 优先级2：文本分析回退
             if (!string.IsNullOrEmpty(context))
             {
                 var analysis = SceneAnalyzer.AnalyzeScene(context);
                 return analysis.PrimaryScene;
             }
-            
+
             // 默认：中性
             return SceneType.Neutral;
         }
-        
+
         /// <summary>
         /// ⭐ v3.3.16: 计算记忆评分（使用动态权重）
         /// </summary>
         private static float CalculateMemoryScore(
-            MemoryEntry memory, 
-            List<string> contextKeywords, 
+            MemoryEntry memory,
+            List<string> contextKeywords,
             DynamicWeights sceneWeights,
             FourLayerMemoryComp memoryComp)
         {
@@ -239,7 +243,7 @@ namespace RimTalk.Memory
             // 4. 层级加成
             float layerBonus = GetLayerBonus(memory.layer);
             score += layerBonus * Weights.LayerBonus;
-            
+
             // 5. 关系加成
             var pawn = memoryComp.parent as Pawn;
             float relationshipBonus = CalculateRelationshipBonus(memory, pawn);
@@ -248,7 +252,7 @@ namespace RimTalk.Memory
             // 6. ⭐ 用户覆盖（绝对优先级，不受场景影响）
             if (memory.isPinned)
                 score += Weights.PinnedBonus;
-            
+
             if (memory.isUserEdited)
                 score += Weights.UserEditedBonus;
 
@@ -308,7 +312,7 @@ namespace RimTalk.Memory
 
             return UnityEngine.Mathf.Min(jaccardSimilarity + contentMatch, 1f);
         }
-        
+
         /// <summary>
         /// 计算关系加成（记忆涉及的人物与当前Pawn的关系）
         /// </summary>
@@ -316,48 +320,48 @@ namespace RimTalk.Memory
         {
             if (string.IsNullOrEmpty(memory.relatedPawnId) || currentPawn == null)
                 return 0f;
-            
+
             // 查找关联的Pawn
             Pawn relatedPawn = null;
             foreach (var map in Find.Maps)
             {
-                relatedPawn = map.mapPawns.AllPawns.FirstOrDefault(p => 
-                    p.ThingID == memory.relatedPawnId || 
+                relatedPawn = map.mapPawns.AllPawns.FirstOrDefault(p =>
+                    p.ThingID == memory.relatedPawnId ||
                     p.LabelShort == memory.relatedPawnName
                 );
-                
+
                 if (relatedPawn != null)
                     break;
             }
-            
+
             if (relatedPawn == null)
                 return 0f;
-            
+
             // 计算关系亲密度
             if (currentPawn.relations == null || relatedPawn.relations == null)
                 return 0f;
-            
+
             // 检查是否有直接关系
             var directRelations = currentPawn.relations.DirectRelations
                 .Where(r => r.otherPawn == relatedPawn)
                 .ToList();
-            
+
             if (directRelations.Any())
             {
                 // 配偶/恋人：高加成
                 if (directRelations.Any(r => r.def == PawnRelationDefOf.Spouse || r.def == PawnRelationDefOf.Lover))
                     return 1.0f;
-                
+
                 // 家人：中等加成
-                if (directRelations.Any(r => r.def == PawnRelationDefOf.Parent || 
+                if (directRelations.Any(r => r.def == PawnRelationDefOf.Parent ||
                                             r.def == PawnRelationDefOf.Child ||
                                             r.def == PawnRelationDefOf.Sibling))
                     return 0.6f;
-                
+
                 // 其他关系：小加成
                 return 0.3f;
             }
-            
+
             // 检查好感度
             int opinion = currentPawn.relations.OpinionOf(relatedPawn);
             if (opinion > 50)
@@ -366,7 +370,7 @@ namespace RimTalk.Memory
                 return 0.3f;
             else if (opinion < -20)
                 return 0.2f; // 负面关系也值得记忆
-            
+
             return 0f;
         }
 
@@ -400,7 +404,7 @@ namespace RimTalk.Memory
 
             // 检测是否提到过去、历史等关键词
             string[] archiveKeywords = { "过去", "以前", "曾经", "记得", "回忆", "历史", "当时", "那时候" };
-            
+
             foreach (var keyword in archiveKeywords)
             {
                 if (context.Contains(keyword))
@@ -427,24 +431,24 @@ namespace RimTalk.Memory
 
             // 使用超级关键词引擎获取候选词
             var weightedKeywords = SuperKeywordEngine.ExtractKeywords(text, 100);
-            
+
             if (weightedKeywords.Count == 0)
             {
                 return new List<string>();
             }
-            
+
             // 核心词：按长度降序 + 字母顺序升序，取前10个
             var sortedByLength = weightedKeywords
                 .OrderByDescending(kw => kw.Word.Length)
                 .ThenBy(kw => kw.Word, StringComparer.Ordinal)
                 .ToList();
-            
+
             var coreKeywords = sortedByLength.Take(10).ToList();
-            
+
             // 模糊词：从剩余池按字母顺序选10个
             var remainingPool = sortedByLength.Skip(10).ToList();
             var fuzzyKeywords = new List<WeightedKeyword>();
-            
+
             if (remainingPool.Count > 0)
             {
                 fuzzyKeywords = remainingPool
@@ -452,12 +456,12 @@ namespace RimTalk.Memory
                     .Take(10)
                     .ToList();
             }
-            
+
             // 合并核心词 + 模糊词（最多20个）
             var finalKeywords = new List<string>();
             finalKeywords.AddRange(coreKeywords.Select(kw => kw.Word));
             finalKeywords.AddRange(fuzzyKeywords.Select(kw => kw.Word));
-            
+
             return finalKeywords;
         }
 

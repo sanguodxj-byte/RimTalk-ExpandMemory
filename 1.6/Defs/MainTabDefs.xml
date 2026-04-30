@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Memory Management Main Tab -->
+  <MainButtonDef>
+    <defName>RimTalk_Memory</defName>
+    <!-- label 和 description 由 Languages/*/DefInjected/MainButtonDef/RimTalk_Memory.xml 提供 -->
+    <tabWindowClass>RimTalk.Memory.UI.MainTabWindow_Memory, RimTalkMemoryPatch</tabWindowClass>
+    <order>35</order>
+  </MainButtonDef>
+</Defs>

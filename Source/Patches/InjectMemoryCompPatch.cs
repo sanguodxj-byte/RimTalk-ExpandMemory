@@ -63,10 +63,6 @@ namespace RimTalk.Memory.Patches
                         
                         // ⚠️ v3.4.8: 移除 LabelShort 访问，避免 InitializeComps 阶段崩溃
                         // 在这个阶段，Pawn 的 gender、kindDef 等属性可能还未设置
-                        if (Prefs.DevMode)
-                        {
-                            Log.Message($"[RimTalk Memory] ✅ Injected PawnMemoryComp for {pawn.ThingID}");
-                        }
                     }
                 }
             }
