@@ -122,19 +122,19 @@ namespace RimTalk.Memory
             foreach (var scored in scoredMemories)
             {
                 float timeScore = CalculateTimeDecayScore(scored.Memory, sceneWeights.TimeDecay, sceneWeights.RecencyWindow);
-                float importanceScore = scored.Memory.importance * sceneWeights.Importance;
+                float importanceScore = scored.Memory.Importance * sceneWeights.Importance;
                 float keywordScore = CalculateKeywordMatchScore(scored.Memory, contextKeywords) * sceneWeights.KeywordMatch;
 
-                float bonusScore = GetLayerBonus(scored.Memory.layer) * Weights.LayerBonus;
+                float bonusScore = GetLayerBonus(scored.Memory.Layer) * Weights.LayerBonus;
 
                 // 关系加成
                 float relationshipScore = CalculateRelationshipBonus(scored.Memory, pawn) * sceneWeights.RelationshipBonus;
                 bonusScore += relationshipScore;
 
                 // ⭐ 用户覆盖：绝对优先级（不受场景影响）
-                if (scored.Memory.isPinned)
+                if (scored.Memory.IsPinned)
                     bonusScore += Weights.PinnedBonus;
-                if (scored.Memory.isUserEdited)
+                if (scored.Memory.IsUserEdited)
                     bonusScore += Weights.UserEditedBonus;
 
                 scores.Add(new MemoryScore
@@ -234,14 +234,14 @@ namespace RimTalk.Memory
             score += timeScore;
 
             // 2. 重要性分数
-            score += memory.importance * sceneWeights.Importance;
+            score += memory.Importance * sceneWeights.Importance;
 
             // 3. 关键词匹配分数
             float keywordScore = CalculateKeywordMatchScore(memory, contextKeywords);
             score += keywordScore * sceneWeights.KeywordMatch;
 
             // 4. 层级加成
-            float layerBonus = GetLayerBonus(memory.layer);
+            float layerBonus = GetLayerBonus(memory.Layer);
             score += layerBonus * Weights.LayerBonus;
 
             // 5. 关系加成
@@ -250,14 +250,14 @@ namespace RimTalk.Memory
             score += relationshipBonus * sceneWeights.RelationshipBonus;
 
             // 6. ⭐ 用户覆盖（绝对优先级，不受场景影响）
-            if (memory.isPinned)
+            if (memory.IsPinned)
                 score += Weights.PinnedBonus;
 
-            if (memory.isUserEdited)
+            if (memory.IsUserEdited)
                 score += Weights.UserEditedBonus;
 
             // 7. 活跃度加成
-            score += memory.activity * 0.1f;
+            score += memory.Activity * 0.1f;
 
             return score;
         }
@@ -268,7 +268,7 @@ namespace RimTalk.Memory
         private static float CalculateTimeDecayScore(MemoryEntry memory, float decayRate, int recencyWindow)
         {
             int currentTick = Find.TickManager.TicksGame;
-            int age = currentTick - memory.timestamp;
+            int age = currentTick - memory.GameTick;
 
             // 超过时间窗口的记忆大幅衰减
             if (age > recencyWindow)
@@ -306,7 +306,7 @@ namespace RimTalk.Memory
             float contentMatch = 0f;
             foreach (var keyword in contextKeywords)
             {
-                if (memory.content.Contains(keyword))
+                if (memory.Content.Contains(keyword))
                     contentMatch += 0.2f;
             }
 

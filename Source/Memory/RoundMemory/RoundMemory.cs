@@ -13,6 +13,8 @@ namespace RimTalk.Memory
     public class RoundMemory : MemoryEntry, IExposable
     {
         // 唯一编号
+        // 此处本应使用父类的 Id，但父类的 Id 的设计哲学是分布式控制（每个记忆自己生成唯一ID）而轮次记忆则是绑定存档的集中式控制
+        // 因此在此处单独设置一个字段来存储RoundMemory的唯一ID
         public long RoundMemoryUniqueID = -1;
         // 时间
         private long AbsTick = -1;
@@ -45,7 +47,7 @@ namespace RimTalk.Memory
                 Log.Warning($"[RoundMemory] RoundMemory字数超出{maxContentLength}，已截短");
             }
             // 显式显示参与者名单，完成文本构建
-            this.content = $"[对话参与者: {GetParticipants()}]\n{content}";
+            this.Content = $"[对话参与者: {GetParticipants()}]\n{content}";
 
             // 构建唯一ID和时间
             RoundMemoryUniqueID = RoundMemoryManager.GetNewRoundMemoryId();

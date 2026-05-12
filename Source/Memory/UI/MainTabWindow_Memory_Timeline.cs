@@ -148,7 +148,7 @@ namespace RimTalk.Memory.UI
             foreach (var memory in cachedMemories)
             {
                 cachedCardYPositions.Add(cachedTotalHeight);
-                float height = GetCardHeight(memory.layer);
+                float height = GetCardHeight(memory.Layer);
                 cachedCardHeights.Add(height);
                 cachedTotalHeight += height + CARD_SPACING;
             }
@@ -157,10 +157,10 @@ namespace RimTalk.Memory.UI
         private void DrawMemoryCard(Rect rect, MemoryEntry memory)
         {
             bool isSelected = selectedMemories.Contains(memory);
-            Color borderColor = GetLayerColor(memory.layer);
+            Color borderColor = GetLayerColor(memory.Layer);
             
             // Background
-            if (memory.isPinned)
+            if (memory.IsPinned)
             {
                 Widgets.DrawBoxSolid(rect, new Color(0.25f, 0.2f, 0.1f, 0.5f));
             }
@@ -207,17 +207,17 @@ namespace RimTalk.Memory.UI
             {
                 Widgets.DrawHighlight(pinButtonRect);
             }
-            if (Widgets.ButtonImage(pinButtonRect, memory.isPinned ? TexButton.ReorderUp : TexButton.ReorderDown))
+            if (Widgets.ButtonImage(pinButtonRect, memory.IsPinned ? TexButton.ReorderUp : TexButton.ReorderDown))
             {
-                memory.isPinned = !memory.isPinned;
+                memory.IsPinned = !memory.IsPinned;
                 if (currentMemoryComp != null)
                 {
-                    currentMemoryComp.PinMemory(memory.id, memory.isPinned);
+                    currentMemoryComp.PinMemory(memory.Id, memory.IsPinned);
                 }
                 // ? v3.3.32: No need to mark dirty for pin/unpin as it doesn't affect filtering
                 Event.current.Use();
             }
-            TooltipHandler.TipRegion(pinButtonRect, memory.isPinned ? "RimTalk_MindStream_Unpin".Translate() : "RimTalk_MindStream_Pin".Translate());
+            TooltipHandler.TipRegion(pinButtonRect, memory.IsPinned ? "RimTalk_MindStream_Unpin".Translate() : "RimTalk_MindStream_Pin".Translate());
             buttonX -= buttonSize + buttonSpacing;
             
             // Edit button
@@ -247,8 +247,8 @@ namespace RimTalk.Memory.UI
             
             // Header
             Text.Font = GameFont.Tiny;
-            string layerLabel = GetLayerLabel(memory.layer);
-            string typeLabel = memory.type.ToString();
+            string layerLabel = GetLayerLabel(memory.Layer);
+            string typeLabel = memory.Type.ToString();
             string timeLabel = memory.TimeAgoString;
             
             string header = $"[{layerLabel}] {typeLabel} ? {timeLabel}";
@@ -267,8 +267,8 @@ namespace RimTalk.Memory.UI
             float contentHeight = contentRect.height - 40f;
             Rect textRect = new Rect(contentRect.x, contentY, contentRect.width, contentHeight);
             
-            string displayText = memory.content;
-            int maxLength = GetContentMaxLength(memory.layer);
+            string displayText = memory.Content;
+            int maxLength = GetContentMaxLength(memory.Layer);
             if (displayText.Length > maxLength)
             {
                 displayText = displayText.Substring(0, maxLength) + "...";
@@ -277,9 +277,9 @@ namespace RimTalk.Memory.UI
             Widgets.Label(textRect, displayText);
             
             // Tooltip for full content
-            if (memory.content.Length > maxLength && Mouse.IsOver(textRect))
+            if (memory.Content.Length > maxLength && Mouse.IsOver(textRect))
             {
-                TooltipHandler.TipRegion(textRect, memory.content);
+                TooltipHandler.TipRegion(textRect, memory.Content);
             }
             
             // Footer (importance/activity bars)
@@ -287,12 +287,12 @@ namespace RimTalk.Memory.UI
             float barWidth = (contentRect.width - 4f) / 2f;
             
             Rect importanceBarRect = new Rect(contentRect.x, barY, barWidth, 8f);
-            Widgets.FillableBar(importanceBarRect, Mathf.Clamp01(memory.importance), Texture2D.whiteTexture, BaseContent.ClearTex, false);
-            TooltipHandler.TipRegion(importanceBarRect, "RimTalk_MindStream_ImportanceLabel".Translate(memory.importance.ToString("F2")));
+            Widgets.FillableBar(importanceBarRect, Mathf.Clamp01(memory.Importance), Texture2D.whiteTexture, BaseContent.ClearTex, false);
+            TooltipHandler.TipRegion(importanceBarRect, "RimTalk_MindStream_ImportanceLabel".Translate(memory.Importance.ToString("F2")));
             
             Rect activityBarRect = new Rect(contentRect.x + barWidth + 4f, barY, barWidth, 8f);
-            Widgets.FillableBar(activityBarRect, Mathf.Clamp01(memory.activity), Texture2D.whiteTexture, BaseContent.ClearTex, false);
-            TooltipHandler.TipRegion(activityBarRect, "RimTalk_MindStream_ActivityLabel".Translate(memory.activity.ToString("F2")));
+            Widgets.FillableBar(activityBarRect, Mathf.Clamp01(memory.Activity), Texture2D.whiteTexture, BaseContent.ClearTex, false);
+            TooltipHandler.TipRegion(activityBarRect, "RimTalk_MindStream_ActivityLabel".Translate(memory.Activity.ToString("F2")));
             
             Text.Font = GameFont.Small;
         }
@@ -391,7 +391,7 @@ namespace RimTalk.Memory.UI
                     float y = 0f;
                     foreach (var memory in filteredMemories)
                     {
-                        float height = GetCardHeight(memory.layer);
+                        float height = GetCardHeight(memory.Layer);
                         Rect cardRect = new Rect(0f, y, viewRect.width, height);
                         
                         if (selectionBoxContent.Overlaps(cardRect))

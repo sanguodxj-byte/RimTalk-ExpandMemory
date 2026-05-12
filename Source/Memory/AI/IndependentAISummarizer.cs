@@ -49,7 +49,7 @@ namespace RimTalk.Memory.AI
 
         public static string ComputeCacheKey(Pawn pawn, List<MemoryEntry> memories)
         {
-            var ids = memories.Select(m => m.id ?? m.content.GetHashCode().ToString()).ToArray();
+            var ids = memories.Select(m => m.Id ?? m.Content.GetHashCode().ToString()).ToArray();
             string joinedIds = string.Join("|", ids);
             return $"{pawn.ThingID}_{memories.Count}_{joinedIds.GetHashCode()}";
         }
@@ -505,9 +505,9 @@ namespace RimTalk.Memory.AI
             var memoryListSb = new StringBuilder();
             int maxMemories = (template == "deep_archive") ? 15 : 20;
             int i = 1;
-            foreach (var m in memories.OrderBy(m => m.timestamp))
+            foreach (var m in memories.OrderBy(m => m.GameTick))
             {
-                memoryListSb.AppendLine($"{i}. {m.content}");
+                memoryListSb.AppendLine($"{i}. {m.Content}");
                 i++;
             }
             string memoryList = memoryListSb.ToString().TrimEnd();

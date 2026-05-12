@@ -26,8 +26,8 @@ namespace RimTalk.Memory.UI
         {
             this.memory = memory;
             this.memoryComp = comp;
-            this.editedContent = memory.content;
-            this.editedNotes = memory.notes ?? "";
+            this.editedContent = memory.Content;
+            this.editedNotes = memory.Notes ?? "";
             
             // 初始化可用标签列表
             availableTags = new List<string>
@@ -59,7 +59,7 @@ namespace RimTalk.Memory.UI
             Widgets.Label(new Rect(infoRect.x, infoRect.y, infoRect.width, 25f), 
                 $"类型: {memory.TypeName}  |  层级: {memory.LayerName}  |  时间: {memory.TimeAgoString}");
             Widgets.Label(new Rect(infoRect.x, infoRect.y + 25f, infoRect.width, 25f), 
-                $"重要性: {memory.importance:F2}  |  活跃度: {memory.activity:F2}");
+                $"重要性: {memory.Importance:F2}  |  活跃度: {memory.Activity:F2}");
             GUI.color = Color.white;
             curY += 65f;
 
@@ -99,11 +99,11 @@ namespace RimTalk.Memory.UI
 
             // 固定选项
             Rect pinnedRect = new Rect(0f, curY, inRect.width, 30f);
-            bool wasPinned = memory.isPinned;
-            Widgets.CheckboxLabeled(pinnedRect, "固定此记忆（不会被删除或衰减）", ref memory.isPinned);
-            if (memory.isPinned != wasPinned)
+            bool wasPinned = memory.IsPinned;
+            Widgets.CheckboxLabeled(pinnedRect, "固定此记忆（不会被删除或衰减）", ref memory.IsPinned);
+            if (memory.IsPinned != wasPinned)
             {
-                if (memory.isPinned)
+                if (memory.IsPinned)
                 {
                     memory.AddTag(MemoryTags.重要);
                 }
@@ -209,7 +209,7 @@ namespace RimTalk.Memory.UI
 
         private void SaveChanges()
         {
-            memoryComp.EditMemory(memory.id, editedContent, editedNotes);
+            memoryComp.EditMemory(memory.Id, editedContent, editedNotes);
             
             // 添加用户编辑标签
             if (!memory.tags.Contains(MemoryTags.用户编辑))

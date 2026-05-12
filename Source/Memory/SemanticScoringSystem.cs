@@ -104,7 +104,7 @@ namespace RimTalk.Memory
                 {
                     try
                     {
-                        float[] memoryEmbedding = await AI.EmbeddingService.GetEmbeddingAsync(scored.Item.content);
+                        float[] memoryEmbedding = await AI.EmbeddingService.GetEmbeddingAsync(scored.Item.Content);
                         
                         if (memoryEmbedding != null)
                         {
@@ -259,15 +259,15 @@ namespace RimTalk.Memory
                 // 只为重要记忆（importance > 0.7）生成缓存
                 var importantMemories = new List<MemoryEntry>();
                 
-                importantMemories.AddRange(memoryComp.SituationalMemories.Where(m => m.importance > 0.7f));
-                importantMemories.AddRange(memoryComp.EventLogMemories.Where(m => m.importance > 0.7f));
-                importantMemories.AddRange(memoryComp.ArchiveMemories.Take(10).Where(m => m.importance > 0.7f));
+                importantMemories.AddRange(memoryComp.SituationalMemories.Where(m => m.Importance > 0.7f));
+                importantMemories.AddRange(memoryComp.EventLogMemories.Where(m => m.Importance > 0.7f));
+                importantMemories.AddRange(memoryComp.ArchiveMemories.Take(10).Where(m => m.Importance > 0.7f));
                 
                 if (importantMemories.Count == 0)
                     return;
                 
                 // 批量生成嵌入（限制数量）
-                var toBatch = importantMemories.Take(20).Select(m => m.content).ToList();
+                var toBatch = importantMemories.Take(20).Select(m => m.Content).ToList();
                 
                 if (Prefs.DevMode)
                     Log.Message($"[Semantic Scoring] Prewarming {toBatch.Count} memory embeddings...");

@@ -83,7 +83,7 @@ namespace RimTalk.Memory
 
             if (Prefs.DevMode)
             {
-                Log.Message($"[Proactive Recall] {pawn.LabelShort} recalled memory: {best.Memory.content.Substring(0, Math.Min(50, best.Memory.content.Length))} (Score: {best.Score:F2}, Chance: {triggerChance:P0})");
+                Log.Message($"[Proactive Recall] {pawn.LabelShort} recalled memory: {best.Memory.Content.Substring(0, Math.Min(50, best.Memory.Content.Length))} (Score: {best.Score:F2}, Chance: {triggerChance:P0})");
             }
 
             return recallPrompt;
@@ -109,10 +109,10 @@ namespace RimTalk.Memory
             score += keywordMatch * 0.4f;
 
             // 2. 重要性（权重30%）
-            score += memory.importance * 0.3f;
+            score += memory.Importance * 0.3f;
 
             // 3. 新鲜度（权重20%）
-            int age = Find.TickManager.TicksGame - memory.timestamp;
+            int age = Find.TickManager.TicksGame - memory.GameTick;
             float freshness = UnityEngine.Mathf.Exp(-age / 120000f); // 2天半衰期
             score += freshness * 0.2f;
 
@@ -126,10 +126,10 @@ namespace RimTalk.Memory
             }
 
             // 5. 特殊加成
-            if (memory.type == MemoryType.Emotion)
+            if (memory.Type == MemoryType.Emotion)
                 score += 0.15f; // 情感记忆更容易被主动提及
 
-            if (memory.isPinned)
+            if (memory.IsPinned)
                 score += 0.2f; // 固定记忆优先
 
             return score;
@@ -143,16 +143,16 @@ namespace RimTalk.Memory
             float chance = TriggerProbability.BaseChance;
 
             // 重要性加成
-            if (memory.importance > 0.7f)
+            if (memory.Importance > 0.7f)
                 chance += TriggerProbability.HighImportanceBonus;
 
             // 近期记忆加成
-            int age = Find.TickManager.TicksGame - memory.timestamp;
+            int age = Find.TickManager.TicksGame - memory.GameTick;
             if (age < 60000) // 1天内
                 chance += TriggerProbability.RecentMemoryBonus;
 
             // 情感记忆加成
-            if (memory.type == MemoryType.Emotion)
+            if (memory.Type == MemoryType.Emotion)
                 chance += TriggerProbability.EmotionalBonus;
 
             return Math.Min(chance, 0.6f); // 最高60%触发率
@@ -170,10 +170,10 @@ namespace RimTalk.Memory
             sb.AppendLine();
 
             // 记忆内容
-            string typeTag = GetMemoryTypeTag(memory.type);
+            string typeTag = GetMemoryTypeTag(memory.Type);
             string timeStr = memory.TimeAgoString;
             
-            sb.AppendLine($"**Recalled Memory:** [{typeTag}] {memory.content}");
+            sb.AppendLine($"**Recalled Memory:** [{typeTag}] {memory.Content}");
             sb.AppendLine($"**When:** {timeStr}");
 
             // 如果有相关Pawn，标注
@@ -183,9 +183,9 @@ namespace RimTalk.Memory
             }
 
             // 情感提示
-            if (memory.type == MemoryType.Emotion)
+            if (memory.Type == MemoryType.Emotion)
             {
-                sb.AppendLine($"**Emotional weight:** High (importance: {memory.importance:P0})");
+                sb.AppendLine($"**Emotional weight:** High (importance: {memory.Importance:P0})");
             }
 
             sb.AppendLine();
@@ -248,7 +248,7 @@ namespace RimTalk.Memory
                 // 统计高分记忆
                 var highScore = memoryComp.SituationalMemories
                     .Concat(memoryComp.EventLogMemories)
-                    .Where(m => m.importance > 0.7f)
+                    .Where(m => m.Importance > 0.7f)
                     .Count();
                 
                 diagnostics.HighImportanceMemories = highScore;

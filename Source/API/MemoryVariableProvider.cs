@@ -149,7 +149,7 @@ namespace RimTalk.Memory.API
 
             // 按时间排序
             var sortedMemories = recentMemories
-                .OrderByDescending(m => m.timestamp)
+                .OrderByDescending(m => m.GameTick)
                 .Take(maxCount)
                 .ToList();
 
@@ -174,7 +174,7 @@ namespace RimTalk.Memory.API
 
             foreach (var memory in memories)
             {
-                sb.AppendLine($"{index}. {memory.content} ({memory.TimeAgoString})");
+                sb.AppendLine($"{index}. {memory.Content} ({memory.TimeAgoString})");
                 index++;
             }
 
@@ -303,7 +303,7 @@ namespace RimTalk.Memory.API
 
             // 按时间降序排序（最新的在前）
             var sortedMemories = memories
-                .OrderByDescending(m => m.timestamp)
+                .OrderByDescending(m => m.GameTick)
                 .Take(maxCount)
                 .ToList();
 

@@ -63,7 +63,7 @@ namespace RimTalk.Memory
             foreach (var memory in recentMemories)
             {
                 string emotionalTag = GetEmotionalTag(memory);
-                summary.AppendLine("- " + emotionalTag + memory.content);
+                summary.AppendLine("- " + emotionalTag + memory.Content);
             }
 
             return summary.ToString();
@@ -71,9 +71,9 @@ namespace RimTalk.Memory
 
         private static string GetEmotionalTag(MemoryEntry memory)
         {
-            if (memory.importance > 0.8f)
+            if (memory.Importance > 0.8f)
                 return "[Important] ";
-            if (memory.importance < 0.3f)
+            if (memory.Importance < 0.3f)
                 return "[Minor] ";
             return "";
         }
