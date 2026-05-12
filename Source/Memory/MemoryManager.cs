@@ -692,7 +692,7 @@ namespace RimTalk.Memory
                     
                     // ⭐ 步骤1：选择最旧的前 25% ELS 记忆进行归档（移除 isUserEdited 检查）
                     var nonPinnedELS = fourLayerComp.EventLogMemories
-                        .Where(m => !m.isPinned)
+                        .Where(m => !m.IsPinned)
                         .ToList();
                     
                     if (nonPinnedELS.Count == 0)
@@ -703,7 +703,7 @@ namespace RimTalk.Memory
                     
                     // 选择最旧的记忆
                     var toArchive = nonPinnedELS
-                        .OrderBy(m => m.timestamp)
+                        .OrderBy(m => m.GameTick)
                         .Take(archiveCount)
                         .ToList();
                     
@@ -711,7 +711,7 @@ namespace RimTalk.Memory
                         continue;
                     
                     // ⭐ 步骤2：将选中的记忆按类型分组并总结归档
-                    var byType = toArchive.GroupBy(m => m.type);
+                    var byType = toArchive.GroupBy(m => m.Type);
                     
                     int archivedCount = 0;
                     foreach (var typeGroup in byType)
@@ -722,17 +722,17 @@ namespace RimTalk.Memory
                         string archiveSummary = CreateArchiveSummary(memories, typeGroup.Key);
                         
                         // ⭐ 修复：使用被归档记忆中最晚（最新）的timestamp作为归档entry的时间戳
-                        int latestTimestamp = memories.Max(m => m.timestamp);
+                        int latestTimestamp = memories.Max(m => m.GameTick);
                         
                         var archiveEntry = new MemoryEntry(
                             content: archiveSummary,
                             type: typeGroup.Key,
                             layer: MemoryLayer.Archive,
-                            importance: memories.Average(m => m.importance) + 0.3f // CLPA 记忆重要性更高
+                            importance: memories.Average(m => m.Importance) + 0.3f // CLPA 记忆重要性更高
                         );
                         
                         // ⭐ 修复：覆盖默认的timestamp
-                        archiveEntry.timestamp = latestTimestamp;
+                        archiveEntry.GameTick = latestTimestamp;
                         
                         // 合并关键词和标签
                         archiveEntry.keywords.AddRange(memories.SelectMany(m => m.keywords).Distinct());
@@ -749,10 +749,10 @@ namespace RimTalk.Memory
                             {
                                 if (!string.IsNullOrEmpty(aiSummary))
                                 {
-                                    archiveEntry.content = aiSummary;
+                                    archiveEntry.Content = aiSummary;
                                     archiveEntry.RemoveTag("简单归档");
                                     archiveEntry.AddTag("AI归档");
-                                    archiveEntry.notes = "AI 深度归档已完成。";
+                                    archiveEntry.Notes = "AI 深度归档已完成。";
                                 }
                             });
                             
@@ -760,7 +760,7 @@ namespace RimTalk.Memory
                             
                             archiveEntry.AddTag("简单归档");
                             archiveEntry.AddTag("待AI更新");
-                            archiveEntry.notes = "AI 深度归档正在后台处理中...";
+                            archiveEntry.Notes = "AI 深度归档正在后台处理中...";
                         }
                         
                         // 添加到 CLPA
@@ -798,9 +798,9 @@ namespace RimTalk.Memory
                     {
                         // 移除最旧的低重要性记忆（只保护固定记忆）
                         var toRemove = fourLayerComp.ArchiveMemories
-                            .Where(m => !m.isPinned)
-                            .OrderBy(m => m.importance)
-                            .ThenBy(m => m.timestamp)
+                            .Where(m => !m.IsPinned)
+                            .OrderBy(m => m.Importance)
+                            .ThenBy(m => m.GameTick)
                             .Take(fourLayerComp.ArchiveMemories.Count - maxArchive)
                             .ToList();
                         
@@ -872,7 +872,7 @@ namespace RimTalk.Memory
                 summary.Append($"行动归档（{memories.Count}条）：");
                 
                 var grouped = memories
-                    .Select(m => m.content.Length > 20 ? m.content.Substring(0, 20) : m.content)
+                    .Select(m => m.Content.Length > 20 ? m.Content.Substring(0, 20) : m.Content)
                     .GroupBy(a => a)
                     .OrderByDescending(g => g.Count());
                 
@@ -897,7 +897,7 @@ namespace RimTalk.Memory
                 summary.Append($"{type}归档（{memories.Count}条）：");
                 
                 var grouped = memories
-                    .GroupBy(m => m.content.Length > 30 ? m.content.Substring(0, 30) : m.content)
+                    .GroupBy(m => m.Content.Length > 30 ? m.Content.Substring(0, 30) : m.Content)
                     .OrderByDescending(g => g.Count());
                 
                 int shown = 0;
@@ -905,7 +905,7 @@ namespace RimTalk.Memory
                 {
                     if (shown > 0) summary.Append("；");
                     
-                    string content = group.First().content;
+                    string content = group.First().Content;
                     if (content.Length > 60)
                         content = content.Substring(0, 60) + "...";
                     
