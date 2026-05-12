@@ -174,7 +174,7 @@ namespace RimTalk.Memory.API
 
             foreach (var memory in memories)
             {
-                sb.AppendLine($"{index}. {memory.Content} ({memory.TimeAgoString})");
+                sb.AppendLine($"{index}. {memory.Content} ({memory.AgeString})");
                 index++;
             }
 

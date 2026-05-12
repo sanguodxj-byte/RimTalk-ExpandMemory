@@ -51,7 +51,7 @@ namespace RimTalk.Memory
 
             foreach (var memory in memories)
             {
-                context.AppendLine($"- [{memory.TypeName}] {memory.Content} ({memory.TimeAgoString})");
+                context.AppendLine($"- [{memory.TypeName}] {memory.Content} ({memory.AgeString})");
             }
 
             return context.ToString();
