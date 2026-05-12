@@ -202,7 +202,7 @@ namespace RimTalk.Memory.UI
             // Use translated memory type
             string memoryTypeLabel = ("RimTalk_MemoryType_" + memory.Type.ToString()).Translate();
 
-            string header = "[" + memoryTypeLabel + "] " + memory.TimeAgoString;
+            string header = "[" + memoryTypeLabel + "] " + memory.AgeString;
             if (!string.IsNullOrEmpty(memory.relatedPawnName))
                 header += " - " + "RimTalk_With".Translate() + " " + memory.relatedPawnName;
 

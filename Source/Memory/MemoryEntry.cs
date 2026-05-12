@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace RimTalk.Memory
@@ -15,6 +16,7 @@ namespace RimTalk.Memory
     {
         // 基本信息
         public string Id;                   // 唯一ID
+        // 更应当存储 AbsTick，无奈屎山已经堆起来了
         public int GameTick = -1;           // 时间戳（单位 tick）
         public string Content;              // 内容
 
@@ -72,86 +74,21 @@ namespace RimTalk.Memory
         public virtual bool CanBeSummarized => !IsSummarized;
 
         /// <summary>
-        /// 获取记忆年龄（单位tick）（仅限主线程访问）
+        /// 获取记忆年龄描述
+        /// 根据年龄大小返回相对描述（如“刚刚”、“一天前”）或具体日期（如“5501年春1日”）
         /// </summary>
-        public int Age => Find.TickManager.TicksGame - GameTick;
-
-        /// <summary>
-        /// 获取记忆的游戏日期时间戳（精确到日期）
-        /// 格式：5220年春12日
-        /// </summary>
-        public string GameDateString
+        public string AgeString => (Find.TickManager?.TicksGame - GameTick) switch
         {
-            get
-            {
-                try
-                {
-                    // 获取年份
-                    int year = GenDate.Year(GameTick, 0);
-
-                    // 获取日期（0-59，每年60天）
-                    int dayOfYear = GenDate.DayOfYear(GameTick, 0);
-
-                    // RimWorld 使用 Quadrum（季度）：0=春, 1=夏, 2=秋, 3=冬
-                    // 每个季度15天
-                    int quadrumIndex = dayOfYear / 15; // 0-3
-                    int dayOfQuadrum = (dayOfYear % 15) + 1; // 1-15
-
-                    string[] quadrumNames = { "春", "夏", "秋", "冬" };
-                    string quadrumName = quadrumNames[quadrumIndex % 4];
-
-                    return $"{year}年{quadrumName}{dayOfQuadrum}日";
-                }
-                catch (Exception ex)
-                {
-                    // 如果计算失败，记录错误并返回模糊时间
-                    Log.Error($"[RimTalk Memory] Failed to generate GameDateString for timestamp {GameTick}: {ex.Message}");
-                    return TimeAgoString;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 获取记忆年龄描述（完全口语化）
-        /// 模糊时间感知，更自然
-        /// </summary>
-        public string TimeAgoString
-        {
-            get
-            {
-                int age = Age;
-
-                // 超短期（<1小时 = <2500 ticks）
-                if (age < GenDate.TicksPerHour) return "刚才";
-
-                // 短期（1-6小时）
-                if (age < GenDate.TicksPerHour * 6) return "不久前";
-
-                // 当天（6-24小时）
-                if (age < GenDate.TicksPerDay) return "今天";
-
-                // 昨天
-                if (age < GenDate.TicksPerDay * 2) return "昨天";
-
-                // 前天
-                if (age < GenDate.TicksPerDay * 3) return "前天";
-
-                // 前几天（3-7天）
-                if (age < GenDate.TicksPerDay * 7) return "前几天";
-
-                // 上周（7-15天）
-                if (age < GenDate.TicksPerDay * 15) return "上周";
-
-                // 最近（15-30天）
-                if (age < GenDate.TicksPerDay * 30) return "最近";
-
-                // 之前（30天-1年）
-                if (age < GenDate.TicksPerYear) return "之前";
-
-                // 很久以前（>1年）
-                return "很久以前";
-            }
-        }
+            null or < 0 => "异常时间",
+            < GenDate.TicksPerHour => "刚刚",
+            < GenDate.TicksPerHour * 6 => "几小时前",
+            < GenDate.TicksPerDay => "一天内",
+            < GenDate.TicksPerDay * 2 => "一天前",
+            < GenDate.TicksPerDay * 3 => "前天",
+            < GenDate.TicksPerDay * 7 => "前几天",
+            < GenDate.TicksPerDay * 14 => "上周",
+            _ => GenDate.DateFullStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)
+        };
 
         public MemoryEntry() { }
 
@@ -272,7 +209,7 @@ namespace RimTalk.Memory
             float score = 0f;
 
             // 时间因子（越新越好）
-            float timeFactor = (float)Math.Exp(-(float)Age / GenDate.TicksPerDay);
+            float timeFactor = (float)Math.Exp(-(float)(Find.TickManager.TicksGame - GameTick) / GenDate.TicksPerDay);
             score += timeFactor * 0.3f;
 
             // 重要性因子
