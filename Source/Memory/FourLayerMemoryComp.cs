@@ -784,7 +784,6 @@ namespace RimTalk.Memory
                 isUserEdited = true,
                 isPinned = true,
                 notes = roundMemory.notes,
-                aiCacheKey = roundMemory.aiCacheKey,
             };
             SituationalMemories?.Add(newMemory);
             DeleteMemory(memoryId);
