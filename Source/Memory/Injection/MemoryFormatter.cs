@@ -26,11 +26,11 @@ namespace RimTalk.Memory.Injection
             
             foreach (var memory in memories)
             {
-                string typeTag = GetMemoryTypeTag(memory.type);
+                string typeTag = GetMemoryTypeTag(memory.Type);
                 string timeStr = GetTimeString(memory);
                 
                 // 格式：序号. [类型] 内容 (时间)
-                sb.AppendLine($"{index}. [{typeTag}] {memory.content} ({timeStr})");
+                sb.AppendLine($"{index}. [{typeTag}] {memory.Content} ({timeStr})");
                 index++;
             }
             
@@ -45,10 +45,10 @@ namespace RimTalk.Memory.Injection
             if (memory == null)
                 return string.Empty;
             
-            string typeTag = GetMemoryTypeTag(memory.type);
+            string typeTag = GetMemoryTypeTag(memory.Type);
             string timeStr = GetTimeString(memory);
             
-            return $"{index}. [{typeTag}] {memory.content} ({timeStr})";
+            return $"{index}. [{typeTag}] {memory.Content} ({timeStr})";
         }
         
         /// <summary>
@@ -57,7 +57,7 @@ namespace RimTalk.Memory.Injection
         /// </summary>
         private static string GetTimeString(MemoryEntry memory)
         {
-            if (memory.layer == MemoryLayer.Active || memory.layer == MemoryLayer.Situational)
+            if (memory.Layer == MemoryLayer.Active || memory.Layer == MemoryLayer.Situational)
                 return memory.TimeAgoString;
             else
                 return memory.GameDateString;

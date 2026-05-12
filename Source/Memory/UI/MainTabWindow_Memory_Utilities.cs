@@ -46,26 +46,26 @@ namespace RimTalk.Memory.UI
             
             if (showABM)
             {
-                memories.AddRange(currentMemoryComp.ActiveMemories.Where(m => filterType == null || m.type == filterType.Value));
+                memories.AddRange(currentMemoryComp.ActiveMemories.Where(m => filterType == null || m.Type == filterType.Value));
             }
             
             if (showSCM)
             {
-                memories.AddRange(currentMemoryComp.SituationalMemories.Where(m => filterType == null || m.type == filterType.Value));
+                memories.AddRange(currentMemoryComp.SituationalMemories.Where(m => filterType == null || m.Type == filterType.Value));
             }
             
             if (showELS)
             {
-                memories.AddRange(currentMemoryComp.EventLogMemories.Where(m => filterType == null || m.type == filterType.Value));
+                memories.AddRange(currentMemoryComp.EventLogMemories.Where(m => filterType == null || m.Type == filterType.Value));
             }
             
             if (showCLPA)
             {
-                memories.AddRange(currentMemoryComp.ArchiveMemories.Where(m => filterType == null || m.type == filterType.Value));
+                memories.AddRange(currentMemoryComp.ArchiveMemories.Where(m => filterType == null || m.Type == filterType.Value));
             }
             
             // Sort by timestamp (newest first)
-            cachedFilteredMemories = memories.OrderByDescending(m => m.timestamp).ToList();
+            cachedFilteredMemories = memories.OrderByDescending(m => m.GameTick).ToList();
         }
         
         private float GetCardHeight(MemoryLayer layer)

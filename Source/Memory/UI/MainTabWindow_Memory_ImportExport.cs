@@ -169,7 +169,7 @@ namespace RimTalk.Memory.UI
                         foreach (var memory in importedMemories)
                         {
                             // 根据层级添加到对应列表
-                            switch (memory.layer)
+                            switch (memory.Layer)
                             {
                                 case MemoryLayer.Active:
                                     // ⭐ v4.0: ABM 无容量限制
