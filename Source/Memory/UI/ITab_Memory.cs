@@ -156,7 +156,7 @@ namespace RimTalk.Memory.UI
             {
                 foreach (var memory in memoryComp.ShortTermMemories)
                 {
-                    if (filterType == null || memory.type == filterType.Value)
+                    if (filterType == null || memory.Type == filterType.Value)
                     {
                         cachedEntries.Add(new MemoryListEntry
                         {
@@ -171,7 +171,7 @@ namespace RimTalk.Memory.UI
             {
                 foreach (var memory in memoryComp.LongTermMemories)
                 {
-                    if (filterType == null || memory.type == filterType.Value)
+                    if (filterType == null || memory.Type == filterType.Value)
                     {
                         cachedEntries.Add(new MemoryListEntry
                         {
@@ -200,7 +200,7 @@ namespace RimTalk.Memory.UI
             Text.Font = GameFont.Tiny;
 
             // Use translated memory type
-            string memoryTypeLabel = ("RimTalk_MemoryType_" + memory.type.ToString()).Translate();
+            string memoryTypeLabel = ("RimTalk_MemoryType_" + memory.Type.ToString()).Translate();
 
             string header = "[" + memoryTypeLabel + "] " + memory.TimeAgoString;
             if (!string.IsNullOrEmpty(memory.relatedPawnName))
@@ -212,7 +212,7 @@ namespace RimTalk.Memory.UI
             Text.Font = GameFont.Small;
 
             // 截断到合适长度显示
-            string displayText = memory.content;
+            string displayText = memory.Content;
             if (!string.IsNullOrEmpty(displayText) && displayText.Length > 80)
             {
                 displayText = displayText.Substring(0, 77) + "...";
@@ -224,12 +224,12 @@ namespace RimTalk.Memory.UI
             // 添加 Tooltip 显示完整内容
             if (Mouse.IsOver(contentRect))
             {
-                TooltipHandler.TipRegion(contentRect, memory.content);
+                TooltipHandler.TipRegion(contentRect, memory.Content);
             }
 
             // Importance bar
             Rect importanceRect = new Rect(innerRect.x, innerRect.y + 64f, innerRect.width, 8f);
-            Widgets.FillableBar(importanceRect, Mathf.Clamp01(memory.importance),
+            Widgets.FillableBar(importanceRect, Mathf.Clamp01(memory.Importance),
                 BaseContent.WhiteTex, null, false);
 
             Text.Font = GameFont.Small;

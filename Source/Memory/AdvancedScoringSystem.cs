@@ -85,9 +85,9 @@ namespace RimTalk.Memory
                     {
                         ContextRelevance = CalculateContextRelevance(memory, features),
                         Recency = CalculateRecency(memory),
-                        Importance = memory.importance,
+                        Importance = memory.Importance,
                         Diversity = 0f, // 稍后计算
-                        LayerPriority = GetLayerPriority(memory.layer)
+                        LayerPriority = GetLayerPriority(memory.Layer)
                     }
                 });
             }
@@ -362,20 +362,20 @@ namespace RimTalk.Memory
             baseScore += recency * weights.Recency;
 
             // 3. 重要性
-            baseScore += memory.importance * weights.Importance;
+            baseScore += memory.Importance * weights.Importance;
 
             // 4. 层级优先级（修复：确保层级加成被计算）
-            float layerScore = GetLayerPriority(memory.layer);
+            float layerScore = GetLayerPriority(memory.Layer);
             baseScore += layerScore * weights.LayerPriority;
 
             // 5. 类型加成（修复：使用乘法而不是替换）
-            float typeBoost = GetTypeBoost(memory.type, weights);
+            float typeBoost = GetTypeBoost(memory.Type, weights);
             float finalScore = baseScore * typeBoost;
 
             // 6. 特殊标记加成
-            if (memory.isPinned)
+            if (memory.IsPinned)
                 finalScore *= 1.5f;
-            if (memory.isUserEdited)
+            if (memory.IsUserEdited)
                 finalScore *= 1.3f;
 
             // 7. 相关人物加成
@@ -432,7 +432,7 @@ namespace RimTalk.Memory
             // 2. 内容直接匹配
             foreach (var keyword in features.Keywords.Take(10)) // 只检查前10个最重要的
             {
-                if (memory.content.Contains(keyword))
+                if (memory.Content.Contains(keyword))
                 {
                     relevance += 0.1f;
                 }
@@ -441,18 +441,18 @@ namespace RimTalk.Memory
             // 3. 主题匹配
             foreach (var topic in features.Topics)
             {
-                if (memory.tags.Contains(topic) || memory.content.Contains(topic))
+                if (memory.tags.Contains(topic) || memory.Content.Contains(topic))
                 {
                     relevance += 0.15f;
                 }
             }
 
             // 4. 情感匹配
-            if (memory.type == MemoryType.Emotion)
+            if (memory.Type == MemoryType.Emotion)
             {
                 foreach (var emotion in features.EmotionWords)
                 {
-                    if (memory.content.Contains(emotion))
+                    if (memory.Content.Contains(emotion))
                     {
                         relevance += 0.2f;
                     }
@@ -503,7 +503,7 @@ namespace RimTalk.Memory
         private static float CalculateRecency(MemoryEntry memory)
         {
             int currentTick = Find.TickManager.TicksGame;
-            int age = currentTick - memory.timestamp;
+            int age = currentTick - memory.GameTick;
 
             // 使用分段衰减（更符合人类记忆规律）
             if (age < 2500) // < 1小时
@@ -591,7 +591,7 @@ namespace RimTalk.Memory
         private static string GetItemType(object item)
         {
             if (item is MemoryEntry memory)
-                return memory.type.ToString();
+                return memory.Type.ToString();
             else if (item is CommonKnowledgeEntry knowledge)
                 return knowledge.GetTags().FirstOrDefault() ?? "unknown";
             else

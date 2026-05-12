@@ -218,8 +218,8 @@ namespace RimTalk.Memory.UI
             int targetCount = targetMemories.Count;
             
             // ? 修复：总结按钮现在支持 ABM + SCM
-            int abmCount = targetMemories.Count(m => m.layer == MemoryLayer.Active);
-            int scmCount = targetMemories.Count(m => m.layer == MemoryLayer.Situational);
+            int abmCount = targetMemories.Count(m => m.Layer == MemoryLayer.Active);
+            int scmCount = targetMemories.Count(m => m.Layer == MemoryLayer.Situational);
             int summarizableCount = abmCount + scmCount;
             
             GUI.enabled = summarizableCount > 0;
@@ -262,7 +262,7 @@ namespace RimTalk.Memory.UI
             y += buttonHeight + spacing;
             
             // Archive Selected/All (ELS -> CLPA)
-            int elsCount = targetMemories.Count(m => m.layer == MemoryLayer.EventLog);
+            int elsCount = targetMemories.Count(m => m.Layer == MemoryLayer.EventLog);
             GUI.enabled = elsCount > 0;
             string archiveLabel;
             if (hasSelection)
