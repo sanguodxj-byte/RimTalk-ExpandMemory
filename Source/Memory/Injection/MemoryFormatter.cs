@@ -57,10 +57,7 @@ namespace RimTalk.Memory.Injection
         /// </summary>
         private static string GetTimeString(MemoryEntry memory)
         {
-            if (memory.Layer == MemoryLayer.Active || memory.Layer == MemoryLayer.Situational)
-                return memory.TimeAgoString;
-            else
-                return memory.GameDateString;
+            return memory.AgeString;
         }
         
         /// <summary>

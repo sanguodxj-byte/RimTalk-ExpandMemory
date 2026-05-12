@@ -249,7 +249,7 @@ namespace RimTalk.Memory.UI
             Text.Font = GameFont.Tiny;
             string layerLabel = GetLayerLabel(memory.Layer);
             string typeLabel = memory.Type.ToString();
-            string timeLabel = memory.TimeAgoString;
+            string timeLabel = memory.AgeString;
             
             string header = $"[{layerLabel}] {typeLabel} ? {timeLabel}";
             if (!string.IsNullOrEmpty(memory.relatedPawnName))

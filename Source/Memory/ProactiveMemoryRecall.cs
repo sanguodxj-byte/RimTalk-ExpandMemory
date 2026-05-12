@@ -171,7 +171,7 @@ namespace RimTalk.Memory
 
             // 记忆内容
             string typeTag = GetMemoryTypeTag(memory.Type);
-            string timeStr = memory.TimeAgoString;
+            string timeStr = memory.AgeString;
             
             sb.AppendLine($"**Recalled Memory:** [{typeTag}] {memory.Content}");
             sb.AppendLine($"**When:** {timeStr}");

@@ -57,7 +57,7 @@ namespace RimTalk.Memory.UI
             Rect infoRect = new Rect(0f, curY, inRect.width, 60f);
             GUI.color = Color.gray;
             Widgets.Label(new Rect(infoRect.x, infoRect.y, infoRect.width, 25f), 
-                $"类型: {memory.TypeName}  |  层级: {memory.LayerName}  |  时间: {memory.TimeAgoString}");
+                $"类型: {memory.TypeName}  |  层级: {memory.LayerName}  |  时间: {memory.AgeString}");
             Widgets.Label(new Rect(infoRect.x, infoRect.y + 25f, infoRect.width, 25f), 
                 $"重要性: {memory.Importance:F2}  |  活跃度: {memory.Activity:F2}");
             GUI.color = Color.white;
