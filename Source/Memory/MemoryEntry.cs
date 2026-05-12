@@ -260,7 +260,7 @@ namespace RimTalk.Memory
         /// </summary>
         public void Decay(float rate)
         {
-            if (isPinned || isUserEdited) return; // 固定或编辑过的记忆不衰减
+            if (isPinned) return; // 固定的记忆不衰减
 
             activity *= (1f - rate);
         }
