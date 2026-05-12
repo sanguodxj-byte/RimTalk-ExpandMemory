@@ -898,11 +898,11 @@ namespace RimTalk.Memory.Debug
                             var score = memoryScores[i];
                             var memory = score.Memory;
                             
-                            string layerTag = GetLayerTag(memory.layer);
+                            string layerTag = GetLayerTag(memory.Layer);
                             
-                            sb.AppendLine($"[{i + 1}] {layerTag} {GetTypeTag(memory.type)}");
+                            sb.AppendLine($"[{i + 1}] {layerTag} {GetTypeTag(memory.Type)}");
                             sb.AppendLine($"    " + "RimTalk_Preview_ScoreDetail".Translate(score.TotalScore.ToString("F3")));
-                            sb.AppendLine($"    {memory.content}");
+                            sb.AppendLine($"    {memory.Content}");
                             sb.AppendLine();
                         }
                     }
@@ -921,12 +921,12 @@ namespace RimTalk.Memory.Debug
                     foreach (var memory in memoryComp.EventLogMemories.Take(5))
                     {
                         count++;
-                        sb.AppendLine($"[ELS-{count}] {memory.content}");
+                        sb.AppendLine($"[ELS-{count}] {memory.Content}");
                     }
                     foreach (var memory in memoryComp.ArchiveMemories.Take(5))
                     {
                         count++;
-                        sb.AppendLine($"[CLPA-{count}] {memory.content}");
+                        sb.AppendLine($"[CLPA-{count}] {memory.Content}");
                     }
                     
                     cachedMemoryCount = count;

@@ -14,17 +14,17 @@ namespace RimTalk.Memory
     public class MemoryEntry : IExposable
     {
         // 基本信息
-        public string id;                   // 唯一ID
-        public int timestamp = -1;          // 时间戳
-        public string content;              // 内容
+        public string Id;                   // 唯一ID
+        public int GameTick = -1;           // 时间戳（单位 tick）
+        public string Content;              // 内容
 
         // 分类
-        public MemoryType type;             // 类型
-        public MemoryLayer layer;           // 层级
+        public MemoryType Type;             // 类型
+        public MemoryLayer Layer;           // 层级
 
         // 重要性和活跃度
-        public float importance = -1;       // 重要性 (0-1)
-        public float activity = -1;         // 活跃度 (随时间衰减)
+        public float Importance = -1;       // 重要性 (0-1)
+        public float Activity = -1;         // 活跃度 (随时间衰减)
 
         // 关联信息
         public string relatedPawnId;        // 相关小人ID
@@ -34,15 +34,15 @@ namespace RimTalk.Memory
         public List<string> keywords = new();   // 关键词
 
         // 元数据
-        public bool isUserEdited = false;   // 是否被用户编辑过
-        public bool isPinned = false;       // 是否固定（不会被删除）
+        public bool IsUserEdited = false;   // 是否被用户编辑过
+        public bool IsPinned = false;       // 是否固定（不会被删除）
         public bool IsSummarized = false;   // 是否已被AI总结过，新生成的记忆默认为false
-        public string notes;                // 用户备注
+        public string Notes;                // 用户备注
 
         /// <summary>
         /// 获取层级名称（中文）
         /// </summary>
-        public string LayerName => layer switch
+        public string LayerName => Layer switch
         {
             MemoryLayer.Active => "超短期",
             MemoryLayer.Situational => "短期",
@@ -54,7 +54,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 获取类型名称（中文）
         /// </summary>
-        public string TypeName => type switch
+        public string TypeName => Type switch
         {
             MemoryType.Conversation => "对话",
             MemoryType.Action => "行动",
@@ -74,7 +74,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 获取记忆年龄（单位tick）（仅限主线程访问）
         /// </summary>
-        public int Age => Find.TickManager.TicksGame - timestamp;
+        public int Age => Find.TickManager.TicksGame - GameTick;
 
         /// <summary>
         /// 获取记忆的游戏日期时间戳（精确到日期）
@@ -87,10 +87,10 @@ namespace RimTalk.Memory
                 try
                 {
                     // 获取年份
-                    int year = GenDate.Year(timestamp, 0);
+                    int year = GenDate.Year(GameTick, 0);
 
                     // 获取日期（0-59，每年60天）
-                    int dayOfYear = GenDate.DayOfYear(timestamp, 0);
+                    int dayOfYear = GenDate.DayOfYear(GameTick, 0);
 
                     // RimWorld 使用 Quadrum（季度）：0=春, 1=夏, 2=秋, 3=冬
                     // 每个季度15天
@@ -105,7 +105,7 @@ namespace RimTalk.Memory
                 catch (Exception ex)
                 {
                     // 如果计算失败，记录错误并返回模糊时间
-                    Log.Error($"[RimTalk Memory] Failed to generate GameDateString for timestamp {timestamp}: {ex.Message}");
+                    Log.Error($"[RimTalk Memory] Failed to generate GameDateString for timestamp {GameTick}: {ex.Message}");
                     return TimeAgoString;
                 }
             }
@@ -157,16 +157,15 @@ namespace RimTalk.Memory
 
         public MemoryEntry(string content, MemoryType type, MemoryLayer layer, float importance = 1f, string relatedPawn = null)
         {
-            id = "mem-" + Guid.NewGuid().ToString("N").Substring(0, 12);
-            timestamp = Find.TickManager?.TicksGame ?? -1;
-            this.content = content;
+            Id = "mem-" + Guid.NewGuid().ToString("N").Substring(0, 12);
+            GameTick = Find.TickManager?.TicksGame ?? -1;
+            Content = content;
 
-            this.type = type;
-            this.layer = layer;
+            Type = type;
+            Layer = layer;
 
-            activity = 1f;
-            this.importance = importance;
-
+            Activity = 1f;
+            Importance = importance;
             relatedPawnName = relatedPawn;
 
             // 自动添加类型标签
@@ -174,7 +173,7 @@ namespace RimTalk.Memory
         }
         private void AddTypeTag()
         {
-            AddTag(type switch
+            AddTag(Type switch
             {
                 MemoryType.Conversation => "对话",
                 MemoryType.Action => "行动",
@@ -189,15 +188,15 @@ namespace RimTalk.Memory
 
         public virtual void ExposeData()
         {
-            Scribe_Values.Look(ref id, "id");
-            Scribe_Values.Look(ref timestamp, "timestamp", -1);
-            Scribe_Values.Look(ref content, "content");
+            Scribe_Values.Look(ref Id, "id");
+            Scribe_Values.Look(ref GameTick, "timestamp", -1);
+            Scribe_Values.Look(ref Content, "content");
 
-            Scribe_Values.Look(ref type, "type");
-            Scribe_Values.Look(ref layer, "layer");
+            Scribe_Values.Look(ref Type, "type");
+            Scribe_Values.Look(ref Layer, "layer");
 
-            Scribe_Values.Look(ref importance, "importance", -1);
-            Scribe_Values.Look(ref activity, "activity", -1);
+            Scribe_Values.Look(ref Importance, "importance", -1);
+            Scribe_Values.Look(ref Activity, "activity", -1);
 
             Scribe_Values.Look(ref relatedPawnId, "relatedPawnId");
             Scribe_Values.Look(ref relatedPawnName, "relatedPawnName");
@@ -205,10 +204,10 @@ namespace RimTalk.Memory
             Scribe_Collections.Look(ref tags, "tags", LookMode.Value);
             Scribe_Collections.Look(ref keywords, "keywords", LookMode.Value);
 
-            Scribe_Values.Look(ref isUserEdited, "isUserEdited", false);
-            Scribe_Values.Look(ref isPinned, "isPinned", false);
+            Scribe_Values.Look(ref IsUserEdited, "isUserEdited", false);
+            Scribe_Values.Look(ref IsPinned, "isPinned", false);
             Scribe_Values.Look(ref IsSummarized, "IsSummarized", true); // 旧存档中的记忆默认为true以向后兼容
-            Scribe_Values.Look(ref notes, "notes");
+            Scribe_Values.Look(ref Notes, "notes");
 
             // 集合型字段应当在读档后进行防空处理
             tags ??= new();
@@ -260,9 +259,9 @@ namespace RimTalk.Memory
         /// </summary>
         public void Decay(float rate)
         {
-            if (isPinned) return; // 固定的记忆不衰减
+            if (IsPinned) return; // 固定的记忆不衰减
 
-            activity *= (1f - rate);
+            Activity *= (1f - rate);
         }
 
         /// <summary>
@@ -277,10 +276,10 @@ namespace RimTalk.Memory
             score += timeFactor * 0.3f;
 
             // 重要性因子
-            score += importance * 0.3f;
+            score += Importance * 0.3f;
 
             // 活跃度因子
-            score += activity * 0.2f;
+            score += Activity * 0.2f;
 
             // 相关性因子（关键词匹配）
             if (contextKeywords != null && contextKeywords.Count > 0)
@@ -295,8 +294,8 @@ namespace RimTalk.Memory
             }
 
             // 固定/编辑过的记忆优先级更高
-            if (isPinned) score += 0.3f;
-            if (isUserEdited) score += 0.2f;
+            if (IsPinned) score += 0.3f;
+            if (IsUserEdited) score += 0.2f;
 
             return score;
         }

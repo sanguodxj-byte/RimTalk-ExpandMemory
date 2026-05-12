@@ -67,8 +67,8 @@ namespace RimTalk.Memory.Injection
             // ⭐ v5.0: 对话优先排序
             // 先按类型排序（Conversation 在前），再按时间降序
             var sortedList = comp.ActiveMemories
-                .OrderBy(m => m.type == MemoryType.Conversation ? 0 : 1)  // 对话优先
-                .ThenByDescending(m => m.timestamp)  // 然后按时间降序
+                .OrderBy(m => m.Type == MemoryType.Conversation ? 0 : 1)  // 对话优先
+                .ThenByDescending(m => m.GameTick)  // 然后按时间降序
                 .ToList();
             
             int stackedLength = 0;
@@ -110,7 +110,7 @@ namespace RimTalk.Memory.Injection
                 // 非 RoundMemory 不做去重，直接添加（与旧代码一致）
                 
                 // 文本长度处理
-                int contentLength = entry.content?.Length ?? 0;
+                int contentLength = entry.Content?.Length ?? 0;
                 stackedLength += contentLength;
                 stackedCount++;
                 

@@ -154,11 +154,11 @@ namespace RimTalk.Memory.UI
             // 添加备注
             if (!string.IsNullOrWhiteSpace(notesText))
             {
-                newMemory.notes = notesText.Trim();
+                newMemory.Notes = notesText.Trim();
             }
 
             // 设置固定状态
-            newMemory.isPinned = isPinned;
+            newMemory.IsPinned = isPinned;
 
             // 添加"手动添加"标签
             newMemory.AddTag("手动添加");

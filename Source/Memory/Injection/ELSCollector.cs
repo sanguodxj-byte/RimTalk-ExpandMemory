@@ -61,7 +61,7 @@ namespace RimTalk.Memory.Injection
         {
             var all = Collect(pawn, context, maxCount * 2); // 多取一些，再过滤
             return all
-                .Where(m => m.layer == MemoryLayer.EventLog)
+                .Where(m => m.Layer == MemoryLayer.EventLog)
                 .Take(maxCount)
                 .ToList();
         }
@@ -73,7 +73,7 @@ namespace RimTalk.Memory.Injection
         {
             var all = Collect(pawn, context, maxCount * 2); // 多取一些，再过滤
             return all
-                .Where(m => m.layer == MemoryLayer.Archive)
+                .Where(m => m.Layer == MemoryLayer.Archive)
                 .Take(maxCount)
                 .ToList();
         }
