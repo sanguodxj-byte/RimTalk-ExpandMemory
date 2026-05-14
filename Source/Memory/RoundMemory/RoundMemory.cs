@@ -27,7 +27,7 @@ namespace RimTalk.Memory
         public override bool CanBeSummarized => true; // 总是可以被总结
 
         public RoundMemory() { }
-        public RoundMemory(HashSet<Pawn> pawns, string content) : base(
+        public RoundMemory(HashSet<Pawn> pawns, string content = null) : base(
             content: string.Empty,
             type: MemoryType.Conversation,
             layer: MemoryLayer.Active,
@@ -37,17 +37,6 @@ namespace RimTalk.Memory
             // 构建参与者集合，可能为空集合
             Pawns = pawns ?? new();
             Pawns.RemoveWhere(p => p is null);
-
-            // 构建文本
-            // 截短超限文本
-            var maxContentLength = RoundMemoryManager.MaxContentLength;
-            if (content.Length > maxContentLength)
-            {
-                content = content.Substring(0, maxContentLength) + "...";
-                Log.Warning($"[RoundMemory] RoundMemory字数超出{maxContentLength}，已截短");
-            }
-            // 显式显示参与者名单，完成文本构建
-            this.Content = $"[对话参与者: {GetParticipants()}]\n{content}";
 
             // 构建唯一ID和时间
             RoundMemoryUniqueID = RoundMemoryManager.GetNewRoundMemoryId();
@@ -62,7 +51,21 @@ namespace RimTalk.Memory
             }
             planetTile = Pawns.FirstOrDefault()?.Tile ?? PlanetTile.Invalid;
             IsHomeMap = Pawns.Select(p => p.Map).FirstOrDefault(m => m is not null)?.IsPlayerHome ?? false;
+
+            // 显式显示参与者名单（可选：并在构建时就初始化内容）
+            Content = $"[对话参与者: {GetParticipantsRoster()}]{(content is null ? string.Empty : $"\n{content}")}";
         }
+
+        /// <summary>
+        /// 添加一行内容到轮次记忆的末尾，自动换行
+        /// </summary>
+        public void AppendLine(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line)) return;
+
+            Content += $"\n{line}";
+        }
+
 
         // 计算并返回历史的日期时间字符串
         public string GetDateAndTime()
@@ -88,7 +91,7 @@ namespace RimTalk.Memory
         }
 
         // 返回历史参与者名单，逗号分隔
-        public string GetParticipants()
+        public string GetParticipantsRoster()
         {
             return string.Join(", ", Pawns
                 .Select(p => p?.LabelShort)

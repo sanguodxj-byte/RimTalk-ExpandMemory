@@ -2,6 +2,8 @@
 using RimTalk.MemoryPatch;
 using RimWorld;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Verse;
 
 namespace RimTalk.Memory
@@ -28,7 +30,6 @@ namespace RimTalk.Memory
 
         // 配置常量
         private const int MaxRoundMemory = 256; // 最大保存轮次记忆条目数
-        public const int MaxContentLength = 16384; // 创建时单条RoundMemory最大文本长度
 
         // 核心: 轮次记忆环形缓冲区（按时间升序，最旧在前）
         private RimRingBuffer<RoundMemory> _roundMemories = new(MaxRoundMemory);
@@ -41,8 +42,13 @@ namespace RimTalk.Memory
         private long _nextRoundMemoryId = 0;
 
         // 玩家对话相关缓存
-        private Pawn _playerPawn; // 调用时为空是正常的，需要在调用端进行空值检查
+        // 如果多个对话生成并行，可能导致问题，但本轮更新中我暂时不想管
         private string _playerDialogue = string.Empty;
+
+        // 流式构建时，用于对应捕获的 Response 和 RoundMemory
+        // 其中 key 实际是 TalkRequest，此处为了解耦而使用 object
+        // 弱引用，不影响 request 的回收
+        private readonly ConditionalWeakTable<object, RoundMemory> _dictToRoundMemory = new();
 
         public RoundMemoryManager(Game game) : base()
         {
@@ -72,7 +78,6 @@ namespace RimTalk.Memory
                 Log.Error("[RoundMemory] 警告：捕获玩家对话时发现RoundMemory中控台不存在");
                 return;
             }
-            Instance._playerPawn = playerPawn;
 
             string playerName = playerPawn?.LabelShort;
             Instance._playerDialogue = $"{(string.IsNullOrWhiteSpace(playerName) ? "Player" : playerName)}: {playerDialogue}";
@@ -81,9 +86,9 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// 构建并添加轮次记忆
+        /// 流式构建轮次记忆
         /// </summary>
-        public static void BuildRoundMemory(HashSet<Pawn> pawns, string content, bool isPlayerInitiate = false)
+        public static void StreamingBuildRoundMemory<T>(T talkRequest, string content, IEnumerable<Pawn> participants = null, bool isUserInitiate = false) where T : class
         {
             if (Instance is null)
             {
@@ -91,17 +96,58 @@ namespace RimTalk.Memory
                 return;
             }
 
-            // 如果对话为玩家发起且启用相关配置项，则提前修饰数据
-            if (isPlayerInitiate && (RimTalkMemoryPatchMod.Settings?.IsPlayerDialogueInject ?? true))
+            var dicToRoundMemory = Instance._dictToRoundMemory;
+
+            // 如果目标 RoundMemory 不存在，创建新的并加入字典
+            if (!dicToRoundMemory.TryGetValue(talkRequest, out var roundMemory))
             {
-                pawns?.Add(Instance._playerPawn);
-                content = $"{Instance._playerDialogue}\n{content}";
-                Log.Message("[RoundMemory] 成功插入玩家文本");
+                if (!participants?.Any() ?? true)
+                {
+                    Log.Warning("[RoundMemory] 流式创建新轮次记忆时未提供参与者，创建失败");
+                    return;
+                }
+
+                string userContent = null;
+
+                // 如果对话为“用户发起”且启用相关配置项，则赋值用户文本
+                if (isUserInitiate && (RimTalkMemoryPatchMod.Settings?.IsPlayerDialogueInject ?? true))
+                    userContent = Instance._playerDialogue;
+
+                // 复制参与者枚举到新 HashSet
+                var participantsHashSet = participants.ToHashSet();
+
+                // 构建新的 RoundMemory 实例并分发
+                roundMemory = new RoundMemory(participantsHashSet, userContent);
+
+                dicToRoundMemory.AddOrUpdate(talkRequest, roundMemory);
+
+                AddRoundMemory(participantsHashSet, roundMemory);
+            }
+
+            // 向 RoundMemory 追加内容并更新 session 活跃时间
+            roundMemory?.AppendLine(content);
+        }
+
+        /// <summary>
+        /// 构建一条完整的轮次记忆
+        /// </summary>
+        public static void BuildRoundMemory(HashSet<Pawn> pawns, string content)
+        {
+            if (Instance is null)
+            {
+                Log.Error("[RoundMemory] 警告：构建轮次记忆时发现RoundMemory中控台不存在");
+                return;
             }
 
             // 构建新的 RoundMemory 实例
             var roundMemory = new RoundMemory(pawns, content);
 
+            AddRoundMemory(pawns, roundMemory);
+        }
+
+        // 分发 RoundMemory
+        private static void AddRoundMemory(HashSet<Pawn> pawns, RoundMemory roundMemory)
+        {
             // 直接向环形缓冲区添加，RimRingBuffer 内部会自动高效处理超出容量时的覆盖逻辑
             Instance._roundMemories.Add(roundMemory);
 
@@ -114,7 +160,9 @@ namespace RimTalk.Memory
             }
         }
 
-        // 存档读写
+        /// <summary>
+        /// 存档读写
+        /// </summary>
         public override void ExposeData()
         {
             base.ExposeData();
@@ -168,7 +216,9 @@ namespace RimTalk.Memory
             }
         }
 
-        // 在读档后修正各 Pawn 上的指针
+        /// <summary>
+        /// 在读档后修正各 Pawn 上的指针
+        /// </summary>
         public override void FinalizeInit()
         {
             // 1. 建立去重索引
