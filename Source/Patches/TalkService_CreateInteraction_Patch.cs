@@ -2,7 +2,7 @@ using HarmonyLib;
 using RimTalk.Data;
 using RimTalk.MemoryPatch;
 using RimTalk.Service;
-using RimTalk.Util;
+using RimTalk.Source.Data;
 using System.Text.RegularExpressions;
 
 namespace RimTalk.Memory.Patches
@@ -23,18 +23,20 @@ namespace RimTalk.Memory.Patches
         {
             if (!IsEnabled
                 || talk is null
-                || ApiHistory.GetApiLog(talk.Id)?.TalkRequest is not { } talkRequest)   // talkRequest 即当前 response 的唯一标识
+                || ApiHistory.GetApiLog(talk.Id) is not { } apiLog
+                || apiLog.Channel is Channel.User   // 由玩家输入直接产生的那条 response 不处理
+                || apiLog.TalkRequest is not { } talkRequest)   // talkRequest 即当前 response 的唯一标识
                 return;
 
             // 构建 content
             string name = talk.Name;
             string content = $"{(string.IsNullOrWhiteSpace(name) ? "???" : name)}: {CleanText(talk.Text)}";
 
-            // 判断是否为“用户发起”（以玩家身份直接对话）
-            bool isUserInitiate = talkRequest.Recipient.IsPlayer();
+            // 判断是否为玩家发起
+            bool isPlayerInitiate = talk.TalkType.IsFromUser();
 
             // 将转换好的数据发送给 RoundMemoryManager
-            RoundMemoryManager.StreamingBuildRoundMemory(talkRequest, content, talkRequest.Participants, isUserInitiate);
+            RoundMemoryManager.StreamingBuildRoundMemory(talkRequest, content, talkRequest.Participants, isPlayerInitiate);
         }
 
         // 清洗文本

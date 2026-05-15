@@ -88,7 +88,12 @@ namespace RimTalk.Memory
         /// <summary>
         /// 流式构建轮次记忆
         /// </summary>
-        public static void StreamingBuildRoundMemory<T>(T talkRequest, string content, IEnumerable<Pawn> participants = null, bool isUserInitiate = false) where T : class
+        public static void StreamingBuildRoundMemory<T>(
+            T talkRequest,
+            string content,
+            IEnumerable<Pawn> participants = null,
+            bool isPlayerInitiate = false
+            ) where T : class
         {
             if (Instance is null)
             {
@@ -107,17 +112,17 @@ namespace RimTalk.Memory
                     return;
                 }
 
-                string userContent = null;
+                string initialContent = null;
 
-                // 如果对话为“用户发起”且启用相关配置项，则赋值用户文本
-                if (isUserInitiate && (RimTalkMemoryPatchMod.Settings?.IsPlayerDialogueInject ?? true))
-                    userContent = Instance._playerDialogue;
+                // 如果对话为玩家发起且启用相关配置项，则赋值玩家文本
+                if (isPlayerInitiate && (RimTalkMemoryPatchMod.Settings?.IsPlayerDialogueInject ?? true))
+                    initialContent = Instance._playerDialogue;
 
                 // 复制参与者枚举到新 HashSet
                 var participantsHashSet = participants.ToHashSet();
 
                 // 构建新的 RoundMemory 实例并分发
-                roundMemory = new RoundMemory(participantsHashSet, userContent);
+                roundMemory = new RoundMemory(participantsHashSet, initialContent);
 
                 dicToRoundMemory.AddOrUpdate(talkRequest, roundMemory);
 
