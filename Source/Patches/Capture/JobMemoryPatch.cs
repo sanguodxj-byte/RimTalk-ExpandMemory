@@ -2,11 +2,10 @@
 using RimWorld;
 using Verse;
 using Verse.AI;
-using RimTalk.Memory;
 using System.Reflection;
 using RimTalk.MemoryPatch;
 
-namespace RimTalk.Patches
+namespace RimTalk.Memory.Patches.Capture
 {
     /// <summary>
     /// Patch to capture job start as memories

@@ -5,7 +5,7 @@ using RimTalk.Service;
 using RimTalk.Source.Data;
 using System.Text.RegularExpressions;
 
-namespace RimTalk.Memory.Patches
+namespace RimTalk.Memory.Patches.Capture
 {
 
     // 用于流式捕获发言，转换成原版数据结构传给 RoundMemoryManager
