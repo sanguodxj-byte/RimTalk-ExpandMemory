@@ -2,7 +2,7 @@
 using RimTalk.Memory.Injection;
 using RimTalk.Prompt;
 
-namespace RimTalk.Memory.Patches
+namespace RimTalk.Memory.Patches.Injection
 {
     
     // 通过 patch rimtalk 在合适的时点重置去重缓存

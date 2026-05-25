@@ -3,10 +3,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Verse;
-using RimTalk.Memory;
 using RimWorld;
+using RimTalk.MemoryPatch;
 
-namespace RimTalk.MemoryPatch.Patches
+namespace RimTalk.Memory.Patches.Capture
 {
     /// <summary>
     /// ⚠️ v4.0: 此 Patch 已弃用
