@@ -14,46 +14,56 @@ namespace RimTalk.Memory
     /// </summary>
     public class FourLayerMemoryComp : ThingComp
     {
-        // ⭐ v4.0: 三层记忆存储（移除 SCM）
-        // ABM: 完整对话记录，无容量限制，总结后转 ELS
-        // SCM: 已废弃，保留列表仅为兼容旧存档
-        // ELS: 总结后的记忆
-        // CLPA: 归档
-        private List<MemoryEntry> activeMemories = new List<MemoryEntry>();      // ABM: 无限制
-        private List<MemoryEntry> situationalMemories = new List<MemoryEntry>(); // SCM: ⭐ 已废弃，仅兼容旧存档
-        private List<MemoryEntry> eventLogMemories = new List<MemoryEntry>();    // ELS: ~50条
-        private List<MemoryEntry> archiveMemories = new List<MemoryEntry>();     // CLPA: 无限制
+        // 核心记忆存储
+        private List<MemoryEntry> activeMemories = new();      // ABM: 完整对话记录，无容量限制，总结后转 ELS
+        private List<MemoryEntry> situationalMemories = new(); // SCM: 固定后的轮次记忆ABM，或是非轮次记忆的过渡层
+        private List<MemoryEntry> eventLogMemories = new();    // ELS: 总结后的记忆，~50条
+        private List<MemoryEntry> archiveMemories = new();     // CLPA: 归档后的记忆，无容量限制
 
-        // 容量限制（从设置中读取）
-        // ⭐ v4.0: 移除 MAX_ACTIVE（ABM 无限制）
-        // 恢复为可选项
-        private int MAX_ACTIVE => RimTalkMemoryPatchMod.Settings.maxActiveMemories;
-        public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
-        // ⭐ v4.0: MAX_SITUATIONAL 仅用于兼容旧存档的显示
-        private int MAX_SITUATIONAL => RimTalkMemoryPatchMod.Settings.maxSituationalMemories;
-        private int MAX_EVENTLOG => RimTalkMemoryPatchMod.Settings.maxEventLogMemories;
-        // CLPA 无限制
-
+        // 属性访问
+        /// <summary>
+        /// ABM: 完整对话记录，无容量限制，总结后转 ELS
+        /// </summary>
         public List<MemoryEntry> ActiveMemories => activeMemories;
+
+        /// <summary>
+        /// SCM: 固定后的轮次记忆ABM，或是非轮次记忆的过渡层
+        /// </summary>
         public List<MemoryEntry> SituationalMemories => situationalMemories;
+
+        /// <summary>
+        /// ELS: 总结后的记忆
+        /// </summary>
         public List<MemoryEntry> EventLogMemories => eventLogMemories;
+
+        /// <summary>
+        /// CLPA: 归档后的记忆
+        /// </summary>
         public List<MemoryEntry> ArchiveMemories => archiveMemories;
 
+
+        // 配置项（从设置中读取）
+        public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
+        private int MaxABM => RimTalkMemoryPatchMod.Settings.maxActiveMemories;
+        private int MaxSCM => RimTalkMemoryPatchMod.Settings.maxSituationalMemories;
+        private int MaxELS => RimTalkMemoryPatchMod.Settings.maxEventLogMemories;
+        // CLPA 无限制
+
+
+        // 存档读写
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_Collections.Look(ref activeMemories, "activeMemories", LookMode.Deep);
+            Scribe_Collections.Look(ref activeMemories, "activeMemories", LookMode.Deep); // label建议使用大写开头。但此处屎山已成
             Scribe_Collections.Look(ref situationalMemories, "situationalMemories", LookMode.Deep);
             Scribe_Collections.Look(ref eventLogMemories, "eventLogMemories", LookMode.Deep);
             Scribe_Collections.Look(ref archiveMemories, "archiveMemories", LookMode.Deep);
 
-            if (Scribe.mode == LoadSaveMode.PostLoadInit)
-            {
-                if (activeMemories == null) activeMemories = new List<MemoryEntry>();
-                if (situationalMemories == null) situationalMemories = new List<MemoryEntry>();
-                if (eventLogMemories == null) eventLogMemories = new List<MemoryEntry>();
-                if (archiveMemories == null) archiveMemories = new List<MemoryEntry>();
-            }
+            // 集合空保护
+            activeMemories ??= new();
+            situationalMemories ??= new();
+            eventLogMemories ??= new();
+            archiveMemories ??= new();
         }
 
         /// <summary>
@@ -75,94 +85,6 @@ namespace RimTalk.Memory
                         WorkSessionAggregator.ForceEndSession(pawn);
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// 添加记忆到超短期记忆（ABM）
-        /// ⭐ v3.3.2.25: 移除向量化同步
-        /// </summary>
-        // 使用工坊版 AddActiveMemory
-        public void AddActiveMemory(string content, MemoryType type, float importance = 1f, string relatedPawn = null)
-        {
-            bool flag = IsDuplicateMemory(content, relatedPawn, type);
-            if (flag)
-            {
-                bool devMode = Prefs.DevMode;
-                if (devMode)
-                {
-                    Pawn pawn = parent as Pawn;
-                    string pawnLabel = ((pawn != null) ? pawn.LabelShort : null) ?? "Unknown";
-                    Log.Message(string.Concat(
-                    [
-                        "[Memory] Skipped duplicate memory for ",
-                        pawnLabel,
-                        ": ",
-                        content.Substring(0, Math.Min(50, content.Length)),
-                        "..."
-                    ]));
-                }
-            }
-            else
-            {
-                MemoryEntry memory = new MemoryEntry(content, type, MemoryLayer.Active, importance, relatedPawn);
-                ExtractKeywords(memory);
-                activeMemories.Insert(0, memory);
-
-                // 开启轮次记忆时，ABM不再有容量限制，且不再自动转移到SCM
-                if (IsRoundMemoryEnabled) return;
-
-                int nonPinnedCount = activeMemories.Count((MemoryEntry m) => !m.IsPinned);
-                bool flag2 = nonPinnedCount > MAX_ACTIVE;
-                if (flag2)
-                {
-                    MemoryEntry oldest = (from m in activeMemories
-                                          where !m.IsPinned
-                                          orderby m.GameTick
-                                          select m).FirstOrDefault();
-                    bool flag3 = oldest != null;
-                    if (flag3)
-                    {
-                        activeMemories.Remove(oldest);
-                        PromoteToSituational(oldest);
-                    }
-                }
-            }
-        }
-
-        private bool IsDuplicateMemory(string content, string relatedPawn, MemoryType type)
-        {
-            if (string.IsNullOrEmpty(content))
-                return false;
-
-            foreach (var memory in activeMemories)
-            {
-                if (memory.Type == type && memory.Content == content && memory.relatedPawnName == relatedPawn)
-                    return true;
-            }
-
-            int checkCount = Math.Min(5, situationalMemories.Count);
-            for (int i = 0; i < checkCount; i++)
-            {
-                var memory = situationalMemories[i];
-                if (memory.Type == type && memory.Content == content && memory.relatedPawnName == relatedPawn)
-                    return true;
-            }
-
-            return false;
-        }
-
-        // ⭐ v4.0: 已删除 PromoteToSituational 方法
-        // SCM 层已废弃，ABM 总结后直接转 ELS
-        // 恢复，改为可选
-        private void PromoteToSituational(MemoryEntry memory)
-        {
-            memory.Layer = MemoryLayer.Situational;
-            situationalMemories.Insert(0, memory);
-            bool flag = situationalMemories.Count > MAX_SITUATIONAL * 1.5f;
-            if (flag)
-            {
-                Log.Warning(string.Format("[Memory] {0} SCM overflow ({1}), needs summarization", parent.LabelShort, situationalMemories.Count));
             }
         }
 
@@ -476,18 +398,18 @@ namespace RimTalk.Memory
 
         private void TrimEventLog()
         {
-            if (eventLogMemories.Count <= MAX_EVENTLOG)
+            if (eventLogMemories.Count <= MaxELS)
                 return;
 
             // ⭐ 修复：只计算非固定的记忆数量（移除 isUserEdited 检查）
             int nonPinnedCount = eventLogMemories.Count(m => !m.IsPinned);
 
             // 如果非固定记忆没超过上限，则不需要trim
-            if (nonPinnedCount <= MAX_EVENTLOG)
+            if (nonPinnedCount <= MaxELS)
                 return;
 
             // ⭐ 修复：按时间戳排序，只移除非固定的最旧记忆（移除 isUserEdited 检查）
-            int toRemoveCount = nonPinnedCount - MAX_EVENTLOG;
+            int toRemoveCount = nonPinnedCount - MaxELS;
             var toRemove = eventLogMemories
                 .Where(m => !m.IsPinned)
                 .OrderBy(m => m.GameTick)
@@ -607,9 +529,9 @@ namespace RimTalk.Memory
             int elsNonPinnedCount = eventLogMemories.Count(m => !m.IsPinned);
 
             // ⭐ 处理SCM容量限制（移除 isUserEdited 检查）
-            if (scmNonPinnedCount > MAX_SITUATIONAL)
+            if (scmNonPinnedCount > MaxSCM)
             {
-                int toRemoveCount = scmNonPinnedCount - MAX_SITUATIONAL;
+                int toRemoveCount = scmNonPinnedCount - MaxSCM;
                 // 按activity升序排序，删除最低的
                 var toRemove = situationalMemories
                     .Where(m => !m.IsPinned)
@@ -626,9 +548,9 @@ namespace RimTalk.Memory
             }
 
             // ⭐ 处理ELS容量限制（移除 isUserEdited 检查）
-            if (elsNonPinnedCount > MAX_EVENTLOG)
+            if (elsNonPinnedCount > MaxELS)
             {
-                int toRemoveCount = elsNonPinnedCount - MAX_EVENTLOG;
+                int toRemoveCount = elsNonPinnedCount - MaxELS;
                 // 按activity升序排序，删除最低的
                 var toRemove = eventLogMemories
                     .Where(m => !m.IsPinned)
@@ -652,8 +574,8 @@ namespace RimTalk.Memory
                 int elsPinnedCount = eventLogMemories.Count(m => m.IsPinned);
 
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} enforced limits: " +
-                           $"removed {removedSCM} SCM (non-pinned: {scmNonPinnedCount - removedSCM}, pinned: {scmPinnedCount}, max: {MAX_SITUATIONAL}) + " +
-                           $"{removedELS} ELS (non-pinned: {elsNonPinnedCount - removedELS}, pinned: {elsPinnedCount}, max: {MAX_EVENTLOG})");
+                           $"removed {removedSCM} SCM (non-pinned: {scmNonPinnedCount - removedSCM}, pinned: {scmPinnedCount}, max: {MaxSCM}) + " +
+                           $"{removedELS} ELS (non-pinned: {elsNonPinnedCount - removedELS}, pinned: {elsPinnedCount}, max: {MaxELS})");
             }
         }
 
@@ -867,5 +789,92 @@ namespace RimTalk.Memory
                 Log.Message($"[Memory] {parent.LabelShort} manual archive: {archivedCount} entries");
             }
         }
+
+
+        // 以下成员为非轮次记忆管线，已不再维护和更新
+        /// <summary>
+        /// 添加记忆到超短期记忆（ABM）
+        /// 非轮次记忆管线，已不再维护和更新
+        /// </summary>
+        public void AddActiveMemory(string content, MemoryType type, float importance = 1f, string relatedPawn = null)
+        {
+            bool flag = IsDuplicateMemory(content, relatedPawn, type);
+            if (flag)
+            {
+                bool devMode = Prefs.DevMode;
+                if (devMode)
+                {
+                    Pawn pawn = parent as Pawn;
+                    string pawnLabel = ((pawn != null) ? pawn.LabelShort : null) ?? "Unknown";
+                    Log.Message(string.Concat(
+                    [
+                        "[Memory] Skipped duplicate memory for ",
+                        pawnLabel,
+                        ": ",
+                        content.Substring(0, Math.Min(50, content.Length)),
+                        "..."
+                    ]));
+                }
+            }
+            else
+            {
+                MemoryEntry memory = new MemoryEntry(content, type, MemoryLayer.Active, importance, relatedPawn);
+                ExtractKeywords(memory);
+                activeMemories.Insert(0, memory);
+
+                // 开启轮次记忆时，ABM不再有容量限制，且不再自动转移到SCM
+                if (IsRoundMemoryEnabled) return;
+
+                int nonPinnedCount = activeMemories.Count((MemoryEntry m) => !m.IsPinned);
+                bool flag2 = nonPinnedCount > MaxABM;
+                if (flag2)
+                {
+                    MemoryEntry oldest = (from m in activeMemories
+                                          where !m.IsPinned
+                                          orderby m.GameTick
+                                          select m).FirstOrDefault();
+                    bool flag3 = oldest != null;
+                    if (flag3)
+                    {
+                        activeMemories.Remove(oldest);
+                        PromoteToSituational(oldest);
+                    }
+                }
+            }
+        }
+
+        private bool IsDuplicateMemory(string content, string relatedPawn, MemoryType type)
+        {
+            if (string.IsNullOrEmpty(content))
+                return false;
+
+            foreach (var memory in activeMemories)
+            {
+                if (memory.Type == type && memory.Content == content && memory.relatedPawnName == relatedPawn)
+                    return true;
+            }
+
+            int checkCount = Math.Min(5, situationalMemories.Count);
+            for (int i = 0; i < checkCount; i++)
+            {
+                var memory = situationalMemories[i];
+                if (memory.Type == type && memory.Content == content && memory.relatedPawnName == relatedPawn)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void PromoteToSituational(MemoryEntry memory)
+        {
+            memory.Layer = MemoryLayer.Situational;
+            situationalMemories.Insert(0, memory);
+            bool flag = situationalMemories.Count > MaxSCM * 1.5f;
+            if (flag)
+            {
+                Log.Warning(string.Format("[Memory] {0} SCM overflow ({1}), needs summarization", parent.LabelShort, situationalMemories.Count));
+            }
+        }
     }
+
 }
