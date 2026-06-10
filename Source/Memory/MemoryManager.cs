@@ -265,7 +265,7 @@ namespace RimTalk.Memory
                         else
                         {
                             var memoryComp = pawn.TryGetComp<PawnMemoryComp>();
-                            if (memoryComp != null && memoryComp.GetSituationalMemoryCount() > 0)
+                            if (memoryComp != null && memoryComp.SituationalMemories.Count > 0)
                             {
                                 summarizationQueue.Enqueue(pawn);
                                 queuedCount++;
@@ -631,7 +631,7 @@ namespace RimTalk.Memory
                             var memoryComp = pawn.TryGetComp<PawnMemoryComp>();
                             if (memoryComp != null)
                             {
-                                memoryComp.DecayMemories();
+                                memoryComp.DecayActivity();
                             }
                         }
                     }

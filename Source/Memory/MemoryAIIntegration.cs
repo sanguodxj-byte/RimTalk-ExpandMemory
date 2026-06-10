@@ -127,7 +127,7 @@ namespace RimTalk.Memory
             {
                 string listenerName = listener != null ? listener.LabelShort : "self";
                 string memoryContent = "Said to " + listenerName + ": " + content;
-                speakerMemory.AddMemory(memoryContent, MemoryType.Conversation, 0.6f, listenerName);
+                speakerMemory.AddActiveMemory(memoryContent, MemoryType.Conversation, 0.6f, listenerName);
             }
 
             // Record for listener（听者视角）- 只在listener存在且不是自己时记录
@@ -138,7 +138,7 @@ namespace RimTalk.Memory
                 {
                     string speakerName = speaker != null ? speaker.LabelShort : "someone";
                     string memoryContent = speakerName + " said: " + content;
-                    listenerMemory.AddMemory(memoryContent, MemoryType.Conversation, 0.5f, speakerName);
+                    listenerMemory.AddActiveMemory(memoryContent, MemoryType.Conversation, 0.5f, speakerName);
                 }
             }
             
