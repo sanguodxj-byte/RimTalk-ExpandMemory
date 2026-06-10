@@ -1,7 +1,8 @@
-using Verse;
+﻿using Verse;
 
 namespace RimTalk.Memory
 {
+
     /// <summary>
     /// CompProperties for PawnMemoryComp
     /// </summary>
@@ -12,4 +13,13 @@ namespace RimTalk.Memory
             compClass = typeof(PawnMemoryComp);
         }
     }
+
+    /// <summary>
+    /// 兼容层，确保旧数据不会丢失
+    /// </summary>
+    public class PawnMemoryComp : FourLayerMemoryComp
+    {
+
+    }
+
 }

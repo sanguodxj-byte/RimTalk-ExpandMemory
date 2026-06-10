@@ -154,7 +154,7 @@ namespace RimTalk.Memory.UI
             // 根据切换按钮决定显示哪些记忆
             if (showShortTerm)
             {
-                foreach (var memory in memoryComp.ShortTermMemories)
+                foreach (var memory in memoryComp.SituationalMemories)
                 {
                     if (filterType == null || memory.Type == filterType.Value)
                     {
@@ -169,7 +169,7 @@ namespace RimTalk.Memory.UI
 
             if (showLongTerm)
             {
-                foreach (var memory in memoryComp.LongTermMemories)
+                foreach (var memory in memoryComp.EventLogMemories) // 鉴于本类本质是废弃代码，故此处随便写了个 EventLogMemories
                 {
                     if (filterType == null || memory.Type == filterType.Value)
                     {

@@ -791,6 +791,40 @@ namespace RimTalk.Memory
         }
 
 
+        // 注入层相关，待后续分离解耦
+        // 兼容旧API：GetMemoryContext
+        public string GetMemoryContext(int count = 5)
+        {
+            var query = new MemoryQuery
+            {
+                maxCount = count,
+                includeContext = true
+            };
+
+            var memories = RetrieveMemories(query);
+            var context = new StringBuilder();
+
+            foreach (var memory in memories)
+            {
+                context.AppendLine($"- [{memory.TypeName}] {memory.Content} ({memory.AgeString})");
+            }
+
+            return context.ToString();
+        }
+
+        // 兼容旧API：GetRelevantMemories
+        public List<MemoryEntry> GetRelevantMemories(int count = 5)
+        {
+            var query = new MemoryQuery
+            {
+                maxCount = count,
+                includeContext = true
+            };
+
+            return RetrieveMemories(query);
+        }
+
+
         // 以下成员为非轮次记忆管线，已不再维护和更新
         /// <summary>
         /// 添加记忆到超短期记忆（ABM）
