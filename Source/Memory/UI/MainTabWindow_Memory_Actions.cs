@@ -145,7 +145,7 @@ namespace RimTalk.Memory.UI
                 foreach (var pawn in map.mapPawns.FreeColonists)
                 {
                     var comp = pawn.TryGetComp<PawnMemoryComp>();
-                    if (comp != null && comp.GetSituationalMemoryCount() > 0)
+                    if (comp != null && comp.SituationalMemories.Count > 0)
                     {
                         pawnsToSummarize.Add(pawn);
                     }
@@ -164,6 +164,7 @@ namespace RimTalk.Memory.UI
             }
         }
         
+        /* 废弃代码，暂时先不删而是注释掉，之后再善后
         private void ArchiveAll()
         {
             int count = 0;
@@ -182,5 +183,6 @@ namespace RimTalk.Memory.UI
             
             Messages.Message("RimTalk_MindStream_ArchivedForN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
         }
+        */
     }
 }

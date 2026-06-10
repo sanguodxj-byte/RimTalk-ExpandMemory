@@ -238,20 +238,6 @@ namespace RimTalk.Memory.Patches
         {
             return pawn?.TryGetComp<PawnMemoryComp>() != null;
         }
-
-        /// <summary>
-        /// Get memory summary for debugging
-        /// </summary>
-        public static string GetMemorySummary(Pawn pawn)
-        {
-            var memoryComp = pawn?.TryGetComp<PawnMemoryComp>();
-            if (memoryComp == null) return "No memory component";
-
-            int shortTerm = memoryComp.ShortTermMemories.Count;
-            int longTerm = memoryComp.LongTermMemories.Count;
-            
-            return $"{pawn.LabelShort}: {shortTerm} short-term, {longTerm} long-term memories";
-        }
         
         /// <summary>
         /// 尝试从缓存获取对话（新增）
