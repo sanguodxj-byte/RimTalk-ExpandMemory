@@ -25,7 +25,18 @@ namespace RimTalk.Memory
         public MemoryLayer Layer;           // 层级
 
         // 重要性和活跃度
-        public float Importance = -1;       // 重要性 (0-1)
+        private float _importance = -1;       // 重要性 (0-1)
+        /// <summary>
+        /// 重要性，set 时自动收束到0-1
+        /// </summary>
+        public float Importance
+        {
+            get => _importance;
+            set
+            {
+                _importance = Math.Clamp(value, 0f, 1f);
+            }
+        }
         public float Activity = -1;         // 活跃度 (随时间衰减)
 
         // 关联信息
@@ -92,7 +103,7 @@ namespace RimTalk.Memory
 
         public MemoryEntry() { }
 
-        public MemoryEntry(string content, MemoryType type, MemoryLayer layer, float importance = 1f, string relatedPawn = null)
+        public MemoryEntry(string content, MemoryType type, MemoryLayer layer, float importance = 0.5f, string relatedPawn = null)
         {
             Id = "mem-" + Guid.NewGuid().ToString("N").Substring(0, 12);
             GameTick = Find.TickManager?.TicksGame ?? -1;
@@ -123,6 +134,8 @@ namespace RimTalk.Memory
             });
         }
 
+        // 存档读写
+        // label 更应当用 PascalCase，但此处屎山已成
         public virtual void ExposeData()
         {
             Scribe_Values.Look(ref Id, "id");
@@ -132,7 +145,7 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref Type, "type");
             Scribe_Values.Look(ref Layer, "layer");
 
-            Scribe_Values.Look(ref Importance, "importance", -1);
+            Scribe_Values.Look(ref _importance, "importance", -1);
             Scribe_Values.Look(ref Activity, "activity", -1);
 
             Scribe_Values.Look(ref relatedPawnId, "relatedPawnId");
