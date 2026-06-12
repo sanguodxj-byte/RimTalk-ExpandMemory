@@ -79,11 +79,10 @@ namespace RimTalk.Memory.Capture
 
         // 实例成员
         // --- 状态数据 ---
-        private JobDef _lastJobDef;
-        private int _lastActiveTick;
-
         private MemoryEntry _lastJobMemory;
+        private JobDef _lastJobDef;
         private int _startGameTick;
+        private int _lastActiveTick;
         private int _repeatCount;
         private readonly HashSet<string> _targetNames = new(); // 使用 HashSet，牺牲一定遍历性能，换取自动去重
 
@@ -123,8 +122,16 @@ namespace RimTalk.Memory.Capture
                 // --- 工作记忆新建管线 ---
                 if (parent is not Pawn parentPawn) return; // 此判断在实际应用场景上为多余
 
+                // 获取并简单处理工作报告文本
+                string content = job.GetReport(parentPawn);
+                if (content.StartsWith("正在"))
+                {
+                    content = content.Substring(2);
+                }
+
+                // 创建记忆条目并添加到记忆组件
                 var newMemory = new MemoryEntry(
-                    content: job.GetReport(parentPawn),
+                    content,
                     MemoryType.Action,
                     MemoryLayer.Active,
                     importance: _dictJobToImportance.TryGetValue(jobDef, out float value) ? value : 0.5f
@@ -132,33 +139,34 @@ namespace RimTalk.Memory.Capture
 
                 _memoryComp.ActiveMemories.Add(newMemory);
 
+                // 重置会话
                 StartNewSession(newMemory, job);
-
-                // 考虑到字符串操作有额外的 GC 开销，此处额外进行一次 contain 判断，仅针对待聚合工作进行目标提取
-                if (_dictAggregatedJobToDesc.ContainsKey(jobDef)) TryAddTargetName(job);
             }
             else
             {
                 // --- 工作记忆聚合管线 ---
                 _lastJobMemory.GameTick = Find.TickManager.TicksGame;
-
-                TryAddTargetName(job);
-                _lastJobMemory.Content = GenerateAggregatedContent();
-
                 _lastJobMemory.Importance += ImportanceIncrement();
 
+                // 需先更新相关状态，再生成聚合文本，避免内容滞后
                 UpdateSession(job);
+                _lastJobMemory.Content = BuildAggregatedContent();
             }
         }
 
         // 重置并创建新聚合会话
         private void StartNewSession(MemoryEntry newMemory, Job job)
         {
+            var jobDef = job.def;
+
             _lastJobMemory = newMemory;
-            _lastJobDef = job.def;
+            _lastJobDef = jobDef;
             _startGameTick = _lastActiveTick = Find.TickManager.TicksGame;
             _repeatCount = 1;
+
             _targetNames.Clear();
+            // 考虑到字符串操作有额外的 GC 开销，此处额外进行一次 contain 判断，仅针对待聚合工作进行目标提取
+            if (_dictAggregatedJobToDesc.ContainsKey(jobDef)) TryAddTargetName(job);
         }
 
         // 更新聚合会话状态
@@ -166,6 +174,7 @@ namespace RimTalk.Memory.Capture
         {
             _lastActiveTick = Find.TickManager.TicksGame;
             _repeatCount++;
+            TryAddTargetName(job);
         }
 
         // 提取并添加 job 的目标，暂时只提取 targetA
@@ -200,7 +209,7 @@ namespace RimTalk.Memory.Capture
         }
 
         // 生成聚合记忆更新文本
-        private string GenerateAggregatedContent()
+        private string BuildAggregatedContent()
         {
             // 耗时描述
             string durationDesc = (Find.TickManager.TicksGame - _startGameTick) switch
