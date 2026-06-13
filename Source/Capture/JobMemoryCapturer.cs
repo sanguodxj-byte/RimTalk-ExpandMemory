@@ -107,15 +107,25 @@ namespace RimTalk.Memory.Capture
         /// </summary>
         public void BuildJobMemory(Job job)
         {
-            if (job?.def is not { } jobDef
-                || _jobsToIgnore.Contains(jobDef)
-                || Find.TickManager is null)
+            if (job?.def is not { } jobDef || Find.TickManager is null) return;
+
+            int currentTick = Find.TickManager.TicksGame;
+
+            // 如果当前游戏刻正好是上一个会话的开始刻，说明上一个工作根本没来得及执行，此时将移除对应的无效工作记忆，并清空会话
+            if (_startGameTick == currentTick && _lastJobMemory is not null)
+            {
+                // 此处会执行 O(N)，但考虑到本分支总出现在暂停时，故性能开销可以接受
+                _memoryComp.ActiveMemories.Remove(_lastJobMemory);
+                _lastJobMemory = null; // 置空后，不论下方是什么逻辑，都会被当作全新的状态处理
+            }
+
+            if (_jobsToIgnore.Contains(jobDef))
                 return;
 
             // 管线分流
             if (jobDef != _lastJobDef
-                || Find.TickManager.TicksGame - _lastActiveTick > SessionTimeoutTicks
-                || Find.TickManager.TicksGame - _startGameTick > SessionMaxDurationTicks
+                || currentTick - _lastActiveTick > SessionTimeoutTicks
+                || currentTick - _startGameTick > SessionMaxDurationTicks
                 || !_dictAggregatedJobToDesc.ContainsKey(jobDef)
                 || _lastJobMemory is null)
             {
@@ -145,7 +155,7 @@ namespace RimTalk.Memory.Capture
             else
             {
                 // --- 工作记忆聚合管线 ---
-                _lastJobMemory.GameTick = Find.TickManager.TicksGame;
+                _lastJobMemory.GameTick = currentTick;
                 _lastJobMemory.Importance += ImportanceIncrement();
 
                 // 需先更新相关状态，再生成聚合文本，避免内容滞后
