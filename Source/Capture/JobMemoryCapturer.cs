@@ -30,7 +30,8 @@ namespace RimTalk.Memory.Capture
             _jobsToIgnore.UnionWith([
                 JobDefOf.Goto, JobDefOf.GotoWander,
                 JobDefOf.Wait, JobDefOf.Wait_Wander, JobDefOf.Wait_Combat, JobDefOf.Wait_MaintainPosture,
-                JobDefOf.Wait_Asleep, JobDefOf.Wait_AsleepDormancy, JobDefOf.Wait_WithSleeping
+                JobDefOf.Wait_Asleep, JobDefOf.Wait_AsleepDormancy, JobDefOf.Wait_WithSleeping,
+                JobDefOf.LayDown, JobDefOf.LayDownAwake, JobDefOf.LayDownResting
                 ]);
             _jobsToIgnore.Remove(null);
 
@@ -67,6 +68,7 @@ namespace RimTalk.Memory.Capture
                     _ when defName.Contains("Mine") => "采矿",
                     _ when defName.Contains("Clean") => "清洁",
                     _ when defName.Contains("Repair") => "修理",
+                    _ when defName.Contains("BeatFire") || defName.Contains("ExtinguishFiresNearby") => "扑灭",
                     _ => desc
                 };
 
