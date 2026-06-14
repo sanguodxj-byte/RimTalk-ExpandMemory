@@ -1,5 +1,6 @@
 using RimTalk.API;
 using RimTalk.MemoryPatch;
+using RimTalk.Prompt;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -39,6 +40,19 @@ namespace RimTalk.Memory.API
         private static Type _promptRoleType;
         private static Type _promptPositionType;
         private static Type _promptContextType;  // ⭐ v5.0: 改名为 PromptContext
+        
+        // 用于嗅探预设是否已自定义记忆变量的关键词
+        private static readonly string[] SniffingKeywords = new string[]
+        {
+            "pawn.memory", "p.memory",
+            "pawn.ABM", "p.ABM",
+            "pawn.ELS", "p.ELS",
+            "pawn.CLPA", "p.CLPA",
+            "{{knowledge}}", "{{ knowledge }}",
+            "knowledge_grouped", "knowledge_rules", 
+            "knowledge_lore", "knowledge_status", 
+            "knowledge_history"
+        };
         
         // 标志：是否使用新 API（用于禁用旧 Patch）
         public static bool IsUsingNewAPI => _apiAvailable;
@@ -401,6 +415,31 @@ namespace RimTalk.Memory.API
                                 // ⭐ v5.0: 仍然检查并禁用 Chat History
                                 DisableChatHistoryIfEnabled(preset);
                                 return;
+                            }
+                        }
+                        
+                        // ⭐ 新增：内容特征嗅探 (Content Heuristic Sniffing)
+                        // 如果我们在预设中没有找到当前 Mod 注入的 Entry，
+                        // 我们扫描现有所有 Entry 的内容，判断预设是否已自行处理记忆上下文
+                        if (preset is PromptPreset rimtalkPreset)
+                        {
+                            if (rimtalkPreset.Entries != null)
+                            {
+                                foreach (var currentEntry in rimtalkPreset.Entries)
+                                {
+                                    string content = currentEntry.Content;
+                                    if (!string.IsNullOrEmpty(content))
+                                    {
+                                        foreach (var keyword in SniffingKeywords)
+                                        {
+                                            if (content.Contains(keyword))
+                                            {
+                                                Log.Message($"[MemoryPatch] Detected custom memory variable '{keyword}' in active preset. Skipping auto-injection.");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
