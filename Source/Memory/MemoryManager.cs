@@ -133,7 +133,7 @@ namespace RimTalk.Memory
                 lastDecayTick = Find.TickManager.TicksGame;
                 
                 // 检查工作会话超时
-                WorkSessionAggregator.CheckSessionTimeouts();
+                // 已迁移至 JobMemoryCapturer 的 CompTick 中自动处理
                 
                 // ⭐ 每小时更新Pawn状态常识（24小时间隔检查）
                 if (RimTalkMemoryPatchMod.Settings.enablePawnStatusKnowledge)
