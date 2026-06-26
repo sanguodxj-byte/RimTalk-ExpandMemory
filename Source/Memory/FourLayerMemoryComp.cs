@@ -1,4 +1,5 @@
-﻿using RimTalk.Memory.UI;
+﻿using RimTalk.Memory.Capture;
+using RimTalk.Memory.UI;
 using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ namespace RimTalk.Memory
         private List<MemoryEntry> situationalMemories = new(); // SCM: 固定后的轮次记忆ABM，或是非轮次记忆的过渡层
         private List<MemoryEntry> eventLogMemories = new();    // ELS: 总结后的记忆，~50条
         private List<MemoryEntry> archiveMemories = new();     // CLPA: 归档后的记忆，无容量限制
+
+        // 直接持有工作记忆捕获模块
+        private readonly JobMemoryCapturer _jobCapturer;
 
         // 属性访问
         /// <summary>
@@ -41,13 +45,22 @@ namespace RimTalk.Memory
         /// </summary>
         public List<MemoryEntry> ArchiveMemories => archiveMemories;
 
+        /// <summary>
+        /// 工作记忆捕获模块，负责捕获工作相关的记忆并存入 ABM
+        /// </summary>
+        public JobMemoryCapturer JobCapturer => _jobCapturer;
 
         // 配置项（从设置中读取）
         public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
         private int MaxABM => RimTalkMemoryPatchMod.Settings.maxActiveMemories;
         private int MaxSCM => RimTalkMemoryPatchMod.Settings.maxSituationalMemories;
         private int MaxELS => RimTalkMemoryPatchMod.Settings.maxEventLogMemories;
-        // CLPA 无限制
+
+        // 构造函数，初始化捕获模块
+        public FourLayerMemoryComp()
+        {
+            _jobCapturer = new JobMemoryCapturer(this);
+        }
 
 
         // 存档读写
@@ -64,28 +77,6 @@ namespace RimTalk.Memory
             situationalMemories ??= new();
             eventLogMemories ??= new();
             archiveMemories ??= new();
-        }
-
-        /// <summary>
-        /// ⭐ 修复3: 定期检查并清理工作会话（Pawn死亡/离开时）
-        /// </summary>
-        public override void CompTick()
-        {
-            base.CompTick();
-
-            // 每5秒检查一次
-            if (Find.TickManager.TicksGame % 300 == 0)
-            {
-                var pawn = parent as Pawn;
-                if (pawn != null)
-                {
-                    // 如果Pawn死亡或不在地图上，强制结束工作会话
-                    if (pawn.Dead || !pawn.Spawned || pawn.Map == null)
-                    {
-                        WorkSessionAggregator.ForceEndSession(pawn);
-                    }
-                }
-            }
         }
 
         public void DailySummarization()
