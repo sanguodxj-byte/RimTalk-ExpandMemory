@@ -3,7 +3,6 @@ using RimTalk.Data;
 using RimTalk.MemoryPatch;
 using RimTalk.Service;
 using RimTalk.Source.Data;
-using System.Text.RegularExpressions;
 
 namespace RimTalk.Memory.Patches.Capture
 {
@@ -12,9 +11,6 @@ namespace RimTalk.Memory.Patches.Capture
     [HarmonyPatch(typeof(TalkService), "CreateInteraction")]
     public static class TalkService_CreateInteraction_Patch
     {
-        // 正则清洗器
-        private static readonly Regex RegexCleaner = new(@"</?(?:color[^>]*|b|i|size[^>]*)>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         [HarmonyPostfix]
         static void Postfix(TalkResponse talk)
         {
@@ -26,22 +22,14 @@ namespace RimTalk.Memory.Patches.Capture
                 || apiLog.TalkRequest is not { } talkRequest)   // talkRequest 即当前 response 的唯一标识
                 return;
 
-            // 构建 content
             string name = talk.Name;
-            string content = $"{(string.IsNullOrWhiteSpace(name) ? "???" : name)}: {CleanText(talk.Text)}";
 
-            // 判断是否为玩家发起
-            bool isPlayerInitiate = talk.TalkType.IsFromUser();
-
-            // 将转换好的数据发送给 RoundMemoryManager
-            RoundMemoryManager.StreamingBuildRoundMemory(talkRequest, content, talkRequest.Participants, isPlayerInitiate);
-        }
-
-        // 清洗文本
-        private static string CleanText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return string.Empty;
-            return RegexCleaner.Replace(text, string.Empty).Replace("\r\n", " ").Replace('\n', ' ').Replace('\r', ' ').Trim();
+            // 转换数据并发送给 RoundMemoryManager
+            RoundMemoryManager.StreamingBuildRoundMemory(
+                talkRequest,
+                $"{(string.IsNullOrWhiteSpace(name) ? "???" : name)}: {talk.Text}",
+                talkRequest.Participants,
+                isPlayerInitiate: talk.TalkType.IsFromUser());
         }
     }
 
