@@ -1,160 +1,112 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.8.0] - 2026-07-09
 
 ### Added
-- 新增对 RimChat 的对话捕获支持（作为软依赖）。
-- 新增泛型的超高性能环形缓冲区类，用于底层数据管理。
-- 添加俄语和英语等语言的 UI 国际化翻译支持。
-- 添加并补充常识分类枚举与相关的变量选项。
-- 新增注入轮数的相关 UI 设置，并重构预览界面。
-- 增加各自独立的记忆层级变量支持 (`ABM` / `ELS` / `CLPA` / `matchELS` / `matchCLPA`)。
-- 增加控制最大注入常识数的滑块与文本输入框。
-- 增加轮次记忆的独立控制开关选项。
+- 轮次记忆现默认启用，无需手动开启。 (`7a074b1`)
 
 ### Changed
-- 彻底重构轮次记忆的捕获管线，应用环形缓冲区架构，大幅提升捕获性能。
-- 优化记忆总结方法，并将轮次记忆去重逻辑迁移至 `ABMCollector`。
-- 增强 `RoundMemoryManager` 的代码健壮性并规范字段命名。
-- 优化记忆编辑窗口的 UI 体验与交互逻辑。
-- 优化常识分类逻辑与相关的 UI 交互体验。
-- 重构 `RoundMemory` 的双重存储架构，消除数据不一致与旧版本遗留的指针修正问题。
-- 优化记忆去重逻辑，防止 `ABM` 在某些情境下被意外丢弃而不注入。
-- 自动禁用原版的聊天历史记录，并将记忆拓展条目统一注册至其下方界面中。
-- 当手动固定 `ABM` 记忆时，系统会自动将其转入受保护的 `SCM` 记忆层中。
+- 工作记忆捕获架构彻底重构为双 Hook 快照式事件驱动：捕获时机从工作开始改为工作结束，记录"已执行的工作"而非"已下达的意图"；零时长工作静默跳过，不再产生幽灵记忆。 (`ae1d0a4`)
+- 旧版对话逐条捕获管线重构：直接 Patch `TalkService.CreateInteraction` 替代运行时反射扫描，移除旧去重机制与整条废弃桥接管线。 (`0bfeb62`)
+- 规范部分 Patch 文件名。 (`e705a5a`)
+- 去除轮次记忆捕获管线中多余的文本处理，提升性能。 (`881c10d`)
 
-### Fixed
-- 修复对话过于频繁以及预览界面下的轮次记忆去重缓存污染问题。
-- 修复一处可能导致每日记忆总结失败的核心逻辑 Bug。
-- 修复提示词的正则表达式问题，以及总结构建时记忆排列可能出现的乱序问题。
-- 修复手动总结未能正确清除所有未固定记忆的 Bug。
-- 修复已被固定的记忆依然会错误地参与总结而被消除的 Bug。
-- 修复由于缺失变量导致的潜在报错，以及部分 UI 交互中冒号显示异常的问题。
-- 修复无限递归过滤的潜在死锁问题。
-- 恢复旧存档的指针修正机制，并修复 `ABM` 注入相关的底层 Bug。
-- 过滤 `knowledge` 变量的非法输入，防止误选导致的游戏闪退。
-- 修复预览界面不显示单条记忆评分的 UI 显示异常。
-
-## [3.5.1] - 2026-01-20
-
-### Changed
-- 将默认的常识匹配源选择策略回滚为更贴近旧版逻辑的保守设定。
-
-## [3.5.0] - 2026-01-19
+## [1.7.0] - 2026-06-14
 
 ### Added
-- 全面适配 RimTalk 最新版的 Scriban 模板引擎与相关的 API 架构系统。
-
-## [3.4.10] - 2025-12-30
+- 引入预设内容嗅探机制 (Content Heuristics Sniffing)：注入默认记忆提示词前自动扫描 RimTalk 激活预设，检测到自定义关键词时自动中止注入，实现零配置智能适配，避免 Token 浪费与 AI 幻觉。 (`774dd3d`)
 
 ### Changed
-- 提升系统性能与稳定性，引入反射属性缓存机制，并实现线程安全的数据快照机制。
+- 整理 Patches 文件结构。 (`13678f9`)
+- 整理和清理 `FourLayerMemoryComp` 代码结构，不影响现有逻辑。 (`9c8e39a`)
+- 优化记忆组件注入逻辑：使用 Harmony `ref ___comps` 直接注入，移除 `InitializeComps` 阶段的反射开销；引入全局单例共享属性，减少 GC 压力；移除 `HasVocalLink` 等死代码。 (`1e6d460`)
+- 清理 `PawnMemoryComp` 废弃 API，合并 `CompProperties_PawnMemory` 至同一文件，全局调用链同步迁移至 `FourLayerMemoryComp` 原生方法。 (`5771039`)
+- 封装 `Importance` 属性并增加 `Math.Clamp(0, 1)` 收束，默认值由 1f 调整为 0.5f，正确使用后备字段序列化。 (`46806f2`)
 
-## [3.4.7] - 2025-12-29
-
-### Fixed
-- 修复 `WorldComponent` 加载时的报错，移除无效的定义，并简化针对旧存档兼容的修复逻辑。
-
-## [3.4.4] - 2025-12-29
+## [1.6.0] - 2026-05-16
 
 ### Added
-- 添加 RimWorld 1.5 版本的兼容依赖，全面切换至 .NET SDK 9 进行编译。
-
-### Changed
-- 优化 `PlayLog` 事件扫描逻辑，并增强 Patch 拦截层的底层稳定性。
+- RoundMemory 捕获管线替换为流式捕获管线：每句话实时追加，新增 `AppendLine()` 方法和 `StreamingBuildRoundMemory<T>` 基于 `ConditionalWeakTable` 的 session 隔离。 (`8021cf9`)
 
 ### Fixed
-- 修复与 RimTalk 主体更新相关的兼容性问题，适配了最新的异步对话生成 Patch 签名。
-
-## [3.4.0] - 2025-12-26
+- 修复 colonist 代发时玩家发言未被录入轮次记忆的问题。 (`cdda298`)
 
 ### Changed
-- 拆分重构了 `MainTabWindow_Memory` 组件，大幅优化底层的 UI 代码结构。
+- 更新 `项目管线.md` 文档。 (`1da7b7e`)
+
+## [1.5.0] - 2026-05-12
+
+### Changed
+- 优化 `MemoryEntry` 基类数据结构：移除 `CalculateRetrievalScore` 中的 LINQ 操作改用零分配循环，数学运算迁移至 `System.Math`，使用 C# 8 Switch 表达式重构，消除魔法数字统一使用 `GenDate` 常量。 (`ad0562d`)
+- 规范化公有字段为 PascalCase 命名，`timestamp` 重命名为 `GameTick` 明确语义，`ExposeData` 序列化键值保持原样以兼容旧存档。 (`7f48f11`)
+- 合并 `Age`、`TimeAgoString`、`GameDateString` 为统一的 `AgeString` 属性，使用 C# 9 模式匹配简化时间判定，改用 RimWorld 原生 `GenDate` API。 (`6ae7a7d`)
 
 ### Fixed
-- 统一使用 Prompt 进行常识匹配，修复了 `injectToContext` 模式下的文本匹配错误。
-- 修复对话类记忆在每日总结后意外消失丢失的严重问题。
-- 补充了缺失的 UI 面板文件，并强制统一所有 UI 源码为 UTF-8 编码以防乱码。
+- 修正用户编辑的记忆无法自然衰减的问题。 (`3acbd6f`)
 
-## [3.3.38] - 2025-12-26
-
-### Changed
-- 重大重构：将记忆和常识的注入位置由系统的 `prompts` 级别改为用户消息的 `context` 级别。在保持系统提示词简洁的同时，提高了 AI 对全局规则的关注度和 Token 的利用效率。
-
-## [3.3.2.37] - 2025-12-26
-
-### Changed
-- 引入提示词规范化系统，支持正则表达式规范化过滤并实时生效。
+## [1.4.0] - 2026-04-30
 
 ### Fixed
-- 修复用户自定义提示词中含有花括号（如 JSON 格式）时导致 `string.Format` 解析崩溃的报错问题。
+- 修复每日总结中轮次记忆总结不完全的问题：同一个 `RoundMemory` 对象被多个 pawn 总结时只能被第一个正确总结，新增 `CanBeSummarized` 虚属性实现状态隔离。 (`aa2f556`)
 
-## [3.3.2.36] - 2025-12-25
+### Changed
+- `MemoryTypes.cs` 改名为 `MemoryEntry.cs`，部分内容转移至 `MemoryCategory.cs`。 (`b9989b4`)
+
+## [1.3.0] - 2026-04-06
+
+### Changed
+- 整理项目根目录：部署脚本归集至 `deploy` 文件夹，文档归集至 `doc` 文件夹，Defs 置于 1.6/1.5 目录以符合当前 RimWorld mod 开发规范。 (`1c70b73`)
+- 整理 `.cproj` 项目文件，移除多余内容。 (`78ba4f9`)
+- 为 RimChat 相关代码增加显式注解。 (`a090ffd`)
+- 更新 CHANGELOG.md 文档。 (`b5f1f97`)
+
+### Fixed
+- 移除一处总会在存档加载时刷屏的日志输出。 (`7cd68db`)
 
 ### Added
-- 新增常识库公共 API (`CommonKnowledgeAPI`)，支持通过代码层面对其进行添加、更新、查询和导入导出操作。
+- 添加用于 Visual Studio 开发的 `.props` 文件。 (`50f90ad`)
+
+## [1.2.0] - 2026-03-26
+
+### Added
+- 新增泛型高性能环形缓冲区类：强制尺寸为二的幂，位运算寻址，O(1) 读写。 (`75c9497`)
 
 ### Changed
-- 优化常识分类规则，支持部分匹配模式（如：规则-世界观）。
-- 重写常识库 UI 帮助文档与 API 使用说明，推荐使用逗号作为标签分隔符。
+- 轮次记忆全局列表应用环形缓冲区：从 RemoveAt(0) 的 O(N) 算法升级为自动覆盖最旧记忆的 O(1) 算法，通过临时列表读写存档完全向后兼容，上限降低至合理的 256。 (`d91a7e7`)
+- 规范 `RoundMemoryManager` 字段命名。 (`b211d8a`)
+- 增强 `RoundMemoryManager` 健壮性：存档外访问 Instance 时通过 GC 销毁旧实例并返回 null。 (`5cf015a`)
+
+## [1.1.0] - 2026-03-22
+
+### Added
+- 优化记忆编辑窗口：扩大窗口尺寸以改善轮次记忆（通常为多行）的查看和编辑体验，为记忆内容窗口增加滚动条。 (`cd27e51`)
+- 新增对 RimChat 的轮次记忆捕获支持（软依赖），可捕获 RPG 对话和外交对话内容。 (`a1d1b47`)
 
 ### Fixed
-- 修复总结生成的 `ELS` 时间戳与列表位置不符的问题，确保总结时间戳继承自组内最新的记忆，并按时间戳降序正确插入列表。
-- 验证并修复了固定记忆（`isPinned`）在总结和归档阶段未被正确保护的问题。
-- 移除 `isUserEdited` 标记对归档行为的限制，用户编辑过的记忆现在也可以正常参与每日的自动归档与清理。
-
-## [3.3.19] - 2025-12-25
-
-### Added
-- 引入 Mind Stream UI (全局记忆时间流)：基于卡片式布局的直观记忆查看器。
-- 支持框选、拖拽多选，并可按层级与类型进行精准筛选操作。
-- 增加各层级容量的实时统计显示与颜色分级指示器。
+- 修复总结记忆时偶现"非法字符"报错的问题，改为显式使用更宽容的转码方式。 (`b744771`)
+- 修复对话过于频繁时和预览界面下轮次记忆去重缓存污染的问题：将基于 tick 的缓存重置改为基于 RimTalk 逻辑监听，通过 Patch 在构建 prompt 和渲染预览时重置缓存。 (`9180d7a`)
 
 ### Changed
-- 优化图形界面的高度渲染逻辑，按记忆类别（ABM/SCM/ELS/CLPA）动态计算并呈现卡片高度。
-- 整合并移除了过期的 `MindStream` 与 `Library` 旧界面文件代码。
+- 记忆总结方法 `InjectMemoriesWithDetails` 可选层级参数拓展为两个，优化内部判断代码。 (`c748a40`)
+- 轮次记忆去重逻辑转移至 `ABMCollector`。 (`f08c624`)
+- 优化轮次记忆捕获管线架构：在 Patch 中将 RimTalk 相关数据处理为原版数据再传给 `RoundMemoryManager`，由 Manager 全权负责构建和插入，优化文本格式化和清洗性能。 (`ea84173`)
+- 优化轮次记忆捕获/创建模块代码：进一步与 RimTalk 解耦，硬依赖集中至 Patch，核心逻辑内聚至核心类。 (`40fdf5f`)
 
-## [3.3.14] - 2025-12-25
+## [1.0.0] - 2026-03-20
 
-### Added
-- 引入记忆自动清理系统：增加记忆活跃度 (`Activity`) 的自动衰减阈值机制，每天自动回收并归档低活跃记忆。
+接手项目，基于前作代码开始后续维护与迭代。
 
-## [3.3.13] - 2025-12-25
-
-### Changed
-- 优化知识库相似度打分：调整并提高了基于标签命中率的加权得分统计算法。
-
-## [3.3.0] - 2025-12-24
-
-### Added
-- 项目初始核心版本发布。
-- 构建了完整的四层记忆系统（SCM, ELS, CLPA, FMS）。
-- 增加基于标签匹配与向量增强的双重常识库支持。
-- 集成 AI 驱动的离线异步记忆深度总结。
-- 新增基于 Pawn 状态与事件记录的自动常识生成。
-
-### Fixed
-- 修复殖民者加入日期产生漂移的底层数据问题。
-- 完善长期记忆 (CLPA) 的衰减和安全删除机制逻辑。
-- 适配并修复 `System.Net.Http` 与其他大型模组（如 SOS2）之间的版本冲突问题。
-
-<!-- GitHub Links -->
-[Unreleased]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.5.1...HEAD
-[3.5.1]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.5.0...v3.5.1
-[3.5.0]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.4.10...v3.5.0
-[3.4.10]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.4.7...v3.4.10
-[3.4.7]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.4.4...v3.4.7
-[3.4.4]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.4.0...v3.4.4
-[3.4.0]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.38...v3.4.0
-[3.3.38]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.2.37...v3.3.38
-[3.3.2.37]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.2.36...v3.3.2.37
-[3.3.2.36]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.19...v3.3.2.36
-[3.3.19]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.14...v3.3.19
-[3.3.14]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.13...v3.3.14
-[3.3.13]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/compare/v3.3.0...v3.3.13
-[3.3.0]: https://github.com/sanguodxj-byte/RimTalk-ExpandMemory/releases/tag/v3.3.0
+[1.8.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/releases/tag/v1.0.0
