@@ -223,15 +223,6 @@ namespace RimTalk.Memory.Patches
         }
 
         /// <summary>
-        /// Record a conversation between two pawns
-        /// </summary>
-        public static void RecordConversation(Pawn speaker, Pawn listener, string content)
-        {
-            // 直接调用底层方法
-            MemoryAIIntegration.RecordConversation(speaker, listener, content);
-        }
-
-        /// <summary>
         /// Check if a pawn has the memory component
         /// </summary>
         public static bool HasMemoryComponent(Pawn pawn)
