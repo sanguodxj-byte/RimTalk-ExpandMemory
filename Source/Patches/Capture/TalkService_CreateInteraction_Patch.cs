@@ -12,16 +12,14 @@ namespace RimTalk.Memory.Patches.Capture
     [HarmonyPatch(typeof(TalkService), "CreateInteraction")]
     public static class TalkService_CreateInteraction_Patch
     {
-        // 通过设置控制启用
-        private static bool IsEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
-
         // 正则清洗器
         private static readonly Regex RegexCleaner = new(@"</?(?:color[^>]*|b|i|size[^>]*)>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         [HarmonyPostfix]
         static void Postfix(TalkResponse talk)
         {
-            if (!IsEnabled
+            if ((!RimTalkMemoryPatchMod.Settings?.enableConversationMemory ?? true)
+                || (!RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? true)
                 || talk is null
                 || ApiHistory.GetApiLog(talk.Id) is not { } apiLog
                 || apiLog.Channel is Channel.User   // 由玩家输入直接产生的那条 response 不处理
