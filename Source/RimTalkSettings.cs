@@ -5,8 +5,6 @@ using RimTalk.Memory;
 using RimTalk.Memory.UI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace RimTalk.MemoryPatch
 {
@@ -186,7 +184,7 @@ namespace RimTalk.MemoryPatch
             // ⭐ 是否注入玩家发言
             Scribe_Values.Look(ref IsPlayerDialogueInject, "fourLayer_isPlayerDialogueInject", true);
             // 是否启用轮次记忆
-            Scribe_Values.Look(ref IsRoundMemoryActive, "fourLayer_IsRoundMemoryActive", false);
+            Scribe_Values.Look(ref IsRoundMemoryActive, "fourLayer_IsRoundMemoryActive", true);
 
             Scribe_Values.Look(ref scmDecayRate, "fourLayer_scmDecayRate", 0.01f);
             Scribe_Values.Look(ref elsDecayRate, "fourLayer_elsDecayRate", 0.005f);
