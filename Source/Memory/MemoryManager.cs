@@ -129,7 +129,6 @@ namespace RimTalk.Memory
             // 每小时衰减记忆活跃度
             if (Find.TickManager.TicksGame - lastDecayTick >= DecayInterval)
             {
-                DecayAllMemories();
                 lastDecayTick = Find.TickManager.TicksGame;
                 
                 // 检查工作会话超时
@@ -602,40 +601,6 @@ namespace RimTalk.Memory
             else
             {
                 Messages.Message("没有需要手动总结的殖民者", MessageTypeDefOf.RejectInput, false);
-            }
-        }
-
-        /// <summary>
-        /// 为所有殖民者触发记忆衰减
-        /// </summary>
-        private void DecayAllMemories()
-        {
-            if (Current.Game == null) return;
-
-            foreach (var map in Find.Maps)
-            {
-                foreach (var pawn in map.mapPawns.AllPawnsSpawned)
-                {
-                    // ⭐ v3.5.2: 扩展到殖民者 + 配置了链接催化剂的殖民地动物/机械体
-                    if (pawn.IsColonist || IsColonyAnimalWithVocalLink(pawn))
-                    {
-                        // 尝试新的四层记忆组件
-                        var fourLayerComp = pawn.TryGetComp<FourLayerMemoryComp>();
-                        if (fourLayerComp != null)
-                        {
-                            fourLayerComp.DecayActivity();
-                        }
-                        else
-                        {
-                            // 兼容旧的记忆组件
-                            var memoryComp = pawn.TryGetComp<PawnMemoryComp>();
-                            if (memoryComp != null)
-                            {
-                                memoryComp.DecayActivity();
-                            }
-                        }
-                    }
-                }
             }
         }
 

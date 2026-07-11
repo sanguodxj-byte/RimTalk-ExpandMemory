@@ -127,7 +127,7 @@ namespace RimTalk.Memory.UI
                 {
                     foreach (var memory in targetMemories.ToList())
                     {
-                        currentMemoryComp.DeleteMemory(memory.Id);
+                        currentMemoryComp.Maintainer.Remove(memory);
                     }
                     
                     selectedMemories.Clear();

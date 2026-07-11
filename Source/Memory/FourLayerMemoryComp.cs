@@ -1,6 +1,7 @@
 ﻿using RimTalk.Memory.Capture;
-using RimTalk.Memory.UI;
+using RimTalk.Memory.Maintenance;
 using RimTalk.MemoryPatch;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,9 @@ namespace RimTalk.Memory
 
         // 直接持有工作记忆捕获模块
         private readonly JobMemoryCapturer _jobCapturer;
+
+        // 机械维护器：执行衰减、清理、容量治理与直接迁移
+        private readonly MemoryMaintainer _maintainer;
 
         // 属性访问
         /// <summary>
@@ -50,16 +54,19 @@ namespace RimTalk.Memory
         /// </summary>
         public JobMemoryCapturer JobCapturer => _jobCapturer;
 
+        /// <summary>
+        /// 机械维护器，负责衰减、清理、容量治理与直接层级迁移
+        /// </summary>
+        public MemoryMaintainer Maintainer => _maintainer;
+
         // 配置项（从设置中读取）
         public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
-        private int MaxABM => RimTalkMemoryPatchMod.Settings.maxActiveMemories;
-        private int MaxSCM => RimTalkMemoryPatchMod.Settings.maxSituationalMemories;
-        private int MaxELS => RimTalkMemoryPatchMod.Settings.maxEventLogMemories;
 
-        // 构造函数，初始化捕获模块
+        // 构造函数，初始化捕获模块和维护器
         public FourLayerMemoryComp()
         {
             _jobCapturer = new JobMemoryCapturer(this);
+            _maintainer = new MemoryMaintainer(this);
         }
 
 
@@ -77,6 +84,28 @@ namespace RimTalk.Memory
             situationalMemories ??= new();
             eventLogMemories ??= new();
             archiveMemories ??= new();
+        }
+
+        /// <summary>
+        /// 低频 Tick：每小时衰减 + 清理低活跃，每天执行容量治理。
+        /// 通过 <see cref="Pawn.IsHashIntervalTick"/> 哈希分散，避免全局集中执行。
+        /// </summary>
+        public override void CompTickRare()
+        {
+            base.CompTickRare();
+
+            // 每小时衰减 + 迁移/清理 ABM + 清理低活跃记忆
+            if (parent.IsHashIntervalTick(GenDate.TicksPerHour))
+            {
+                _maintainer.RunDecay();
+                _maintainer.CleanupLowActivityMemories();
+            }
+
+            // 每天执行容量治理
+            if (parent.IsHashIntervalTick(GenDate.TicksPerDay))
+            {
+                _maintainer.EnforceMemoryLimits();
+            }
         }
 
         public void DailySummarization()
@@ -148,8 +177,8 @@ namespace RimTalk.Memory
                     summaryEntry.Notes = "AI 总结正在后台处理中...";
                 }
 
-                // ⭐ 修复：根据时间戳插入到正确位置，而不是总是插入到开头
-                InsertMemoryByTimestamp(eventLogMemories, summaryEntry);
+                // 按时间排序的义务已转交至 UI 端
+                EventLogMemories.Add(summaryEntry);
             }
 
             foreach (var memory in allMemoriesToSummarize)
@@ -170,8 +199,6 @@ namespace RimTalk.Memory
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} daily summarization: " +
                            $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned");
             }
-
-            TrimEventLog();
         }
 
         // 经过艰辛的排查，终于确定此方法用于【一键总结所有殖民者】
@@ -246,7 +273,8 @@ namespace RimTalk.Memory
                 }
 
                 // ⭐ 修复：根据时间戳插入到正确位置，而不是总是插入到开头
-                InsertMemoryByTimestamp(eventLogMemories, summaryEntry);
+                // 按时间排序的义务已转交至 UI 端
+                EventLogMemories.Add(summaryEntry);
             }
 
             foreach (var memory in allMemoriesToSummarize)
@@ -267,35 +295,7 @@ namespace RimTalk.Memory
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} manual summarization: " +
                            $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned");
             }
-
-            TrimEventLog();
-        }
-
-        /// <summary>
-        /// ⭐ 新方法：根据时间戳将记忆插入到正确的位置（保持列表按时间降序排序）
-        /// </summary>
-        private void InsertMemoryByTimestamp(List<MemoryEntry> list, MemoryEntry entry)
-        {
-            // 如果列表为空，直接添加
-            if (list.Count == 0)
-            {
-                list.Add(entry);
-                return;
             }
-
-            // 使用二分查找找到插入位置（降序排列，新的在前）
-            int insertIndex = list.FindIndex(m => m.GameTick < entry.GameTick);
-
-            // 如果没找到（所有记忆都比新记忆新），添加到末尾
-            if (insertIndex == -1)
-            {
-                list.Add(entry);
-            }
-            else
-            {
-                list.Insert(insertIndex, entry);
-            }
-        }
 
         private string CreateSimpleSummary(List<MemoryEntry> memories, MemoryType type)
         {
@@ -387,189 +387,6 @@ namespace RimTalk.Memory
             return summary.Length > 0 ? summary.ToString() : $"{type}记忆{memories.Count}条";
         }
 
-        private void TrimEventLog()
-        {
-            if (eventLogMemories.Count <= MaxELS)
-                return;
-
-            // ⭐ 修复：只计算非固定的记忆数量（移除 isUserEdited 检查）
-            int nonPinnedCount = eventLogMemories.Count(m => !m.IsPinned);
-
-            // 如果非固定记忆没超过上限，则不需要trim
-            if (nonPinnedCount <= MaxELS)
-                return;
-
-            // ⭐ 修复：按时间戳排序，只移除非固定的最旧记忆（移除 isUserEdited 检查）
-            int toRemoveCount = nonPinnedCount - MaxELS;
-            var toRemove = eventLogMemories
-                .Where(m => !m.IsPinned)
-                .OrderBy(m => m.GameTick)
-                .Take(toRemoveCount)
-                .ToList();
-
-            foreach (var memory in toRemove)
-            {
-                eventLogMemories.Remove(memory);
-                memory.Layer = MemoryLayer.Archive;
-                archiveMemories.Insert(0, memory);
-            }
-        }
-
-        private void ExtractKeywords(MemoryEntry memory)
-        {
-            if (string.IsNullOrEmpty(memory.Content))
-                return;
-
-            var words = memory.Content
-                .Split(new[] { ' ', '，', '。', '、', '；', '：', '-', '×' }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(w => w.Length > 1)
-                .Distinct()
-                .Take(10);
-
-            foreach (var word in words)
-            {
-                memory.AddKeyword(word);
-            }
-        }
-
-        /// <summary>
-        /// 记忆衰减和自动清理
-        /// ⭐ v3.3.14: 添加activity阈值清理 + 容量限制
-        /// </summary>
-        public void DecayActivity()
-        {
-            float scmRate = RimTalkMemoryPatchMod.Settings.scmDecayRate;
-            float elsRate = RimTalkMemoryPatchMod.Settings.elsDecayRate;
-            float clpaRate = RimTalkMemoryPatchMod.Settings.clpaDecayRate;
-
-            // 步骤1：衰减所有记忆的activity
-            foreach (var memory in situationalMemories)
-                memory.Decay(scmRate);
-
-            foreach (var memory in eventLogMemories)
-                memory.Decay(elsRate);
-
-            foreach (var memory in archiveMemories)
-                memory.Decay(clpaRate);
-
-            // ⭐ 步骤2：清理极低activity的"死亡"记忆（方案1）
-            CleanupLowActivityMemories();
-
-            // ⭐ 步骤3：强制执行容量限制（方案3）
-            EnforceMemoryLimits();
-        }
-
-        /// <summary>
-        /// ⭐ v3.3.14: 清理极低activity的记忆（方案1）
-        /// 当activity < 0.01时，认为记忆已"死亡"，可以安全删除
-        /// ⭐ 移除 isUserEdited 检查，只保留固定记忆保护
-        /// </summary>
-        private void CleanupLowActivityMemories()
-        {
-            const float ACTIVITY_THRESHOLD = 0.01f; // activity < 0.01视为"死亡"
-
-            int removedSCM = 0;
-            int removedELS = 0;
-            int removedCLPA = 0;
-
-            // 清理SCM中的低activity记忆（移除 isUserEdited 检查）
-            int beforeSCM = situationalMemories.Count;
-            situationalMemories.RemoveAll(m =>
-                m.Activity < ACTIVITY_THRESHOLD &&
-                !m.IsPinned
-            );
-            removedSCM = beforeSCM - situationalMemories.Count;
-
-            // 清理ELS中的低activity记忆（移除 isUserEdited 检查）
-            int beforeELS = eventLogMemories.Count;
-            eventLogMemories.RemoveAll(m =>
-                m.Activity < ACTIVITY_THRESHOLD &&
-                !m.IsPinned
-            );
-            removedELS = beforeELS - eventLogMemories.Count;
-
-            // ⭐ 清理CLPA中的低activity记忆（移除 isUserEdited 检查）
-            int beforeCLPA = archiveMemories.Count;
-            archiveMemories.RemoveAll(m =>
-                m.Activity < ACTIVITY_THRESHOLD &&
-                !m.IsPinned
-            );
-            removedCLPA = beforeCLPA - archiveMemories.Count;
-
-            // 开发模式日志
-            if (Prefs.DevMode && (removedSCM > 0 || removedELS > 0 || removedCLPA > 0))
-            {
-                var pawn = parent as Pawn;
-                Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} cleaned up " +
-                           $"{removedSCM} SCM + {removedELS} ELS + {removedCLPA} CLPA memories (activity < {ACTIVITY_THRESHOLD})");
-            }
-        }
-
-        /// <summary>
-        /// ⭐ v3.3.14: 强制执行容量限制（方案3）
-        /// 当层级超过容量时，删除最低activity的记忆
-        /// ⭐ 移除 isUserEdited 检查，只保留固定记忆保护
-        /// </summary>
-        private void EnforceMemoryLimits()
-        {
-            int removedSCM = 0;
-            int removedELS = 0;
-
-            // ⭐ 修复：只计算非固定的记忆数量（移除 isUserEdited 检查）
-            int scmNonPinnedCount = situationalMemories.Count(m => !m.IsPinned);
-            int elsNonPinnedCount = eventLogMemories.Count(m => !m.IsPinned);
-
-            // ⭐ 处理SCM容量限制（移除 isUserEdited 检查）
-            if (scmNonPinnedCount > MaxSCM)
-            {
-                int toRemoveCount = scmNonPinnedCount - MaxSCM;
-                // 按activity升序排序，删除最低的
-                var toRemove = situationalMemories
-                    .Where(m => !m.IsPinned)
-                    .OrderBy(m => m.Activity)
-                    .ThenBy(m => m.GameTick) // 相同activity时，删除更旧的
-                    .Take(toRemoveCount)
-                    .ToList();
-
-                foreach (var memory in toRemove)
-                {
-                    situationalMemories.Remove(memory);
-                    removedSCM++;
-                }
-            }
-
-            // ⭐ 处理ELS容量限制（移除 isUserEdited 检查）
-            if (elsNonPinnedCount > MaxELS)
-            {
-                int toRemoveCount = elsNonPinnedCount - MaxELS;
-                // 按activity升序排序，删除最低的
-                var toRemove = eventLogMemories
-                    .Where(m => !m.IsPinned)
-                    .OrderBy(m => m.Activity)
-                    .ThenBy(m => m.GameTick)
-                    .Take(toRemoveCount)
-                    .ToList();
-
-                foreach (var memory in toRemove)
-                {
-                    eventLogMemories.Remove(memory);
-                    removedELS++;
-                }
-            }
-
-            // 开发模式日志
-            if (Prefs.DevMode && (removedSCM > 0 || removedELS > 0))
-            {
-                var pawn = parent as Pawn;
-                int scmPinnedCount = situationalMemories.Count(m => m.IsPinned);
-                int elsPinnedCount = eventLogMemories.Count(m => m.IsPinned);
-
-                Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} enforced limits: " +
-                           $"removed {removedSCM} SCM (non-pinned: {scmNonPinnedCount - removedSCM}, pinned: {scmPinnedCount}, max: {MaxSCM}) + " +
-                           $"{removedELS} ELS (non-pinned: {elsNonPinnedCount - removedELS}, pinned: {elsPinnedCount}, max: {MaxELS})");
-            }
-        }
-
         /// <summary>
         /// ⭐ v4.0: 更新检索逻辑
         /// - ABM: 按 conversationId 去重后返回所有
@@ -637,99 +454,6 @@ namespace RimTalk.Memory
                 return false;
 
             return true;
-        }
-
-        public void EditMemory(string memoryId, string newContent, string notes = null)
-        {
-            var memory = FindMemoryById(memoryId);
-            if (memory != null)
-            {
-                memory.Content = newContent;
-                // ⭐ 修复：只在首次编辑时设置 isUserEdited，避免覆盖用户手动删除的标记
-                if (!memory.IsUserEdited)
-                {
-                    memory.IsUserEdited = true;
-                }
-                if (!string.IsNullOrEmpty(notes))
-                    memory.Notes = notes;
-            }
-        }
-
-        public void PinMemory(string memoryId, bool pinned)
-        {
-            var memory = FindMemoryById(memoryId);
-            if (memory is RoundMemory roundMemory)
-            {
-                PinRoundMemory(roundMemory, memoryId); // 已并入
-                return;
-            }
-            if (memory != null)
-            {
-                memory.IsPinned = pinned;
-            }
-            if (memory?.Layer == MemoryLayer.Active && memory.IsPinned == true) // 固定ABM时自动转移至SCM
-            {
-                memory.Layer = MemoryLayer.Situational;
-                SituationalMemories?.Add(memory);
-                ActiveMemories?.Remove(memory);
-            }
-        }
-        // RoundMemory入口
-        public void PinRoundMemory(RoundMemory roundMemory, string memoryId)
-        {
-            Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Pinning RoundMemory");
-
-            // 是 RoundMemory 类型，则创建一个新的 MemoryEntry 对象复制 RoundMemory
-            var newMemory = new MemoryEntry(
-            content: string.Empty,
-            type: MemoryType.Conversation,
-            layer: MemoryLayer.Situational,
-            importance: 0.5f
-            )
-            {
-                Content = roundMemory.Content,
-                GameTick = roundMemory.GameTick,
-                relatedPawnId = roundMemory.relatedPawnId,
-                relatedPawnName = roundMemory.relatedPawnName,
-                location = roundMemory.location,
-                tags = new(roundMemory.tags ?? Enumerable.Empty<string>()),
-                keywords = new(roundMemory.keywords ?? Enumerable.Empty<string>()),
-                IsUserEdited = true,
-                IsPinned = true,
-                Notes = roundMemory.Notes,
-            };
-            SituationalMemories?.Add(newMemory);
-            DeleteMemory(memoryId);
-            Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Pinned RoundMemory as MemoryEntry");
-
-            roundMemory.IsPinned = false; // 由于UI bug，这里强制回正一下
-
-            // 刷新 UI 缓存
-            GetMemoryWindowInstance()?.InvalidateCache();
-            Log.Message("[RoundMemory] FourLayerMemoryComp.PinMemory: Refreshed Memory Window UI");
-        }
-        // 获取 Memory 窗口实例
-        static MainTabWindow_Memory GetMemoryWindowInstance()
-        {
-            return Find.WindowStack.Windows
-                .OfType<MainTabWindow_Memory>()
-                .FirstOrDefault();
-        }
-
-        public void DeleteMemory(string memoryId)
-        {
-            activeMemories.RemoveAll(m => m.Id == memoryId);
-            situationalMemories.RemoveAll(m => m.Id == memoryId);
-            eventLogMemories.RemoveAll(m => m.Id == memoryId);
-            archiveMemories.RemoveAll(m => m.Id == memoryId);
-        }
-
-        private MemoryEntry FindMemoryById(string id)
-        {
-            return activeMemories.FirstOrDefault(m => m.Id == id)
-                ?? situationalMemories.FirstOrDefault(m => m.Id == id)
-                ?? eventLogMemories.FirstOrDefault(m => m.Id == id)
-                ?? archiveMemories.FirstOrDefault(m => m.Id == id);
         }
 
         public List<MemoryEntry> GetAllMemories()

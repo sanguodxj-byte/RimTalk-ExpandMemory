@@ -22,7 +22,7 @@ namespace RimTalk.Memory
 
         // 分类
         public MemoryType Type;             // 类型
-        public MemoryLayer Layer;           // 层级
+        public MemoryLayer Layer;           // 层级，此字段计划在未来移除
 
         // 重要性和活跃度
         private float _importance = -1;       // 重要性 (0-1)
@@ -83,6 +83,11 @@ namespace RimTalk.Memory
         /// 是否可以被总结
         /// </summary>
         public virtual bool CanBeSummarized => !IsSummarized;
+
+        /// <summary>
+        /// 是否应当被清理
+        /// </summary>
+        public bool ShouldBeCleaned => Activity < 0.01f && !IsPinned;
 
         /// <summary>
         /// 获取记忆年龄描述
