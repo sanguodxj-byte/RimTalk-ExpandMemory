@@ -233,20 +233,13 @@ namespace RimTalk.Memory.Capture
             string report = null;
             string getReport() => report ??= GetJobReportCached(job);
 
-            // DRY
-            void updateMemoryBase()
-            {
-                _lastJobMemory.GameTick = Find.TickManager.TicksGame;
-                _lastJobMemory.Importance += ImportanceIncrement();
-            }
-
             // --- 管线分流 ---
             // 精确命中，优先进入精确合并管线
             // 精确合并管线无法处理复数目标，此时（尝试）下放给模糊聚合管线处理
             if (TargetNames.Count <= 1 && getReport() == _lastJobReport && sharedCondition())
             {
                 // --- 工作记忆精确合并管线 ---
-                updateMemoryBase();
+                _lastJobMemory.Importance += ImportanceIncrement();
                 // 需先更新 Session 再生成文本，避免内容滞后
                 UpdateSession(); // 精确命中时无需获取和传入 targetName
                 _lastJobMemory.Content = BuildExactContent();
@@ -263,7 +256,7 @@ namespace RimTalk.Memory.Capture
                 && sharedCondition())
             {
                 // --- 工作记忆模糊聚合管线 ---
-                updateMemoryBase();
+                _lastJobMemory.Importance += ImportanceIncrement();
                 // 需先更新 Session 再生成文本，避免内容滞后
                 UpdateSession(GetTargetANameCached(job));
                 _lastJobMemory.Content = BuildFuzzyContent();
