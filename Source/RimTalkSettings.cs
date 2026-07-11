@@ -55,9 +55,14 @@ namespace RimTalk.MemoryPatch
         public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话
         
         // 衰减速率设置
-        public float scmDecayRate = 0.01f;
-        public float elsDecayRate = 0.005f;
-        public float clpaDecayRate = 0.001f;
+        public float scmDecayRate = defaultScmDecayRate;
+        public const float defaultScmDecayRate = 0.01f;
+
+        public float elsDecayRate = defaultElsDecayRate;
+        public const float defaultElsDecayRate = 0.005f;
+
+        public float clpaDecayRate = defaultClpaDecayRate;
+        public const float defaultClpaDecayRate = 0.001f;
         
         // 总结设置
         public bool enableDailySummarization = true;

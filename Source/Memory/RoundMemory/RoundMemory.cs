@@ -66,6 +66,33 @@ namespace RimTalk.Memory
             Content += $"\n{line}";
         }
 
+        /// <summary>
+        /// 克隆一份个人 SCM（MemoryEntry）
+        /// </summary>
+        public MemoryEntry Clone()
+        {
+            return new MemoryEntry(
+                content: string.Empty,
+                type: Type,
+                layer: Layer,
+                importance: Importance
+            )
+            {
+                Content = Content,
+                GameTick = GameTick,
+
+                relatedPawnId = relatedPawnId,
+                relatedPawnName = relatedPawnName,
+                location = location,
+                tags = new(tags ?? []),
+                keywords = new(keywords ?? []),
+
+                IsUserEdited = IsUserEdited,
+                IsPinned = IsPinned,
+                IsSummarized = IsSummarized,
+                Notes = Notes,
+            };
+        }
 
         // 计算并返回历史的日期时间字符串
         public string GetDateAndTime()
