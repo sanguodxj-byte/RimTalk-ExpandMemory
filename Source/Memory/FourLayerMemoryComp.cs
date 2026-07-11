@@ -98,6 +98,7 @@ namespace RimTalk.Memory
             if (parent.IsHashIntervalTick(GenDate.TicksPerHour))
             {
                 _maintainer.RunDecay();
+                _maintainer.ConvertActiveMemories();
                 _maintainer.CleanupLowActivityMemories();
             }
 
@@ -295,7 +296,7 @@ namespace RimTalk.Memory
                 Log.Message($"[Memory] {pawn?.LabelShort ?? "Unknown"} manual summarization: " +
                            $"cleared ABM, removed {removedCount} SCM, kept {situationalMemories.Count} pinned");
             }
-            }
+        }
 
         private string CreateSimpleSummary(List<MemoryEntry> memories, MemoryType type)
         {

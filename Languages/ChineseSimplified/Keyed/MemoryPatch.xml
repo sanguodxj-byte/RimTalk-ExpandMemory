@@ -286,6 +286,7 @@
   <RimTalk_Settings_SCMDecayLabel>SCM 衰减率: {0}</RimTalk_Settings_SCMDecayLabel>
   <RimTalk_Settings_ELSDecayLabel>ELS 衰减率: {0}</RimTalk_Settings_ELSDecayLabel>
   <RimTalk_Settings_CLPADecayLabel>CLPA 衰减率: {0}</RimTalk_Settings_CLPADecayLabel>
+  <RimTalk_Settings_ABMLifespanLabel>ABM 寿命: {0} 游戏小时（0=禁用，对话→SCM，其他移除）</RimTalk_Settings_ABMLifespanLabel>
   
   <!-- 总结设置 -->
   <RimTalk_Settings_SummarizationSection>记忆总结设置</RimTalk_Settings_SummarizationSection>

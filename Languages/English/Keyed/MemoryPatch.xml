@@ -282,6 +282,7 @@
   <RimTalk_Settings_SCMDecayLabel>SCM Decay Rate: {0}</RimTalk_Settings_SCMDecayLabel>
   <RimTalk_Settings_ELSDecayLabel>ELS Decay Rate: {0}</RimTalk_Settings_ELSDecayLabel>
   <RimTalk_Settings_CLPADecayLabel>CLPA Decay Rate: {0}</RimTalk_Settings_CLPADecayLabel>
+  <RimTalk_Settings_ABMLifespanLabel>ABM Lifespan: {0} hours (0=disabled, Conversation→SCM, others removed)</RimTalk_Settings_ABMLifespanLabel>
   
   <!-- Summarization Settings -->
   <RimTalk_Settings_SummarizationSection>Memory Summarization Settings</RimTalk_Settings_SummarizationSection>
