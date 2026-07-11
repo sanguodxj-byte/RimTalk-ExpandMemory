@@ -28,7 +28,7 @@ namespace RimTalk.Memory.UI
             this.memoryComp = comp;
             this.editedContent = memory.Content;
             this.editedNotes = memory.Notes ?? "";
-            
+
             // 初始化可用标签列表
             availableTags = new List<string>
             {
@@ -56,9 +56,9 @@ namespace RimTalk.Memory.UI
             // 记忆信息
             Rect infoRect = new Rect(0f, curY, inRect.width, 60f);
             GUI.color = Color.gray;
-            Widgets.Label(new Rect(infoRect.x, infoRect.y, infoRect.width, 25f), 
+            Widgets.Label(new Rect(infoRect.x, infoRect.y, infoRect.width, 25f),
                 $"类型: {memory.TypeName}  |  层级: {memory.LayerName}  |  时间: {memory.AgeString}");
-            Widgets.Label(new Rect(infoRect.x, infoRect.y + 25f, infoRect.width, 25f), 
+            Widgets.Label(new Rect(infoRect.x, infoRect.y + 25f, infoRect.width, 25f),
                 $"重要性: {memory.Importance:F2}  |  活跃度: {memory.Activity:F2}");
             GUI.color = Color.white;
             curY += 65f;
@@ -66,7 +66,7 @@ namespace RimTalk.Memory.UI
             // 内容编辑
             Widgets.Label(new Rect(0f, curY, inRect.width, 25f), "内容:");
             curY += 25f;
-            
+
             // 内容区域扩大并增加滑条
             // 外层的固定显示区域
             Rect contentRect = new Rect(0f, curY, inRect.width, 150f);
@@ -85,7 +85,7 @@ namespace RimTalk.Memory.UI
             // 备注编辑
             Widgets.Label(new Rect(0f, curY, inRect.width, 25f), "备注:");
             curY += 25f;
-            
+
             Rect notesRect = new Rect(0f, curY, inRect.width, 60f);
             editedNotes = Widgets.TextArea(notesRect, editedNotes);
             curY += 65f;
@@ -113,7 +113,7 @@ namespace RimTalk.Memory.UI
             // 底部按钮
             float buttonWidth = 120f;
             float buttonY = inRect.height - 40f;
-            
+
             // 保存按钮
             if (Widgets.ButtonText(new Rect(inRect.width - buttonWidth * 2 - 10f, buttonY, buttonWidth, 35f), "保存"))
             {
@@ -141,21 +141,21 @@ namespace RimTalk.Memory.UI
                 foreach (var tag in memory.tags.ToList())
                 {
                     Rect tagRect = new Rect(0f, curY, viewRect.width, 22f);
-                    
+
                     // 标签名称
                     Rect labelRect = new Rect(tagRect.x + 5f, tagRect.y, tagRect.width - 70f, tagRect.height);
                     Widgets.Label(labelRect, $"✓ {tag}");
-                    
+
                     // 移除按钮
                     Rect removeRect = new Rect(tagRect.xMax - 60f, tagRect.y, 55f, 22f);
                     if (Widgets.ButtonText(removeRect, "移除"))
                     {
                         memory.RemoveTag(tag);
                     }
-                    
+
                     curY += 25f;
                 }
-                
+
                 curY += 5f;
                 Widgets.DrawLineHorizontal(0f, curY, viewRect.width);
                 curY += 10f;
@@ -168,20 +168,20 @@ namespace RimTalk.Memory.UI
                     continue;
 
                 Rect tagRect = new Rect(0f, curY, viewRect.width, 22f);
-                
+
                 // 标签名称
                 Rect labelRect = new Rect(tagRect.x + 5f, tagRect.y, tagRect.width - 70f, tagRect.height);
                 GUI.color = Color.gray;
                 Widgets.Label(labelRect, tag);
                 GUI.color = Color.white;
-                
+
                 // 添加按钮
                 Rect addRect = new Rect(tagRect.xMax - 60f, tagRect.y, 55f, 22f);
                 if (Widgets.ButtonText(addRect, "添加"))
                 {
                     memory.AddTag(tag);
                 }
-                
+
                 curY += 25f;
             }
 
@@ -189,14 +189,14 @@ namespace RimTalk.Memory.UI
             curY += 5f;
             Widgets.DrawLineHorizontal(0f, curY, viewRect.width);
             curY += 10f;
-            
+
             Rect customLabelRect = new Rect(0f, curY, viewRect.width, 22f);
             Widgets.Label(customLabelRect, "自定义标签:");
             curY += 25f;
-            
+
             Rect inputRect = new Rect(0f, curY, viewRect.width - 70f, 22f);
             newTagInput = Widgets.TextField(inputRect, newTagInput);
-            
+
             Rect addCustomRect = new Rect(viewRect.width - 60f, curY, 55f, 22f);
             if (Widgets.ButtonText(addCustomRect, "添加") && !string.IsNullOrWhiteSpace(newTagInput))
             {
@@ -209,8 +209,8 @@ namespace RimTalk.Memory.UI
 
         private void SaveChanges()
         {
-            memoryComp.EditMemory(memory.Id, editedContent, editedNotes);
-            
+            EditMemory(memory, editedContent, editedNotes);
+
             // 添加用户编辑标签
             if (!memory.tags.Contains(MemoryTags.用户编辑))
             {
@@ -218,6 +218,22 @@ namespace RimTalk.Memory.UI
             }
 
             Messages.Message($"记忆已更新", MessageTypeDefOf.TaskCompletion);
+        }
+
+        /// <summary>
+        /// 编辑记忆的内容与备注
+        /// </summary>
+        private void EditMemory(MemoryEntry memory, string newContent, string notes = null)
+        {
+            if (memory is null) return;
+
+            memory.Content = newContent;
+
+            memory.IsUserEdited = true;
+
+            if (notes is null) return;
+
+            memory.Notes = notes;
         }
     }
 }

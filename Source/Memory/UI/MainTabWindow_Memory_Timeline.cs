@@ -212,7 +212,8 @@ namespace RimTalk.Memory.UI
                 memory.IsPinned = !memory.IsPinned;
                 if (currentMemoryComp != null)
                 {
-                    currentMemoryComp.PinMemory(memory.Id, memory.IsPinned);
+                    currentMemoryComp.Maintainer.PinMemory(memory, memory.IsPinned);
+                    InvalidateCache();
                 }
                 // ? v3.3.32: No need to mark dirty for pin/unpin as it doesn't affect filtering
                 Event.current.Use();
