@@ -51,6 +51,50 @@ namespace RimTalk.Memory.Maintenance
         }
 
         /// <summary>
+        /// ABM 寿命检查：基于当前 tick 与创建 tick 的差值，
+        /// 超出寿命的 Conversation 类型 ABM 转为 SCM，其余类型直接移除
+        /// </summary>
+        public void ConvertActiveMemories()
+        {
+            if (Find.TickManager is not { } tickManager) return;
+
+            // 获取配置并校验有效性
+            int lifeSpanHours = RimTalkMemoryPatchMod.Settings.abmLifespanHours;
+            if (lifeSpanHours <= 0) return;
+
+            // 获取 ABM 列表
+            var abmList = ABMList;
+            if (abmList is null || abmList.Count == 0) return;
+
+            // 准备参数
+            int removeCount = 0;
+            int currentTick = tickManager.TicksGame;
+            int lifeSpanTicks = lifeSpanHours * GenDate.TicksPerHour;
+
+            // 特别的，ABM 列表是按时间升序排列的，故此处可以直接正序遍历并提前 break
+            for (; removeCount < abmList.Count; removeCount++)
+            {
+                if (abmList[removeCount] is not { } abm) continue;
+
+                // 若命中一个记忆的寿命仍在范围内，则后续记忆必然更晚，结束循环
+                // 考虑在未来规范为 AbsTick 运算
+                if (currentTick - abm.GameTick <= lifeSpanTicks) break;
+
+                // 超时，移入 SCM
+                if (abm.Type is MemoryType.Action) continue;
+
+                if (abm is RoundMemory roundMemory)
+                    abm = roundMemory.Clone();
+
+                abm.Layer = MemoryLayer.Situational;
+                SCMList.Add(abm);
+            }
+
+            // 移除原列表中的超时条目
+            ABMList.RemoveRange(0, removeCount);
+        }
+
+        /// <summary>
         /// 清理 activity 低于阈值的非固定记忆，空元素会被顺便清理
         /// 不清理 ABM
         /// </summary>

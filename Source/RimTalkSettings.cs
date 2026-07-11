@@ -63,6 +63,9 @@ namespace RimTalk.MemoryPatch
 
         public float clpaDecayRate = defaultClpaDecayRate;
         public const float defaultClpaDecayRate = 0.001f;
+
+        // ABM 寿命设置（以游戏小时为单位，0 表示禁用）
+        public int abmLifespanHours = 24;
         
         // 总结设置
         public bool enableDailySummarization = true;
@@ -194,6 +197,8 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref scmDecayRate, "fourLayer_scmDecayRate", 0.01f);
             Scribe_Values.Look(ref elsDecayRate, "fourLayer_elsDecayRate", 0.005f);
             Scribe_Values.Look(ref clpaDecayRate, "fourLayer_clpaDecayRate", 0.001f);
+
+            Scribe_Values.Look(ref abmLifespanHours, "fourLayer_abmLifespanHours", 24);
             
             Scribe_Values.Look(ref enableDailySummarization, "fourLayer_enableDailySummarization", true);
             Scribe_Values.Look(ref summarizationHour, "fourLayer_summarizationHour", 0);
@@ -517,6 +522,9 @@ namespace RimTalk.MemoryPatch
             
             listing.Label("RimTalk_Settings_CLPADecayLabel".Translate(clpaDecayRate.ToString("P1")));
             clpaDecayRate = listing.Slider(clpaDecayRate, 0.0001f, 0.01f);
+
+            listing.Label("RimTalk_Settings_ABMLifespanLabel".Translate(abmLifespanHours));
+            abmLifespanHours = (int)listing.Slider(abmLifespanHours, 12, 72);
         }
 
         private void DrawSummarizationSettings(Listing_Standard listing)
