@@ -91,19 +91,23 @@ namespace RimTalk.Memory
 
         /// <summary>
         /// 获取记忆年龄描述
-        /// 根据年龄大小返回相对描述（如“刚刚”、“一天前”）或具体日期（如“5501年春1日”）
+        /// 如果层级为 Archive，则直接返回年月日期
+        /// 根据年龄大小返回相对描述（如“刚刚”、“一天前”）或具体日期（如“5501年素象1日”）
         /// </summary>
-        public string AgeString => (Find.TickManager?.TicksGame - GameTick) switch
+        public string AgeString => Layer switch
+        {
+            // 此乃权宜之计，未来考虑为 CLPA 额外记录“起始时间”，以时间段来描述 Age
+            MemoryLayer.Archive => GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero),
+            _ => (Find.TickManager?.TicksGame - GameTick) switch
         {
             null or < 0 => "异常时间",
             < GenDate.TicksPerHour => "刚刚",
             < GenDate.TicksPerHour * 6 => "几小时前",
             < GenDate.TicksPerDay => "一天内",
-            < GenDate.TicksPerDay * 2 => "一天前",
+            < GenDate.TicksPerDay * 2 => "昨天",
             < GenDate.TicksPerDay * 3 => "前天",
-            < GenDate.TicksPerDay * 7 => "前几天",
-            < GenDate.TicksPerDay * 14 => "上周",
             _ => GenDate.DateFullStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)
+            }
         };
 
         public MemoryEntry() { }
