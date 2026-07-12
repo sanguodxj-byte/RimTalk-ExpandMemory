@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using RimTalk.Memory.Utils;
+using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,18 +104,8 @@ namespace RimTalk.Memory
             // 若位置获取异常，则使用默认值
             var location = Find.WorldGrid?.LongLatOf(planetTile) ?? Vector2.zero;
 
-            // 使用本体方法得到日期，RimTalk方法得到时间
-            return $"{GenDate.DateFullStringAt(AbsTick, location)} {GetInGameHour12HString(AbsTick, location)}";
-        }
-
-        // 考虑未来将此方法放在一个公共工具类中
-        private static string GetInGameHour12HString(long absTicks, Vector2 longLat)
-        {
-            int hour24 = GenDate.HourOfDay(absTicks, longLat.x);
-            int hour12 = hour24 % 12;
-            if (hour12 == 0) hour12 = 12;
-            string arg = (hour24 < 12) ? "am" : "pm";
-            return $"{hour12}{arg}";
+            // 计算并返回日期和时间
+            return $"{GenDate.DateFullStringAt(AbsTick, location)} {GenDateExtension.GetInGameHour12HString(AbsTick, location)}";
         }
 
         // 返回历史参与者名单，逗号分隔
