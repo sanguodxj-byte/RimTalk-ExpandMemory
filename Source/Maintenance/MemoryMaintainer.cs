@@ -41,13 +41,13 @@ namespace RimTalk.Memory.Maintenance
             var settings = RimTalkMemoryPatchMod.Settings;
 
             foreach (var sCM in SCMList)
-                sCM?.Decay(settings.scmDecayRate);
+                sCM?.Decay(settings.ScmDecayRate);
 
             foreach (var eLS in ELSList)
-                eLS?.Decay(settings.elsDecayRate);
+                eLS?.Decay(settings.ElsDecayRate);
 
             foreach (var cLPA in CLPAList)
-                cLPA?.Decay(settings.clpaDecayRate);
+                cLPA?.Decay(settings.ClpaDecayRate);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace RimTalk.Memory.Maintenance
             if (Find.TickManager is not { } tickManager) return;
 
             // 获取配置并校验有效性
-            int lifeSpanHours = RimTalkMemoryPatchMod.Settings.abmLifespanHours;
+            int lifeSpanHours = RimTalkMemoryPatchMod.Settings.AbmLifespanHours;
             if (lifeSpanHours <= 0) return;
 
             // 获取 ABM 列表

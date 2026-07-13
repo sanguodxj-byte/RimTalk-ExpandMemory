@@ -55,17 +55,18 @@ namespace RimTalk.MemoryPatch
         public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话
 
         // 衰减速率设置
-        public float scmDecayRate = defaultScmDecayRate;
-        public const float defaultScmDecayRate = 0.01f;
+        // 默认设置 + 斩杀线 0.025f 时，SCM/ELS/CLPA 的衰减周期分别约为3/40/120天
+        public float ScmDecayRate = DefaultScmDecayRate;
+        public const float DefaultScmDecayRate = 0.05f;
 
-        public float elsDecayRate = defaultElsDecayRate;
-        public const float defaultElsDecayRate = 0.005f;
+        public float ElsDecayRate = DefaultElsDecayRate;
+        public const float DefaultElsDecayRate = 0.00384f;
 
-        public float clpaDecayRate = defaultClpaDecayRate;
-        public const float defaultClpaDecayRate = 0.001f;
+        public float ClpaDecayRate = DefaultClpaDecayRate;
+        public const float DefaultClpaDecayRate = 0.00128f;
 
         // ABM 寿命设置（以游戏小时为单位，0 表示禁用）
-        public int abmLifespanHours = 24;
+        public int AbmLifespanHours = 24;
 
         // 总结设置
         public bool EnableDailySummarization = true;
@@ -75,7 +76,7 @@ namespace RimTalk.MemoryPatch
 
         // CLPA 归档设置
         public bool EnableAutoArchive = true;
-        public int ArchiveIntervalDays = 7;
+        public int ArchiveIntervalDays = 15;
         public int maxArchiveMemories = 50;
 
         // AI 配置
@@ -212,11 +213,11 @@ namespace RimTalk.MemoryPatch
             // 是否启用轮次记忆
             Scribe_Values.Look(ref IsRoundMemoryActive, "fourLayer_IsRoundMemoryActive", true);
 
-            Scribe_Values.Look(ref scmDecayRate, "fourLayer_scmDecayRate", 0.01f);
-            Scribe_Values.Look(ref elsDecayRate, "fourLayer_elsDecayRate", 0.005f);
-            Scribe_Values.Look(ref clpaDecayRate, "fourLayer_clpaDecayRate", 0.001f);
+            Scribe_Values.Look(ref ScmDecayRate, "fourLayer_scmDecayRate", DefaultScmDecayRate);
+            Scribe_Values.Look(ref ElsDecayRate, "fourLayer_elsDecayRate", DefaultElsDecayRate);
+            Scribe_Values.Look(ref ClpaDecayRate, "fourLayer_clpaDecayRate", DefaultClpaDecayRate);
 
-            Scribe_Values.Look(ref abmLifespanHours, "fourLayer_abmLifespanHours", 24);
+            Scribe_Values.Look(ref AbmLifespanHours, "fourLayer_abmLifespanHours", 24);
 
             Scribe_Values.Look(ref EnableDailySummarization, "fourLayer_enableDailySummarization", true);
             Scribe_Values.Look(ref summarizationHour, "fourLayer_summarizationHour", 0);
@@ -224,7 +225,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref maxSummaryLength, "fourLayer_maxSummaryLength", 80);
 
             Scribe_Values.Look(ref EnableAutoArchive, "fourLayer_enableAutoArchive", true);
-            Scribe_Values.Look(ref ArchiveIntervalDays, "fourLayer_archiveIntervalDays", 7);
+            Scribe_Values.Look(ref ArchiveIntervalDays, "fourLayer_archiveIntervalDays", 15);
             Scribe_Values.Look(ref maxArchiveMemories, "fourLayer_maxArchiveMemories", 50);
 
             Scribe_Values.Look(ref useRimTalkAIConfig, "ai_useRimTalkConfig", true);
@@ -532,17 +533,17 @@ namespace RimTalk.MemoryPatch
 
         private void DrawDecaySettings(Listing_Standard listing)
         {
-            listing.Label("RimTalk_Settings_SCMDecayLabel".Translate(scmDecayRate.ToString("P1")));
-            scmDecayRate = listing.Slider(scmDecayRate, 0.001f, 0.05f);
+            listing.Label("RimTalk_Settings_SCMDecayLabel".Translate(ScmDecayRate.ToString("P1")));
+            ScmDecayRate = listing.Slider(ScmDecayRate, 0.01f, 0.1f);
 
-            listing.Label("RimTalk_Settings_ELSDecayLabel".Translate(elsDecayRate.ToString("P1")));
-            elsDecayRate = listing.Slider(elsDecayRate, 0.0005f, 0.02f);
+            listing.Label("RimTalk_Settings_ELSDecayLabel".Translate(ElsDecayRate.ToString("P1")));
+            ElsDecayRate = listing.Slider(ElsDecayRate, 0.001f, 0.01f);
 
-            listing.Label("RimTalk_Settings_CLPADecayLabel".Translate(clpaDecayRate.ToString("P1")));
-            clpaDecayRate = listing.Slider(clpaDecayRate, 0.0001f, 0.01f);
+            listing.Label("RimTalk_Settings_CLPADecayLabel".Translate(ClpaDecayRate.ToString("P1")));
+            ClpaDecayRate = listing.Slider(ClpaDecayRate, 0.0005f, 0.0015f);
 
-            listing.Label("RimTalk_Settings_ABMLifespanLabel".Translate(abmLifespanHours));
-            abmLifespanHours = (int)listing.Slider(abmLifespanHours, 12, 72);
+            listing.Label("RimTalk_Settings_ABMLifespanLabel".Translate(AbmLifespanHours));
+            AbmLifespanHours = (int)listing.Slider(AbmLifespanHours, 12, 72);
         }
 
         private void DrawSummarizationSettings(Listing_Standard listing)
