@@ -19,16 +19,16 @@ namespace RimTalk.MemoryPatch
             public string pattern = "";
             public string replacement = "";
             public bool isEnabled = true;
-            
+
             public ReplacementRule() { }
-            
+
             public ReplacementRule(string pattern, string replacement, bool isEnabled = true)
             {
                 this.pattern = pattern;
                 this.replacement = replacement;
                 this.isEnabled = isEnabled;
             }
-            
+
             public void ExposeData()
             {
                 Scribe_Values.Look(ref pattern, "pattern", "");
@@ -36,7 +36,7 @@ namespace RimTalk.MemoryPatch
                 Scribe_Values.Look(ref isEnabled, "isEnabled", true);
             }
         }
-        
+
         // ⭐ 提示词规范化规则列表（功能保留，默认为空）
         public List<ReplacementRule> normalizationRules = new List<ReplacementRule>();
 
@@ -53,7 +53,7 @@ namespace RimTalk.MemoryPatch
 
         // ⭐ v4.0: ABM 注入轮数配置
         public int maxABMInjectionRounds = 3;  // 默认注入最近3轮对话
-        
+
         // 衰减速率设置
         public float scmDecayRate = defaultScmDecayRate;
         public const float defaultScmDecayRate = 0.01f;
@@ -66,16 +66,16 @@ namespace RimTalk.MemoryPatch
 
         // ABM 寿命设置（以游戏小时为单位，0 表示禁用）
         public int abmLifespanHours = 24;
-        
+
         // 总结设置
-        public bool enableDailySummarization = true;
+        public bool EnableDailySummarization = true;
         public int summarizationHour = 0;
         public bool useAISummarization = true;
         public int maxSummaryLength = 80;
-        
+
         // CLPA 归档设置
-        public bool enableAutoArchive = true;
-        public int archiveIntervalDays = 7;
+        public bool EnableAutoArchive = true;
+        public int ArchiveIntervalDays = 7;
         public int maxArchiveMemories = 50;
 
         // AI 配置
@@ -85,22 +85,40 @@ namespace RimTalk.MemoryPatch
         public string independentModel = "gpt-3.5-turbo";
         public string independentProvider = "OpenAI";
         public bool enablePromptCaching = true;
-        
+
         // AI 总结提示词配置
-        public string dailySummaryPrompt = "";  // 空字符串表示使用默认
-        public string deepArchivePrompt = "";   // 空字符串表示使用默认
+        public string SummarizePrompt = DefaultSummarizePrompt;  // 空字符串表示使用默认
+        public const string DefaultSummarizePrompt =
+            "殖民者{0}的记忆总结\n\n" +
+            "记忆列表\n" +
+            "{1}\n\n" +
+            "要求提炼地点人物事件\n" +
+            "相似事件合并标注频率\n" +
+            "极简表达不超过80字\n" +
+            "只输出总结文字不要其他格式";
+
+        public string ArchivePrompt = DefaultArchivePrompt;   // 空字符串表示使用默认
+        public const string DefaultArchivePrompt =
+            "殖民者{0}的记忆归档\n\n" +
+            "记忆列表\n" +
+            "{1}\n\n" +
+            "要求提炼核心特征和里程碑事件\n" +
+            "合并相似经历突出长期趋势\n" +
+            "极简表达不超过60字\n" +
+            "只输出总结文字不要其他格式";
+
         public int summaryMaxTokens = 8000;  // ⭐ v3.4.0: 调整默认值为 8000
 
         // UI 设置
         public bool enableMemoryUI = true;
-        
+
         // 记忆类型开关
         public bool enableActionMemory = true;
         public bool enableConversationMemory = true;
-        
+
         // Pawn状态常识自动生成
         public bool enablePawnStatusKnowledge = false;
-        
+
         // 事件记录常识自动生成
         public bool enableEventRecordKnowledge = false;
 
@@ -108,7 +126,7 @@ namespace RimTalk.MemoryPatch
         public bool enableConversationCache = true;
         public int conversationCacheSize = 200;
         public int conversationCacheExpireDays = 14;
-        
+
         // 提示词缓存设置
         public bool enablePromptCache = true;
         public int promptCacheSize = 100;
@@ -118,38 +136,38 @@ namespace RimTalk.MemoryPatch
         public bool useDynamicInjection = true;
         public int maxInjectedMemories = 10;
         public int maxInjectedKnowledge = 5;
-        
+
         // 动态注入权重配置
         public float weightTimeDecay = 0.3f;
         public float weightImportance = 0.3f;
         public float weightKeywordMatch = 0.4f;
-        
+
         // 注入阈值设置
         public float memoryScoreThreshold = 0.15f;
         public float knowledgeScoreThreshold = 0.1f;
-        
+
         // 自适应阈值设置
         public bool enableAdaptiveThreshold = false;
         public bool autoApplyAdaptiveThreshold = false;
-        
+
         // 主动记忆召回
         public bool enableProactiveRecall = false;
         public float recallTriggerChance = 0.15f;
-        
+
         // Vector Enhancement Settings
         public bool enableVectorEnhancement = false;
         public float vectorSimilarityThreshold = 0.75f;
         public int maxVectorResults = 5;
-        
+
         // Cloud Embedding Settings
         public string embeddingApiKey = "";
         public string embeddingApiUrl = "https://api.siliconflow.cn/v1/embeddings";
         public string embeddingModel = "BAAI/bge-m3";
-        
+
         // Knowledge Matching Settings
         public bool enableKnowledgeChaining = false; // ⭐ 默认改为false
         public int maxChainingRounds = 2;
-        
+
         // v4.1: 知识匹配源选择（用于选择哪些 Mustache 变量用于匹配）
         // 默认勾选 Pawn 的核心属性：fullname、role、age、gender、backstory、traits、skills、relations
         public List<string> knowledgeMatchingSources = new List<string> { "prompt", "fullname", "role", "age", "gender", "backstory", "traits", "skills", "relations" };
@@ -163,32 +181,32 @@ namespace RimTalk.MemoryPatch
         private static bool expandMemoryTypes = false;
         private static bool expandVectorEnhancement = true; // ⭐ 恢复向量增强折叠状态
         private static bool expandExperimentalFeatures = true;
-        
+
         private static Vector2 scrollPosition = Vector2.zero;
 
         public override void ExposeData()
         {
             base.ExposeData();
-            
+
             // ⭐ 序列化提示词规范化规则
             Scribe_Collections.Look(ref normalizationRules, "normalizationRules", LookMode.Deep);
-            
+
             // ⭐ 兼容性：如果加载后为 null，初始化为空列表
             if (Scribe.mode == LoadSaveMode.PostLoadInit && normalizationRules == null)
             {
                 normalizationRules = new List<ReplacementRule>();
             }
-            
+
             // ⭐ v4.0: maxActiveMemories 已废弃，保留序列化key以兼容旧存档（读取后忽略）
             int _legacyMaxActive = 6;
             Scribe_Values.Look(ref _legacyMaxActive, "fourLayer_maxActiveMemories", 6);
-            
+
             Scribe_Values.Look(ref maxSituationalMemories, "fourLayer_maxSituationalMemories", 20);
             Scribe_Values.Look(ref maxEventLogMemories, "fourLayer_maxEventLogMemories", 50);
-            
+
             // ⭐ v4.0: ABM 注入轮数
             Scribe_Values.Look(ref maxABMInjectionRounds, "fourLayer_maxABMInjectionRounds", 0); // 默认不注入 ABM 以向后兼容
-            
+
             // ⭐ 是否注入玩家发言
             Scribe_Values.Look(ref IsPlayerDialogueInject, "fourLayer_isPlayerDialogueInject", true);
             // 是否启用轮次记忆
@@ -199,14 +217,14 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref clpaDecayRate, "fourLayer_clpaDecayRate", 0.001f);
 
             Scribe_Values.Look(ref abmLifespanHours, "fourLayer_abmLifespanHours", 24);
-            
-            Scribe_Values.Look(ref enableDailySummarization, "fourLayer_enableDailySummarization", true);
+
+            Scribe_Values.Look(ref EnableDailySummarization, "fourLayer_enableDailySummarization", true);
             Scribe_Values.Look(ref summarizationHour, "fourLayer_summarizationHour", 0);
             Scribe_Values.Look(ref useAISummarization, "fourLayer_useAISummarization", true);
             Scribe_Values.Look(ref maxSummaryLength, "fourLayer_maxSummaryLength", 80);
-            
-            Scribe_Values.Look(ref enableAutoArchive, "fourLayer_enableAutoArchive", true);
-            Scribe_Values.Look(ref archiveIntervalDays, "fourLayer_archiveIntervalDays", 7);
+
+            Scribe_Values.Look(ref EnableAutoArchive, "fourLayer_enableAutoArchive", true);
+            Scribe_Values.Look(ref ArchiveIntervalDays, "fourLayer_archiveIntervalDays", 7);
             Scribe_Values.Look(ref maxArchiveMemories, "fourLayer_maxArchiveMemories", 50);
 
             Scribe_Values.Look(ref useRimTalkAIConfig, "ai_useRimTalkConfig", true);
@@ -215,9 +233,9 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref independentModel, "ai_independentModel", "gpt-3.5-turbo");
             Scribe_Values.Look(ref independentProvider, "ai_independentProvider", "OpenAI");
             Scribe_Values.Look(ref enablePromptCaching, "ai_enablePromptCaching", true);
-            
-            Scribe_Values.Look(ref dailySummaryPrompt, "ai_dailySummaryPrompt", "");
-            Scribe_Values.Look(ref deepArchivePrompt, "ai_deepArchivePrompt", "");
+
+            Scribe_Values.Look(ref SummarizePrompt, "ai_dailySummaryPrompt", "");
+            Scribe_Values.Look(ref ArchivePrompt, "ai_deepArchivePrompt", "");
             Scribe_Values.Look(ref summaryMaxTokens, "ai_summaryMaxTokens", 8000);  // ⭐ v3.4.0: 与字段默认值同步
 
             Scribe_Values.Look(ref enableMemoryUI, "memoryPatch_enableMemoryUI", true);
@@ -232,7 +250,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enablePromptCache, "cache_enablePromptCache", true);
             Scribe_Values.Look(ref promptCacheSize, "cache_promptCacheSize", 100);
             Scribe_Values.Look(ref promptCacheExpireMinutes, "cache_promptCacheExpireMinutes", 60);
-            
+
             Scribe_Values.Look(ref useDynamicInjection, "dynamic_useDynamicInjection", true);
             Scribe_Values.Look(ref maxInjectedMemories, "dynamic_maxInjectedMemories", 10);
             Scribe_Values.Look(ref maxInjectedKnowledge, "dynamic_maxInjectedKnowledge", 5);
@@ -241,7 +259,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref weightKeywordMatch, "dynamic_weightKeywordMatch", 0.4f);
             Scribe_Values.Look(ref memoryScoreThreshold, "dynamic_memoryScoreThreshold", 0.15f);
             Scribe_Values.Look(ref knowledgeScoreThreshold, "dynamic_knowledgeScoreThreshold", 0.1f);
-            
+
             Scribe_Values.Look(ref enableAdaptiveThreshold, "adaptive_enableAdaptiveThreshold", false);
             Scribe_Values.Look(ref autoApplyAdaptiveThreshold, "adaptive_autoApplyAdaptiveThreshold", false);
             Scribe_Values.Look(ref enableProactiveRecall, "recall_enableProactiveRecall", false);
@@ -251,7 +269,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref enableVectorEnhancement, "vector_enableVectorEnhancement", false);
             Scribe_Values.Look(ref vectorSimilarityThreshold, "vector_vectorSimilarityThreshold", 0.75f);
             Scribe_Values.Look(ref maxVectorResults, "vector_maxVectorResults", 5);
-            
+
             Scribe_Values.Look(ref embeddingApiKey, "vector_embeddingApiKey", "");
             Scribe_Values.Look(ref embeddingApiUrl, "vector_embeddingApiUrl", "https://api.siliconflow.cn/v1/embeddings");
             Scribe_Values.Look(ref embeddingModel, "vector_embeddingModel", "BAAI/bge-m3");
@@ -259,10 +277,10 @@ namespace RimTalk.MemoryPatch
             // Knowledge Matching
             Scribe_Values.Look(ref enableKnowledgeChaining, "knowledge_enableKnowledgeChaining", false); // ⭐ 默认改为false
             Scribe_Values.Look(ref maxChainingRounds, "knowledge_maxChainingRounds", 2);
-            
+
             // ⭐ v4.0: 知识匹配源
             Scribe_Collections.Look(ref knowledgeMatchingSources, "knowledgeMatchingSources", LookMode.Value);
-            
+
             // 兼容性：如果加载后为 null 或空，初始化为默认值
             if (Scribe.mode == LoadSaveMode.PostLoadInit && (knowledgeMatchingSources == null || knowledgeMatchingSources.Count == 0))
             {
@@ -395,57 +413,57 @@ namespace RimTalk.MemoryPatch
         {
             Rect headerRect = listing.GetRect(30f);
             Widgets.DrawBoxSolid(headerRect, new Color(0.2f, 0.2f, 0.2f, 0.5f));
-            
+
             Text.Font = GameFont.Medium;
             Rect labelRect = new Rect(headerRect.x + 30f, headerRect.y + 3f, headerRect.width - 30f, headerRect.height);
             Widgets.Label(labelRect, title);
             Text.Font = GameFont.Small;
-            
+
             Rect iconRect = new Rect(headerRect.x + 5f, headerRect.y + 7f, 20f, 20f);
             if (Widgets.ButtonImage(iconRect, expanded ? TexButton.Collapse : TexButton.Reveal))
             {
                 expanded = !expanded;
             }
-            
+
             listing.Gap(3f);
-            
+
             if (expanded)
             {
                 listing.Gap(3f);
                 drawContent?.Invoke();
                 listing.Gap(6f);
             }
-            
+
             listing.GapLine();
         }
 
         private void DrawDynamicInjectionSettings(Listing_Standard listing)
         {
             listing.CheckboxLabeled("RimTalk_Settings_EnableDynamicInjection".Translate(), ref useDynamicInjection);
-            
+
             if (useDynamicInjection)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 listing.Label("  " + "RimTalk_Settings_DynamicInjectionDesc".Translate());
                 GUI.color = Color.white;
-                
+
                 listing.Gap();
-                
+
                 // ⭐ v4.0: ABM 注入轮数设置
                 listing.Label("RimTalk_Settings_MaxABMInjectionRoundsLabel".Translate(maxABMInjectionRounds));
                 maxABMInjectionRounds = (int)listing.Slider(maxABMInjectionRounds, 1, 10);
                 GUI.color = Color.gray;
                 listing.Label("  " + "RimTalk_Settings_MaxABMInjectionRoundsDesc".Translate());
                 GUI.color = Color.white;
-                
+
                 listing.Gap();
-                
+
                 // ⭐ 是否注入玩家发言
                 listing.CheckboxLabeled("RimTalk_Settings_IsPlayerDialogueInject".Translate(), ref IsPlayerDialogueInject);
                 GUI.color = Color.gray;
                 listing.Label("  " + "RimTalk_Settings_IsPlayerDialogueInjectDesc".Translate());
                 GUI.color = Color.white;
-                
+
                 listing.Gap();
 
                 // ⭐ 是否启用轮次记忆
@@ -474,17 +492,17 @@ namespace RimTalk.MemoryPatch
 
                 listing.Label("RimTalk_Settings_MaxInjectedMemoriesLabel".Translate(maxInjectedMemories));
                 maxInjectedMemories = (int)listing.Slider(maxInjectedMemories, 1, 20);
-                
+
                 listing.Label("RimTalk_Settings_MaxInjectedKnowledgeLabel".Translate(maxInjectedKnowledge));
-                
+
                 // 滑条和输入框组合
                 Rect knowledgeSliderRect = listing.GetRect(28f);
                 Rect sliderRect = new Rect(knowledgeSliderRect.x, knowledgeSliderRect.y, knowledgeSliderRect.width - 70f, 28f);
                 Rect inputRect = new Rect(knowledgeSliderRect.xMax - 60f, knowledgeSliderRect.y, 60f, 24f);
-                
+
                 // 滑条
                 maxInjectedKnowledge = (int)Widgets.HorizontalSlider(sliderRect, maxInjectedKnowledge, 0f, 100f, true);
-                
+
                 // 输入框
                 string knowledgeInput = maxInjectedKnowledge.ToString();
                 knowledgeInput = Widgets.TextField(inputRect, knowledgeInput);
@@ -492,12 +510,12 @@ namespace RimTalk.MemoryPatch
                 {
                     maxInjectedKnowledge = Mathf.Clamp(parsedKnowledge, 0, 100);
                 }
-                
+
                 listing.Gap();
-                
+
                 listing.Label("RimTalk_Settings_MemoryScoreThresholdLabel".Translate(memoryScoreThreshold.ToString("P0")));
                 memoryScoreThreshold = listing.Slider(memoryScoreThreshold, 0f, 1f);
-                
+
                 listing.Label("RimTalk_Settings_KnowledgeScoreThresholdLabel".Translate(knowledgeScoreThreshold.ToString("P0")));
                 knowledgeScoreThreshold = listing.Slider(knowledgeScoreThreshold, 0f, 1f);
             }
@@ -507,7 +525,7 @@ namespace RimTalk.MemoryPatch
         {
             listing.Label("RimTalk_Settings_SCMCapacityLabel".Translate(maxSituationalMemories));
             maxSituationalMemories = (int)listing.Slider(maxSituationalMemories, 10, 50);
-            
+
             listing.Label("RimTalk_Settings_ELSCapacityLabel".Translate(maxEventLogMemories));
             maxEventLogMemories = (int)listing.Slider(maxEventLogMemories, 20, 100);
         }
@@ -516,10 +534,10 @@ namespace RimTalk.MemoryPatch
         {
             listing.Label("RimTalk_Settings_SCMDecayLabel".Translate(scmDecayRate.ToString("P1")));
             scmDecayRate = listing.Slider(scmDecayRate, 0.001f, 0.05f);
-            
+
             listing.Label("RimTalk_Settings_ELSDecayLabel".Translate(elsDecayRate.ToString("P1")));
             elsDecayRate = listing.Slider(elsDecayRate, 0.0005f, 0.02f);
-            
+
             listing.Label("RimTalk_Settings_CLPADecayLabel".Translate(clpaDecayRate.ToString("P1")));
             clpaDecayRate = listing.Slider(clpaDecayRate, 0.0001f, 0.01f);
 
@@ -529,21 +547,21 @@ namespace RimTalk.MemoryPatch
 
         private void DrawSummarizationSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("RimTalk_Settings_EnableDailySummarization".Translate(), ref enableDailySummarization);
-            
-            if (enableDailySummarization)
+            listing.CheckboxLabeled("RimTalk_Settings_EnableDailySummarization".Translate(), ref EnableDailySummarization);
+
+            if (EnableDailySummarization)
             {
                 listing.Label("RimTalk_Settings_TriggerTimeLabel".Translate(summarizationHour));
                 summarizationHour = (int)listing.Slider(summarizationHour, 0, 23);
             }
-            
-            listing.CheckboxLabeled("RimTalk_Settings_EnableAutoArchive".Translate(), ref enableAutoArchive);
+
+            listing.CheckboxLabeled("RimTalk_Settings_EnableAutoArchive".Translate(), ref EnableAutoArchive);
         }
 
         private void DrawAIConfigSettings(Listing_Standard listing)
         {
             listing.CheckboxLabeled("RimTalk_Settings_PreferRimTalkAI".Translate(), ref useRimTalkAIConfig);
-            
+
             if (useRimTalkAIConfig)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
@@ -551,29 +569,29 @@ namespace RimTalk.MemoryPatch
                 GUI.color = Color.white;
                 listing.Gap();
             }
-            
+
             listing.Gap();
-            
+
             // ⭐ v3.3.20: 使用辅助类绘制提供商选择
             SettingsUIDrawers.DrawAIProviderSelection(listing, this);
-            
+
             listing.Gap();
-            
+
             // API 配置
             listing.Label("RimTalk_Settings_APIKey".Translate() + ":");
             independentApiKey = listing.TextEntry(independentApiKey);
-            
+
             listing.Label("RimTalk_Settings_APIURL".Translate() + ":");
             independentApiUrl = listing.TextEntry(independentApiUrl);
-            
+
             listing.Label("RimTalk_Settings_ModelName".Translate() + ":");
             independentModel = listing.TextEntry(independentModel);
-            
+
             listing.Gap();
-            
+
             // ⭐ 修改：Prompt Caching 选项 - 仅DeepSeek和OpenAI可切换
             bool canToggleCaching = (independentProvider == "OpenAI" || independentProvider == "DeepSeek");
-            
+
             if (canToggleCaching)
             {
                 listing.CheckboxLabeled("RimTalk_Settings_EnablePromptCaching".Translate(), ref enablePromptCaching);
@@ -587,7 +605,7 @@ namespace RimTalk.MemoryPatch
                 listing.CheckboxLabeled("RimTalk_Settings_EnablePromptCachingUnavailable".Translate(), ref disabledCache);
                 GUI.color = Color.white;
             }
-            
+
             if (enablePromptCaching || !canToggleCaching)
             {
                 if (independentProvider == "OpenAI")
@@ -625,22 +643,22 @@ namespace RimTalk.MemoryPatch
                     GUI.color = Color.white;
                 }
             }
-            
+
             listing.Gap();
-            
+
             // 配置验证按钮
             Rect validateButtonRect = listing.GetRect(35f);
             if (Widgets.ButtonText(validateButtonRect, "RimTalk_Settings_ValidateConfig".Translate()))
             {
                 ValidateAIConfig();
             }
-            
+
             // 提示信息
             GUI.color = Color.gray;
             listing.Label("RimTalk_Settings_ValidateConfigTip".Translate());
             GUI.color = Color.white;
         }
-        
+
         /// <summary>
         /// 验证 AI 配置
         /// </summary>
@@ -651,34 +669,34 @@ namespace RimTalk.MemoryPatch
                 Messages.Message("RimTalk_Settings_UsingRimTalkConfigNoValidation".Translate(), MessageTypeDefOf.NeutralEvent);
                 return;
             }
-            
+
             if (string.IsNullOrEmpty(independentApiKey))
             {
                 Messages.Message("RimTalk_Settings_PleaseEnterAPIKey".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
-            
+
             if (string.IsNullOrEmpty(independentApiUrl))
             {
                 Messages.Message("RimTalk_Settings_PleaseEnterAPIURL".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
-            
+
             if (string.IsNullOrEmpty(independentModel))
             {
                 Messages.Message("RimTalk_Settings_PleaseEnterModel".Translate(), MessageTypeDefOf.RejectInput);
                 return;
             }
-            
+
             Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.NeutralEvent);
-            
+
             // 强制重新初始化 AI Summarizer
             System.Threading.Tasks.Task.Run(() =>
             {
                 try
                 {
                     Memory.AI.IndependentAISummarizer.ForceReinitialize();
-                    
+
                     if (Memory.AI.IndependentAISummarizer.IsAvailable())
                     {
                         LongEventHandler.ExecuteWhenFinished(() =>
@@ -714,23 +732,23 @@ namespace RimTalk.MemoryPatch
         private void DrawExperimentalFeaturesSettings(Listing_Standard listing)
         {
             listing.CheckboxLabeled("RimTalk_Settings_EnableProactiveRecall".Translate(), ref enableProactiveRecall);
-            
+
             if (enableProactiveRecall)
             {
                 listing.Label("RimTalk_Settings_TriggerChanceLabel".Translate(recallTriggerChance.ToString("P0")));
                 recallTriggerChance = listing.Slider(recallTriggerChance, 0.05f, 0.60f);
             }
-            
+
             listing.Gap();
             listing.GapLine();
-            
+
             // ⭐ v4.0: 知识匹配源选择（动态从 RimTalk 获取 Mustache 变量）
             SettingsUIDrawers.DrawKnowledgeMatchingSourcesSettings(listing, this);
-            
+
             // ⭐ 常识链设置
             SettingsUIDrawers.DrawKnowledgeChainingSettings(listing, this);
         }
-        
+
         private void DrawVectorEnhancementSettings(Listing_Standard listing)
         {
             // ⭐ SiliconFlow向量服务设置
@@ -754,7 +772,7 @@ namespace RimTalk.MemoryPatch
 
             Find.WindowStack.Add(new Dialog_CommonKnowledge(memoryManager.CommonKnowledge));
         }
-        
+
         /// <summary>
         /// ✦ 绘制提示词规范化设置 UI
         /// </summary>
@@ -806,10 +824,10 @@ namespace RimTalk.MemoryPatch
                 }
 
                 settings.DrawCollapsibleSection(listing, "RimTalk_Settings_MemoryTypesSection".Translate(), ref expandMemoryTypes, delegate { settings.DrawMemoryTypesSettings(listing); });
-                
+
                 // ⭐ 添加向量增强设置
                 settings.DrawCollapsibleSection(listing, "RimTalk_Settings_VectorEnhancementSection".Translate(), ref expandVectorEnhancement, delegate { settings.DrawVectorEnhancementSettings(listing); });
-                
+
                 settings.DrawCollapsibleSection(listing, "RimTalk_Settings_ExperimentalSection".Translate(), ref expandExperimentalFeatures, delegate { settings.DrawExperimentalFeaturesSettings(listing); });
 
                 listing.End();

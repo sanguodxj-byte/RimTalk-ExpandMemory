@@ -50,13 +50,13 @@ namespace RimTalk.Memory.UI
             closeOnClickedOutside = false;
             
             // 初始化编辑变量
-            editDailySummary = string.IsNullOrEmpty(settings.dailySummaryPrompt) 
+            editDailySummary = string.IsNullOrEmpty(settings.SummarizePrompt) 
                 ? DEFAULT_DAILY_SUMMARY 
-                : settings.dailySummaryPrompt;
+                : settings.SummarizePrompt;
                 
-            editDeepArchive = string.IsNullOrEmpty(settings.deepArchivePrompt) 
+            editDeepArchive = string.IsNullOrEmpty(settings.ArchivePrompt) 
                 ? DEFAULT_DEEP_ARCHIVE 
-                : settings.deepArchivePrompt;
+                : settings.ArchivePrompt;
                 
             editMaxTokens = settings.summaryMaxTokens;
         }
@@ -192,11 +192,11 @@ namespace RimTalk.Memory.UI
         {
             // 保存到设置
             // 如果与默认值相同，保存为空字符串（表示使用默认）
-            settings.dailySummaryPrompt = (editDailySummary == DEFAULT_DAILY_SUMMARY) 
+            settings.SummarizePrompt = (editDailySummary == DEFAULT_DAILY_SUMMARY) 
                 ? "" 
                 : editDailySummary;
                 
-            settings.deepArchivePrompt = (editDeepArchive == DEFAULT_DEEP_ARCHIVE) 
+            settings.ArchivePrompt = (editDeepArchive == DEFAULT_DEEP_ARCHIVE) 
                 ? "" 
                 : editDeepArchive;
                 
