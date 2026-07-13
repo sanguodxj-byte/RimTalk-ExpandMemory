@@ -71,8 +71,8 @@ namespace RimTalk.Memory.Injection
                     return "Conversation";
                 case MemoryType.Action:
                     return "Action";
-                case MemoryType.Observation:
-                    return "Observation";
+                case MemoryType.Summarization:
+                    return "Summarization";
                 case MemoryType.Event:
                     return "Event";
                 case MemoryType.Emotion:

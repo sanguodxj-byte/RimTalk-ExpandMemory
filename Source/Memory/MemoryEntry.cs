@@ -52,6 +52,9 @@ namespace RimTalk.Memory
         public bool IsSummarized = false;   // 是否已被AI总结过，新生成的记忆默认为false
         public string Notes;                // 用户备注
 
+        // 临时标识（不会被存档）
+        public bool IsSummarizing = false; // 是否正在被总结
+
         /// <summary>
         /// 获取层级名称（中文）
         /// </summary>
@@ -71,18 +74,13 @@ namespace RimTalk.Memory
         {
             MemoryType.Conversation => "对话",
             MemoryType.Action => "行动",
-            MemoryType.Observation => "观察",
+            MemoryType.Summarization => "总结",
             MemoryType.Event => "事件",
             MemoryType.Emotion => "情绪",
             MemoryType.Relationship => "关系",
             MemoryType.Internal => "内部",
             _ => "未知"
         };
-
-        /// <summary>
-        /// 是否可以被总结
-        /// </summary>
-        public virtual bool CanBeSummarized => !IsSummarized;
 
         /// <summary>
         /// 是否应当被清理
@@ -99,14 +97,14 @@ namespace RimTalk.Memory
             // 此乃权宜之计，未来考虑为 CLPA 额外记录“起始时间”，以时间段来描述 Age
             MemoryLayer.Archive => GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero),
             _ => (Find.TickManager?.TicksGame - GameTick) switch
-        {
-            null or < 0 => "异常时间",
-            < GenDate.TicksPerHour => "刚刚",
-            < GenDate.TicksPerHour * 6 => "几小时前",
-            < GenDate.TicksPerDay => "一天内",
-            < GenDate.TicksPerDay * 2 => "昨天",
-            < GenDate.TicksPerDay * 3 => "前天",
-            _ => GenDate.DateFullStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)
+            {
+                null or < 0 => "异常时间",
+                < GenDate.TicksPerHour => "刚刚",
+                < GenDate.TicksPerHour * 6 => "几小时前",
+                < GenDate.TicksPerDay => "一天内",
+                < GenDate.TicksPerDay * 2 => "昨天",
+                < GenDate.TicksPerDay * 3 => "前天",
+                _ => GenDate.DateFullStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)
             }
         };
 
@@ -134,7 +132,7 @@ namespace RimTalk.Memory
             {
                 MemoryType.Conversation => "对话",
                 MemoryType.Action => "行动",
-                MemoryType.Observation => "观察",
+                MemoryType.Summarization => "总结",
                 MemoryType.Event => "事件",
                 MemoryType.Emotion => "情绪",
                 MemoryType.Relationship => "关系",

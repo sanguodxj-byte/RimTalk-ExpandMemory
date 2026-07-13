@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Verse;
-using UnityEngine;
 using RimWorld;
 using RimTalk.MemoryPatch;  // ? v3.3.6: 添加 RimWorld 命名空间
 
@@ -37,55 +36,6 @@ namespace RimTalk.Memory.AI
         
         private static bool isInitialized = false;
         private static string apiKey, apiUrl, model, provider;
-        
-        // ? 修复1: 添加缓存大小限制，防止内存泄漏
-        private const int MAX_CACHE_SIZE = 100; // 最多缓存100个总结
-        private const int CACHE_CLEANUP_THRESHOLD = 120; // 达到120个时清理
-        
-        private static readonly Dictionary<string, string> completedSummaries = new Dictionary<string, string>();
-        private static readonly HashSet<string> pendingSummaries = new HashSet<string>();
-        private static readonly Dictionary<string, List<Action<string>>> callbackMap = new Dictionary<string, List<Action<string>>>();
-        private static readonly Queue<Action> mainThreadActions = new Queue<Action>();
-
-        public static string ComputeCacheKey(Pawn pawn, List<MemoryEntry> memories)
-        {
-            var ids = memories.Select(m => m.Id ?? m.Content.GetHashCode().ToString()).ToArray();
-            string joinedIds = string.Join("|", ids);
-            return $"{pawn.ThingID}_{memories.Count}_{joinedIds.GetHashCode()}";
-        }
-
-        public static void RegisterCallback(string cacheKey, Action<string> callback)
-        {
-            lock (callbackMap)
-            {
-                if (!callbackMap.TryGetValue(cacheKey, out var callbacks))
-                {
-                    callbacks = new List<Action<string>>();
-                    callbackMap[cacheKey] = callbacks;
-                }
-                callbacks.Add(callback);
-            }
-        }
-
-        public static void ProcessPendingCallbacks(int maxPerTick = 5)
-        {
-            int processed = 0;
-            lock (mainThreadActions)
-            {
-                while (mainThreadActions.Count > 0 && processed < maxPerTick)
-                {
-                    try
-                    {
-                        mainThreadActions.Dequeue()?.Invoke();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error($"[AI Summarizer] Callback error: {ex.Message}");
-                    }
-                    processed++;
-                }
-            }
-        }
 
         /// <summary>
         /// ? 修复：添加强制重新初始化方法
@@ -94,42 +44,6 @@ namespace RimTalk.Memory.AI
         {
             isInitialized = false;
             Initialize();
-        }
-        
-        /// <summary>
-        /// ? v3.3.3: 清除所有API配置和缓存
-        /// </summary>
-        public static void ClearAllConfiguration()
-        {
-            // 清除静态变量
-            apiKey = "";
-            apiUrl = "";
-            model = "";
-            provider = "";
-            isInitialized = false;
-            
-            // 清除所有缓存
-            lock (completedSummaries)
-            {
-                completedSummaries.Clear();
-            }
-            
-            lock (pendingSummaries)
-            {
-                pendingSummaries.Clear();
-            }
-            
-            lock (callbackMap)
-            {
-                callbackMap.Clear();
-            }
-            
-            lock (mainThreadActions)
-            {
-                mainThreadActions.Clear();
-            }
-            
-            Log.Message("[AI] ?? All API configuration and cache cleared");
         }
         
         public static void Initialize()
@@ -410,165 +324,12 @@ namespace RimTalk.Memory.AI
             return isInitialized;
         }
 
-        public static string SummarizeMemories(Pawn pawn, List<MemoryEntry> memories, string promptTemplate)
+        /// <summary>
+        /// 异步调用 LLM，发送 prompt 并返回结果文本。
+        /// </summary>
+        public static Task<string> CallAIAsync(string prompt)
         {
-            if (!IsAvailable()) return null;
-
-            string cacheKey = ComputeCacheKey(pawn, memories);
-
-            lock (completedSummaries)
-            {
-                if (completedSummaries.TryGetValue(cacheKey, out string summary))
-                {
-                    return summary; // Return cached result directly if available
-                }
-            }
-
-            lock (pendingSummaries)
-            {
-                if (pendingSummaries.Contains(cacheKey)) return null; // Already processing
-                pendingSummaries.Add(cacheKey);
-            }
-
-            string prompt = BuildPrompt(pawn, memories, promptTemplate);
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    string result = await CallAIAsync(prompt);
-                    if (result != null)
-                    {
-                        lock (completedSummaries)
-                        {
-                            // ? 修改1: 增加缓存上限，防止内存泄漏
-                            if (completedSummaries.Count >= CACHE_CLEANUP_THRESHOLD)
-                            {
-                                // ? v3.3.2.29: 确定性清理 - 按 key 字母顺序升序排序后删除前50%
-                                // 使用字母顺序排序代替随机 Take()，确保相同的缓存状态总是删除相同的条目
-                                var toRemove = completedSummaries.Keys
-                                    .OrderBy(k => k, StringComparer.Ordinal) // 字母顺序升序
-                                    .Take(MAX_CACHE_SIZE / 2)
-                                    .ToList();
-                                
-                                foreach (var key in toRemove)
-                                {
-                                    completedSummaries.Remove(key);
-                                }
-                                
-
-                                if (Prefs.DevMode)
-                                {
-                                    Log.Message($"[AI Summarizer] ?? Cleaned cache: {toRemove.Count} entries removed (deterministic by key order), {completedSummaries.Count} remaining");
-                                }
-                            }
-                            
-                            completedSummaries[cacheKey] = result;
-                        }
-                        lock (callbackMap)
-                        {
-                            if (callbackMap.TryGetValue(cacheKey, out var callbacks))
-                            {
-                                foreach (var cb in callbacks)
-                                {
-                                    lock (mainThreadActions)
-                                    {
-                                        mainThreadActions.Enqueue(() => cb(result));
-                                    }
-                                }
-                                callbackMap.Remove(cacheKey);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[AI Summarizer] Task failed: {ex.Message}");
-                }
-                finally
-                {
-                    lock (pendingSummaries)
-                    {
-                        pendingSummaries.Remove(cacheKey);
-                    }
-                }
-            });
-
-            return null; // Indicates that the process is async
-        }
-
-        private static string BuildPrompt(Pawn pawn, List<MemoryEntry> memories, string template)
-        {
-            var settings = RimTalkMemoryPatchMod.Settings;
-            
-            // 构建记忆列表
-            var memoryListSb = new StringBuilder();
-            int maxMemories = (template == "deep_archive") ? 15 : 20;
-            int i = 1;
-            foreach (var m in memories.OrderBy(m => m.GameTick))
-            {
-                memoryListSb.AppendLine($"{i}. {m.Content}");
-                i++;
-            }
-            string memoryList = memoryListSb.ToString().TrimEnd();
-            
-            // 使用自定义提示词或默认提示词
-            string promptTemplate;
-            
-            if (template == "deep_archive")
-            {
-                // 深度归档
-                if (!string.IsNullOrEmpty(settings.deepArchivePrompt))
-                {
-                    // 使用自定义提示词
-                    promptTemplate = settings.deepArchivePrompt;
-                }
-                else
-                {
-                    // 使用默认提示词
-                    promptTemplate = 
-                        "殖民者{0}的记忆归档\n\n" +
-                        "记忆列表\n" +
-                        "{1}\n\n" +
-                        "要求提炼核心特征和里程碑事件\n" +
-                        "合并相似经历突出长期趋势\n" +
-                        "极简表达不超过60字\n" +
-                        "只输出总结文字不要其他格式";
-                }
-            }
-            else
-            {
-                // 每日总结
-                if (!string.IsNullOrEmpty(settings.dailySummaryPrompt))
-                {
-                    // 使用自定义提示词
-                    promptTemplate = settings.dailySummaryPrompt;
-                }
-                else
-                {
-                    // 使用默认提示词
-                    promptTemplate = 
-                        "殖民者{0}的记忆总结\n\n" +
-                        "记忆列表\n" +
-                        "{1}\n\n" +
-                        "要求提炼地点人物事件\n" +
-                        "相似事件合并标注频率\n" +
-                        "极简表达不超过80字\n" +
-                        "只输出总结文字不要其他格式";
-                }
-            }
-            
-            // ⭐ 修复：先转义花括号，防止 string.Format 报错
-            // 将用户自定义提示词中的 { 和 } 转义为 {{ 和 }}
-            string escapedTemplate = promptTemplate.Replace("{", "{{").Replace("}", "}}");
-            
-            // 然后把占位符 {{{0}}} 和 {{{1}}} 替换回 {0} 和 {1}
-            escapedTemplate = escapedTemplate.Replace("{{0}}", "{0}").Replace("{{1}}", "{1}");
-            
-            // 替换占位符
-            string result = string.Format(escapedTemplate, pawn.LabelShort, memoryList);
-            
-            return result;
+            return CallAIAsyncInternal(prompt);
         }
 
         /// <summary>
@@ -722,7 +483,7 @@ namespace RimTalk.Memory.AI
             return sb.ToString();
         }
 
-        private static async Task<string> CallAIAsync(string prompt)
+        private static async Task<string> CallAIAsyncInternal(string prompt)
         {
             const int MAX_RETRIES = 3;
             const int RETRY_DELAY_MS = 2000; // 2秒重试延迟

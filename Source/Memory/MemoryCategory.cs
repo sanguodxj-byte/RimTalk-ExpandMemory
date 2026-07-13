@@ -20,10 +20,10 @@ namespace RimTalk.Memory
     public enum MemoryType
     {
         Conversation,   // 对话（RimTalk生成的完整对话内容）
-        [Obsolete("互动记忆已废弃，保留此枚举值仅为兼容旧存档")]
-        Interaction,    // 互动（已废弃 - 无具体内容，已被Conversation替代）
+        [Obsolete("已废弃，保留以确保 enum 运作")]
+        Interaction,
         Action,         // 行动（工作、战斗等）
-        Observation,    // 观察（未实现）
+        Summarization,  // 总结
         Event,          // 事件
         Emotion,        // 情绪
         Relationship,   // 关系
