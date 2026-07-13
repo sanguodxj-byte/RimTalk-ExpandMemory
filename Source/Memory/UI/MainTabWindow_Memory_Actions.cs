@@ -1,10 +1,7 @@
-using UnityEngine;
 using Verse;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Memory;
-using RimTalk.MemoryPatch;
 
 namespace RimTalk.Memory.UI
 {
@@ -15,112 +12,52 @@ namespace RimTalk.Memory.UI
     public partial class MainTabWindow_Memory
     {
         // ==================== Batch Actions ====================
-        
+
         private void SummarizeMemories(List<MemoryEntry> targetMemories)
         {
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
-            
-            // ? 修复：同时收集 ABM 和 SCM（只排除总结过的记忆）
-            var abmMemories = targetMemories
-                .Where(m => m.Layer == MemoryLayer.Active && m.CanBeSummarized)
-                .ToList();
-                
-            var scmMemories = targetMemories
-                .Where(m => m.Layer == MemoryLayer.Situational && m.CanBeSummarized)
-                .ToList();
-            
-            var allMemoriesToSummarize = new List<MemoryEntry>();
-            allMemoriesToSummarize.AddRange(abmMemories);
-            allMemoriesToSummarize.AddRange(scmMemories);
-                
-            if (allMemoriesToSummarize.Count == 0)
-            {
-                Messages.Message("没有可总结的记忆（ABM或SCM）", MessageTypeDefOf.RejectInput, false);
-                return;
-            }
-            
-            string confirmMessage;
-            if (abmMemories.Count > 0 && scmMemories.Count > 0)
-            {
-                confirmMessage = $"确定要总结 {abmMemories.Count} 条ABM记忆和 {scmMemories.Count} 条SCM记忆吗？";
-            }
-            else if (abmMemories.Count > 0)
-            {
-                confirmMessage = $"确定要总结 {abmMemories.Count} 条ABM记忆吗？";
-            }
-            else
-            {
-                confirmMessage = $"确定要总结 {scmMemories.Count} 条SCM记忆吗？";
-            }
-            
+
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                confirmMessage,
+                $"确定要总结选中的 {targetMemories.Count} 条记忆吗？",
                 delegate
                 {
-                    AggregateMemories(
-                        allMemoriesToSummarize,
-                        MemoryLayer.EventLog,
-                        currentMemoryComp.SituationalMemories,
-                        currentMemoryComp.EventLogMemories,
-                        "daily_summary"
-                    );
-                    
-                    // ? 总结后清空ABM（因为已经总结过了）
-                    foreach (var abm in abmMemories)
-                    {
-                        currentMemoryComp.ActiveMemories.Remove(abm);
-                    }
-                    
+                    currentMemoryComp.Summarizer.ManualSummarize(targetMemories);
                     selectedMemories.Clear();
-                    filtersDirty = true; // ? v3.3.32: Mark cache dirty after modifying memories
-                    Messages.Message("RimTalk_MindStream_SummarizedN".Translate(scmMemories.Count), MessageTypeDefOf.PositiveEvent, false);
+                    filtersDirty = true;
+
+                    // 后续考虑发放更全面的 message。以后再说
+                    Messages.Message("总结命令已下发", MessageTypeDefOf.SilentInput, false);
                 }
             ));
         }
-        
+
         private void ArchiveMemories(List<MemoryEntry> targetMemories)
         {
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
-            
-            // ? 修复：排除总结过的记忆
-            var elsMemories = targetMemories
-                .Where(m => m.Layer == MemoryLayer.EventLog && m.CanBeSummarized)
-                .ToList();
-                
-            if (elsMemories.Count == 0)
-            {
-                Messages.Message("RimTalk_MindStream_NoELSSelected".Translate(), MessageTypeDefOf.RejectInput, false);
-                return;
-            }
-            
+
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                "RimTalk_MindStream_ArchiveConfirm".Translate(elsMemories.Count),
+                $"确定要归档选中的 {targetMemories.Count} 条记忆吗？",
                 delegate
                 {
-                    AggregateMemories(
-                        elsMemories,
-                        MemoryLayer.Archive,
-                        currentMemoryComp.EventLogMemories,
-                        currentMemoryComp.ArchiveMemories,
-                        "deep_archive"
-                    );
-                    
+                    currentMemoryComp.Summarizer.Archive(targetMemories);
                     selectedMemories.Clear();
-                    filtersDirty = true; // ? v3.3.32: Mark cache dirty after modifying memories
-                    Messages.Message("RimTalk_MindStream_ArchivedN".Translate(elsMemories.Count), MessageTypeDefOf.PositiveEvent, false);
+                    filtersDirty = true;
+
+                    // 后续考虑发放更全面的 message。以后再说
+                    Messages.Message("归档命令已下发", MessageTypeDefOf.SilentInput, false);
                 }
             ));
         }
-        
+
         private void DeleteMemories(List<MemoryEntry> targetMemories)
         {
             if (currentMemoryComp == null || targetMemories == null || targetMemories.Count == 0)
                 return;
-            
+
             int count = targetMemories.Count;
-            
+
             Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
                 "RimTalk_MindStream_DeleteConfirm".Translate(count),
                 delegate
@@ -129,14 +66,14 @@ namespace RimTalk.Memory.UI
                     {
                         currentMemoryComp.Maintainer.Remove(memory);
                     }
-                    
+
                     selectedMemories.Clear();
                     filtersDirty = true; // ? v3.3.32: Mark cache dirty after modifying memories
                     Messages.Message("RimTalk_MindStream_DeletedN".Translate(count), MessageTypeDefOf.PositiveEvent, false);
                 }
             ));
         }
-        
+
         private void SummarizeAll()
         {
             List<Pawn> pawnsToSummarize = new List<Pawn>();
@@ -151,11 +88,12 @@ namespace RimTalk.Memory.UI
                     }
                 }
             }
-            
+
             if (pawnsToSummarize.Count > 0)
             {
-                var memoryManager = Find.World.GetComponent<MemoryManager>();
-                memoryManager?.QueueManualSummarization(pawnsToSummarize);
+                foreach (var pawn in pawnsToSummarize)
+                    pawn?.TryGetComp<FourLayerMemoryComp>()?.Summarizer.AutoSummarize();
+
                 Messages.Message("RimTalk_MindStream_QueuedSummarization".Translate(pawnsToSummarize.Count), MessageTypeDefOf.TaskCompletion, false);
             }
             else
@@ -163,7 +101,7 @@ namespace RimTalk.Memory.UI
                 Messages.Message("RimTalk_MindStream_NoNeedSummarization".Translate(), MessageTypeDefOf.RejectInput, false);
             }
         }
-        
+
         /* 废弃代码，暂时先不删而是注释掉，之后再善后
         private void ArchiveAll()
         {

@@ -77,7 +77,6 @@ namespace RimTalk.Memory.UI
         {
             // 动态按钮数量：1个“全部”+枚举中的记忆类型按钮（排除未实现 Observation）
             var types = System.Enum.GetValues(typeof(MemoryType)).Cast<MemoryType>()
-                .Where(t => t != MemoryType.Observation) // 过滤未实现类型
                 .ToList();
             int totalButtons = types.Count + 1; // 包含“全部”
             float buttonWidth = rect.width / totalButtons;
