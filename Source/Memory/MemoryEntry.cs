@@ -85,7 +85,7 @@ namespace RimTalk.Memory
         /// <summary>
         /// 是否应当被清理
         /// </summary>
-        public bool ShouldBeCleaned => Activity < 0.01f && !IsPinned;
+        public bool ShouldBeCleaned => Activity < 0.025f && !IsPinned;
 
         /// <summary>
         /// 获取记忆年龄描述
