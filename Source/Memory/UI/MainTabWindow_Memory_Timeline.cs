@@ -209,10 +209,10 @@ namespace RimTalk.Memory.UI
             }
             if (Widgets.ButtonImage(pinButtonRect, memory.IsPinned ? TexButton.ReorderUp : TexButton.ReorderDown))
             {
-                memory.IsPinned = !memory.IsPinned;
+                bool isPinned = !memory.IsPinned;
                 if (currentMemoryComp != null)
                 {
-                    currentMemoryComp.Maintainer.PinMemory(memory, memory.IsPinned);
+                    currentMemoryComp.Maintainer.PinMemory(memory, isPinned);
                     InvalidateCache();
                 }
                 // ? v3.3.32: No need to mark dirty for pin/unpin as it doesn't affect filtering

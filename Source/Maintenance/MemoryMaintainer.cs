@@ -142,12 +142,12 @@ namespace RimTalk.Memory.Maintenance
         /// 修改 Pin 状态，自动处理 ABM->SCM 迁移与 RoundMemory 实体化，
         /// 当 memoryId 对应记忆为 RoundMemory 时，复制一份新的 SCM 条目并删除原条目
         /// </summary>
-        public void PinMemory(MemoryEntry memory, bool pinned)
+        public void PinMemory(MemoryEntry memory, bool isPinned)
         {
             if (memory is null) return;
 
             // 层级信息或将改为由 UI 端传入
-            if (memory.Layer is MemoryLayer.Active)
+            if (isPinned && memory.Layer is MemoryLayer.Active)
             {
                 ABMList.Remove(memory);
 
@@ -162,7 +162,7 @@ namespace RimTalk.Memory.Maintenance
                 SCMList.Add(memory);
             }
 
-            memory.IsPinned = pinned;
+            memory.IsPinned = isPinned;
         }
 
         /// <summary>
