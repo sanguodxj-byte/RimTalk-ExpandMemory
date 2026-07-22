@@ -2,12 +2,14 @@
 using UnityEngine;
 using HarmonyLib;
 using System;
+using System.Text;
 
 namespace RimTalk.MemoryPatch
 {
     public class RimTalkMemoryPatchMod : Mod
     {
         public static RimTalkMemoryPatchSettings _settings;
+        private int _apiSettingsHash = 0;
 
         /// <summary>
         /// 获取当前 Mod 的设置实例
@@ -28,9 +30,7 @@ namespace RimTalk.MemoryPatch
         public RimTalkMemoryPatchMod(ModContentPack content) : base(content)
         {
             _settings = GetSettings<RimTalkMemoryPatchSettings>();
-
-            // ⭐ v3.3.2.5: 强制预注册关键类型，确保旧存档兼容性
-            Memory.BackCompatibilityFix.ForceInitialize();
+            _apiSettingsHash = GetApiSettingsHash(_settings);
 
             // ⭐ 初始化提示词规范化器
             Memory.PromptNormalizer.UpdateRules(Settings.normalizationRules);
@@ -62,6 +62,37 @@ namespace RimTalk.MemoryPatch
 
             // 重新加载提示词规范化规则
             Memory.PromptNormalizer.UpdateRules(Settings.normalizationRules);
+
+            var settings = Settings;
+            int newHash = GetApiSettingsHash(settings);
+
+            if (newHash != _apiSettingsHash)
+            {
+                _apiSettingsHash = newHash;
+                Memory.AI.AIService.ResetClientPool();
+                Log.Message("[RimTalk-Expand Memory] AI config changed, client pool reset.");
+            }
+        }
+
+        private int GetApiSettingsHash(RimTalkMemoryPatchSettings settings)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine(settings.UseRimTalkAIConfig.ToString());
+
+            if (settings.ApiConfigs != null)
+            {
+                foreach (var config in settings.ApiConfigs)
+                {
+                    sb.AppendLine(config.Provider.ToString());
+                    sb.AppendLine(config.ApiKey);
+                    sb.AppendLine(config.CustomModelName);
+                    sb.AppendLine(config.CustomUrl);
+                    sb.AppendLine(config.IsEnabled.ToString());
+                }
+            }
+
+            return sb.ToString().GetHashCode();
         }
     }
 }

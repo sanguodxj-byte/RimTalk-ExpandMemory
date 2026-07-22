@@ -5,6 +5,7 @@ using RimTalk.Memory;
 using RimTalk.Memory.UI;
 using System;
 using System.Collections.Generic;
+using RimTalk.Memory.AI;
 
 namespace RimTalk.MemoryPatch
 {
@@ -80,12 +81,11 @@ namespace RimTalk.MemoryPatch
         public int maxArchiveMemories = 50;
 
         // AI 配置
-        public bool useRimTalkAIConfig = true;
-        public string independentApiKey = "";
-        public string independentApiUrl = "";
-        public string independentModel = "gpt-3.5-turbo";
-        public string independentProvider = "OpenAI";
-        public bool enablePromptCaching = true;
+        public bool EnableAILog = false;
+        public bool UseRimTalkAIConfig = true;
+
+        // 新多备选配置链(本期 v4.x 主要数据来源)
+        public List<Memory.AI.ApiConfig> ApiConfigs = new();
 
         // AI 总结提示词配置
         public string SummarizePrompt = DefaultSummarizePrompt;  // 空字符串表示使用默认
@@ -108,7 +108,7 @@ namespace RimTalk.MemoryPatch
             "极简表达不超过60字\n" +
             "只输出总结文字不要其他格式";
 
-        public int summaryMaxTokens = 8000;  // ⭐ v3.4.0: 调整默认值为 8000
+        public int SummaryMaxTokens = 8000;  // ⭐ v3.4.0: 调整默认值为 8000
 
         // UI 设置
         public bool enableMemoryUI = true;
@@ -228,16 +228,19 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref ArchiveIntervalDays, "fourLayer_archiveIntervalDays", 15);
             Scribe_Values.Look(ref maxArchiveMemories, "fourLayer_maxArchiveMemories", 50);
 
-            Scribe_Values.Look(ref useRimTalkAIConfig, "ai_useRimTalkConfig", true);
-            Scribe_Values.Look(ref independentApiKey, "ai_independentApiKey", "");
-            Scribe_Values.Look(ref independentApiUrl, "ai_independentApiUrl", "");
-            Scribe_Values.Look(ref independentModel, "ai_independentModel", "gpt-3.5-turbo");
-            Scribe_Values.Look(ref independentProvider, "ai_independentProvider", "OpenAI");
-            Scribe_Values.Look(ref enablePromptCaching, "ai_enablePromptCaching", true);
+            Scribe_Values.Look(ref EnableAILog, "EnableAILog", false);
+            Scribe_Values.Look(ref UseRimTalkAIConfig, "UseRimTalkConfig", true);
+
+            // 新链路
+            Scribe_Collections.Look(ref ApiConfigs, "ApiConfigs", LookMode.Deep);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                ApiConfigs ??= new();
+            }
 
             Scribe_Values.Look(ref SummarizePrompt, "ai_dailySummaryPrompt", "");
             Scribe_Values.Look(ref ArchivePrompt, "ai_deepArchivePrompt", "");
-            Scribe_Values.Look(ref summaryMaxTokens, "ai_summaryMaxTokens", 8000);  // ⭐ v3.4.0: 与字段默认值同步
+            Scribe_Values.Look(ref SummaryMaxTokens, "ai_summaryMaxTokens", 8000);  // ⭐ v3.4.0: 与字段默认值同步
 
             Scribe_Values.Look(ref enableMemoryUI, "memoryPatch_enableMemoryUI", true);
             Scribe_Values.Look(ref enableActionMemory, "memoryPatch_enableActionMemory", true);
@@ -561,167 +564,71 @@ namespace RimTalk.MemoryPatch
 
         private void DrawAIConfigSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("RimTalk_Settings_PreferRimTalkAI".Translate(), ref useRimTalkAIConfig);
+            // 是否启用 AI 日志
+            listing.CheckboxLabeled("RimTalk_Settings_EnableAILog".Translate(), ref EnableAILog);
 
-            if (useRimTalkAIConfig)
+            // 跟随 RimTalk 主开关
+            listing.CheckboxLabeled("RimTalk_Settings_PreferRimTalkAI".Translate(), ref UseRimTalkAIConfig);
+
+            if (UseRimTalkAIConfig)
             {
                 GUI.color = new Color(0.8f, 1f, 0.8f);
                 listing.Label("  " + "RimTalk_Settings_WillFollowRimTalkConfig".Translate());
                 GUI.color = Color.white;
                 listing.Gap();
             }
-
-            listing.Gap();
-
-            // ⭐ v3.3.20: 使用辅助类绘制提供商选择
-            SettingsUIDrawers.DrawAIProviderSelection(listing, this);
-
-            listing.Gap();
-
-            // API 配置
-            listing.Label("RimTalk_Settings_APIKey".Translate() + ":");
-            independentApiKey = listing.TextEntry(independentApiKey);
-
-            listing.Label("RimTalk_Settings_APIURL".Translate() + ":");
-            independentApiUrl = listing.TextEntry(independentApiUrl);
-
-            listing.Label("RimTalk_Settings_ModelName".Translate() + ":");
-            independentModel = listing.TextEntry(independentModel);
-
-            listing.Gap();
-
-            // ⭐ 修改：Prompt Caching 选项 - 仅DeepSeek和OpenAI可切换
-            bool canToggleCaching = (independentProvider == "OpenAI" || independentProvider == "DeepSeek");
-
-            if (canToggleCaching)
-            {
-                listing.CheckboxLabeled("RimTalk_Settings_EnablePromptCaching".Translate(), ref enablePromptCaching);
-            }
             else
             {
-                // 其他提供商强制关闭缓存
-                enablePromptCaching = false;
+                // fallback 链生效提示
                 GUI.color = Color.gray;
-                bool disabledCache = false;
-                listing.CheckboxLabeled("RimTalk_Settings_EnablePromptCachingUnavailable".Translate(), ref disabledCache);
+                listing.Label("  " + "RimTalk_Settings_FallbackEnabledDesc".Translate());
                 GUI.color = Color.white;
+                listing.Gap();
             }
 
-            if (enablePromptCaching || !canToggleCaching)
-            {
-                if (independentProvider == "OpenAI")
-                {
-                    GUI.color = new Color(0.8f, 1f, 0.8f);
-                    listing.Label("  " + "RimTalk_Settings_OpenAICachingSupport".Translate());
-                    listing.Label("  " + "RimTalk_Settings_OpenAICachingModels".Translate());
-                    GUI.color = Color.white;
-                }
-                else if (independentProvider == "DeepSeek")
-                {
-                    GUI.color = new Color(0.8f, 1f, 0.8f);
-                    listing.Label("  " + "RimTalk_Settings_DeepSeekCachingSupport".Translate());
-                    listing.Label("  " + "RimTalk_Settings_DeepSeekCachingSavings".Translate());
-                    GUI.color = Color.white;
-                }
-                else if (independentProvider == "Player2")
-                {
-                    GUI.color = Color.gray;
-                    listing.Label("  " + "RimTalk_Settings_Player2NoCaching".Translate());
-                    listing.Label("  " + "RimTalk_Settings_Player2LocalNoCache".Translate());
-                    GUI.color = Color.white;
-                }
-                else if (independentProvider == "Google")
-                {
-                    GUI.color = Color.gray;
-                    listing.Label("  " + "RimTalk_Settings_GoogleNoCaching".Translate());
-                    GUI.color = Color.white;
-                }
-                else if (independentProvider == "Custom")
-                {
-                    GUI.color = Color.gray;
-                    listing.Label("  " + "RimTalk_Settings_CustomNoCaching".Translate());
-                    listing.Label("  " + "RimTalk_Settings_CustomCachingDepends".Translate());
-                    GUI.color = Color.white;
-                }
-            }
+            listing.GapLine();
+
+            // 独立多备选配置表格（跟随 RimTalk 时仍可编辑，作为关闭跟随后的 fallback 链）
+            SettingsUIDrawers.DrawRimTalkStyleApiConfigs(listing, this);
 
             listing.Gap();
 
-            // 配置验证按钮
+            // 配置验证：仅存档内可用（依赖 AIService GameComponent）
+            if (Current.Game == null)
+            {
+                GUI.color = Color.gray;
+                listing.Label("RimTalk_Settings_ValidateInSaveOnly".Translate());
+                GUI.color = Color.white;
+                return;
+            }
+
             Rect validateButtonRect = listing.GetRect(35f);
             if (Widgets.ButtonText(validateButtonRect, "RimTalk_Settings_ValidateConfig".Translate()))
             {
                 ValidateAIConfig();
             }
 
-            // 提示信息
             GUI.color = Color.gray;
             listing.Label("RimTalk_Settings_ValidateConfigTip".Translate());
             GUI.color = Color.white;
         }
 
         /// <summary>
-        /// 验证 AI 配置
+        /// 验证 AI 配置（仅存档内有效）
         /// </summary>
-        private void ValidateAIConfig()
+        private async void ValidateAIConfig()
         {
-            if (useRimTalkAIConfig)
+            AIService.ResetClientPool();
+
+            Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.CautionInput, historical: false);
+
+            if (await AIService.ValidateAIConfigAsync())
             {
-                Messages.Message("RimTalk_Settings_UsingRimTalkConfigNoValidation".Translate(), MessageTypeDefOf.NeutralEvent);
+                Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
                 return;
             }
 
-            if (string.IsNullOrEmpty(independentApiKey))
-            {
-                Messages.Message("RimTalk_Settings_PleaseEnterAPIKey".Translate(), MessageTypeDefOf.RejectInput);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(independentApiUrl))
-            {
-                Messages.Message("RimTalk_Settings_PleaseEnterAPIURL".Translate(), MessageTypeDefOf.RejectInput);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(independentModel))
-            {
-                Messages.Message("RimTalk_Settings_PleaseEnterModel".Translate(), MessageTypeDefOf.RejectInput);
-                return;
-            }
-
-            Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.NeutralEvent);
-
-            // 强制重新初始化 AI Summarizer
-            System.Threading.Tasks.Task.Run(() =>
-            {
-                try
-                {
-                    Memory.AI.IndependentAISummarizer.ForceReinitialize();
-
-                    if (Memory.AI.IndependentAISummarizer.IsAvailable())
-                    {
-                        LongEventHandler.ExecuteWhenFinished(() =>
-                        {
-                            Messages.Message("RimTalk_Settings_ValidationSuccess".Translate(independentProvider), MessageTypeDefOf.PositiveEvent);
-                        });
-                    }
-                    else
-                    {
-                        LongEventHandler.ExecuteWhenFinished(() =>
-                        {
-                            Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.RejectInput);
-                        });
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Error($"AI Config validation failed: {ex.Message}");
-                    LongEventHandler.ExecuteWhenFinished(() =>
-                    {
-                        Messages.Message("RimTalk_Settings_ValidationError".Translate(ex.Message), MessageTypeDefOf.RejectInput);
-                    });
-                }
-            });
+            Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
         }
 
         private void DrawMemoryTypesSettings(Listing_Standard listing)

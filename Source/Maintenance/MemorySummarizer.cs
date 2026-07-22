@@ -93,8 +93,6 @@ namespace RimTalk.Memory.Maintenance
         /// </remarks>
         public void AutoSummarize(int latestPotentialSummarizeTick = -1)
         {
-            if (!IndependentAISummarizer.IsAvailable()) return;
-
             // 懒计算
             if (latestPotentialSummarizeTick == -1)
             {
@@ -125,9 +123,7 @@ namespace RimTalk.Memory.Maintenance
         /// </summary>
         public void ManualSummarize(IEnumerable<MemoryEntry> source)
         {
-            if (source is null
-                || !source.Any()
-                || !IndependentAISummarizer.IsAvailable())
+            if (source is null || !source.Any())
                 return;
 
             // 建立 query
@@ -187,9 +183,9 @@ namespace RimTalk.Memory.Maintenance
             try
             {
                 // 入列 AI 请求队列，异步执行
-                AIRequestManager.EnqueueAIRequest(prompt, result =>
-                {
-                    try
+                AIService.EnqueueAIRequest(
+                    prompt,
+                    callback: result =>
                     {
                         if (string.IsNullOrWhiteSpace(result))
                         {
@@ -204,14 +200,14 @@ namespace RimTalk.Memory.Maintenance
                         // 构建成功，标记源条目为已总结
                         foreach (var m in memoryList)
                             m?.IsSummarized = true;
-                    }
-                    finally
+                    },
+                    dispose: () =>
                     {
                         // 无论成功与否，都将源条目标记为不再总结中
                         foreach (var m in memoryList)
                             m?.IsSummarizing = false;
                     }
-                });
+                    );
             }
             catch (Exception ex)
             {
@@ -247,8 +243,6 @@ namespace RimTalk.Memory.Maintenance
         /// </summary>
         public void Archive(IEnumerable<MemoryEntry> source = null)
         {
-            if (!IndependentAISummarizer.IsAvailable()) return;
-
             // 与手动 summarize 以及自动 summarize/archive 的面向层级 + 抓取机制不同，
             // 手动 Archive 面向记忆类型，只要是 MemoryType.Summarization 的条目都可以被手动归档
             // 手动归档权限更高，已总结过的条目也可再次总结
@@ -303,9 +297,9 @@ namespace RimTalk.Memory.Maintenance
             try
             {
                 // 入列 AI 请求队列，异步执行
-                AIRequestManager.EnqueueAIRequest(prompt, result =>
-                {
-                    try
+                AIService.EnqueueAIRequest(
+                    prompt,
+                    callback: result =>
                     {
                         if (string.IsNullOrWhiteSpace(result))
                         {
@@ -320,14 +314,14 @@ namespace RimTalk.Memory.Maintenance
                         // 构建成功，标记源条目为已总结
                         foreach (var m in memoryList)
                             m?.IsSummarized = true;
-                    }
-                    finally
+                    },
+                    dispose: () =>
                     {
                         // 无论成功与否，都将源条目标记为不再总结中
                         foreach (var m in memoryList)
                             m?.IsSummarizing = false;
                     }
-                });
+                    );
             }
             catch (Exception ex)
             {
