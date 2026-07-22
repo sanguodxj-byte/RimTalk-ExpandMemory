@@ -402,9 +402,7 @@ namespace RimTalk.Memory.VectorDB
                 var settings = RimTalkMemoryPatchMod.Settings;
                 
                 // 优先使用专用的 Embedding API Key，如果为空则使用通用 API Key
-                string apiKey = string.IsNullOrEmpty(settings.embeddingApiKey) 
-                    ? settings.independentApiKey 
-                    : settings.embeddingApiKey;
+                string apiKey = settings.embeddingApiKey;
                     
                 string apiUrl = settings.embeddingApiUrl;
                 string model = settings.embeddingModel;

@@ -58,7 +58,7 @@ namespace RimTalk.Memory.UI
                 ? DEFAULT_DEEP_ARCHIVE 
                 : settings.ArchivePrompt;
                 
-            editMaxTokens = settings.summaryMaxTokens;
+            editMaxTokens = settings.SummaryMaxTokens;
         }
         
         public override void DoWindowContents(Rect inRect)
@@ -200,7 +200,7 @@ namespace RimTalk.Memory.UI
                 ? "" 
                 : editDeepArchive;
                 
-            settings.summaryMaxTokens = editMaxTokens;
+            settings.SummaryMaxTokens = editMaxTokens;
             
             // 保存设置
             settings.Write();

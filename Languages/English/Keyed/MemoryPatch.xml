@@ -293,7 +293,26 @@
   <!-- AI Configuration -->
   <RimTalk_Settings_AIConfigSection>AI Configuration</RimTalk_Settings_AIConfigSection>
   <RimTalk_Settings_PreferRimTalkAI>Prefer RimTalk Configuration</RimTalk_Settings_PreferRimTalkAI>
+  <RimTalk_Settings_EnableAILog>Enable AI request logging</RimTalk_Settings_EnableAILog>
   <RimTalk_Settings_WillFollowRimTalkConfig>Will automatically follow RimTalk Mod's AI configuration</RimTalk_Settings_WillFollowRimTalkConfig>
+  <RimTalk_Settings_FallbackEnabledDesc>Independent fallback chain is active. Calls will move to the next provider automatically on failure.</RimTalk_Settings_FallbackEnabledDesc>
+  <RimTalk_Settings_ApiConfigInvalid>Invalid config: check that the URL is valid and the model is filled in</RimTalk_Settings_ApiConfigInvalid>
+  <RimTalk_Settings_ValidationSuccessAny>Validation passed: at least one config is usable. See logs for details.</RimTalk_Settings_ValidationSuccessAny>
+  <RimTalk_Settings_ValidateInSaveOnly>Validation only works in a save. Load or start a game first.</RimTalk_Settings_ValidateInSaveOnly>
+  <RimTalk_Settings_CloudApiConfigurations>API Configurations</RimTalk_Settings_CloudApiConfigurations>
+  <RimTalk_Settings_CloudApiConfigurationsDesc>Add one or more providers. They form an ordered fallback chain: if a call fails, the next enabled provider is tried automatically.</RimTalk_Settings_CloudApiConfigurationsDesc>
+  <RimTalk_Settings_ProviderHeader>Provider</RimTalk_Settings_ProviderHeader>
+  <RimTalk_Settings_ApiKeyHeader>API Key</RimTalk_Settings_ApiKeyHeader>
+  <RimTalk_Settings_ModelHeader>Model</RimTalk_Settings_ModelHeader>
+  <RimTalk_Settings_EnabledHeader>Enabled</RimTalk_Settings_EnabledHeader>
+  <RimTalk_Settings_EnableDisableTooltip>Enable/Disable this provider as a fallback candidate</RimTalk_Settings_EnableDisableTooltip>
+  <RimTalk_Settings_PlaceholderApiKey>Paste API Key...</RimTalk_Settings_PlaceholderApiKey>
+  <RimTalk_Settings_PlaceholderModelId>Model ID</RimTalk_Settings_PlaceholderModelId>
+  <RimTalk_Settings_BaseUrlTooltip>Custom endpoint base URL (only for Custom provider)</RimTalk_Settings_BaseUrlTooltip>
+  <RimTalk_Settings_ChooseModel>(choose model...)</RimTalk_Settings_ChooseModel>
+  <RimTalk_Settings_DefaultModel>default</RimTalk_Settings_DefaultModel>
+  <RimTalk_Settings_CustomModel>Custom...</RimTalk_Settings_CustomModel>
+  <RimTalk_Settings_QuotaExceeded>AI quota exhausted, please check your provider account</RimTalk_Settings_QuotaExceeded>
   <RimTalk_Settings_APIKey>API Key</RimTalk_Settings_APIKey>
   <RimTalk_Settings_APIURL>API URL</RimTalk_Settings_APIURL>
   <RimTalk_Settings_ModelName>Model</RimTalk_Settings_ModelName>
@@ -309,7 +328,7 @@
   <RimTalk_Settings_CustomNoCaching>✗ Custom API does not support Prompt Caching</RimTalk_Settings_CustomNoCaching>
   <RimTalk_Settings_CustomCachingDepends>Depends on your API implementation</RimTalk_Settings_CustomCachingDepends>
   <RimTalk_Settings_ValidateConfig>✓ Validate Configuration</RimTalk_Settings_ValidateConfig>
-  <RimTalk_Settings_ValidateConfigTip>Tip: Validation will test the API connection and configuration</RimTalk_Settings_ValidateConfigTip>
+  <RimTalk_Settings_ValidateConfigTip>Tip: Validation sends a real API request along the fallback chain (in-save only)</RimTalk_Settings_ValidateConfigTip>
   <RimTalk_Settings_UsingRimTalkConfigNoValidation>Currently using RimTalk config, no validation needed for independent config</RimTalk_Settings_UsingRimTalkConfigNoValidation>
   <RimTalk_Settings_PleaseEnterAPIKey>Please enter API Key first</RimTalk_Settings_PleaseEnterAPIKey>
   <RimTalk_Settings_PleaseEnterAPIURL>Please enter API URL first</RimTalk_Settings_PleaseEnterAPIURL>
