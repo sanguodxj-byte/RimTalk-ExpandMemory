@@ -297,7 +297,26 @@
   <!-- AI 配置 -->
   <RimTalk_Settings_AIConfigSection>AI 配置</RimTalk_Settings_AIConfigSection>
   <RimTalk_Settings_PreferRimTalkAI>优先使用 RimTalk 配置</RimTalk_Settings_PreferRimTalkAI>
+  <RimTalk_Settings_EnableAILog>启用 AI 请求日志</RimTalk_Settings_EnableAILog>
   <RimTalk_Settings_WillFollowRimTalkConfig>将自动跟随 RimTalk Mod 的 AI 配置</RimTalk_Settings_WillFollowRimTalkConfig>
+  <RimTalk_Settings_FallbackEnabledDesc>独立备选链已启用。调用失败时会自动切换到下一个启用的 Provider。</RimTalk_Settings_FallbackEnabledDesc>
+  <RimTalk_Settings_ApiConfigInvalid>配置无效，请检查 URL 是否合法、模型是否填写</RimTalk_Settings_ApiConfigInvalid>
+  <RimTalk_Settings_ValidationSuccessAny>验证通过，至少有一个可用配置项</RimTalk_Settings_ValidationSuccessAny>
+  <RimTalk_Settings_ValidateInSaveOnly>验证仅在存档内可用，请先载入或新建游戏</RimTalk_Settings_ValidateInSaveOnly>
+  <RimTalk_Settings_CloudApiConfigurations>API 配置</RimTalk_Settings_CloudApiConfigurations>
+  <RimTalk_Settings_CloudApiConfigurationsDesc>添加一个或多个提供商,按顺序构成 fallback 链:某个调用失败会自动尝试下一个启用的 Provider。</RimTalk_Settings_CloudApiConfigurationsDesc>
+  <RimTalk_Settings_ProviderHeader>Provider</RimTalk_Settings_ProviderHeader>
+  <RimTalk_Settings_ApiKeyHeader>API Key</RimTalk_Settings_ApiKeyHeader>
+  <RimTalk_Settings_ModelHeader>模型</RimTalk_Settings_ModelHeader>
+  <RimTalk_Settings_EnabledHeader>启用</RimTalk_Settings_EnabledHeader>
+  <RimTalk_Settings_EnableDisableTooltip>把这个 Provider 作为备选链候选启用/禁用</RimTalk_Settings_EnableDisableTooltip>
+  <RimTalk_Settings_PlaceholderApiKey>粘贴 API Key...</RimTalk_Settings_PlaceholderApiKey>
+  <RimTalk_Settings_PlaceholderModelId>模型 ID</RimTalk_Settings_PlaceholderModelId>
+  <RimTalk_Settings_BaseUrlTooltip>自定义 endpoint Base URL (仅用于 Custom Provider)</RimTalk_Settings_BaseUrlTooltip>
+  <RimTalk_Settings_ChooseModel>(选择模型...)</RimTalk_Settings_ChooseModel>
+  <RimTalk_Settings_DefaultModel>默认</RimTalk_Settings_DefaultModel>
+  <RimTalk_Settings_CustomModel>自定义...</RimTalk_Settings_CustomModel>
+  <RimTalk_Settings_QuotaExceeded>AI 配额已耗尽,请检查你的提供商账户</RimTalk_Settings_QuotaExceeded>
   <RimTalk_Settings_APIKey>API Key</RimTalk_Settings_APIKey>
   <RimTalk_Settings_APIURL>API URL</RimTalk_Settings_APIURL>
   <RimTalk_Settings_ModelName>Model</RimTalk_Settings_ModelName>
@@ -313,14 +332,14 @@
   <RimTalk_Settings_CustomNoCaching>✗ 自定义API 不支持 Prompt Caching</RimTalk_Settings_CustomNoCaching>
   <RimTalk_Settings_CustomCachingDepends>取决于您的 API 实现</RimTalk_Settings_CustomCachingDepends>
   <RimTalk_Settings_ValidateConfig>✓ 验证配置</RimTalk_Settings_ValidateConfig>
-  <RimTalk_Settings_ValidateConfigTip>提示: 验证将测试 API 连接和配置</RimTalk_Settings_ValidateConfigTip>
+  <RimTalk_Settings_ValidateConfigTip>提示: 验证会按 fallback 顺序实际请求 API（仅存档内）</RimTalk_Settings_ValidateConfigTip>
   <RimTalk_Settings_UsingRimTalkConfigNoValidation>当前使用 RimTalk 配置，无需验证独立配置</RimTalk_Settings_UsingRimTalkConfigNoValidation>
   <RimTalk_Settings_PleaseEnterAPIKey>请先输入 API Key</RimTalk_Settings_PleaseEnterAPIKey>
   <RimTalk_Settings_PleaseEnterAPIURL>请先输入 API URL</RimTalk_Settings_PleaseEnterAPIURL>
   <RimTalk_Settings_PleaseEnterModel>请先输入 Model</RimTalk_Settings_PleaseEnterModel>
   <RimTalk_Settings_Validating>配置验证中...</RimTalk_Settings_Validating>
   <RimTalk_Settings_ValidationSuccess>✓ 配置验证成功！提供商: {0}</RimTalk_Settings_ValidationSuccess>
-  <RimTalk_Settings_ValidationFailed>✗ 配置验证失败，请检查 API Key 和 URL</RimTalk_Settings_ValidationFailed>
+  <RimTalk_Settings_ValidationFailed>✗ 配置验证失败，详见日志</RimTalk_Settings_ValidationFailed>
   <RimTalk_Settings_ValidationError>✗ 验证失败: {0}</RimTalk_Settings_ValidationError>
   
   <!-- 记忆类型 -->
