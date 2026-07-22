@@ -25,10 +25,10 @@ namespace RimTalk.Memory.Patches.Capture
     public static class Pawn_JobTracker_CleanupCurrentJob_Patch
     {
         [HarmonyPrefix]
-        public static void Prefix(Job ___curJob, Pawn ___pawn) // 未来此处还可传入 JobCondition 进行更精密的上游判断或下游操作
+        public static void Prefix(JobCondition condition, Job ___curJob, Pawn ___pawn) // 未来此处还可传入 JobCondition 进行更精密的上游判断或下游操作
         {
             // 相关检定全部交由下游
-            JobMemoryCapturer.BuildJobMemoryEnter(___curJob, ___pawn);
+            JobMemoryCapturer.BuildJobMemoryEnter(condition, ___curJob, ___pawn);
         }
     }
 

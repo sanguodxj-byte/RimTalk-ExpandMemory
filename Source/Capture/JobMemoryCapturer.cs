@@ -106,14 +106,16 @@ namespace RimTalk.Memory.Capture
         /// </summary>
         public static void ExtractJobInfoEnter(Job job, Pawn pawn)
         {
-            if (// job 不过关时提前返回，跳过 GetComp
-                job?.def is not { } jobDef
-                || _jobsToIgnore.Contains(jobDef)
+            if (// 配置项
+                !RimTalkMemoryPatchMod.Settings.enableActionMemory
 
                 // 仅殖民者且启用工作记忆捕捉时才激活 capturer
                 || pawn is null
                 || !pawn.IsColonist
-                || !RimTalkMemoryPatchMod.Settings.enableActionMemory)
+
+                // job 不过关时提前返回，跳过 GetComp
+                || job?.def is not { } jobDef
+                || _jobsToIgnore.Contains(jobDef))
 
                 return;
 
@@ -126,20 +128,21 @@ namespace RimTalk.Memory.Capture
         /// <summary>
         /// 工作记忆捕获入口
         /// </summary>
-        public static void BuildJobMemoryEnter(Job job, Pawn pawn)
+        public static void BuildJobMemoryEnter(JobCondition condition, Job job, Pawn pawn)
         {
-            if (// job 不过关时提前返回，跳过 GetComp
-                job?.def is not { } jobDef
-                || _jobsToIgnore.Contains(jobDef)
-
-                // build 时额外判断 job 在时间尺度上是否真的“进行”了
-                || Find.TickManager?.TicksGame is not { } currentTick
-                || currentTick == job.startTick
+            if (// 配置项
+                !RimTalkMemoryPatchMod.Settings.enableActionMemory
 
                 // 仅殖民者且启用工作记忆捕捉时才激活 capturer
                 || pawn is null
                 || !pawn.IsColonist
-                || !RimTalkMemoryPatchMod.Settings.enableActionMemory)
+
+                // 只有成功完成的工作才会被捕获
+                || condition is not JobCondition.Succeeded
+
+                // job 不过关时提前返回，跳过 GetComp
+                || job?.def is not { } jobDef
+                || _jobsToIgnore.Contains(jobDef))
 
                 return;
 
@@ -225,8 +228,8 @@ namespace RimTalk.Memory.Capture
             // 这些条件大部分时候为 true，故在多“且”判断中会往后放，以期直接短路跳过
             bool? sharedConditionCache = null;
             bool sharedCondition() => sharedConditionCache ??=
-                Find.TickManager.TicksGame - _lastActiveTick <= SessionTimeoutTicks
-                && Find.TickManager.TicksGame - _startGameTick <= SessionMaxDurationTicks
+                GenTicks.TicksGame - _lastActiveTick <= SessionTimeoutTicks
+                && GenTicks.TicksGame - _startGameTick <= SessionMaxDurationTicks
                 && _lastJobMemory is not null;
 
             // 获取报告是一个潜在的重操作，仅在需要时才执行，并且总是只执行一次
@@ -293,7 +296,7 @@ namespace RimTalk.Memory.Capture
         private void StartNewSession(MemoryEntry newMemory, string report, string jobAggregateDesc, string targetName = null)
         {
             // 初始化会话数据
-            _startGameTick = _lastActiveTick = Find.TickManager.TicksGame;
+            _startGameTick = _lastActiveTick = GenTicks.TicksGame;
             _repeatCount = 1;
             TargetNames.Clear();
 
@@ -313,7 +316,7 @@ namespace RimTalk.Memory.Capture
         // targetName 可选，若提供则添加到目标名称集合中
         private void UpdateSession(string targetName = null)
         {
-            _lastActiveTick = Find.TickManager.TicksGame;
+            _lastActiveTick = GenTicks.TicksGame;
             _repeatCount++;
 
             if (!string.IsNullOrEmpty(targetName))
@@ -402,7 +405,7 @@ namespace RimTalk.Memory.Capture
         // 获取耗时描述
         private string GetDurationDesc()
         {
-            return (Find.TickManager.TicksGame - _startGameTick) switch
+            return (GenTicks.TicksGame - _startGameTick) switch
             {
                 <= GenDate.TicksPerHour => "连续",
                 <= 2 * GenDate.TicksPerHour => "两小时内",
@@ -417,7 +420,7 @@ namespace RimTalk.Memory.Capture
         private float ImportanceIncrement()
         {
             // 每小时增长0.02
-            float increment = (Find.TickManager.TicksGame - _lastActiveTick) * (0.02f / GenDate.TicksPerHour);
+            float increment = (GenTicks.TicksGame - _lastActiveTick) * (0.02f / GenDate.TicksPerHour);
 
             // 前20次每次增长0.01，之后不再增长
             if (_repeatCount <= 20) increment += 0.01f;
