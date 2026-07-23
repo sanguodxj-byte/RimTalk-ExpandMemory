@@ -190,24 +190,28 @@ namespace RimTalk.Memory.API
         /// </summary>
         private static string GetCurrentDialogueContext()
         {
-            try
+            return "";
+            // 一坨彻底的死代码，高山流水遇知音式编程这一块嗷
+            /*
+        try
+        {
+            // 从 RimTalkMemoryAPI 获取缓存的上下文
+            var context = Patches.RimTalkMemoryAPI.GetLastRimTalkContext(out _, out int tick);
+
+            // 检查缓存是否过期（60 ticks 内有效）
+            int currentTick = Find.TickManager?.TicksGame ?? 0;
+            if (currentTick - tick > 60)
             {
-                // 从 RimTalkMemoryAPI 获取缓存的上下文
-                var context = Patches.RimTalkMemoryAPI.GetLastRimTalkContext(out _, out int tick);
+                return "";
+            }
 
-                // 检查缓存是否过期（60 ticks 内有效）
-                int currentTick = Find.TickManager?.TicksGame ?? 0;
-                if (currentTick - tick > 60)
-                {
-                    return "";
-                }
-
-                return context ?? "";
+            return context ?? "";
             }
             catch
             {
                 return "";
             }
+            */
         }
 
         // 注意：固定记忆(isPinned)不需要单独处理

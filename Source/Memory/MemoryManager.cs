@@ -39,18 +39,6 @@ namespace RimTalk.Memory
             }
         }
 
-        // 对话缓存
-        private ConversationCache conversationCache;
-        public ConversationCache ConversationCache
-        {
-            get
-            {
-                if (conversationCache == null)
-                    conversationCache = new ConversationCache();
-                return conversationCache;
-            }
-        }
-
         // ⭐ 提示词缓存（新增）
         private PromptCache promptCache;
         public PromptCache PromptCache
@@ -72,17 +60,6 @@ namespace RimTalk.Memory
 
             var manager = Find.World.GetComponent<MemoryManager>();
             return manager?.CommonKnowledge ?? new CommonKnowledgeLibrary();
-        }
-
-        /// <summary>
-        /// 静态方法获取对话缓存
-        /// </summary>
-        public static ConversationCache GetConversationCache()
-        {
-            if (Current.Game == null) return new ConversationCache();
-
-            var manager = Find.World.GetComponent<MemoryManager>();
-            return manager?.ConversationCache ?? new ConversationCache();
         }
 
         /// <summary>
@@ -138,7 +115,6 @@ namespace RimTalk.Memory
             Scribe_Values.Look(ref lastDecayTick, "lastDecayTick", 0);
 
             Scribe_Deep.Look(ref commonKnowledge, "commonKnowledge");
-            Scribe_Deep.Look(ref conversationCache, "conversationCache");
             Scribe_Deep.Look(ref promptCache, "promptCache");
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -148,11 +124,6 @@ namespace RimTalk.Memory
                 {
                     commonKnowledge = new CommonKnowledgeLibrary();
                     Log.Warning("[RimTalk Memory] commonKnowledge was null, initialized new instance");
-                }
-                if (conversationCache == null)
-                {
-                    conversationCache = new ConversationCache();
-                    Log.Warning("[RimTalk Memory] conversationCache was null, initialized new instance");
                 }
                 if (promptCache == null)
                 {
