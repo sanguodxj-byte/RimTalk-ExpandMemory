@@ -8,8 +8,8 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Memory.Maintenance
-{
+namespace RimTalk.Memory.Maintenance;
+
     /// <summary>
     /// 语义总结器：绑定单个 <see cref="FourLayerMemoryComp"/>，
     /// 统一每日总结、手动总结、选中总结、选中归档与周期归档
@@ -103,10 +103,7 @@ namespace RimTalk.Memory.Maintenance
                 memory is { IsSummarizing: false, IsSummarized: false } && memory.GameTick < latestPotentialSummarizeTick;
 
             // 从 ABM + SCM 中抓取符合条件的条目并按天分组，最旧的周期先提交
-            foreach (var group in ((List<MemoryEntry>)[
-                .. ABMList.Where(IsSummarizable),
-                .. SCMList.Where(IsSummarizable)
-                ])
+        foreach (var group in ABMList.Where(IsSummarizable).Concat(SCMList.Where(IsSummarizable))
                 .GroupBy(m => (latestPotentialSummarizeTick - m.GameTick) / GenDate.TicksPerDay)
                 .OrderByDescending(g => g.Key))
             {
@@ -134,12 +131,13 @@ namespace RimTalk.Memory.Maintenance
                 memory is { IsSummarizing: false } && sourceHashSet.Contains(memory);
 
             // 从 ABM + SCM 中抓取 query 命中的条目
-            var targetMemories = (List<MemoryEntry>)[
-                .. ABMList.Where(IsSummarizable),
-                .. SCMList.Where(IsSummarizable)
-                ];
+        // 这里不使用 concat 是因为手动总结管线需要提前显式判断集合是否为空
+        var targetMemories = (List<MemoryEntry>)[
+            .. ABMList.Where(IsSummarizable),
+            .. SCMList.Where(IsSummarizable)
+            ];
 
-            if (targetMemories.Count == 0)
+        if (targetMemories.Count == 0)
             {
                 Messages.Message("无可总结条目", MessageTypeDefOf.RejectInput, historical: false);
                 return;
@@ -403,6 +401,4 @@ namespace RimTalk.Memory.Maintenance
                 keywords = [.. memoryList.SelectMany(m => m.keywords).Distinct()]
             };
         }
-    }
-
 }
