@@ -108,7 +108,7 @@ namespace RimTalk.Memory.Maintenance
                 .. SCMList.Where(IsSummarizable)
                 ])
                 .GroupBy(m => (latestPotentialSummarizeTick - m.GameTick) / GenDate.TicksPerDay)
-                .OrderBy(g => g.Key))
+                .OrderByDescending(g => g.Key))
             {
                 // 若没有可总结的条目，则 foreach 不会执行，总结静默失败
                 // 符合自动总结的设计理念
