@@ -1,176 +1,154 @@
-# AI 层重写方案 — 实现说明
+# AI 层重写方案 - 当前实现说明
 
-> 文档版本: v2.0（对齐当前代码实现）  
-> 适用项目: RimTalk-ExpandMemory (`cj.rimtalk.expandmemory`)  
-> 状态: **已实现**（原 v1.0 为设计评审稿，本文按落地代码回写）
+> 文档版本：v3.0
+> 对齐范围：`Source/AI/`、`Source/Maintenance/MemorySummarizer.cs`、AI 设置与池重置逻辑
+> 状态：重写主链已落地；本文描述当前代码事实，不再作为待实施设计稿
 
----
+## 1. 重写结果
 
-## 目录
+旧链路已经删除：
 
-- [一、背景与动机](#一背景与动机)
-- [二、设计目标与原则](#二设计目标与原则)
-- [三、整体架构](#三整体架构)
-- [四、模块清单与职责](#四模块清单与职责)
-- [五、Fallback 与配置链](#五fallback-与配置链)
-- [六、关键数据类型](#六关键数据类型)
-- [七、调用方迁移](#七调用方迁移)
-- [八、Settings UI 与持久化](#八settings-ui-与持久化)
-- [九、Embedding / 向量](#九embedding--向量)
-- [十、目录结构](#十目录结构)
-- [十一、行为约定与已知限制](#十一行为约定与已知限制)
-
----
-
-## 一、背景与动机
-
-### 1.1 旧实现问题
-
-旧链路：
-
-```
+```text
 MemorySummarizer
-  → AIRequestManager (WorldComponent, 10s 节流队列)
-  → IndependentAISummarizer.CallAIAsync
+  -> AIRequestManager (WorldComponent)
+  -> IndependentAISummarizer
 ```
 
-`IndependentAISummarizer`（约 864 行）职责过重：配置加载、RimTalk 反射、手写 JSON、Gemini 原生协议、正则抠响应、HttpWebRequest 重试、Player2 探测、Prompt Caching 字段等。
+当前唯一的总结/归档 AI 链路是：
 
-### 1.2 重写后入口
-
-```
+```text
 MemorySummarizer
-  → AIService.EnqueueAIRequest (GameComponent, 10s 节流队列)
-  → ClientPool (IAIClient, 多配置 fallback)
-  → OpenAIClient (UnityWebRequest + OpenAI 兼容端点)
+  -> AIService.EnqueueAIRequest(prompt, callback, dispose)
+  -> AIService.GameComponentUpdate (现实时间 10 秒出队一次)
+  -> ClientPool.GetChatCompletionAsync
+  -> OpenAIClient.GetChatCompletionAsync
+  -> OpenAI 兼容 chat/completions 端点
+  -> Payload
+  -> MemorySummarizer callback / dispose
 ```
 
----
+重写后的职责边界：
 
-## 二、设计目标与原则
+- `MemorySummarizer` 负责业务提示词、源条目状态和结果写回。
+- `AIService` 负责队列、节流、统一结果检查和回调派发。
+- `ClientPool` 负责按配置顺序 fallback。
+- `AIClientFactory` 负责选择配置并创建客户端。
+- `OpenAIClient` 负责请求构造、网络、超时、重试和响应解析。
+- AI 基础设施不直接引用或修改 `MemoryEntry`。
 
-| 原则 | 落地情况 |
-|------|----------|
-| 分层清晰 | 编排 / 池 / 工厂 / 客户端 / DTO 分离 |
-| 对齐 RimTalk 主模组模式 | OpenAI 兼容端点、Provider 表、多 ApiConfig 表 UI |
-| **不复用** RimTalk 类型 | 本模组自有 `ApiConfig` / `AIProvider`；跟随 RimTalk 时经 `RimTalkApiConfigGetter` 映射拷贝 |
-| 全 Provider 走 OpenAI 兼容 chat/completions | Google 亦用 `.../v1beta/openai/chat/completions` |
-| 不做旧独立配置迁移 | 删除 `independentApiKey/Url/Model/Provider`；升级后需重配或跟随 RimTalk |
-| 去掉 Prompt Caching / Player2 | 本期不支持 |
-| 验证仅存档内 | 依赖 `AIService` GameComponent 实例 |
+## 2. 当前架构
 
----
-
-## 三、整体架构
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 调用方                                                       │
-│   MemorySummarizer.SummarizeInternal / Archive               │
-│     AIService.EnqueueAIRequest(prompt, callback, dispose)    │
-└────────────────────────────┬────────────────────────────────┘
-                             │ 10s 现实时间节流
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│ AIService : GameComponent                                    │
-│   - 队列 + GameComponentUpdate 出列                           │
-│   - ExecuteTask → ClientPool.GetChatCompletionAsync          │
-│   - Payload.IsValid → callback；finally → dispose            │
-│   - ValidateAIConfigAsync / ResetClientPool（静态门户）        │
-└────────────────────────────┬────────────────────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│ ClientPool : IAIClient                                       │
-│   - 懒构建客户端列表，失败则工厂再取下一个有效配置               │
-│   - 成功: result.IsValid == true 即返回                       │
-│   - Reset() 清空池 + 新工厂（设置变更时）                      │
-└────────────────────────────┬────────────────────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│ AIClientFactory                                              │
-│   - UseRimTalkAIConfig ? RimTalk 映射列表 : settings.ApiConfigs│
-│   - 跳过 !IsEnabled / !IsValid                                │
-│   - BuildClient → 目前一律 OpenAIClient                      │
-└────────────────────────────┬────────────────────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│ OpenAIClient : IAIClient                                     │
-│   - UnityWebRequest POST                                      │
-│   - 单客户端内重试: 最多 3 次尝试，间隔 4s / 8s                  │
-│   - 401/403/其它致命 4xx 不重试；429/5xx 可重试                 │
-│   - 存档中途 Current.Game==null → abort                       │
-│   - ParseSuccessResponse 成功时 payload.IsValid = true        │
-└─────────────────────────────────────────────────────────────┘
+```text
+调用方
+  MemorySummarizer.SummarizeInternal / ArchiveInternal
+          |
+          | EnqueueAIRequest(prompt, callback, dispose)
+          v
+AIService : GameComponent
+  - 实例级 Queue<(prompt, callback, dispose)>
+  - 静态 _instance 门户
+  - GameComponentUpdate 每帧轮询
+  - RealTime.LastRealTime 控制 10 秒出队间隔
+  - Payload 有效时才调用 callback
+  - finally 中调用 dispose
+          |
+          v
+ClientPool : IAIClient
+  - 缓存已创建的 IAIClient
+  - 每个请求从池中第 0 个客户端开始尝试
+  - 失败时复用或懒创建下一客户端
+  - 任一 Payload.IsValid == true 即返回
+          |
+          v
+AIClientFactory
+  - 跟随 RimTalk：映射 Settings.Get().CloudConfigs
+  - 独立配置：读取本模组 Settings.ApiConfigs
+  - 跳过禁用或无效配置
+  - 当前所有 Provider 都创建 OpenAIClient
+          |
+          v
+OpenAIClient
+  - UnityWebRequest POST
+  - OpenAI 兼容请求/响应 DTO
+  - 首字节等待 120 秒；开始接收后无进度 60 秒超时
+  - 429、5xx、连接和读取超时可重试
+  - 401、403 和其他 HTTP 错误立即失败
+  - Current.Game == null 时 Abort
 ```
 
-配置来源：
+## 3. 模块与真实路径
 
-```
-UseRimTalkAIConfig == true
-  → RimTalkApiConfigGetter.GetRimTalkApiConfigs()
-     (Settings.Get().CloudConfigs → 本模组 List<ApiConfig> 深拷贝映射)
+| 路径 | 当前职责 |
+|---|---|
+| `Source/AI/AIService.cs` | `GameComponent` 队列、10 秒节流、Payload 检查、回调与清理派发 |
+| `Source/AI/AIClientFactory.cs` | 顺序扫描有效配置并创建客户端 |
+| `Source/AI/AIProvider.cs` | Provider 枚举和默认端点注册表 |
+| `Source/AI/ApiConfig.cs` | 单条可持久化配置和 `IsValid` |
+| `Source/AI/Payload.cs` | AI 调用统一结果及可选日志字段 |
+| `Source/AI/Integration/RimTalkApiConfigsGetter.cs` | RimTalk `CloudConfigs` 到本模组配置的深拷贝映射 |
+| `Source/AI/Client/IAIClient.cs` | 完成请求与验证接口 |
+| `Source/AI/Client/ClientPool.cs` | 客户端缓存、配置 fallback、验证 fallback |
+| `Source/AI/Client/OpenAIClient.cs` | UnityWebRequest、超时、重试、序列化和响应解析 |
+| `Source/AI/Client/Dto/OpenAIRequest.cs` | OpenAI 兼容请求 DTO |
+| `Source/AI/Client/Dto/OpenAIResponse.cs` | OpenAI 兼容响应和错误 DTO |
+| `Source/Settings/SettingsUIDrawers.cs` | 独立配置链表格 UI |
+| `Source/RimTalkSettings.cs` | AI 配置持久化、验证按钮、提示词和 token 设置 |
+| `Source/RimTalkMod.cs` | API 设置 hash 变化后重置 ClientPool |
+| `Source/Maintenance/MemorySummarizer.cs` | 当前 AI 层的唯一业务调用方 |
+| `Source/VectorDB/EmbeddingService.cs` | 独立的向量 Embedding 实现，不经过本聊天完成链路 |
 
-UseRimTalkAIConfig == false
-  → RimTalkMemoryPatchMod.Settings.ApiConfigs
-```
-
-设置写入时 `WriteSettings` 对 API 相关字段做 hash，变化则 `AIService.ResetClientPool()`。
-
----
-
-## 四、模块清单与职责
-
-| 路径 | 职责 |
-|------|------|
-| `Source/AI/AIService.cs` | 队列编排、`GameComponent` 生命周期、静态入队/校验/重置 |
-| `Source/AI/Client/ClientPool.cs` | 多客户端 fallback 池，实现 `IAIClient` |
-| `Source/AI/AIClientFactory.cs` | 按配置链顺序产出下一个有效客户端 |
-| `Source/AI/Client/IAIClient.cs` | `GetChatCompletionAsync` / `ValidateAsync` |
-| `Source/AI/Client/OpenAIClient.cs` | OpenAI 兼容 HTTP 客户端 |
-| `Source/AI/Client/Dto/OpenAIRequest.cs` | 请求 DTO（DataContract） |
-| `Source/AI/Client/Dto/OpenAIResponse.cs` | 响应 / Error DTO |
-| `Source/AI/Payload.cs` | 统一结果：`IsValid` 默认 false，成功须显式置 true |
-| `Source/Integration/RimTalkApiConfigsGetter.cs` | RimTalk `CloudConfigs` → 本模组 `ApiConfig` |
-| `Source/Settings/AIProvider.cs` | Provider 枚举 + 默认 endpoint 注册表 |
-| `Source/Settings/ApiConfig.cs` | 单条配置 `IExposable` + `IsValid` |
-| `Source/Settings/SettingsUIDrawers.cs` | 多备选配置表 UI + 实时无效提示 |
-| `Source/Utils/JsonUtil.cs` | DataContractJsonSerializer 序列化/反序列化 |
-| `Source/Utils/MessageUtil.cs` | Message + Log.Error 合一 |
-| `Source/Memory/EmbeddingService.cs` | 由 `Memory/AI/` 上移（内容未改） |
-
-### 已删除
+已删除且不应再作为当前架构引用：
 
 - `Source/Memory/AI/IndependentAISummarizer.cs`
 - `Source/Memory/AI/AIRequestManager.cs`
-- `Source/Memory/AI/DTO/GeminiTypes.cs` / `OpenAITypes.cs`
-- `Source/Memory/AI/SiliconFlowEmbeddingService.cs`（向量客户端实现；向量入口仍可能用其它路径）
+- 旧 Gemini/OpenAI 手写 DTO
+- `SiliconFlowEmbeddingService`
 
----
+## 4. 配置来源与 fallback
 
-## 五、Fallback 与配置链
+### 4.1 配置源二选一
 
-### 5.1 无 sticky 指针
+```text
+UseRimTalkAIConfig == true
+  -> RimTalkApiConfigGetter.GetRimTalkApiConfigs()
+  -> Settings.Get().CloudConfigs 的映射副本
 
-**没有** `CurrentApiConfigIndex` / `TryNextConfig()`。  
-每次 `ClientPool.Reset()` 后从链头重新懒构建；单次请求内按池中已有客户端顺序试，失败再 `TryGetNewClient` 追加下一个有效配置。
+UseRimTalkAIConfig == false
+  -> RimTalkMemoryPatchMod.Settings.ApiConfigs
+```
 
-### 5.2 有效配置条件
+“跟随 RimTalk”与“独立配置链”不是两级 fallback。开关决定本次只使用其中一个来源；跟随模式失败后不会自动转入本模组独立配置。
+
+### 4.2 工厂扫描
+
+`AIClientFactory` 持有 `_configIndex`，从上次已产出配置的下一项继续扫描：
 
 ```csharp
 apiConfig is { IsEnabled: true, IsValid: true }
-
-// ApiConfig.IsValid:
-!string.IsNullOrWhiteSpace(CustomModelName)
-&& Uri.IsWellFormedUriString(URL, UriKind.Absolute)
-
-// URL: 非空 CustomUrl 优先，否则 Provider.GetEndpointUrl()
-// ApiKey 可为空（兼容部分本地/兼容端点）
 ```
 
-### 5.3 Provider 注册表（默认 URL）
+`ApiConfig.IsValid` 仅要求：
+
+```text
+CustomModelName 非空
+URL 是合法绝对 URI
+```
+
+API Key 可以为空，以兼容不要求认证的本地或代理端点。`CustomUrl` 非空时覆盖 Provider 默认端点。
+
+### 4.3 ClientPool 行为
+
+- 池在 `AIService` 生命周期内缓存已创建客户端。
+- 每个新请求都从 `_clients[0]` 开始，不保存“上次成功配置”的 sticky 指针。
+- 当前客户端返回 `null` 或无效 Payload 后，尝试下一已缓存客户端或由工厂创建下一客户端。
+- 配置耗尽时返回最后一个失败结果；若一个客户端都未创建则可能返回 `null`。
+- `maxRetries = 100` 是池循环保护，不代表会对同一配置发送 100 次请求。
+- `Reset()` 清空客户端列表并替换工厂，使下一次扫描重新从配置链头开始。
+
+### 4.4 默认端点
 
 | Provider | Endpoint |
-|----------|----------|
+|---|---|
 | Google | `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions` |
 | OpenAI | `https://api.openai.com/v1/chat/completions` |
 | DeepSeek | `https://api.deepseek.com/v1/chat/completions` |
@@ -179,196 +157,127 @@ apiConfig is { IsEnabled: true, IsValid: true }
 | GLMCoding | `https://api.z.ai/api/coding/paas/v4/chat/completions` |
 | AlibabaIntl | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions` |
 | AlibabaCN | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` |
-| Custom | 无默认 URL，必须填 `CustomUrl` |
+| Custom | 无默认端点，必须填写 `CustomUrl` |
 
-`OpenAIClient`：若 URL path 为 `/`，自动补 `/v1/chat/completions`。
+若最终 URL 的 path 恰好为 `/`，`OpenAIClient` 自动补成 `/v1/chat/completions`；非根路径保持原样。
 
-### 5.4 RimTalk 映射
+## 5. 单客户端请求语义
 
-`RimTalkApiConfigGetter` 将 `global::RimTalk.AIProvider` 映射到本模组枚举；`AlibabaIntl` / `AlibabaCN` 各自对应；未知 → `Custom`。  
-`BaseUrl` → `CustomUrl`，`CustomModelName` / `ApiKey` / `IsEnabled` 原样拷贝。
+### 5.1 请求体
 
-工厂对 RimTalk 列表做懒缓存（`??=`）；配置变更依赖 `ResetClientPool()` 换新工厂。
+普通请求发送：
 
----
-
-## 六、关键数据类型
-
-### 6.1 Payload
-
-```csharp
-public class Payload
+```json
 {
-    public string URL, Model, Request, Response, ErrorMessage;
-    public int? TokenCount;
-    public bool IsValid { get; set; } = false; // 仅成功解析后显式 true
+  "model": "<CustomModelName>",
+  "messages": [{ "role": "user", "content": "<prompt>" }],
+  "max_tokens": 8000
 }
 ```
 
-- `EnableAILog == true` 时请求侧预填 URL/Model/Request，失败可写 ErrorMessage/Response  
-- `AIService`：`null` 或 `!IsValid` 不调 callback，仍执行 dispose  
-- `ClientPool`：`result?.IsValid ?? false` 为 true 才停止 fallback  
+`max_tokens` 来自 `Settings.SummaryMaxTokens`。配置验证发送内容为 `ping`、`max_tokens = 1`。DTO 预留 `temperature`，当前调用未设置。
 
-### 6.2 ApiConfig
+### 5.2 超时和重试
 
-字段：`IsEnabled`, `Provider`, `ApiKey`, `CustomUrl`, `CustomModelName`。  
-`IExposable` 深存于 `ApiConfigs` 集合。
+- 轮询间隔：100 ms。
+- 收到首字节前连续 120 秒无数据：连接超时。
+- 已开始接收后连续 60 秒无新增字节：读取超时。
+- 最多 3 次总尝试：首次、等待 4 秒后重试、等待 8 秒后重试。
+- 429、5xx、连接超时、读取超时进入重试。
+- 401、403 立即失败。
+- 其他 HTTP/协议错误立即失败。
+- 游戏退出时中止请求并返回无效 Payload，不再重试该客户端。
 
-### 6.3 请求 JSON
+`ValidateAsync()` 不走上述重试循环；它对当前客户端发送一次 ping，失败后由 `ClientPool.ValidateAsync()` 尝试下一配置。
 
-`JsonUtil.SerializeToJson(OpenAIRequest)`：`model` / `messages` / `max_tokens`（默认取 `Settings.SummaryMaxTokens`）。  
-校验 ping：`max_tokens: 1`。
+### 5.3 成功判定
 
----
+只有同时满足以下条件才把 `Payload.IsValid` 置为 `true`：
 
-## 七、调用方迁移
+- 响应文本非空。
+- 可以反序列化为 `OpenAIResponse`。
+- `choices` 非空。
+- 响应没有显式 `error`。
 
-### 7.1 MemorySummarizer
+成功内容取 `choices[0].message.content`，token 数取 `usage.total_tokens`。当前解析不会额外验证 `content` 非空，因此“有效 Payload + 空内容”仍可能到达业务 callback；`MemorySummarizer` 会再次拒绝空白结果。
 
-- 删除 `IndependentAISummarizer.IsAvailable()` 门闩（无配置也会入队，失败由池/客户端处理）
-- 入队：
+## 6. AIService 队列与生命周期
 
-```csharp
-AIService.EnqueueAIRequest(
-    prompt,
-    callback: result => { /* 写 ELS / IsSummarized */ },
-    dispose: () => { /* 清除 IsSummarizing */ });
-```
+`AIService` 是 `GameComponent`，构造时把自身写入静态 `_instance`。静态门户行为：
 
-### 7.2 BackCompatibilityFix
+| 方法 | 无实例时 | 有实例时 |
+|---|---|---|
+| `EnqueueAIRequest` | 静默丢弃 | 加入实例队列 |
+| `ValidateAIConfigAsync` | 返回 `false` | 验证池中配置 |
+| `ResetClientPool` | 无操作 | 清空池和工厂 |
 
-预注册类型由 `AIRequestManager` 改为 `AIService`。
+队列是 FIFO。`GameComponentUpdate()` 每帧检查，但只有距离上次出队至少 10 秒才启动下一项。这里限制的是启动间隔而非并发数：若单次网络调用超过 10 秒，后续请求仍可能启动，因此并不保证全局只有一个在途请求。
 
-### 7.3 Dialog_PromptEditor
+`ExecuteTask` 的约定：
 
-`summaryMaxTokens` → `SummaryMaxTokens`（scribe key 仍为 `ai_summaryMaxTokens`）。
+- `Payload == null` 或 `IsValid == false`：记录错误，不调用业务 callback。
+- 有效结果：调用 `callback(Payload.Response)`。
+- 无论成功、失败或 callback 抛异常，`finally` 都调用 `dispose`。
+- 没有单独的 callback 异常隔离；异常可从 `async void` 续体冒出，但 `dispose` 仍会执行。
 
-### 7.4 生命周期
+## 7. 与维护层的接口
 
-- `AIService(Game game)`：满足 `Game.FillComponents` 的 `Activator.CreateInstance(type, this)`  
-- 仅存档内有实例；主菜单 `Enqueue` / `Validate` / `ResetClientPool` 无实例时为空操作或返回 false  
+`MemorySummarizer` 在提交前：
 
----
+1. 构建总结或归档提示词。
+2. 构造尚未插入列表的目标 `MemoryEntry` 快照。
+3. 将源条目 `IsSummarizing = true`。
+4. 传入成功 callback 和清理 dispose。
 
-## 八、Settings UI 与持久化
+成功 callback 负责写入 ELS/CLPA 并把源条目标为 `IsSummarized = true`；dispose 无条件把源条目的 `IsSummarizing` 恢复为 `false`。因此 AI 层本身不知道记忆层级和条目语义。
 
-### 8.1 字段
+## 8. 设置与持久化
 
-| 字段 | Scribe | 说明 |
-|------|--------|------|
-| `EnableAILog` | `EnableAILog` | AI 请求日志 |
-| `UseRimTalkAIConfig` | `UseRimTalkConfig` | 跟随 RimTalk（默认 true） |
-| `ApiConfigs` | `ApiConfigs` LookMode.Deep | 独立 fallback 链 |
-| `SummaryMaxTokens` | `ai_summaryMaxTokens` | 请求 max_tokens |
+| 字段 | Scribe key | 当前用途 |
+|---|---|---|
+| `EnableAILog` | `EnableAILog` | 记录 URL、模型、请求、响应、token 和错误 |
+| `UseRimTalkAIConfig` | `UseRimTalkConfig` | 选择 RimTalk 配置副本或独立配置链 |
+| `ApiConfigs` | `ApiConfigs`，`LookMode.Deep` | 独立多配置链 |
+| `SummaryMaxTokens` | `ai_summaryMaxTokens` | chat/completions 的 `max_tokens` |
 
-**已删除:** `independentApiKey/Url/Model/Provider`、`enablePromptCaching`、`CurrentApiConfigIndex`。  
-**不做**旧字段 → `ApiConfigs` 的自动迁移。
+单条 `ApiConfig` 持久化 `IsEnabled`、`Provider`、`ApiKey`、`CustomUrl`、`CustomModelName`。
 
-### 8.2 UI 行为
+设置窗口始终绘制独立配置表。验证按钮只在存档内显示，因为它依赖 `AIService` 实例。`RimTalkMemoryPatchMod.WriteSettings()` 对来源开关和独立配置字段计算 hash；变化后调用 `AIService.ResetClientPool()`。
 
-1. EnableAILog 复选  
-2. PreferRimTalkAI：开 → 绿字跟随说明；关 → 灰字独立链说明  
-3. **始终**绘制独立配置表（跟随 RimTalk 时仍可编辑，作为关闭跟随后的链）  
-4. 表：Provider 下拉、ApiKey、Custom 时额外 BaseUrl、Model、启用/排序/删除  
-5. 启用且 `!IsValid` → 统一红字 `RimTalk_Settings_ApiConfigInvalid`（不区分缺 model / URL）  
-6. 验证区：  
-   - `Current.Game == null`：只显示 `ValidateInSaveOnly`，**不画按钮**  
-   - 存档内：验证按钮 + Tip；`ValidateAIConfig` → `ResetClientPool` + `ValidateAIConfigAsync`  
+注意：hash 不包含 RimTalk 主模组 `CloudConfigs` 的内容。跟随模式下仅修改 RimTalk 设置不会主动通知本模组刷新已缓存的映射副本；需要触发本模组池重置或创建新的 `AIService`。
 
-### 8.3 配置变更与池重置
+## 9. Embedding 边界
 
-`RimTalkMemoryPatchMod.WriteSettings`：hash(`UseRimTalkAIConfig` + 各 ApiConfig 字段) 变化 → `AIService.ResetClientPool()`。
+聊天完成重写没有统一 Embedding 管线：
 
----
+- Embedding 实现位于 `Source/VectorDB/EmbeddingService.cs`。
+- 设置仍使用 `embeddingApiKey`、`embeddingApiUrl`、`embeddingModel`。
+- 它不经过 `AIService`、`ClientPool` 或上述 Provider fallback 链。
+- 聊天配置与向量配置是两套独立数据源。
 
-## 九、Embedding / 向量
+## 10. 实现特征
 
-- `EmbeddingService.cs` 移至 `Source/Memory/`（namespace 路径调整，逻辑原样）  
-- 删除 `SiliconFlowEmbeddingService`  
-- `VectorService` 不再回退通用 LLM ApiKey，仅用 `embeddingApiKey`  
-- 向量功能视为废弃/低优先级，不随本期 AI 层主路径演进  
+1. `_instance` 没有显式出档清理。返回主菜单后静态字段可能仍指向旧组件，进入新存档时由新实例覆盖。
+2. `EnqueueAIRequest` 不返回是否入队。若异常情况下没有实例，业务方已经设置的 `IsSummarizing` 无法通过 dispose 恢复。
+3. 队列不持久化、无取消令牌、无请求 ID、无去重和无结果缓存。
+4. 10 秒只限制出队启动频率，不限制在途并发。
+5. AI 回调仍通过闭包捕获源条目和目标条目，没有 `pawnId + memoryId + requestId` 失效校验。
+6. `OpenAIClient` 只在网络轮询期间检查 `Current.Game`；`AIService` 调用 callback 前没有再次检查当前游戏是否仍是原会话。
+7. 配置重置可与在途池遍历交错；代码会尝试重新遍历，但没有显式同步。
+8. 所有 Provider 都假设支持 OpenAI 兼容协议，不支持 Gemini 原生协议、Player2 或 Prompt Caching 专有字段。
+9. 不迁移已删除的旧独立 API 字段；旧用户需启用跟随 RimTalk 或重新填写 `ApiConfigs`。
 
----
+## 11. 重写结项清单
 
-## 十、目录结构
+- [x] 独立配置通过 `ApiConfigs` 提供单配置和多配置链。
+- [x] 当前客户端失败后切换到下一有效配置。
+- [x] 401/403 不重试同一客户端，池继续 fallback。
+- [x] 429/5xx 最多执行 3 次单客户端尝试。
+- [x] 跟随 RimTalk 时使用映射后的 `CloudConfigs`。
+- [x] 主菜单不显示验证按钮。
+- [x] AI 失败仍执行 `dispose`，源条目可再次总结。
+- [x] 出档时 OpenAIClient 在网络轮询中中止请求。
+- [x] 修改本模组 API 设置并保存后重置 ClientPool，从配置链头重建。
+- [x] AI 层重写按当前实现结项。
 
-```
-Source/
-  AI/
-    AIService.cs
-    AIClientFactory.cs
-    Payload.cs
-    Client/
-      IAIClient.cs
-      ClientPool.cs
-      OpenAIClient.cs
-      Dto/
-        OpenAIRequest.cs
-        OpenAIResponse.cs
-  Integration/
-    RimTalkApiConfigsGetter.cs   // 类名: RimTalkApiConfigGetter
-  Settings/
-    AIProvider.cs
-    ApiConfig.cs
-    SettingsUIDrawers.cs         // namespace RimTalk.Memory.UI
-  Utils/
-    JsonUtil.cs
-    MessageUtil.cs
-  Memory/
-    EmbeddingService.cs          // 自 Memory/AI/ 迁出
-  Maintenance/
-    MemorySummarizer.cs          // 调用 AIService
-  RimTalkMod.cs                  // hash + ResetClientPool
-  RimTalkSettings.cs             // 字段 + DrawAIConfigSettings
-```
-
----
-
-## 十一、行为约定与已知限制
-
-### 11.1 约定
-
-| 项 | 行为 |
-|----|------|
-| 队列节流 | 现实时间 10s 一次出列 |
-| 单客户端重试 | 最多 3 次尝试（间隔 4s、8s）；401/403/致命 4xx 立即失败 |
-| 池级 fallback | 当前客户端失败后换下一有效配置 |
-| 取消信号 | 请求循环中 `Current.Game == null` 则 abort（存档退出） |
-| 验证 | 仅存档内；主菜单无按钮 |
-| 实时校验 | UI 仅看 `IsValid`，统一文案 |
-| 旧配置 | 不迁移 |
-
-### 11.2 已知限制 / 可选后续
-
-1. **`_instance` 出档不清理** — 出主菜单后仍指向旧组件，进新档覆盖；主菜单 UI 已挡验证。可对齐 `RoundMemoryManager` 在 `Current.Game == null` 时置空。  
-2. **跟随 RimTalk 时独立表仍显示** — 有意，便于切换。  
-3. **无 Player2 / Prompt Caching / Gemini 原生协议**。  
-4. **工厂 RimTalk 缓存** — 仅在 `Reset` 换工厂时刷新；改 RimTalk 设置后需本模组 WriteSettings 或进档触发 reset 才一致。  
-5. **成功但 content 为 null** — 仍可 `IsValid=true`；Summarizer 对空串按失败处理。  
-
-### 11.3 手测建议
-
-- [ ] 存档内：独立链单配置验证通过/失败  
-- [ ] 存档内：多配置，首条失败后 fallback 到下一条  
-- [ ] 跟随 RimTalk 配置，总结/归档入队并写回  
-- [ ] 主菜单：无验证按钮，仅「仅存档内可用」  
-- [ ] 启用行缺 model/URL 时红字提示  
-- [ ] 改 ApiConfigs 后 WriteSettings 日志出现 client pool reset  
-- [ ] 旧存档加载：无崩溃；需重填独立配置或开跟随  
-
----
-
-## 附：与 v1.0 设计稿的主要差异
-
-| v1.0 设想 | 实际实现 |
-|-----------|----------|
-| `CurrentApiConfigIndex` sticky 指针 | **无**；池 + 工厂顺序扫描 |
-| `CascadingMemoryClient` / 复杂错误层 | `ClientPool` + 客户端内 retry |
-| 旧字段迁移到 `ApiConfigs` | **不做迁移** |
-| `WorldComponent` 队列 | **`GameComponent` `AIService`** |
-| 主菜单可验证 | **仅存档内** |
-| 细粒度 invalid reason key | **统一** `ApiConfigInvalid` |
-| HttpWebRequest | **UnityWebRequest** |
-| 独立 Google 原生协议 | **全部 OpenAI 兼容** |
-
-本文 v2.0 以仓库当前源码为准；若代码再变，请同步改此文档。
+本文以当前源码为准。旧类名只用于说明迁移历史，不应再出现在当前执行图中。
