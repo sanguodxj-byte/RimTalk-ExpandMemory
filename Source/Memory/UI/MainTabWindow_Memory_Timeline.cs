@@ -184,6 +184,24 @@ namespace RimTalk.Memory.UI
                 Widgets.DrawBox(rect, 1);
                 GUI.color = Color.white;
             }
+
+            // Summary state is additive and does not replace layer or selection borders.
+            if (currentMemoryComp?.Summarizer.CheckSummarizing(memory) == true)
+            {
+                float pulse = (Mathf.Sin(Time.realtimeSinceStartup * 4f) + 1f) * 0.5f;
+                GUI.color = Color.Lerp(
+                    new Color(0.48f, 0.2f, 0.68f, 0.65f),
+                    new Color(0.86f, 0.5f, 1f),
+                    pulse);
+                Widgets.DrawBox(rect.ContractedBy(4f), 2);
+                GUI.color = Color.white;
+            }
+            else if (currentMemoryComp?.Summarizer.CheckSummarized(memory) == true)
+            {
+                GUI.color = new Color(0.68f, 0.4f, 0.88f, 0.55f);
+                Widgets.DrawBox(rect.ContractedBy(4f), 1);
+                GUI.color = Color.white;
+            }
             
             // Hover highlight
             if (Mouse.IsOver(rect) && !isDragging)
