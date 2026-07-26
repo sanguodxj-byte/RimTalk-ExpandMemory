@@ -147,7 +147,7 @@ namespace RimTalk.Memory
                 var scmCandidates = situationalMemories
                     .Where(m => MatchesQuery(m, query))
                     .OrderByDescending(m => m.CalculateRetrievalScore(null, query.keywords))
-                    .ThenBy(m => m.Id, StringComparer.Ordinal)
+                    .ThenBy(m => m.Id)
                     .Take(5);
                 results.AddRange(scmCandidates);
             }
@@ -158,7 +158,7 @@ namespace RimTalk.Memory
                 var elsCandidates = eventLogMemories
                     .Where(m => MatchesQuery(m, query))
                     .OrderByDescending(m => m.CalculateRetrievalScore(null, query.keywords))
-                    .ThenBy(m => m.Id, StringComparer.Ordinal)
+                    .ThenBy(m => m.Id)
                     .Take(query.maxCount - results.Count);
                 results.AddRange(elsCandidates);
             }
@@ -169,7 +169,7 @@ namespace RimTalk.Memory
                 var clpaCandidates = archiveMemories
                     .Where(m => MatchesQuery(m, query))
                     .OrderByDescending(m => m.Importance)
-                    .ThenBy(m => m.Id, StringComparer.Ordinal)
+                    .ThenBy(m => m.Id)
                     .Take(3);
                 results.AddRange(clpaCandidates);
             }

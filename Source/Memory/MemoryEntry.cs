@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Security.Cryptography;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -14,12 +16,12 @@ namespace RimTalk.Memory;
 public class MemoryEntry : IExposable
 {
     // 基本信息
-    public string Id;                   // 唯一ID
+    public long Id = 0;                 // 唯一ID，0 表示未初始化
     // 复制品的原始 Id（目前仅用于 summarizer）
-    private string _originId;
-    public string OriginId
+    private long _originId = 0;
+    public long OriginId
     {
-        get => _originId ?? Id;
+        get => _originId == 0 ? Id : _originId;
         set => _originId = value;
     }
     // 更应当存储 AbsTick，无奈屎山已经堆起来了
@@ -118,7 +120,7 @@ public class MemoryEntry : IExposable
 
     public MemoryEntry(string content, MemoryType type, MemoryLayer layer, float importance = 0.5f, string relatedPawn = null)
     {
-        Id = "mem-" + Guid.NewGuid().ToString("N").Substring(0, 12);
+        Id = GenerateId();
         GameTick = Find.TickManager?.TicksGame ?? -1;
         Content = content;
 
@@ -133,27 +135,23 @@ public class MemoryEntry : IExposable
         AddTypeTag();
     }
 
-    private void AddTypeTag()
-    {
-        AddTag(Type switch
-        {
-            MemoryType.Conversation => "对话",
-            MemoryType.Action => "行动",
-            MemoryType.Summarization => "总结",
-            MemoryType.Event => "事件",
-            MemoryType.Emotion => "情绪",
-            MemoryType.Relationship => "关系",
-            MemoryType.Internal => "内部上下文",
-            _ => null
-        });
-    }
-
     // 存档读写
     // label 更应当用 PascalCase，但此处屎山已成
     public virtual void ExposeData()
     {
-        Scribe_Values.Look(ref Id, "id");
-        Scribe_Values.Look(ref _originId, "OriginId");
+        if (Scribe.mode == LoadSaveMode.Saving)
+        {
+            Scribe_Values.Look(ref Id, "id");
+        }
+#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
+        if (Scribe.mode == LoadSaveMode.LoadingVars)
+        {
+            string serializedId = null;
+            Scribe_Values.Look(ref serializedId, "id");
+            Id = ParseId(serializedId);
+        }
+
+        Scribe_Values.Look(ref _originId, "OriginId", 0L);
         Scribe_Values.Look(ref GameTick, "timestamp", -1);
         Scribe_Values.Look(ref Content, "content");
 
@@ -177,6 +175,64 @@ public class MemoryEntry : IExposable
         // 集合型字段应当在读档后进行防空处理
         tags ??= new();
         keywords ??= new();
+    }
+
+    // 静态工具方法
+    // 生成随机唯一 ID
+    private static long GenerateId()
+    {
+        Span<byte> bytes = stackalloc byte[sizeof(long)];
+        long id;
+        do
+        {
+            RandomNumberGenerator.Fill(bytes);
+            id = BitConverter.ToInt64(bytes) & long.MaxValue;
+        }
+        while (id == 0);
+
+        return id;
+    }
+
+    // ID 向后兼容
+    private static long ParseId(string serializedId)
+    {
+        if (serializedId is null)
+        {
+            Log.Warning($"[RimTalk.Memory] 记忆 ID 为 null，已生成新 ID");
+            return GenerateId();
+        }
+
+        if (long.TryParse(serializedId, NumberStyles.None, CultureInfo.InvariantCulture, out long id) && id > 0)
+            return id;
+
+        const string legacyPrefix = "mem-";
+        if (serializedId.StartsWith(legacyPrefix, StringComparison.Ordinal)
+            && long.TryParse(
+                serializedId.Substring(legacyPrefix.Length),
+                NumberStyles.AllowHexSpecifier,
+                CultureInfo.InvariantCulture,
+                out id
+                )
+            && id > 0)
+            return id;
+
+        Log.Warning($"[RimTalk.Memory] 记忆 ID \"{serializedId}\" 无效，已生成新 ID");
+        return GenerateId();
+    }
+
+    private void AddTypeTag()
+    {
+        AddTag(Type switch
+        {
+            MemoryType.Conversation => "对话",
+            MemoryType.Action => "行动",
+            MemoryType.Summarization => "总结",
+            MemoryType.Event => "事件",
+            MemoryType.Emotion => "情绪",
+            MemoryType.Relationship => "关系",
+            MemoryType.Internal => "内部上下文",
+            _ => null
+        });
     }
 
     /// <summary>
