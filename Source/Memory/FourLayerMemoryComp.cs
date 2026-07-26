@@ -67,9 +67,6 @@ namespace RimTalk.Memory
         /// </summary>
         public MemorySummarizer Summarizer => _summarizer;
 
-        // 配置项（从设置中读取）
-        public static bool IsRoundMemoryEnabled => RimTalkMemoryPatchMod.Settings?.IsRoundMemoryActive ?? false;
-
         // 构造函数，初始化捕获模块和维护器
         public FourLayerMemoryComp()
         {
