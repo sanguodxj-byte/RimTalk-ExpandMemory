@@ -1,8 +1,6 @@
 ﻿using RimTalk.Memory.Capture;
 using RimTalk.Memory.Maintenance;
-using RimTalk.MemoryPatch;
 using RimWorld;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +20,11 @@ namespace RimTalk.Memory
         private List<MemoryEntry> eventLogMemories = new();    // ELS: 总结后的记忆，~50条
         private List<MemoryEntry> archiveMemories = new();     // CLPA: 归档后的记忆，无容量限制
 
+        private HashSet<long> _summarizedIds;   // 已总结的记忆ID集合，避免重复总结，需长久随存档保存，故放在主组件仓库中
+        // 懒加载，未激活时不会有任何开销
+        // internal，但实践上仅允许 _summarizer 使用
+        internal HashSet<long> SummarizedIds => _summarizedIds ??= new();
+
         // 直接持有工作记忆捕获模块
         private readonly JobMemoryCapturer _jobCapturer;
 
@@ -31,7 +34,7 @@ namespace RimTalk.Memory
         // 语义总结器：统一每日/手动/选中总结与归档
         private readonly MemorySummarizer _summarizer;
 
-        // 属性访问
+        // 对外属性访问
         /// <summary>
         /// ABM: 完整对话记录，无容量限制，总结后转 ELS
         /// </summary>
@@ -76,20 +79,45 @@ namespace RimTalk.Memory
         }
 
 
+#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
+        // 向后兼容临时字段
+        private bool _summarizedIdsInitialized = true;
         // 存档读写
         public override void PostExposeData()
         {
+            // 存档时，清理 SummarizedIds 中已不存在于主仓库中的条目
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                _summarizedIds?.IntersectWith(
+                    activeMemories.Concat(situationalMemories).Concat(eventLogMemories).Concat(archiveMemories)
+                    .Where(m => m is not null)
+                    .Select(m => m.OriginId)
+                    );
+            }
+
             base.PostExposeData();
             Scribe_Collections.Look(ref activeMemories, "activeMemories", LookMode.Deep); // label建议使用大写开头。但此处屎山已成
             Scribe_Collections.Look(ref situationalMemories, "situationalMemories", LookMode.Deep);
             Scribe_Collections.Look(ref eventLogMemories, "eventLogMemories", LookMode.Deep);
             Scribe_Collections.Look(ref archiveMemories, "archiveMemories", LookMode.Deep);
+            Scribe_Collections.Look(ref _summarizedIds, "summarizedIds", LookMode.Value);
+            Scribe_Values.Look(ref _summarizedIdsInitialized, "summarizedIdsInitialized", false);
 
             // 集合空保护
             activeMemories ??= new();
             situationalMemories ??= new();
             eventLogMemories ??= new();
             archiveMemories ??= new();
+
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && !_summarizedIdsInitialized)
+            {
+                SummarizedIds.UnionWith(
+                    activeMemories.Concat(situationalMemories).Concat(eventLogMemories)
+                    .Where(m => m is not null)
+                    .Select(m => m.OriginId)
+                    );
+                _summarizedIdsInitialized = true;
+            }
         }
 
 
