@@ -57,11 +57,7 @@ public class MemoryEntry : IExposable
     // 元数据
     public bool IsUserEdited = false;   // 是否被用户编辑过
     public bool IsPinned = false;       // 是否固定（不会被删除）
-    public bool IsSummarized = false;   // 是否已被AI总结过，新生成的记忆默认为false
     public string Notes;                // 用户备注
-
-    // 临时标识（不会被存档）
-    public bool IsSummarizing = false; // 是否正在被总结
 
     /// <summary>
     /// 获取层级名称（中文）
@@ -169,7 +165,6 @@ public class MemoryEntry : IExposable
 
         Scribe_Values.Look(ref IsUserEdited, "isUserEdited", false);
         Scribe_Values.Look(ref IsPinned, "isPinned", false);
-        Scribe_Values.Look(ref IsSummarized, "IsSummarized", true); // 旧存档中的记忆默认为true以向后兼容
         Scribe_Values.Look(ref Notes, "notes");
 
         // 集合型字段应当在读档后进行防空处理
