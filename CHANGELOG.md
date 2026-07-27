@@ -1,9 +1,50 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.10.0] - 2026-07-27
+
+### Added
+- 记忆时间线新增总结状态标记：已总结条目以紫色边框标注，正在总结的条目以波动紫色边框标注。 (`462a9e6`)
+- 重写 AI 调度层：新增 `AIService`（GameComponent）以 10 秒现实时间节流统一队列调度总结/归档请求，替代原本散落的独立调用。 (`885ca7a`)
+- 新增多备选 API 配置与 fallback：设置中可填写多组 API 端点，单次请求失败自动切换至下一配置；可在设置中开关"跟随 RimTalk 配置"，跟随模式下深拷贝 RimTalk 的 CloudConfigs。 (`885ca7a`)
+- 新增配置实时校验：缺 model 或 URL 非法时在设置界面统一红字提示。 (`885ca7a`)
+- 新增 `EnableAILog` 设置项，便于排查 AI 请求问题。 (`885ca7a`)
+
+### Changed
+- 总结状态由共享字段改为 Pawn 私有持久化：原 `MemoryEntry.IsSummarized`/`IsSummarizing` 移除，改由 `FourLayerMemoryComp` 持有 `summarizedIds`（已总结记忆的 OriginId 集合），避免一名参与者总结后阻止其他参与者分别总结。旧存档首次加载会将历史 ABM/SCM/ELS 一次性标记为已总结，避免升级后重复处理。 (`5952b97`)
+- 记忆条目 `Clone()` 重构为 `virtual Privatize()`：`MemoryEntry` 默认返回自身，`RoundMemory` 重写为创建扁平副本并写入 `OriginId` 追踪原始出处，便于总结器识别复制品来源。 (`8656a25`)
+- 记忆 ID 由 Guid 字符串改为 `long`：使用加密随机数生成正 long ID，读档时兼容旧版 `mem-` 前缀十六进制 ID；确定性排序改为数值 ID 排序。 (`2808873`)
+- 工作记忆捕获器仅捕获成功完成的工作，并改用 `GenTicks` 获取 Tick，避免幽灵记忆。 (`6dd1444`)
+- 重组源码目录：常识相关文件迁移至 `Source/CommonKnowledge/`，向量数据库迁移至 `Source/VectorDB/`，新增 `Source/Maintenance/` 与 `Source/AI/` 收纳维护层与重写后的 AI 层。 (`9c8c583`, `885ca7a`)
+- 规整 `JobMemoryCapturer` 代码风格与守卫条件顺序。 (`393f4f3`)
+
+### Removed
+- 删除旧 AI 管线：`IndependentAISummarizer`、`AIRequestManager`、Gemini/OpenAI 旧 DTO 与 `SiliconFlowEmbeddingService`。 (`885ca7a`)
+- 移除 `independent*` 与 `enablePromptCaching` 等 Settings 字段，旧独立配置不迁移。 (`885ca7a`)
+- 清理长期废弃代码：`AdaptiveThresholdManager`、`ContextCleaner`、`ConversationCache`、`PerformanceMonitor`、`ProactiveMemoryRecall`、`SmartInjectionManager`、`SimpleRimTalkIntegration`、`MemoryVectorSearch`、`BackCompatibilityFix`、`AIResponsePostProcessor`、`PendingConversation` 等。 (`9c8c583`)
+
+### Fixed
+- 修复一次总结多个周期记忆时未从更早周期开始的问题。 (`8435e61`)
+
+## [1.9.0] - 2026-07-18
+
+### Added
+- 新增 ABM 寿命到期自动迁移机制：过期 ABM 记忆按设定时长自动迁入下层或移除，可在设置中配置寿命（默认 24 小时，设为 0 关闭）。 (`b13749b`)
+- 工作记忆聚合改为只记录起始时间，不再在聚合时刷新 GameTick。 (`f3edb98`)
+
+### Changed
+- 抽取 `MemoryMaintainer` 作为记忆的机械维护器：衰减、清理、容量治理、固定/删除统一由各 Pawn 自身按哈希分散执行，替代原集中式调度。 (`96e0fbc`)
+- 抽取 `MemorySummarizer` 统一并重构总结与归档调度：每日/手动/选中/周期归档由各 Pawn 自身触发，AI 回写失败时不修改源记忆、可下一轮重试；总结/归档后的源条目依靠寿命迁移自然消亡而非立即清空。 (`8a4457b`)
+- 属性封装 `RimTalkSettings`，实例为空时在属性层即抛出错误。 (`d2d6e06`)
+- 调整衰减默认值与滑条范围并规范化 Settings 字段命名：SCM 0.01→0.05、ELS 0.005→0.00384、CLPA 0.001→0.00128；清理斩杀线 0.01→0.025；归档间隔默认 7→15 天。 (`489b2a5`)
+- 调整记忆时间描述逻辑：`AgeString` "一天前"改为"昨天"，移除"前几天/上周"分支；Archive 层级记忆直接显示年月日期。 (`d6cb4ad`)
+
+### Fixed
+- 修复手动固定轮次记忆时原对象也被误固定的问题。 (`d79fb85`)
 
 ## [1.8.0] - 2026-07-09
 
@@ -101,12 +142,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
-[1.8.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.7.0...v1.8.0
-[1.7.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.6.0...v1.7.0
-[1.6.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.5.0...v1.6.0
-[1.5.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.4.0...v1.5.0
-[1.4.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/Anomaly-Works/RimTalk-ExpandMemory/releases/tag/v1.0.0
+[1.10.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.9.0...v1.10.0
+[1.9.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/releases/tag/v1.0.0
