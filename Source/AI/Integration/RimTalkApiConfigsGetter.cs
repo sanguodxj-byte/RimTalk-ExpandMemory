@@ -37,7 +37,9 @@ public static class RimTalkApiConfigGetter
             },
             ApiKey = rimTalkApiConfig.ApiKey,
             CustomUrl = rimTalkApiConfig.BaseUrl,
-            CustomModelName = rimTalkApiConfig.CustomModelName,
+            CustomModelName = string.IsNullOrWhiteSpace(rimTalkApiConfig.CustomModelName)
+                ? rimTalkApiConfig.SelectedModel
+                : rimTalkApiConfig.CustomModelName,
         }).ToList();
     }
 }
