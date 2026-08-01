@@ -19,6 +19,7 @@ namespace RimTalk.Memory.Patches.Capture
                 || talk is null
                 || ApiHistory.GetApiLog(talk.Id) is not { } apiLog
                 || apiLog.Channel is Channel.User   // 由玩家输入直接产生的那条 response 不处理
+                || apiLog.SpokenTick <= 0    // 防止因原方法被其他模组的 Prefix 阻断时仍将未实际生成的 response 加入记忆
                 || apiLog.TalkRequest is not { } talkRequest)   // talkRequest 即当前 response 的唯一标识
                 return;
 
