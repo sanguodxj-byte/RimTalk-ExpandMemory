@@ -386,14 +386,22 @@ public class MemorySummarizer
         // 组装 prompt
         try
         {
-            return string.Format(template, Parent.LabelShort, memoryListString);
+            return string.Format(
+                template,
+                $"{Parent.LabelShort}{(Parent is Pawn parentPawn ? $"({parentPawn.gender}, {parentPawn.ageTracker?.AgeBiologicalYears})" : string.Empty)}",
+                memoryListString
+                );
         }
         catch (Exception ex)
         {
             // 如果模板格式非法，尝试使用默认模板
             if (backUp is null) return string.Empty;
             Log.Error($"[RimTalk.Memory.Maintenance] 提示词非法，尝试使用默认模板: {ex.Message}");
-            return string.Format(backUp, Parent.LabelShort, memoryListString);
+            return string.Format(
+                backUp,
+                $"{Parent.LabelShort}{(Parent is Pawn parentPawn ? $"({parentPawn.gender}, {parentPawn.ageTracker?.AgeBiologicalYears})" : string.Empty)}",
+                memoryListString
+                );
         }
     }
 
