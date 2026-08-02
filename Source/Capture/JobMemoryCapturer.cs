@@ -14,9 +14,17 @@ public class JobMemoryCapturer
     // 全局预设的工作类型分类
     // 不参与记忆捕获的垃圾工作（如发呆、走路等）
     private static readonly HashSet<JobDef> _jobsToIgnore = new();
+
+    // 白名单工作，condition 不为 Succeeded 时也会被捕获
+    // AttackMelee/AttackStatic 常以 InterruptForced 结束（目标死亡/移动/换武器），
+    // 不在此处放行则绝大多数战斗行为都会漏掉。
+    // 能力施放同理：传送类能力成功后自中断施法 Job，需放行才能记录。
+    private static readonly HashSet<JobDef> _jobsAlwaysCapture = new();
+
     // 可模糊聚合工作-描述字典
     // 命中字典的 job 允许在 target 等要素不同时仍然聚合
     private static readonly Dictionary<JobDef, string> _dictAggregatedJobToDesc = new();
+
     // 特定工作-重要性字典
     private static readonly Dictionary<JobDef, float> _dictJobToImportance = new();
 
@@ -32,27 +40,21 @@ public class JobMemoryCapturer
         // 忽略集初始化，精确匹配规则
         _jobsToIgnore.UnionWith([
             JobDefOf.Goto, JobDefOf.GotoWander,
-                JobDefOf.Wait, JobDefOf.Wait_Wander, JobDefOf.Wait_Combat, JobDefOf.Wait_MaintainPosture,
-                JobDefOf.Wait_Asleep, JobDefOf.Wait_AsleepDormancy, JobDefOf.Wait_WithSleeping,
-                JobDefOf.LayDown, JobDefOf.LayDownAwake, JobDefOf.LayDownResting
+            JobDefOf.Wait, JobDefOf.Wait_Wander, JobDefOf.Wait_Combat, JobDefOf.Wait_MaintainPosture,
+            JobDefOf.Wait_Asleep, JobDefOf.Wait_AsleepDormancy, JobDefOf.Wait_WithSleeping,
+            JobDefOf.LayDown, JobDefOf.LayDownAwake, JobDefOf.LayDownResting,
             ]);
-        _jobsToIgnore.Remove(null);
 
-        // 特定工作-重要性字典初始化，精确匹配规则
-        static void AddToDict(JobDef jobDef, float importance)
-        {
-            if (jobDef is null) return;
-            _dictJobToImportance[jobDef] = importance;
-        }
-
-        AddToDict(JobDefOf.AttackMelee, 0.9f);
-        AddToDict(JobDefOf.AttackStatic, 0.9f);
-        AddToDict(JobDefOf.SocialFight, 0.85f);
-
-        AddToDict(JobDefOf.MarryAdjacentPawn, 1.0f);
-        AddToDict(JobDefOf.SpectateCeremony, 0.7f);
-
-        AddToDict(JobDefOf.Lovin, 0.6f);
+        // 白名单初始化，精确匹配规则
+        _jobsAlwaysCapture.UnionWith([
+            // 攻击行为：常以 InterruptForced 结束（目标死亡/移动），需放行非 Succeeded 条件
+            JobDefOf.AttackMelee, JobDefOf.AttackStatic,
+            // 能力施放：传送类能力成功后自中断施法 Job，需放行才能捕获
+            // 后续可能给能力单开一个 capturer，届时移入忽略集
+            JobDefOf.CastAbilityOnThing, JobDefOf.CastAbilityOnWorldTile,
+            JobDefOf.Lovin
+            ]);
+        _jobsAlwaysCapture.Remove(null);
 
         // 可模糊聚合工作-描述字典初始化，模糊匹配规则
         foreach (var jobDef in DefDatabase<JobDef>.AllDefsListForReading)
@@ -99,6 +101,30 @@ public class JobMemoryCapturer
 
             _dictAggregatedJobToDesc[jobDef] = desc;
         }
+        // 精确匹配补充
+        static void AddToAggregatedDict(JobDef jobDef, string desc)
+        {
+            if (jobDef is null) return;
+            _dictAggregatedJobToDesc[jobDef] = desc;
+        }
+        AddToAggregatedDict(JobDefOf.AttackMelee, "近身攻击");
+        AddToAggregatedDict(JobDefOf.AttackStatic, "射击");
+
+        // 特定工作-重要性字典初始化，精确匹配规则
+        static void AddToImportanceDict(JobDef jobDef, float importance)
+        {
+            if (jobDef is null) return;
+            _dictJobToImportance[jobDef] = importance;
+        }
+        AddToImportanceDict(JobDefOf.AttackMelee, 0.9f);
+        AddToImportanceDict(JobDefOf.AttackStatic, 0.9f);
+
+        AddToImportanceDict(JobDefOf.SocialFight, 0.85f);
+
+        AddToImportanceDict(JobDefOf.MarryAdjacentPawn, 1.0f);
+        AddToImportanceDict(JobDefOf.SpectateCeremony, 0.7f);
+
+        AddToImportanceDict(JobDefOf.Lovin, 0.6f);
     }
 
 
@@ -160,7 +186,7 @@ public class JobMemoryCapturer
     public static void ExtractJobInfoEnter(Job job, Pawn pawn)
     {
         if (// 配置项
-            !RimTalkMemoryPatchMod.Settings.enableActionMemory
+            !RimTalkMemoryPatchMod.Settings.EnableActionMemory
 
             // 仅殖民者且启用工作记忆捕捉时才激活 capturer
             || pawn is null
@@ -184,24 +210,25 @@ public class JobMemoryCapturer
     public static void BuildJobMemoryEnter(JobCondition condition, Job job, Pawn pawn)
     {
         if (// 配置项
-            !RimTalkMemoryPatchMod.Settings.enableActionMemory
+            !RimTalkMemoryPatchMod.Settings.EnableActionMemory
 
             // 仅殖民者且启用工作记忆捕捉时才激活 capturer
             || pawn is null
             || !pawn.IsColonist
 
-            // 只有成功完成的工作才会被捕获
-            || condition is not JobCondition.Succeeded
-
             // job 不过关时提前返回，跳过 GetComp
             || job?.def is not { } jobDef
-            || _jobsToIgnore.Contains(jobDef))
+            || _jobsToIgnore.Contains(jobDef)
+
+            // 只有成功完成的 Job 才会被捕获；白名单中的 Job（攻击/能力等）即使被中断也会捕获
+            || (condition is not JobCondition.Succeeded && !_jobsAlwaysCapture.Contains(jobDef)))
 
             return;
 
         // 获取组件实例并传入即将完成的工作
         pawn.GetComp<FourLayerMemoryComp>()?.JobCapturer?.BuildJobMemory(job);
     }
+
 
     /// <summary>
     /// 信息提取实例工作区
