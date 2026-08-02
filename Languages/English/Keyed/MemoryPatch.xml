@@ -347,6 +347,7 @@
   <RimTalk_Settings_MaxABMInjectionRoundsDesc>Controls how many recent conversation rounds are injected into the AI context</RimTalk_Settings_MaxABMInjectionRoundsDesc>
   <RimTalk_Settings_MemoryTypesSection>Memory Type Toggles</RimTalk_Settings_MemoryTypesSection>
   <RimTalk_Settings_ActionMemory>Action Memory</RimTalk_Settings_ActionMemory>
+  <RimTalk_Settings_CombatMemory>Combat Memory</RimTalk_Settings_CombatMemory>
   <RimTalk_Settings_ConversationMemory>Conversation Memory</RimTalk_Settings_ConversationMemory>
   
   <!-- Experimental Features -->

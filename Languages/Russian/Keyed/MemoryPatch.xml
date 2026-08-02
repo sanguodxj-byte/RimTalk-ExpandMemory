@@ -72,6 +72,7 @@
     <RimTalk_EnableInteractionMemoryDesc>Записывать социальные взаимодействия между колонистами</RimTalk_EnableInteractionMemoryDesc>
     <RimTalk_EnableActionMemory>Включить память действий</RimTalk_EnableActionMemory>
     <RimTalk_EnableActionMemoryDesc>Записывать работы, сражения и другие действия</RimTalk_EnableActionMemoryDesc>
+    <RimTalk_Settings_CombatMemory>Память о сражениях</RimTalk_Settings_CombatMemory>
     <RimTalk_EnableConversationMemory>Включить память разговоров</RimTalk_EnableConversationMemory>
     <RimTalk_EnableConversationMemoryDesc>Записывать диалоги, созданные RimTalk (требуется интеграция с RimTalk)</RimTalk_EnableConversationMemoryDesc>
     <RimTalk_EnableObservationMemory>Включить память наблюдений</RimTalk_EnableObservationMemory>
