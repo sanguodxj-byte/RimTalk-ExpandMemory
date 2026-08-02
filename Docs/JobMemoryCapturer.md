@@ -13,10 +13,13 @@
 ## 2. 核心架构
 
 - **双 Hook**：`StartJob`(Postfix) 预提取信息 → `CleanupCurrentJob`(Prefix) 消费缓存生成记忆。
+- **战斗补充管线**：`Pawn.Notify_UsedVerb`(Postfix) → `CombatMemoryCapturer`，仅捕获征召 `Wait_Combat` 中由 `JobDriver_Wait.CheckForAutoAttack` 直接触发、不创建攻击 Job 的自动攻击。
 - **POCO 化**：`JobMemoryCapturer` 不继承 `ThingComp`，由 `FourLayerMemoryComp` 直接持有；删除旧 `WorkSessionAggregator`（-500 行），消除组件注入开销。
 - **零心跳**：完全剥离 `CompTick` / `WorldComponentTick` 依赖，状态流转由事件驱动，零后台轮询。
-- **数据驱动**：`_jobsToIgnore` / `_dictAggregatedJobToDesc` / `_dictJobToImportance` 三个静态集合在静态构造函数中通过 `switch` 模式匹配一次性初始化，废弃 Regex 与 if-else 地狱，工作识别与目标提取 O(1)。
+- **数据驱动**：`_jobsToIgnore` / `_jobsAlwaysCapture` / `_dictAggregatedJobToDesc` / `_dictJobToImportance` 四个静态集合在静态构造函数中通过 `switch` 模式匹配一次性初始化，废弃 Regex 与 if-else 地狱，工作识别与目标提取 O(1)。
 - **三分支管线**：精确合并 / 模糊聚合 / 新建，聚合分支就地覆写 `_lastJobMemory`，零分配。
+
+`AttackMelee` 与 `AttackStatic` 由 `JobMemoryCapturer` 通过 `_jobsAlwaysCapture` 在 Job 结束时统一捕获——无论 Job 以 `Succeeded` 还是 `InterruptForced` 结束。征召 `Wait_Combat` 中由 `JobDriver_Wait` 自动触发的攻击不创建 AttackMelee/AttackStatic Job，改由 `CombatMemoryCapturer` 通过 Verb 成功通知补充捕获。两条管线互不重叠。
 
 ---
 
@@ -74,7 +77,7 @@ public static class Pawn_JobTracker_CleanupCurrentJob_Patch
 }
 ```
 
-闸门统一处理：job 有效性、忽略集匹配、colonist 身份、Settings 开关；`BuildJobMemoryEnter` 额外做同帧拦截（见 §7）。`ExtractJobInfoEnter` 不做同帧拦截——提取本身无害，零时长工作的缓存会被后续 `StartJob` 自然覆写，且 `BuildJobMemoryEnter` 自有同刻跳过兜底。
+闸门统一处理：job 有效性、忽略集匹配、colonist 身份、Settings 开关；`BuildJobMemoryEnter` 额外检查 `JobCondition`——`Succeeded` 直接放行，非 `Succeeded` 仅在 `_jobsAlwaysCapture` 白名单命中时放行（攻击/能力等常以 `InterruptForced` 结束的行为）。`ExtractJobInfoEnter` 不做同帧拦截——提取本身无害，零时长工作的缓存会被后续 `StartJob` 自然覆写，且 `BuildJobMemoryEnter` 自有同刻跳过兜底。
 
 ---
 
