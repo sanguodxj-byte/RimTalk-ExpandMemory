@@ -345,6 +345,7 @@
   <!-- 记忆类型 -->
   <RimTalk_Settings_MemoryTypesSection>记忆类型开关</RimTalk_Settings_MemoryTypesSection>
   <RimTalk_Settings_ActionMemory>行动记忆</RimTalk_Settings_ActionMemory>
+  <RimTalk_Settings_CombatMemory>战斗记忆</RimTalk_Settings_CombatMemory>
   <RimTalk_Settings_ConversationMemory>对话记忆</RimTalk_Settings_ConversationMemory>
   
   <!-- 实验性功能 -->

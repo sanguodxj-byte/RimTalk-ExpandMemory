@@ -72,6 +72,7 @@
     <RimTalk_EnableInteractionMemoryDesc>정착민 간의 사회적 상호작용 기록</RimTalk_EnableInteractionMemoryDesc>
     <RimTalk_EnableActionMemory>행동 메모리 활성화</RimTalk_EnableActionMemory>
     <RimTalk_EnableActionMemoryDesc>작업, 전투 및 기타 행동 기록</RimTalk_EnableActionMemoryDesc>
+    <RimTalk_Settings_CombatMemory>전투 메모리</RimTalk_Settings_CombatMemory>
     <RimTalk_EnableConversationMemory>대화 메모리 활성화</RimTalk_EnableConversationMemory>
     <RimTalk_EnableConversationMemoryDesc>RimTalk에서 생성된 대화 기록 (RimTalk 통합 필요)</RimTalk_EnableConversationMemoryDesc>
     <RimTalk_EnableObservationMemory>관찰 메모리 활성화</RimTalk_EnableObservationMemory>
