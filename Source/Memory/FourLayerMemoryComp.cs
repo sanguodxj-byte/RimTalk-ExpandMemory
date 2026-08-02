@@ -82,6 +82,7 @@ namespace RimTalk.Memory
 #warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
         // 向后兼容临时字段
         private bool _summarizedIdsInitialized = true;
+        private bool _alreadyUpdateSummarizationType = true;
         // 存档读写
         public override void PostExposeData()
         {
@@ -102,6 +103,7 @@ namespace RimTalk.Memory
             Scribe_Collections.Look(ref archiveMemories, "archiveMemories", LookMode.Deep);
             Scribe_Collections.Look(ref _summarizedIds, "summarizedIds", LookMode.Value);
             Scribe_Values.Look(ref _summarizedIdsInitialized, "summarizedIdsInitialized", false);
+            Scribe_Values.Look(ref _alreadyUpdateSummarizationType, "AlreadyUpdateSummarizationType", false);
 
             // 集合空保护
             activeMemories ??= new();
@@ -109,7 +111,10 @@ namespace RimTalk.Memory
             eventLogMemories ??= new();
             archiveMemories ??= new();
 
-            if (Scribe.mode == LoadSaveMode.PostLoadInit && !_summarizedIdsInitialized)
+            // 向后兼容
+            if (Scribe.mode is LoadSaveMode.PostLoadInit)
+            {
+                if (!_summarizedIdsInitialized)
             {
                 SummarizedIds.UnionWith(
                     activeMemories.Concat(situationalMemories).Concat(eventLogMemories)
@@ -117,6 +122,15 @@ namespace RimTalk.Memory
                     .Select(m => m.OriginId)
                     );
                 _summarizedIdsInitialized = true;
+            }
+
+                if (!_alreadyUpdateSummarizationType)
+                {
+                    foreach (var memory in EventLogMemories.Concat(ArchiveMemories))
+                        memory?.Type = MemoryType.Summarization;
+
+                    _alreadyUpdateSummarizationType = true;
+                }
             }
         }
 
