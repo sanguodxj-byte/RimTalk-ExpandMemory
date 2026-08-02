@@ -114,7 +114,7 @@ namespace RimTalk.MemoryPatch
         public bool enableMemoryUI = true;
 
         // 记忆类型开关
-        public bool enableActionMemory = true;
+        public bool EnableActionMemory = true;
         public bool enableConversationMemory = true;
 
         // Pawn状态常识自动生成
@@ -243,7 +243,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref SummaryMaxTokens, "ai_summaryMaxTokens", 8000);  // ⭐ v3.4.0: 与字段默认值同步
 
             Scribe_Values.Look(ref enableMemoryUI, "memoryPatch_enableMemoryUI", true);
-            Scribe_Values.Look(ref enableActionMemory, "memoryPatch_enableActionMemory", true);
+            Scribe_Values.Look(ref EnableActionMemory, "memoryPatch_enableActionMemory", true);
             Scribe_Values.Look(ref enableConversationMemory, "memoryPatch_enableConversationMemory", true);
             Scribe_Values.Look(ref enablePawnStatusKnowledge, "pawnStatus_enablePawnStatusKnowledge", false);
             Scribe_Values.Look(ref enableEventRecordKnowledge, "eventRecord_enableEventRecordKnowledge", false);
@@ -633,7 +633,7 @@ namespace RimTalk.MemoryPatch
 
         private void DrawMemoryTypesSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("RimTalk_Settings_ActionMemory".Translate(), ref enableActionMemory);
+            listing.CheckboxLabeled("RimTalk_Settings_ActionMemory".Translate(), ref EnableActionMemory);
             listing.CheckboxLabeled("RimTalk_Settings_ConversationMemory".Translate(), ref enableConversationMemory);
         }
 
