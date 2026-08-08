@@ -174,7 +174,6 @@ public class FourLayerMemoryComp : ThingComp
     /// <summary>
     /// ⭐ v4.0: 更新检索逻辑
     /// - ABM: 按 conversationId 去重后返回所有
-    /// - SCM: 仅兼容旧存档，返回已有的
     /// - ELS/CLPA: 保持原有逻辑
     /// </summary>
     public List<MemoryEntry> RetrieveMemories(MemoryQuery query)
@@ -187,7 +186,6 @@ public class FourLayerMemoryComp : ThingComp
             .OrderByDescending(m => m.GameTick);
         results.AddRange(abmCandidates);
 
-        // ⭐ v4.0: SCM 仅兼容旧存档（不再生成新的）
         if (situationalMemories.Count > 0)
         {
             var scmCandidates = situationalMemories

@@ -41,11 +41,9 @@ namespace RimTalk.MemoryPatch
         // ⭐ 提示词规范化规则列表（功能保留，默认为空）
         public List<ReplacementRule> normalizationRules = new List<ReplacementRule>();
 
-        // ⭐ v4.0: 三层记忆容量配置（移除 SCM）
         // maxActiveMemories 已废弃，ABM 无容量限制
         // 恢复为可选项
         public int maxActiveMemories = 6;
-        // maxSituationalMemories 仅用于兼容旧存档显示
         public int maxSituationalMemories = 20;
         public int maxEventLogMemories = 50;
 

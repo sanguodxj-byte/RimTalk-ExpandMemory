@@ -178,7 +178,6 @@ namespace RimTalk.Memory.UI
                                     break;
                                     
                                 case MemoryLayer.Situational:
-                                    // ⭐ v4.0: SCM 已废弃，但仍支持导入旧数据
                                     if (currentMemoryComp.SituationalMemories.Count < RimTalkMemoryPatchMod.Settings.maxSituationalMemories)
                                     {
                                         currentMemoryComp.SituationalMemories.Add(memory);
