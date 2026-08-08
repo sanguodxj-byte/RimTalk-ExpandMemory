@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-08-03
+
+### Added
+- 新增战斗记忆捕获管线 `CombatMemoryCapturer`：补充捕获征召"坚守/开火"模式下由系统自动触发、不创建攻击 Job 的自动攻击，仅在实际攻击成功后记录。 (`91c13d8`)
+- 战斗记忆按攻击方式与会话自动聚合：连发同一目标不重复计数，多目标按命中数量汇总；以目标唯一 ID 区分同名个体，对地攻击单独记录。 (`91c13d8`)
+- 新增 `EnableCombatMemory` 设置开关及 UI，补充 en/zh-Hans/ko/ru 翻译。 (`91c13d8`)
+- 构建总结提示词时会在姓名后额外注入性别和年龄，辅助 AI 更准确地总结角色经历。 (`5f6bdae`)
+
+### Changed
+- 战斗/施法 Job 未成功时也进行捕获：攻击与能力施放等 Job 即使以中断等非成功条件结束也会被记录，修复目标死亡/移动导致战斗行为与传送类能力施放漏记的问题。 (`2c9f1f1`)
+- 为近战/射击补充聚合描述（近身攻击/射击）。 (`2c9f1f1`)
+- 设置字段 `enableActionMemory` 重命名为 `EnableActionMemory`，保留序列化键以兼容旧存档。 (`2c9f1f1`)
+
+### Fixed
+- 修复"跟随 RimTalk 配置"开启时模型抓取不正确的问题。 (`21f41ae`)
+- 修复其他模组阻断响应生成时，未实际生成的回复仍被写入记忆的问题。 (`4979887`)
+- 旧存档中 ELS/CLPA 记忆的 type 在加载时自动转为 `summarization`，避免类型不一致导致的问题。 (`4124d79`)
+
 ## [1.10.0] - 2026-07-27
 
 ### Added
@@ -142,6 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
+[1.11.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.7.0...v1.8.0
