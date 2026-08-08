@@ -78,6 +78,7 @@ public class RoundMemory : MemoryEntry, IExposable
             OriginId = Id,
             Content = Content,
             GameTick = GameTick,
+            EndGameTick = EndGameTick,
 
             relatedPawnId = relatedPawnId,
             relatedPawnName = relatedPawnName,

@@ -408,19 +408,24 @@ public class MemorySummarizer
     // 将传入的记忆集合构建为一个新的 MemoryEntry
     private MemoryEntry BuildEmptySummary(List<MemoryEntry> memoryList, MemoryLayer targetLayer)
     {
-        return new MemoryEntry(
+        bool isArchive = targetLayer is MemoryLayer.Archive;
+
+        var memory = new MemoryEntry(
             content: null,
             MemoryType.Summarization,
             targetLayer,
             importance: memoryList.Average(m => m.Importance)
         )
         {
-            // 取 memoryList 中最新的 GameTick 作为新条目的时间戳
-            // memoryList 是有序的，最后一项即为最新
-            GameTick = memoryList[^1].GameTick,
+            // 总结时，GameTick 取最晚的条目；归档时，GameTick 取最早的条目
+            GameTick = isArchive ? memoryList[0].GameTick : memoryList[^1].GameTick,
 
             tags = [.. memoryList.SelectMany(m => m.tags).Distinct()],
             keywords = [.. memoryList.SelectMany(m => m.keywords).Distinct()]
         };
+        // 归档时，额外赋值 EndGameTick 为最晚的条目 GameTick
+        if (isArchive) memory.EndGameTick = memoryList[^1].GameTick;
+
+        return memory;
     }
 }

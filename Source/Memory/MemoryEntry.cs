@@ -26,6 +26,12 @@ public class MemoryEntry : IExposable
     }
     // 更应当存储 AbsTick，无奈屎山已经堆起来了
     public int GameTick = -1;           // 时间戳（单位 tick）
+    private int _endGameTick = -1;        // 结束时间戳，CLPA 独有
+    public int EndGameTick
+    {
+        get => _endGameTick == -1 ? GameTick : _endGameTick;
+        set => _endGameTick = value;
+    }
     public string Content;              // 内容
 
     // 分类
@@ -149,10 +155,17 @@ public class MemoryEntry : IExposable
 
         Scribe_Values.Look(ref _originId, "OriginId", 0L);
         Scribe_Values.Look(ref GameTick, "timestamp", -1);
+        Scribe_Values.Look(ref _endGameTick, "EndGameTick", 0); // -1 是初始化后的无效值，而 0 则代表根本未初始化
         Scribe_Values.Look(ref Content, "content");
 
         Scribe_Values.Look(ref Type, "type");
         Scribe_Values.Look(ref Layer, "layer");
+
+#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
+        if (Scribe.mode is LoadSaveMode.LoadingVars
+            && Layer is MemoryLayer.Archive
+            && EndGameTick == 0)
+            EndGameTick = GameTick + 15 * GenDate.TicksPerDay; // 旧存档 CPLA 默认跨度 15 天
 
         Scribe_Values.Look(ref _importance, "importance", -1);
         Scribe_Values.Look(ref Activity, "activity", -1);
