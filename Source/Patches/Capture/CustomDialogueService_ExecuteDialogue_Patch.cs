@@ -6,7 +6,8 @@ namespace RimTalk.Memory.Patches.Capture
 {
 
     // 捕获玩家发言
-    [HarmonyPatch(typeof(CustomDialogueService), "ExecuteDialogue")]
+    [HarmonyPatch(typeof(CustomDialogueService), "ExecuteDialogue",
+        typeof(Pawn), typeof(Pawn), typeof(string), typeof(bool), typeof(string))]
     public static class CustomDialogueService_ExecuteDialogue_Patch
     {
         [HarmonyPostfix]
