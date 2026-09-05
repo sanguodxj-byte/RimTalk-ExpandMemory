@@ -12,6 +12,7 @@ public enum AIProvider
     GLMCoding,
     AlibabaIntl,
     AlibabaCN,
+    Player2,
     Custom
 }
 
@@ -26,7 +27,8 @@ public static class AIProviderRegistry
         { AIProvider.GLM, "https://api.z.ai/api/paas/v4/chat/completions" },
         { AIProvider.GLMCoding, "https://api.z.ai/api/coding/paas/v4/chat/completions" },
         { AIProvider.AlibabaIntl, "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions" },
-        { AIProvider.AlibabaCN, "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions" }
+        { AIProvider.AlibabaCN, "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions" },
+        { AIProvider.Player2, "https://api.player2.game/v1/chat/completions" }
     };
 
     public static string GetEndpointUrl(this AIProvider p)

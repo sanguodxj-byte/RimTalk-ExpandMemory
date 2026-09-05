@@ -15,26 +15,26 @@ public static class RimTalkApiConfigGetter
 {
     public static List<ApiConfig> GetRimTalkApiConfigs()
     {
+        if (Settings.Get() is not { } settings)
+            return [];
+
+        // 如果使用了简单配置，则直接返回一个包含简单配置的 ApiConfig 列表
+        if (settings.UseSimpleConfig) return [ new ApiConfig
+        {
+            Provider = settings.SimpleProvider.Convert() ,
+            ApiKey = settings.SimpleApiKey,
+            CustomModelName = settings.GetCurrentModel(),
+        }];
+
         // 获取 rimtalk 的 ApiConfig 列表
-        if (Settings.Get()?.CloudConfigs is not { Count: > 0 } rimTalkApiConfigs)
-            return new List<ApiConfig>();
+        if (settings.CloudConfigs is not { Count: > 0 } rimTalkApiConfigs)
+            return [];
 
         // 映射为记忆拓展的 ApiConfig 列表
         return rimTalkApiConfigs.Where(c => c is not null).Select(rimTalkApiConfig => new ApiConfig
         {
             IsEnabled = rimTalkApiConfig.IsEnabled,
-            Provider = rimTalkApiConfig.Provider switch
-            {
-                global::RimTalk.AIProvider.Google => AIProvider.Google,
-                global::RimTalk.AIProvider.OpenAI => AIProvider.OpenAI,
-                global::RimTalk.AIProvider.DeepSeek => AIProvider.DeepSeek,
-                global::RimTalk.AIProvider.Grok => AIProvider.Grok,
-                global::RimTalk.AIProvider.GLM => AIProvider.GLM,
-                global::RimTalk.AIProvider.GLMCoding => AIProvider.GLMCoding,
-                global::RimTalk.AIProvider.AlibabaIntl => AIProvider.AlibabaIntl,
-                global::RimTalk.AIProvider.AlibabaCN => AIProvider.AlibabaCN,
-                _ => AIProvider.Custom
-            },
+            Provider = rimTalkApiConfig.Provider.Convert(),
             ApiKey = rimTalkApiConfig.ApiKey,
             CustomUrl = rimTalkApiConfig.BaseUrl,
             CustomModelName = string.IsNullOrWhiteSpace(rimTalkApiConfig.CustomModelName)
@@ -42,4 +42,18 @@ public static class RimTalkApiConfigGetter
                 : rimTalkApiConfig.CustomModelName,
         }).ToList();
     }
+
+    private static AIProvider Convert(this global::RimTalk.AIProvider provider) => provider switch
+    {
+        global::RimTalk.AIProvider.Google => AIProvider.Google,
+        global::RimTalk.AIProvider.OpenAI => AIProvider.OpenAI,
+        global::RimTalk.AIProvider.DeepSeek => AIProvider.DeepSeek,
+        global::RimTalk.AIProvider.Grok => AIProvider.Grok,
+        global::RimTalk.AIProvider.GLM => AIProvider.GLM,
+        global::RimTalk.AIProvider.GLMCoding => AIProvider.GLMCoding,
+        global::RimTalk.AIProvider.AlibabaIntl => AIProvider.AlibabaIntl,
+        global::RimTalk.AIProvider.AlibabaCN => AIProvider.AlibabaCN,
+        global::RimTalk.AIProvider.Player2 => AIProvider.Player2,
+        _ => AIProvider.Custom
+    };
 }
