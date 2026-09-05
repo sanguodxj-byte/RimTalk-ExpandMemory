@@ -410,13 +410,21 @@ public class JobMemoryCapturer
         // 目标即自身时
         if (targetThing == Parent) return "自己";
 
-        // 目标是蓝图或框架，则提取其正在建造的实体名称（如木材、钢铁等）
-        if (targetThing is Blueprint or Frame)
+        // 泰南你无敌了，原版 API，甚至还是属性 API，能搞出 NRE
+        try
         {
-            return targetThing.def?.entityDefToBuild?.label ?? string.Empty;
-        }
+            // 目标是蓝图或框架，则提取其正在建造的实体名称（如木材、钢铁等）
+            if (targetThing is Blueprint or Frame)
+            {
+                return targetThing.def?.entityDefToBuild?.label ?? string.Empty;
+            }
 
-        return targetThing.LabelShort ?? targetThing.def?.label ?? string.Empty;
+            return targetThing.LabelShort ?? targetThing.def?.label ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 
     // 生成合并/聚合记忆更新文本
