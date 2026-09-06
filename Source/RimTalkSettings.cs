@@ -110,6 +110,7 @@ namespace RimTalk.MemoryPatch
 
         // UI 设置
         public bool enableMemoryUI = true;
+        public float MemoryTabTimeLineWidth = 900f;
 
         // 记忆类型开关
         public bool EnableActionMemory = true;
@@ -242,6 +243,7 @@ namespace RimTalk.MemoryPatch
             Scribe_Values.Look(ref SummaryMaxTokens, "ai_summaryMaxTokens", 8000);  // ⭐ v3.4.0: 与字段默认值同步
 
             Scribe_Values.Look(ref enableMemoryUI, "memoryPatch_enableMemoryUI", true);
+            Scribe_Values.Look(ref MemoryTabTimeLineWidth, "MemoryTabTimeLineWidth", 900f);
             Scribe_Values.Look(ref EnableActionMemory, "memoryPatch_enableActionMemory", true);
             Scribe_Values.Look(ref EnableCombatMemory, "EnableCombatMemory", true);
             Scribe_Values.Look(ref enableConversationMemory, "memoryPatch_enableConversationMemory", true);
@@ -679,7 +681,7 @@ namespace RimTalk.MemoryPatch
                 return;
             }
 
-            Find.WindowStack.Add(new Dialog_CommonKnowledge(memoryManager.CommonKnowledge));
+            Find.WindowStack.Add(new Dialog_CommonKnowledge());
         }
 
         /// <summary>

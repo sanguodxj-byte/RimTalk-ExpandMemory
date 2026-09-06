@@ -1,93 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <!-- ==================== Common UI ==================== -->
-  <RimTalk_Memory_Title>{0}'s Memories</RimTalk_Memory_Title>
-  <RimTalk_SelectColonist>Select Colonist</RimTalk_SelectColonist>
-  <RimTalk_ChooseColonist>Choose...</RimTalk_ChooseColonist>
-  <RimTalk_NoColonists>No colonists available</RimTalk_NoColonists>
-  <RimTalk_NoMemoryComponent>Selected pawn has no memory component</RimTalk_NoMemoryComponent>
-  <RimTalk_ShowAllHumanlikes>Show all humanlikes</RimTalk_ShowAllHumanlikes>
 
   <!-- ITab Memory -->
   <RimTalk_Memory_NoMemories>No memories to display</RimTalk_Memory_NoMemories>
   
   <!-- ==================== Mind Stream UI Tabs ==================== -->
-  <RimTalk_MindStream_SelectColonist>Select a colonist to view memories</RimTalk_MindStream_SelectColonist>
-  <RimTalk_MindStream_NoMemoryComp>Selected pawn has no memory component</RimTalk_MindStream_NoMemoryComp>
-  <RimTalk_MindStream_Preview>Preview</RimTalk_MindStream_Preview>
-  <RimTalk_MindStream_Knowledge>Knowledge</RimTalk_MindStream_Knowledge>
-  <RimTalk_MindStream_OperationGuide>Operation Guide</RimTalk_MindStream_OperationGuide>
-  <RimTalk_MindStream_NoColonists>No colonists</RimTalk_MindStream_NoColonists>
   
   <!-- Control Panel -->
-  <RimTalk_MindStream_MemoryFilters>Memory Filters</RimTalk_MindStream_MemoryFilters>
-  <RimTalk_MindStream_Layers>Layers</RimTalk_MindStream_Layers>
-  <RimTalk_MindStream_ABM>ABM (Active)</RimTalk_MindStream_ABM>
-  <RimTalk_MindStream_SCM>SCM (Short)</RimTalk_MindStream_SCM>
-  <RimTalk_MindStream_ELS>ELS (Event)</RimTalk_MindStream_ELS>
-  <RimTalk_MindStream_CLPA>CLPA (Archive)</RimTalk_MindStream_CLPA>
 
-  <RimTalk_MindStream_Type>Type</RimTalk_MindStream_Type>
-  <RimTalk_MindStream_All>All</RimTalk_MindStream_All>
   <RimTalk_MindStream_Conversation>Conversation</RimTalk_MindStream_Conversation>
   <RimTalk_MindStream_Action>Action</RimTalk_MindStream_Action>
 
-  <RimTalk_MindStream_Statistics>Statistics</RimTalk_MindStream_Statistics>
-  <RimTalk_MindStream_Selected>Selected: {0}</RimTalk_MindStream_Selected>
-  <RimTalk_MindStream_TotalMemories>{0} memories total</RimTalk_MindStream_TotalMemories>
 
-  <RimTalk_MindStream_BatchActions>Batch Actions</RimTalk_MindStream_BatchActions>
-  <RimTalk_MindStream_SummarizeN>Summarize ({0})</RimTalk_MindStream_SummarizeN>
-  <RimTalk_MindStream_SummarizeSelected>Summarize Selected</RimTalk_MindStream_SummarizeSelected>
-  <RimTalk_MindStream_ArchiveN>Archive ({0})</RimTalk_MindStream_ArchiveN>
-  <RimTalk_MindStream_ArchiveSelected>Archive Selected</RimTalk_MindStream_ArchiveSelected>
-  <RimTalk_MindStream_DeleteN>Delete ({0})</RimTalk_MindStream_DeleteN>
-  <RimTalk_MindStream_DeleteSelected>Delete Selected</RimTalk_MindStream_DeleteSelected>
 
-  <RimTalk_MindStream_GlobalActions>Global Actions</RimTalk_MindStream_GlobalActions>
-  <RimTalk_MindStream_SummarizeAll>Summarize All</RimTalk_MindStream_SummarizeAll>
-  <RimTalk_MindStream_ArchiveAll>Archive All</RimTalk_MindStream_ArchiveAll>
   
   <!-- Memory Export/Import -->
-  <RimTalk_Memory_Export>Export</RimTalk_Memory_Export>
-  <RimTalk_Memory_Import>Import</RimTalk_Memory_Import>
-  <RimTalk_Memory_ExportNoPawn>Please select a colonist first</RimTalk_Memory_ExportNoPawn>
-  <RimTalk_Memory_ExportSuccess>Exported {0} memories to {1}</RimTalk_Memory_ExportSuccess>
-  <RimTalk_Memory_ExportSuccessTitle>Export Successful</RimTalk_Memory_ExportSuccessTitle>
-  <RimTalk_Memory_OpenExportFolder>Open export folder?</RimTalk_Memory_OpenExportFolder>
-  <RimTalk_Memory_OpenFolder>📁 Open Folder</RimTalk_Memory_OpenFolder>
-  <RimTalk_Memory_ExportFailed>Export failed: {0}</RimTalk_Memory_ExportFailed>
-  <RimTalk_Memory_ImportNoPawn>Please select a colonist first</RimTalk_Memory_ImportNoPawn>
-  <RimTalk_Memory_ImportNoFolder>Export folder does not exist</RimTalk_Memory_ImportNoFolder>
-  <RimTalk_Memory_ImportNoFiles>No export files found</RimTalk_Memory_ImportNoFiles>
-  <RimTalk_Memory_ImportEmpty>No memory data in file</RimTalk_Memory_ImportEmpty>
-  <RimTalk_Memory_ImportConfirm>Import {1} memories from {0} to {2}?\nMemories exceeding capacity will be skipped.</RimTalk_Memory_ImportConfirm>
-  <RimTalk_Memory_ImportSuccess>Successfully imported {0}/{1} memories</RimTalk_Memory_ImportSuccess>
-  <RimTalk_Memory_ImportFailed>Import failed: {0}</RimTalk_Memory_ImportFailed>
 
   <!-- Timeline -->
-  <RimTalk_MindStream_ShowingN>Showing {0} memories</RimTalk_MindStream_ShowingN>
-  <RimTalk_MindStream_Pin>Pin</RimTalk_MindStream_Pin>
-  <RimTalk_MindStream_Unpin>Unpin</RimTalk_MindStream_Unpin>
-  <RimTalk_MindStream_Edit>Edit</RimTalk_MindStream_Edit>
-  <RimTalk_MindStream_With>with</RimTalk_MindStream_With>
-  <RimTalk_MindStream_ImportanceLabel>Importance: {0}</RimTalk_MindStream_ImportanceLabel>
-  <RimTalk_MindStream_ActivityLabel>Activity: {0}</RimTalk_MindStream_ActivityLabel>
 
   <!-- Messages -->
-  <RimTalk_MindStream_NoSCMSelected>No SCM memories selected</RimTalk_MindStream_NoSCMSelected>
-  <RimTalk_MindStream_SummarizeConfirm>Summarize {0} SCM memories into ELS?</RimTalk_MindStream_SummarizeConfirm>
-  <RimTalk_MindStream_SummarizedN>Summarized {0} memories</RimTalk_MindStream_SummarizedN>
-  <RimTalk_MindStream_NoELSSelected>No ELS memories selected</RimTalk_MindStream_NoELSSelected>
-  <RimTalk_MindStream_ArchiveConfirm>Archive {0} ELS memories into CLPA?</RimTalk_MindStream_ArchiveConfirm>
-  <RimTalk_MindStream_ArchivedN>Archived {0} memories</RimTalk_MindStream_ArchivedN>
-  <RimTalk_MindStream_DeleteConfirm>Delete {0} selected memories?</RimTalk_MindStream_DeleteConfirm>
-  <RimTalk_MindStream_DeletedN>Deleted {0} memories</RimTalk_MindStream_DeletedN>
-  <RimTalk_MindStream_QueuedSummarization>Queued summarization for {0} colonists</RimTalk_MindStream_QueuedSummarization>
-  <RimTalk_MindStream_NoNeedSummarization>No colonists need summarization</RimTalk_MindStream_NoNeedSummarization>
-  <RimTalk_MindStream_ArchivedForN>Archived memories for {0} colonists</RimTalk_MindStream_ArchivedForN>
-  <RimTalk_MindStream_MustEnterGame>Must enter game first</RimTalk_MindStream_MustEnterGame>
-  <RimTalk_MindStream_CannotFindManager>Could not find memory manager</RimTalk_MindStream_CannotFindManager>
 
   <!-- ==================== Knowledge Library UI ==================== -->
   <RimTalk_Knowledge_Categories>Categories</RimTalk_Knowledge_Categories>
@@ -176,42 +108,9 @@
   <RimTalk_Filter_Conversation>Conversation</RimTalk_Filter_Conversation>
   <RimTalk_Filter_Action>Action</RimTalk_Filter_Action>
   
-  <RimTalk_UI_Preview>Preview</RimTalk_UI_Preview>
-  <RimTalk_UI_Knowledge>Knowledge</RimTalk_UI_Knowledge>
-  <RimTalk_UI_ImmediateSummarize>Summarize Now</RimTalk_UI_ImmediateSummarize>
-  <RimTalk_UI_ImmediateSummarizeNoMemory>Summarize (No SCM)</RimTalk_UI_ImmediateSummarizeNoMemory>
-  <RimTalk_UI_MemorySummarized>Summarized memories for {0}</RimTalk_UI_MemorySummarized>
-  <RimTalk_UI_SummarizeAll>Summarize All</RimTalk_UI_SummarizeAll>
-  <RimTalk_UI_MemoriesSummarizedCount>Queued summarization for {0} colonists</RimTalk_UI_MemoriesSummarizedCount>
-  <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
-  <RimTalk_UI_ImmediateArchive>Archive Now</RimTalk_UI_ImmediateArchive>
-  <RimTalk_UI_ImmediateArchiveNoMemory>Archive (No ELS)</RimTalk_UI_ImmediateArchiveNoMemory>
-  <RimTalk_UI_MemoryArchived>Archived memories for {0}</RimTalk_UI_MemoryArchived>
-  <RimTalk_UI_ArchiveAll>Archive All</RimTalk_UI_ArchiveAll>
-  <RimTalk_UI_MemoriesArchivedCount>Archived memories for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
   
-  <RimTalk_Tooltip_Preview>View injection preview</RimTalk_Tooltip_Preview>
-  <RimTalk_Tooltip_Knowledge>Manage knowledge library</RimTalk_Tooltip_Knowledge>
-  <RimTalk_Tooltip_ABM>Active Buffer Memory (last 3)</RimTalk_Tooltip_ABM>
-  <RimTalk_Tooltip_SCM>Situational Context Memory (last 20)</RimTalk_Tooltip_SCM>
-  <RimTalk_Tooltip_ELS>Event Log Storage (50 events)</RimTalk_Tooltip_ELS>
-  <RimTalk_Tooltip_CLPA>Compressed Long-term Persona Archive (unlimited)</RimTalk_Tooltip_CLPA>
   
-  <RimTalk_UI_Edit>Edit</RimTalk_UI_Edit>
-  <RimTalk_UI_Pin>Pin</RimTalk_UI_Pin>
-  <RimTalk_UI_Pinned>Pinned</RimTalk_UI_Pinned>
-  <RimTalk_UI_Delete>Delete</RimTalk_UI_Delete>
-  <RimTalk_UI_ConfirmDeleteMemory>Delete this memory?</RimTalk_UI_ConfirmDeleteMemory>
-  <RimTalk_MemoryDeleted>Memory deleted</RimTalk_MemoryDeleted>
   
-  <RimTalk_Tooltip_Edit>Edit memory content</RimTalk_Tooltip_Edit>
-  <RimTalk_Tooltip_Pin>Pin to prevent auto-cleanup</RimTalk_Tooltip_Pin>
-  <RimTalk_Tooltip_Unpin>Unpin to allow auto-cleanup</RimTalk_Tooltip_Unpin>
-  <RimTalk_Tooltip_Delete>Delete this memory</RimTalk_Tooltip_Delete>
-  <RimTalk_Tooltip_Importance>Importance score (affects injection priority)</RimTalk_Tooltip_Importance>
-  <RimTalk_Tooltip_Activity>Activity score (used for auto-cleanup)</RimTalk_Tooltip_Activity>
-  <RimTalk_Tooltip_Notes>Additional notes</RimTalk_Tooltip_Notes>
-  <RimTalk_Tooltip_Tags>Tags: {0}</RimTalk_Tooltip_Tags>
   
   <RimTalk_Cancel>Cancel</RimTalk_Cancel>
   <RimTalk_Save>Save</RimTalk_Save>
@@ -222,22 +121,9 @@
   <RimTalk_Settings_MustEnterGame>Must enter game first</RimTalk_Settings_MustEnterGame>
   <RimTalk_Settings_CannotFindManager>Cannot find memory manager</RimTalk_Settings_CannotFindManager>
   
-  <RimTalk_Menu_MemoryCompUnavailable>Memory component unavailable</RimTalk_Menu_MemoryCompUnavailable>
-  <RimTalk_Menu_CreateMemoryFailed>Failed to create memory</RimTalk_Menu_CreateMemoryFailed>
-  <RimTalk_Menu_OpenEditFailed>Failed to open edit dialog</RimTalk_Menu_OpenEditFailed>
-  <RimTalk_Menu_AddActionMemory>Add Action Memory to {0}</RimTalk_Menu_AddActionMemory>
-  <RimTalk_Menu_AddConversationMemory>Add Conversation Memory to {0}</RimTalk_Menu_AddConversationMemory>
   
-  <RimTalk_Layer_ELS>ELS</RimTalk_Layer_ELS>
-  <RimTalk_Layer_CLPA>CLPA</RimTalk_Layer_CLPA>
   
   <!-- ==================== Matching Source Categories ==================== -->
-  <RimTalk_MatchSource_CategoryDialogue>Dialogue</RimTalk_MatchSource_CategoryDialogue>
-  <RimTalk_MatchSource_CategoryPawn>Pawn Properties</RimTalk_MatchSource_CategoryPawn>
-  <RimTalk_MatchSource_CategoryEnvironment>Environment</RimTalk_MatchSource_CategoryEnvironment>
-  <RimTalk_MatchSource_CategoryColony>Colony</RimTalk_MatchSource_CategoryColony>
-  <RimTalk_MatchSource_CategoryTime>Time</RimTalk_MatchSource_CategoryTime>
-  <RimTalk_MatchSource_CategoryExtension>Extensions</RimTalk_MatchSource_CategoryExtension>
   
   <!-- ==================== Settings UI ==================== -->
   <!-- Main UI -->
@@ -309,34 +195,10 @@
   <RimTalk_Settings_PlaceholderApiKey>Paste API Key...</RimTalk_Settings_PlaceholderApiKey>
   <RimTalk_Settings_PlaceholderModelId>Model ID</RimTalk_Settings_PlaceholderModelId>
   <RimTalk_Settings_BaseUrlTooltip>Custom endpoint base URL (only for Custom provider)</RimTalk_Settings_BaseUrlTooltip>
-  <RimTalk_Settings_ChooseModel>(choose model...)</RimTalk_Settings_ChooseModel>
-  <RimTalk_Settings_DefaultModel>default</RimTalk_Settings_DefaultModel>
-  <RimTalk_Settings_CustomModel>Custom...</RimTalk_Settings_CustomModel>
-  <RimTalk_Settings_QuotaExceeded>AI quota exhausted, please check your provider account</RimTalk_Settings_QuotaExceeded>
-  <RimTalk_Settings_APIKey>API Key</RimTalk_Settings_APIKey>
-  <RimTalk_Settings_APIURL>API URL</RimTalk_Settings_APIURL>
-  <RimTalk_Settings_ModelName>Model</RimTalk_Settings_ModelName>
-  <RimTalk_Settings_EnablePromptCaching>Enable Prompt Caching</RimTalk_Settings_EnablePromptCaching>
-  <RimTalk_Settings_EnablePromptCachingUnavailable>Enable Prompt Caching (Unavailable)</RimTalk_Settings_EnablePromptCachingUnavailable>
-  <RimTalk_Settings_OpenAICachingSupport>✓ OpenAI Supports Prompt Caching (Beta)</RimTalk_Settings_OpenAICachingSupport>
-  <RimTalk_Settings_OpenAICachingModels>Applicable models: gpt-4o, gpt-4-turbo</RimTalk_Settings_OpenAICachingModels>
-  <RimTalk_Settings_DeepSeekCachingSupport>✓ DeepSeek Supports Prompt Caching</RimTalk_Settings_DeepSeekCachingSupport>
-  <RimTalk_Settings_DeepSeekCachingSavings>Can save ~50% in costs</RimTalk_Settings_DeepSeekCachingSavings>
-  <RimTalk_Settings_Player2NoCaching>✗ Player2 does not support Prompt Caching</RimTalk_Settings_Player2NoCaching>
-  <RimTalk_Settings_Player2LocalNoCache>Local client does not require caching</RimTalk_Settings_Player2LocalNoCache>
-  <RimTalk_Settings_GoogleNoCaching>✗ Google Gemini does not support Prompt Caching</RimTalk_Settings_GoogleNoCaching>
-  <RimTalk_Settings_CustomNoCaching>✗ Custom API does not support Prompt Caching</RimTalk_Settings_CustomNoCaching>
-  <RimTalk_Settings_CustomCachingDepends>Depends on your API implementation</RimTalk_Settings_CustomCachingDepends>
   <RimTalk_Settings_ValidateConfig>✓ Validate Configuration</RimTalk_Settings_ValidateConfig>
   <RimTalk_Settings_ValidateConfigTip>Tip: Validation sends a real API request along the fallback chain (in-save only)</RimTalk_Settings_ValidateConfigTip>
-  <RimTalk_Settings_UsingRimTalkConfigNoValidation>Currently using RimTalk config, no validation needed for independent config</RimTalk_Settings_UsingRimTalkConfigNoValidation>
-  <RimTalk_Settings_PleaseEnterAPIKey>Please enter API Key first</RimTalk_Settings_PleaseEnterAPIKey>
-  <RimTalk_Settings_PleaseEnterAPIURL>Please enter API URL first</RimTalk_Settings_PleaseEnterAPIURL>
-  <RimTalk_Settings_PleaseEnterModel>Please enter Model first</RimTalk_Settings_PleaseEnterModel>
   <RimTalk_Settings_Validating>Validating configuration...</RimTalk_Settings_Validating>
-  <RimTalk_Settings_ValidationSuccess>✓ Configuration validation successful! Provider: {0}</RimTalk_Settings_ValidationSuccess>
   <RimTalk_Settings_ValidationFailed>✗ Configuration validation failed, please check API Key and URL</RimTalk_Settings_ValidationFailed>
-  <RimTalk_Settings_ValidationError>✗ Validation failed: {0}</RimTalk_Settings_ValidationError>
   
   <!-- Memory Types -->
   <RimTalk_Settings_IsRoundMemoryActive>Enable Round Memory</RimTalk_Settings_IsRoundMemoryActive>
@@ -368,21 +230,8 @@
   
   <!-- ==================== SettingsUIDrawers Translations ==================== -->
   <!-- AI Provider Selection -->
-  <RimTalk_Settings_AIProvider>AI Provider</RimTalk_Settings_AIProvider>
-  <RimTalk_Settings_CurrentProvider>Current: {0}</RimTalk_Settings_CurrentProvider>
-  <RimTalk_Settings_SelectProvider>Select Provider</RimTalk_Settings_SelectProvider>
   
   <!-- Provider Descriptions -->
-  <RimTalk_Settings_OpenAIDesc1>✦ OpenAI GPT series models, stable and reliable</RimTalk_Settings_OpenAIDesc1>
-  <RimTalk_Settings_OpenAIDesc2>Recommended models: gpt-3.5-turbo, gpt-4</RimTalk_Settings_OpenAIDesc2>
-  <RimTalk_Settings_DeepSeekDesc1>✦ DeepSeek Chinese-optimized models, cost-effective</RimTalk_Settings_DeepSeekDesc1>
-  <RimTalk_Settings_DeepSeekDesc2>Recommended models: deepseek-chat, deepseek-coder</RimTalk_Settings_DeepSeekDesc2>
-  <RimTalk_Settings_Player2Desc1>✦ Player2 game-optimized AI, supports local client</RimTalk_Settings_Player2Desc1>
-  <RimTalk_Settings_Player2Desc2>Recommended models: gpt-4o, gpt-4-turbo</RimTalk_Settings_Player2Desc2>
-  <RimTalk_Settings_GoogleDesc1>✦ Google Gemini series, strong multi-modal capabilities</RimTalk_Settings_GoogleDesc1>
-  <RimTalk_Settings_GoogleDesc2>Recommended model: gemini-2.0-flash-exp</RimTalk_Settings_GoogleDesc2>
-  <RimTalk_Settings_CustomDesc1>✦ Custom API endpoint, supports third-party proxies</RimTalk_Settings_CustomDesc1>
-  <RimTalk_Settings_CustomDesc2>Please configure API URL and Model manually</RimTalk_Settings_CustomDesc2>
   
   <!-- Knowledge Matching Sources -->
   <RimTalk_Settings_KnowledgeMatchingSources>Knowledge Matching Source Selection</RimTalk_Settings_KnowledgeMatchingSources>
@@ -420,45 +269,11 @@
   
   <!-- ==================== MainTabWindow_Memory Translations ==================== -->
   <!-- Controls -->
-  <RimTalk_MindStream_RightClickToCreate>Right-click to create {0} memory</RimTalk_MindStream_RightClickToCreate>
-  <RimTalk_MindStream_SummarizeSelectedBoth>Summarize Selected (ABM:{0} + SCM:{1})</RimTalk_MindStream_SummarizeSelectedBoth>
-  <RimTalk_MindStream_SummarizeSelectedABM>Summarize Selected (ABM:{0})</RimTalk_MindStream_SummarizeSelectedABM>
-  <RimTalk_MindStream_SummarizeSelectedSCM>Summarize Selected (SCM:{0})</RimTalk_MindStream_SummarizeSelectedSCM>
-  <RimTalk_MindStream_SummarizeAllBoth>Summarize All (ABM:{0} + SCM:{1})</RimTalk_MindStream_SummarizeAllBoth>
-  <RimTalk_MindStream_SummarizeAllABM>Summarize All (ABM:{0})</RimTalk_MindStream_SummarizeAllABM>
-  <RimTalk_MindStream_SummarizeAllSCM>Summarize All (SCM:{0})</RimTalk_MindStream_SummarizeAllSCM>
-  <RimTalk_MindStream_ArchiveAllCount>Archive All ({0})</RimTalk_MindStream_ArchiveAllCount>
-  <RimTalk_MindStream_DeleteAllCount>Delete All ({0})</RimTalk_MindStream_DeleteAllCount>
-  <RimTalk_MindStream_PleaseSelectColonist>Please select a colonist first</RimTalk_MindStream_PleaseSelectColonist>
-  <RimTalk_MindStream_AddConversationTo>Add Conversation Memory to {0}</RimTalk_MindStream_AddConversationTo>
-  <RimTalk_MindStream_AddActionTo>Add Action Memory to {0}</RimTalk_MindStream_AddActionTo>
   
   <!-- TopBar -->
-  <RimTalk_MindStream_SummaryPrompt>Summary Prompt</RimTalk_MindStream_SummaryPrompt>
   
   <!-- Utilities -->
   <RimTalk_Close>Close</RimTalk_Close>
-  <RimTalk_MindStream_GuideContent>=== Mind Stream Operation Guide ===
-
-【Select Memories】
-• Click: Select a single memory
-• Ctrl+Click: Multi-select/deselect
-• Shift+Click: Range selection
-• Drag-select: Batch selection
-
-【Batch Operations】
-• Summarize: Summarize SCM memories to ELS
-• Archive: Archive ELS memories to CLPA
-• Delete: Delete selected memories
-
-【Right-click Features】
-• Right-click on ELS/CLPA checkbox to create a new memory
-
-【Layer Descriptions】
-• ABM (Blue): Ultra short-term memory
-• SCM (Green): Short-term memory
-• ELS (Yellow): Event log
-• CLPA (Purple): Long-term archive</RimTalk_MindStream_GuideContent>
   
   <!-- ==================== Dialog_PromptEditor Translations ==================== -->
   <RimTalk_PromptEditor_Title>Summary Prompt Configuration</RimTalk_PromptEditor_Title>
@@ -509,15 +324,6 @@
   <RimTalk_Preview_StaticMode>Static mode (Dynamic injection disabled)</RimTalk_Preview_StaticMode>
   <RimTalk_Preview_Error>Error: {0}</RimTalk_Preview_Error>
   
-  <RimTalk_Preview_ABMCount>ABM: {0} conversations</RimTalk_Preview_ABMCount>
-  <RimTalk_Preview_ELSCount>ELS: {0} entries</RimTalk_Preview_ELSCount>
-  <RimTalk_Preview_CLPACount>CLPA: {0} entries</RimTalk_Preview_CLPACount>
-  <RimTalk_Preview_MaxInjectedMemories>Max injected memories: {0}</RimTalk_Preview_MaxInjectedMemories>
-  <RimTalk_Preview_MemoryThreshold>Memory threshold: {0}</RimTalk_Preview_MemoryThreshold>
-  <RimTalk_Preview_MaxInjectedKnowledge>Max injected knowledge: {0}</RimTalk_Preview_MaxInjectedKnowledge>
-  <RimTalk_Preview_KnowledgeThreshold>Knowledge threshold: {0}</RimTalk_Preview_KnowledgeThreshold>
-  <RimTalk_Preview_DynamicEnabled>Dynamic injection: Enabled</RimTalk_Preview_DynamicEnabled>
-  <RimTalk_Preview_DynamicDisabled>Dynamic injection: Disabled</RimTalk_Preview_DynamicDisabled>
   
   <RimTalk_Preview_Colonist>(Colonist)</RimTalk_Preview_Colonist>
   <RimTalk_Preview_Prisoner>(Prisoner)</RimTalk_Preview_Prisoner>
@@ -556,4 +362,81 @@ This tool previews memory and knowledge injection effects, helping you understan
 • Environment variables require map information
 • Other variables require at least one generated conversation to parse
 </RimTalk_Preview_HelpContent>
+
+  <!-- ==================== New Memory Archive Workbench UI ==================== -->
+  <RimTalk.Memory.UI.TabWindow.Need_SelectPawn>Select pawn</RimTalk.Memory.UI.TabWindow.Need_SelectPawn>
+  <RimTalk.Memory.UI.TabWindow.NoFaction>No faction</RimTalk.Memory.UI.TabWindow.NoFaction>
+  <RimTalk.Memory.UI.TabWindow.LayerFilter>Layer filter</RimTalk.Memory.UI.TabWindow.LayerFilter>
+  <RimTalk.Memory.UI.TabWindow.TypeFilter>Type filter</RimTalk.Memory.UI.TabWindow.TypeFilter>
+  <RimTalk.Memory.UI.TabWindow.Tools>Tools</RimTalk.Memory.UI.TabWindow.Tools>
+  <RimTalk.Memory.UI.TabWindow.Knowledge>Knowledge</RimTalk.Memory.UI.TabWindow.Knowledge>
+  <RimTalk.Memory.UI.TabWindow.CreateMemory>New memory</RimTalk.Memory.UI.TabWindow.CreateMemory>
+  <RimTalk.Memory.UI.TabWindow.Preview>Injection preview</RimTalk.Memory.UI.TabWindow.Preview>
+  <RimTalk.Memory.UI.TabWindow.SummaryPrompt>Prompt editor</RimTalk.Memory.UI.TabWindow.SummaryPrompt>
+  <RimTalk.Memory.UI.TabWindow.Export>Export</RimTalk.Memory.UI.TabWindow.Export>
+  <RimTalk.Memory.UI.TabWindow.Import>Import</RimTalk.Memory.UI.TabWindow.Import>
+  <RimTalk.Memory.UI.TabWindow.OpenImportFolder>Open import folder</RimTalk.Memory.UI.TabWindow.OpenImportFolder>
+  <RimTalk.Memory.UI.TabWindow.ConfirmImport>Confirm import?</RimTalk.Memory.UI.TabWindow.ConfirmImport>
+  <RimTalk.Memory.UI.TabWindow.SummarizeAll>Summarize all</RimTalk.Memory.UI.TabWindow.SummarizeAll>
+  <RimTalk.Memory.UI.TabWindow.OperationGuide>Operation guide</RimTalk.Memory.UI.TabWindow.OperationGuide>
+  <RimTalk.Memory.UI.TabWindow.Selected>{0} memories selected</RimTalk.Memory.UI.TabWindow.Selected>
+  <RimTalk.Memory.UI.TabWindow.Delete>Delete</RimTalk.Memory.UI.TabWindow.Delete>
+  <RimTalk.Memory.UI.TabWindow.ChronicleTitle>Life chronicle ({COUNT} CLPA chapters)</RimTalk.Memory.UI.TabWindow.ChronicleTitle>
+  <RimTalk.Memory.UI.TabWindow.Pin>Pin</RimTalk.Memory.UI.TabWindow.Pin>
+  <RimTalk.Memory.UI.TabWindow.Unpin>Unpin</RimTalk.Memory.UI.TabWindow.Unpin>
+  <RimTalk.Memory.UI.TabWindow.CreateTitle>New memory for {NAME}</RimTalk.Memory.UI.TabWindow.CreateTitle>
+  <RimTalk.Memory.UI.TabWindow.ContentLabel>Content</RimTalk.Memory.UI.TabWindow.ContentLabel>
+  <RimTalk.Memory.UI.TabWindow.TagsLabel>Tags (comma separated)</RimTalk.Memory.UI.TabWindow.TagsLabel>
+  <RimTalk.Memory.UI.TabWindow.NotesLabel>Notes</RimTalk.Memory.UI.TabWindow.NotesLabel>
+  <RimTalk.Memory.UI.TabWindow.CurrentImportance>Current importance: </RimTalk.Memory.UI.TabWindow.CurrentImportance>
+  <RimTalk.Memory.UI.TabWindow.PinLabel>Pin this memory</RimTalk.Memory.UI.TabWindow.PinLabel>
+  <RimTalk.Memory.UI.TabWindow.Cancel>Cancel</RimTalk.Memory.UI.TabWindow.Cancel>
+  <RimTalk.Memory.UI.TabWindow.Save>Save</RimTalk.Memory.UI.TabWindow.Save>
+  <RimTalk.Memory.UI.TabWindow.Created>Memory created</RimTalk.Memory.UI.TabWindow.Created>
+  <RimTalk.Memory.UI.TabWindow.Guide>=== Memory Archive Workbench Guide ===
+
+[Layout]
+- Top: pawn selector, filters and tools menu
+- Top-left: life chronicle navigation (CLPA)
+- Bottom-left: vertical timeline (ABM/SCM/ELS)
+- Right: memory details and editing
+
+[Controls]
+- Click a card to focus; Ctrl for multi-select; drag on empty space to box-select
+- Scroll wheel scrolls the timeline, pans the chronicle, zooms the chronicle axis
+- Dragging the chronicle cursor repositions the timeline
+- Drag the splitter to resize timeline vs. details
+</RimTalk.Memory.UI.TabWindow.Guide>
+  <RimTalk.Memory.Utils.Layers>All layers</RimTalk.Memory.Utils.Layers>
+  <RimTalk.Memory.Utils.Types>All types</RimTalk.Memory.Utils.Types>
+  <RimTalk.Memory.Utils.Layer_Active>Active (ABM)</RimTalk.Memory.Utils.Layer_Active>
+  <RimTalk.Memory.Utils.Layer_Situational>Situational (SCM)</RimTalk.Memory.Utils.Layer_Situational>
+  <RimTalk.Memory.Utils.Layer_EventLog>Event Log (ELS)</RimTalk.Memory.Utils.Layer_EventLog>
+  <RimTalk.Memory.Utils.Layer_Archive>Archive (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
+  <RimTalk.Memory.Utils.Layer_Default>Unknown layer</RimTalk.Memory.Utils.Layer_Default>
+  <RimTalk.Memory.UI.TabWindow.Details>Memory details</RimTalk.Memory.UI.TabWindow.Details>
+  <RimTalk.Memory.UI.TabWindow.Importance>Importance: {IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
+  <RimTalk.Memory.UI.TabWindow.Activity>Activity: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
+  <RimTalk.Memory.UI.TabWindow.Tags>Tags: </RimTalk.Memory.UI.TabWindow.Tags>
+  <RimTalk.Memory.UI.TabWindow.Notes>Notes: </RimTalk.Memory.UI.TabWindow.Notes>
+  <RimTalk.Memory.UI.TabWindow.Pinned>Pinned</RimTalk.Memory.UI.TabWindow.Pinned>
+  <RimTalk.Memory.UI.TabWindow.NotPinned>Not pinned</RimTalk.Memory.UI.TabWindow.NotPinned>
+  <RimTalk.Memory.UI.TabWindow.Summarizing>Summarizing</RimTalk.Memory.UI.TabWindow.Summarizing>
+  <RimTalk.Memory.UI.TabWindow.Summarized>Summarized</RimTalk.Memory.UI.TabWindow.Summarized>
+  <RimTalk.Memory.UI.TabWindow.NotSummarized>Not summarized</RimTalk.Memory.UI.TabWindow.NotSummarized>
+  <RimTalk.Memory.UI.TabWindow.Edit>Edit</RimTalk.Memory.UI.TabWindow.Edit>
+  <RimTalk.Memory.UI.TabWindow.SaveEdit>Save</RimTalk.Memory.UI.TabWindow.SaveEdit>
+  <RimTalk.Memory.UI.TabWindow.CancelEdit>Cancel</RimTalk.Memory.UI.TabWindow.CancelEdit>
+  <RimTalk.Memory.UI.TabWindow.ClearSelection>Clear selection</RimTalk.Memory.UI.TabWindow.ClearSelection>
+  <RimTalk.Memory.UI.TabWindow.Archive>Archive</RimTalk.Memory.UI.TabWindow.Archive>
+  <RimTalk.Memory.UI.TabWindow.Summarize>Summarize</RimTalk.Memory.UI.TabWindow.Summarize>
+  <RimTalk.Memory.UI.TabWindow.ConfirmDelete>Delete {COUNT} selected memories?</RimTalk.Memory.UI.TabWindow.ConfirmDelete>
+  <RimTalk.Memory.UI.TabWindow.ConfirmArchive>Archive the selected memories?</RimTalk.Memory.UI.TabWindow.ConfirmArchive>
+
+  <RimTalk_Archive_Memory>Memory</RimTalk_Archive_Memory>
+  <RimTalk_Archive_TypeSummary>Summary</RimTalk_Archive_TypeSummary>
+  <RimTalk_Archive_TypeEvent>Event</RimTalk_Archive_TypeEvent>
+  <RimTalk_Archive_TypeEmotion>Emotion</RimTalk_Archive_TypeEmotion>
+  <RimTalk_Archive_TypeRelationship>Relationship</RimTalk_Archive_TypeRelationship>
+  <RimTalk_Archive_ConfirmSummarize>Summarize the selected memories?</RimTalk_Archive_ConfirmSummarize>
 </LanguageData>
