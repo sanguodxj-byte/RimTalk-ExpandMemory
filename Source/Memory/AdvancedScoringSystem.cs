@@ -441,7 +441,7 @@ namespace RimTalk.Memory
             // 3. 主题匹配
             foreach (var topic in features.Topics)
             {
-                if (memory.tags.Contains(topic) || memory.Content.Contains(topic))
+                if (memory.Tags.Contains(topic) || memory.Content.Contains(topic))
                 {
                     relevance += 0.15f;
                 }

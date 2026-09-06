@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RimTalk.Memory.Utils
 {
-    public static class GenDateExtension
+    public static class GenDateUtil
     {
         /// <summary>
         /// 获取坐标位置12小时制时间的字符串表示

@@ -83,12 +83,12 @@ public class RoundMemory : MemoryEntry, IExposable
             relatedPawnId = relatedPawnId,
             relatedPawnName = relatedPawnName,
             location = location,
-            tags = new(tags ?? []),
+            Tags = new(Tags ?? []),
             keywords = new(keywords ?? []),
 
             IsUserEdited = IsUserEdited,
             IsPinned = IsPinned,
-            Notes = Notes,
+            Note = Note,
         };
 
 
@@ -102,7 +102,7 @@ public class RoundMemory : MemoryEntry, IExposable
         var location = Find.WorldGrid?.LongLatOf(planetTile) ?? Vector2.zero;
 
         // 计算并返回日期和时间
-        return $"{GenDate.DateFullStringAt(AbsTick, location)} {GenDateExtension.GetInGameHour12HString(AbsTick, location)}";
+        return $"{GenDate.DateFullStringAt(AbsTick, location)} {GenDateUtil.GetInGameHour12HString(AbsTick, location)}";
     }
 
     // 返回历史参与者名单，逗号分隔

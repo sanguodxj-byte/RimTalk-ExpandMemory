@@ -60,6 +60,20 @@ public class MemorySummarizer
         _memoryComp = memoryComp;
     }
 
+    // ==================== 静态全局操作 ====================
+    public static void SummarizeAll()
+    {
+        var comps = PawnsFinder.AllMapsCaravansAndTravellingTransporters_Alive_Colonists
+            .Select(pawn => pawn?.TryGetComp<FourLayerMemoryComp>())
+            .Where(comp => comp is not null)
+            .ToList();
+
+        foreach (FourLayerMemoryComp comp in comps) 
+            comp.Summarizer?.AutoSummarize();
+
+        Messages.Message("全局总结已启动", MessageTypeDefOf.TaskCompletion, false);
+    }
+
     // ==================== 总结 Summarize ====================
     /// <summary>
     /// 每日自动总结。
@@ -375,7 +389,7 @@ public class MemorySummarizer
         var location = showHour ? Find.WorldGrid?.LongLatOf(Parent.Tile) ?? Vector2.zero : Vector2.zero;
 
         string ComputeHour(MemoryEntry memory) =>
-            GenDateExtension.GetInGameHour12HString(GenDate.TickGameToAbs(memory.GameTick), location);
+            GenDateUtil.GetInGameHour12HString(GenDate.TickGameToAbs(memory.GameTick), location);
 
         // 构建记忆块
         string memoryListString = string.Join("\n\n", memoryList
@@ -420,7 +434,7 @@ public class MemorySummarizer
             // 总结时，GameTick 取最晚的条目；归档时，GameTick 取最早的条目
             GameTick = isArchive ? memoryList[0].GameTick : memoryList[^1].GameTick,
 
-            tags = [.. memoryList.SelectMany(m => m.tags).Distinct()],
+            Tags = [.. memoryList.SelectMany(m => m.Tags).Distinct()],
             keywords = [.. memoryList.SelectMany(m => m.keywords).Distinct()]
         };
         // 归档时，额外赋值 EndGameTick 为最晚的条目 GameTick

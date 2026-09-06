@@ -68,9 +68,9 @@ namespace RimTalk.Memory.UI
 
         public override Vector2 InitialSize => new Vector2(1200f, 800f);
 
-        public Dialog_CommonKnowledge(CommonKnowledgeLibrary library)
+        public Dialog_CommonKnowledge()
         {
-            this.library = library;
+            this.library = Find.World?.GetComponent<MemoryManager>()?.CommonKnowledge;
             this.doCloseX = true;
             this.doCloseButton = false;
             this.closeOnClickedOutside = false;

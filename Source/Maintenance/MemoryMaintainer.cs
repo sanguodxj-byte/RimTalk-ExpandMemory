@@ -137,41 +137,4 @@ public class MemoryMaintainer
 
         memoryList.RemoveAll(targetMemories.Contains);
     }
-
-    /// <summary>
-    /// 修改 Pin 状态，自动处理 ABM->SCM 迁移与 RoundMemory 实体化，
-    /// 当 memoryId 对应记忆为 RoundMemory 时，复制一份新的 SCM 条目并删除原条目
-    /// </summary>
-    public void PinMemory(MemoryEntry memory, bool isPinned)
-    {
-        if (memory is null) return;
-
-        // 层级信息或将改为由 UI 端传入
-        if (isPinned && memory.Layer == MemoryLayer.Active)
-        {
-            ABMList.Remove(memory);
-
-            memory = memory.Privatize();
-
-            memory.Layer = MemoryLayer.Situational;
-
-            SCMList.Add(memory);
-        }
-
-        memory.IsPinned = isPinned;
-    }
-
-    /// <summary>
-    /// 删除指定记忆，返回是否成功删除
-    /// </summary>
-    public bool Remove(MemoryEntry memory)
-    {
-        if (memory is null) return false;
-
-        // 或将要求 UI 端传入层级信息
-        return ABMList.RemoveAll(m => m == memory) > 0
-            | SCMList.RemoveAll(m => m == memory) > 0
-            | ELSList.RemoveAll(m => m == memory) > 0
-            | CLPAList.RemoveAll(m => m == memory) > 0;
-    }
 }

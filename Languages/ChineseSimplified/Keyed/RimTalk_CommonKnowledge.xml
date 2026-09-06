@@ -7,78 +7,39 @@
     <RimTalk_Knowledge_Delete>删除</RimTalk_Knowledge_Delete>
     <RimTalk_Knowledge_ClearAll>清空全部</RimTalk_Knowledge_ClearAll>
     
-    <RimTalk_Knowledge_TotalAndEnabled>总数: {0} | 启用: {1}</RimTalk_Knowledge_TotalAndEnabled>
     
     <!-- Auto Generate Section 自动生成部分 -->
     <RimTalk_Knowledge_AutoGenerate>自动生成常识</RimTalk_Knowledge_AutoGenerate>
     <RimTalk_Knowledge_PawnStatus>殖民者状态常识</RimTalk_Knowledge_PawnStatus>
-    <RimTalk_Knowledge_PawnStatusDesc>每天自动更新殖民者状态（入殖时长、重要关系等）</RimTalk_Knowledge_PawnStatusDesc>
     <RimTalk_Knowledge_EventRecord>事件记录常识</RimTalk_Knowledge_EventRecord>
-    <RimTalk_Knowledge_EventRecordDesc>每天从游戏日志提取重大事件（死亡、结婚、加入、建造等）</RimTalk_Knowledge_EventRecordDesc>
     <RimTalk_Knowledge_GenerateNow>立即生成（手动）</RimTalk_Knowledge_GenerateNow>
-    <RimTalk_Knowledge_GenerateNowDesc>立即生成所有启用的常识类型</RimTalk_Knowledge_GenerateNowDesc>
-    <RimTalk_Knowledge_EnableAtLeastOne>请先启用至少一种常识生成类型</RimTalk_Knowledge_EnableAtLeastOne>
-    <RimTalk_Knowledge_MustEnterGame>请先进入游戏</RimTalk_Knowledge_MustEnterGame>
-    <RimTalk_Knowledge_GeneratedCount>已生成 {0} 条殖民者状态常识</RimTalk_Knowledge_GeneratedCount>
-    <RimTalk_Knowledge_AllExist>所有殖民者状态常识已存在，无需生成</RimTalk_Knowledge_AllExist>
-    <RimTalk_Knowledge_EventGeneratedCount>已生成 {0} 条事件记录常识</RimTalk_Knowledge_EventGeneratedCount>
-    <RimTalk_Knowledge_NoNewEvents>未找到新的重大事件，或所有事件已记录</RimTalk_Knowledge_NoNewEvents>
-    <RimTalk_Knowledge_EventGenerateFailed>生成事件记录失败: {0}</RimTalk_Knowledge_EventGenerateFailed>
     
     <!-- Detail Panel 详情面板 -->
-    <RimTalk_Knowledge_SelectEntry>请选择一个常识条目</RimTalk_Knowledge_SelectEntry>
     <RimTalk_Knowledge_Tag>标签:</RimTalk_Knowledge_Tag>
     <RimTalk_Knowledge_Importance>重要性:</RimTalk_Knowledge_Importance>
     <RimTalk_Knowledge_Status>状态:</RimTalk_Knowledge_Status>
     <RimTalk_Knowledge_Enabled>启用</RimTalk_Knowledge_Enabled>
-    <RimTalk_Knowledge_Disabled>禁用</RimTalk_Knowledge_Disabled>
-    <RimTalk_Knowledge_Keywords>关键词:</RimTalk_Knowledge_Keywords>
     <RimTalk_Knowledge_Content>内容:</RimTalk_Knowledge_Content>
     <RimTalk_Knowledge_Edit>编辑</RimTalk_Knowledge_Edit>
     
     <!-- Edit Panel 编辑面板 -->
-    <RimTalk_Knowledge_KeywordsHint>关键词 (用逗号分隔，留空则自动提取):</RimTalk_Knowledge_KeywordsHint>
     <RimTalk_Knowledge_Save>保存</RimTalk_Knowledge_Save>
     <RimTalk_Knowledge_Cancel>取消</RimTalk_Knowledge_Cancel>
-    <RimTalk_Knowledge_NewTag>新标签</RimTalk_Knowledge_NewTag>
-    <RimTalk_Knowledge_ContentRequired>内容不能为空</RimTalk_Knowledge_ContentRequired>
-    <RimTalk_Knowledge_SaveSuccess>保存成功</RimTalk_Knowledge_SaveSuccess>
     
     <!-- Confirmations 确认对话框 -->
     <RimTalk_Knowledge_DeleteConfirm>确定要删除这条常识吗？</RimTalk_Knowledge_DeleteConfirm>
     <RimTalk_Knowledge_Deleted>已删除</RimTalk_Knowledge_Deleted>
-    <RimTalk_Knowledge_ClearAllConfirm>确定要清空所有 {0} 条常识吗？此操作不可撤销！</RimTalk_Knowledge_ClearAllConfirm>
-    <RimTalk_Knowledge_Cleared>已清空常识库</RimTalk_Knowledge_Cleared>
     
     <!-- Import Dialog 导入对话框 -->
     <RimTalk_Knowledge_ImportTitle>导入常识</RimTalk_Knowledge_ImportTitle>
-    <RimTalk_Knowledge_ImportDesc>请输入或粘贴常识文本\n格式: [标签]内容\n每行一条</RimTalk_Knowledge_ImportDesc>
-    <RimTalk_Knowledge_ImportSuccess>成功导入 {0} 条常识</RimTalk_Knowledge_ImportSuccess>
-    <RimTalk_Knowledge_Confirm>确定</RimTalk_Knowledge_Confirm>
     
     <!-- Export 导出 -->
-    <RimTalk_Knowledge_NoContent>没有可导出的内容</RimTalk_Knowledge_NoContent>
-    <RimTalk_Knowledge_ExportSuccess>已导出到: {0}</RimTalk_Knowledge_ExportSuccess>
-    <RimTalk_Knowledge_ExportFailed>导出失败: {0}</RimTalk_Knowledge_ExportFailed>
     
     <!-- Create Memory Dialog 创建记忆对话框 -->
-    <RimTalk_Memory_AddToLayer>为 {2} 添加{0}到{1}</RimTalk_Memory_AddToLayer>
-    <RimTalk_Memory_Content>记忆内容：</RimTalk_Memory_Content>
-    <RimTalk_Memory_TagsOptional>标签（用逗号分隔，可选）：</RimTalk_Memory_TagsOptional>
-    <RimTalk_Memory_NotesOptional>备注（可选）：</RimTalk_Memory_NotesOptional>
-    <RimTalk_Memory_ImportanceLabel>重要性：{0}</RimTalk_Memory_ImportanceLabel>
-    <RimTalk_Memory_PinMemory>固定此记忆（不会被自动删除或衰减）</RimTalk_Memory_PinMemory>
-    <RimTalk_Memory_ContentRequired>记忆内容不能为空</RimTalk_Memory_ContentRequired>
-    <RimTalk_Memory_AddedToELS>已将记忆添加到 {0} 的 ELS（中期记忆）</RimTalk_Memory_AddedToELS>
-    <RimTalk_Memory_AddedToCLPA>已将记忆添加到 {0} 的 CLPA（长期记忆）</RimTalk_Memory_AddedToCLPA>
     
     <!-- Layer Names 层级名称 -->
-    <RimTalk_Layer_ELS>ELS（中期记忆）</RimTalk_Layer_ELS>
-    <RimTalk_Layer_CLPA>CLPA（长期记忆）</RimTalk_Layer_CLPA>
     
     <!-- Memory Type Names 记忆类型名称 -->
-    <RimTalk_Type_Action>行动记忆</RimTalk_Type_Action>
-    <RimTalk_Type_Conversation>对话记忆</RimTalk_Type_Conversation>
 
     <!-- 常识链 -->
     <RimTalk_ExtendedProperties>扩展属性</RimTalk_ExtendedProperties>

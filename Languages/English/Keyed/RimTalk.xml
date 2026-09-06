@@ -304,7 +304,7 @@
     <RimTalk_UI_MemoriesSummarizedCount>{0} colonists have been queued for summarization</RimTalk_UI_MemoriesSummarizedCount>
     <RimTalk_UI_NoColonistsNeedSummarize>No colonists need summarization</RimTalk_UI_NoColonistsNeedSummarize>
     <RimTalk_UI_MemoryArchived>{0}'s mid-term memories have been archived to long-term memory</RimTalk_UI_MemoryArchived>
-    <RimTalk_UI_MemoriesSummarizedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
+    <RimTalk_UI_MemoriesArchivedCount>Memories archived for {0} colonists</RimTalk_UI_MemoriesArchivedCount>
     
     <!-- Knowledge Library Management UI -->
     <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
