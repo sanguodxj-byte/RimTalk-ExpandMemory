@@ -5,6 +5,44 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-09-07
+
+### Added
+- 记忆主标签完整重写为“记忆档案工作台”：左上篇章区（CLPA 横向人生导航，滚轮缩放/平移、游标拖拽联动时间轴、重叠篇章堆叠指示）、左下纵向时间轴（虚拟化列表，年/象时间分隔与长短期间隔虚线标注）、右侧记忆详情区（查看与无缝编辑）、底部选中动作栏（总结/归档/删除/清空）。
+- 新增自制 UI 组件框架 `UIElement`/`UIContext`/`ScrollUIElement`：组件树脉动生命周期、级联作用域上下文与统一关闭清理。
+- 新增头部工具栏：Pawn 搜索选择器、层级/类型过滤、ABM/SCM/ELS/CLPA 计数统计与工具菜单（常识库、新建记忆、注入预览、提示词编辑、导入导出、全局总结、操作指南）。
+- 新增记忆组件级导入导出 `CustomScribe`：以整个 `FourLayerMemoryComp` 为单位导出/导入 XML，按修改时间排列选择。
+- 新增 `MemoryInteractor` 作为 UI 交互层：固定（自动处理 ABM→SCM 迁移）、删除、新增统一入口。
+- 新增工具集：`MathUtil`（nice 刻度步长）、`WidgetsUtil`（圆形按钮/渐变线/虚线）、`GUIBlock`/`CropBlock`（GUI 状态与裁剪作用域）、`TextUtil`/`EnumUtil`/`DictionaryExtensions`。
+- 时间轴与详情区之间新增可拖拽分隔条，宽度经 `MemoryTabTimeLineWidth` 随存档持久化。
+- Harmony 短路 `MainTabsRoot.HandleLowPriorityShortcuts` 左键分支：记忆标签打开时点击地图选人不再关闭标签，窗口自动切换记忆所有者。
+
+### Changed
+- `MemoryEntry` 字段规范化：`tags`→`Tags`、`Notes`→`Note`、`Activity` 属性化并收束至 [0,1]；序列化键不变，旧存档无缝兼容。
+- 新建记忆不再自动附加类型标签；CLPA 记忆的 `AgeString` 显示起始-结束日期区间。
+- `GenDateExtension` 更名 `GenDateUtil`；`Dialog_CommonKnowledge` 改为自行从 World 组件获取常识库。
+- 中英语言文件同步新增工作台全部翻译，并清理旧 UI 相关无引用死键。
+
+### Removed
+- 删除旧记忆主标签 `MainTabWindow_Memory` 九个分部文件及 `Dialog_CreateMemory`、`Dialog_EditMemory`。
+
+### Fixed
+- 修复英文语言文件 `RimTalk.xml` 一处闭合标签不匹配（`RimTalk_UI_MemoriesArchivedCount`）导致整个文件解析失败的问题。
+
+## [1.12.0] - 2026-09-06
+
+### Added
+- 归档记忆（CLPA）引入 `EndGameTick` 字段表示区间结束时间戳并参与存档序列化：归档时 `GameTick` 取最早条目、`EndGameTick` 取最晚条目，总结时仍取最晚条目；旧存档加载缺失 `EndGameTick` 的 CLPA 条目时按默认跨度 15 天回填。 (`5179365`)
+- 新增 player2 AI provider 并将其设为默认：新增专用 `Player2Client`，该 provider 无需填写模型与 URL 即视为有效配置。 (`63b91b1`)
+
+### Changed
+- "跟随 RimTalk 配置"适配 RimTalk 的简单配置模式：RimTalk 启用简单配置时直接映射为单条 `ApiConfig`，provider 枚举转换统一收敛至 `Convert` 扩展方法。 (`63b91b1`)
+- 修正注释：SCM 目前仍为活跃层级。 (`9c6c0bc`)
+
+### Fixed
+- 适配 RimTalk 的重载更新：`ExecuteDialogue` Patch 显式声明参数签名，避免 Harmony 误匹配重载方法。 (`41b96f2`)
+- 工作记忆捕获提取目标名称时为原版 `label`/`LabelShort` 属性添加异常保护，修复偶发 NRE 的问题。 (`bd31f19`)
+
 ## [1.11.0] - 2026-08-03
 
 ### Added
@@ -160,6 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
+[1.13.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.12.0...v1.13.0
+[1.12.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.8.0...v1.9.0
