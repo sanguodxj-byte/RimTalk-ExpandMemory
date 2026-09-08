@@ -52,5 +52,5 @@ public class AIClientFactory
 
     // 根据不同的 provider 来决定创建不同的 client
     private IAIClient BuildClient(ApiConfig config) =>
-        config.Provider is AIProvider.Player2 ? new Player2Client() : new OpenAIClient(config);
+        config.Provider is AIProvider.Player2 ? new Player2Client(config) : new OpenAIClient(config);
 }

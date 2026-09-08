@@ -120,16 +120,8 @@ namespace RimTalk.Memory.UI
             // 1. Provider 下拉
             DrawProviderDropdown(x, y, height, providerWidth, config);
 
-            // 2. Player2 由本地客户端自行完成鉴权，不显示 Key、URL、Model 输入框。
-            if (config.Provider == AI.AIProvider.Player2)
-            {
-                GUI.color = Color.gray;
-                Rect player2LabelRect = new Rect(middleStartX, y, middleZoneWidth + modelWidth + gap, height);
-                Widgets.Label(player2LabelRect, "Player2 client manages connection automatically");
-                GUI.color = originalColor;
-            }
-            // 3. 中段: ApiKey(+ CustomBaseUrl 当 Provider=Custom 时)
-            else if (config.Provider == AI.AIProvider.Custom)
+            // 2. 中段: ApiKey(+ CustomBaseUrl 当 Provider=Custom 时)
+            if (config.Provider == AI.AIProvider.Custom)
             {
                 float keyWidth = (middleZoneWidth * 0.4f) - (gap / 2);
                 float urlWidth = (middleZoneWidth * 0.6f) - (gap / 2);
@@ -142,16 +134,17 @@ namespace RimTalk.Memory.UI
                 DrawApiKeyInput(middleStartX, y, height, middleZoneWidth, config);
             }
 
-            // 4. Model - 统一走文本输入路径(不再有内置默认模型,用户每次都需填入)，player2 除外
-            if (config.Provider != AI.AIProvider.Player2)
-            {
-                float modelStartX = middleStartX + middleZoneWidth + gap;
+            // 3. Model
+            float modelStartX = middleStartX + middleZoneWidth + gap;
+            if (config.Provider is AI.AIProvider.Player2)
+                Widgets.Label(new Rect(modelStartX, y, modelWidth, height), "通过本地客户端使用时不需要 key");
+            else
                 DrawModelTextInput(modelStartX, y, height, modelWidth, config);
-            }
+
 
             GUI.color = originalColor;
 
-            // 5. 控件区(启用复选框 + ▲▼ + ×) — 坐标相对 rowRect.x
+            // 4. 控件区(启用复选框 + ▲▼ + ×) — 坐标相对 rowRect.x
             float btnSize = 22f;
             float btnGap = 2f;
             float deleteX = x + totalWidth - btnSize;

@@ -11,7 +11,7 @@ public class ApiConfig : IExposable
     public string CustomUrl;
     public string CustomModelName;
 
-    public string URL => !string.IsNullOrWhiteSpace(CustomUrl) ? CustomUrl : Provider.GetEndpointUrl();
+    public string URL => Provider is AIProvider.Custom ? CustomUrl : Provider.GetEndpointUrl();
 
     public bool IsValid =>
         Provider is AIProvider.Player2

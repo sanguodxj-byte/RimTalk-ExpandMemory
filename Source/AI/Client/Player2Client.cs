@@ -20,12 +20,17 @@ public sealed class Player2Client : IAIClient
 {
     // --- Player2 connection constants ---
     private const string GameClientId = "01a05876-8d6b-7376-92ef-0e51b45d130c";
+    private const string DefaultRemoteBaseUrl = "https://api.player2.game/v1";
 
     // --- Runtime connection state ---
     private string _apiKey;
     private string _baseUrl;
 
-    public Player2Client() { }
+    public Player2Client(ApiConfig config)
+    {
+        _apiKey = config.ApiKey;
+        _baseUrl = DefaultRemoteBaseUrl; // 默认会先赋值为远程 URL，后续会尝试本地连接覆盖
+    }
 
     // ====================================================================
     // IAIClient
@@ -48,8 +53,9 @@ public sealed class Player2Client : IAIClient
 
         try
         {
-            // 首次请求时尝试本地登录；Player2 不接受配置中的 Key 或 URL。
-            await EnsureLocalConnectionAsync();
+            // 如果没有 API Key，则尝试获取本地连接。
+            if (string.IsNullOrEmpty(_apiKey))
+                await EnsureLocalConnectionAsync();
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException("Player2 local app is unavailable.");
 
@@ -103,8 +109,6 @@ public sealed class Player2Client : IAIClient
 
     private async Task EnsureLocalConnectionAsync()
     {
-        if (!string.IsNullOrEmpty(_apiKey)) return;
-
         var local = await TryGetLocalConnectionAsync();
         if (local != null)
         {

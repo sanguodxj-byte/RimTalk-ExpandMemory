@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Profiling;
 
 namespace RimTalk.Memory.AI.Integration;
 
@@ -19,13 +20,16 @@ public static class RimTalkApiConfigGetter
             return [];
 
         // 如果使用了简单配置，则直接返回一个包含简单配置的 ApiConfig 列表
-        if (settings.UseSimpleConfig) return [ new ApiConfig
+        if (settings.UseSimpleConfig)
         {
-            Provider = settings.SimpleProvider.Convert() ,
-            ApiKey = settings.SimpleApiKey,
-            CustomModelName = settings.GetCurrentModel(),
-        }];
-
+            var provider = settings.SimpleProvider.Convert();
+            return [ new ApiConfig
+            {
+                Provider = provider ,
+                ApiKey = provider is AIProvider.Player2 ? settings.SimplePlayer2ApiKey : settings.SimpleApiKey,
+                CustomModelName = settings.GetCurrentModel(),
+            }];
+        }
         // 获取 rimtalk 的 ApiConfig 列表
         if (settings.CloudConfigs is not { Count: > 0 } rimTalkApiConfigs)
             return [];
@@ -37,9 +41,7 @@ public static class RimTalkApiConfigGetter
             Provider = rimTalkApiConfig.Provider.Convert(),
             ApiKey = rimTalkApiConfig.ApiKey,
             CustomUrl = rimTalkApiConfig.BaseUrl,
-            CustomModelName = string.IsNullOrWhiteSpace(rimTalkApiConfig.CustomModelName)
-                ? rimTalkApiConfig.SelectedModel
-                : rimTalkApiConfig.CustomModelName,
+            CustomModelName = rimTalkApiConfig.GetEffectiveModelName(),
         }).ToList();
     }
 
