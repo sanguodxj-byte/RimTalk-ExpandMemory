@@ -11,17 +11,11 @@ namespace RimTalk.Memory.UI.TabWindow.TabHeader;
 /// 自行从当前所有地图中检索候选 Pawn，并在选中时直接同步 RimWorld 当前选择，调用方无需提供 Pawn 列表或回调。
 /// 窗口位置/尺寸由调用方一次性算好传入（紧贴触发按钮右侧、收缩在主标签内容区内），呈现“侧边栏”观感。
 /// </summary>
-public sealed class MemoryTabPawnSelector : Window
+public class MemoryTabPawnSelector : SideWindow
 {
     // 尺寸常量
-    private const float Gap = MemoryTabWindow.Gap;
-    private const float QueryHeight = 32f;
-    private const float ScrollbarWidth = MemoryTabWindow.ScrollbarWidth;
-    private const float BottonHeight = 34f;
-    private const float BottonGap = 4f;
-
-    // 外部算好传入的矩形
-    private readonly Rect _sidebarRect;
+    private const float WidgetHeight = MemoryTabWindow.DefaultWidgetHeight;
+    private const float BottonGap = MemoryTabWindow.Gap * 0.5f;
 
     // 抓取到的 Pawn 列表，按殖民者优先、名字排序
     private readonly List<Pawn> _pawns = new();
@@ -32,10 +26,8 @@ public sealed class MemoryTabPawnSelector : Window
     // 滚动位置
     private Vector2 _scroll;
 
-    public MemoryTabPawnSelector(Rect sidebarRect)
+    public MemoryTabPawnSelector(Rect sidebarRect) : base(sidebarRect)
     {
-        _sidebarRect = sidebarRect;
-
         // 获取当前地图上所有 pawn
         _pawns = Find.CurrentMap?.mapPawns?.AllPawns?
             .Where(pawn => pawn?.TryGetComp<FourLayerMemoryComp>() is not null)
@@ -45,13 +37,7 @@ public sealed class MemoryTabPawnSelector : Window
             .ThenBy(pawn => pawn.LabelShort)
             .ToList()
             ?? new();
-
-        absorbInputAroundWindow = true;
-        closeOnClickedOutside = true;
     }
-
-    // 直接采用调用方算好的矩形，跳过默认的居中布局。
-    protected override void SetInitialSizeAndPosition() => windowRect = _sidebarRect.Rounded();
 
     public override void DoWindowContents(Rect inRect)
     {
@@ -60,9 +46,9 @@ public sealed class MemoryTabPawnSelector : Window
         float y = 0f;
 
         // 搜索框：按 Pawn 名字做不区分大小写的子串匹配，空查询时展示全部。
-        Rect queryRect = new(x, y, width, QueryHeight);
+        Rect queryRect = new(x, y, width, WidgetHeight);
         _query = Widgets.TextField(queryRect, _query);
-        y += QueryHeight + Gap;
+        y += WidgetHeight + MemoryTabWindow.Gap;
 
         // 以 query 过滤 Pawn 列表
         var filtered = _pawns;
@@ -76,10 +62,10 @@ public sealed class MemoryTabPawnSelector : Window
         // 列表滚动视图：底部留出滚动条宽度，纵向高度随侧边栏自适应。
         Rect outRect = new(x, y, width, inRect.height - y);
 
-        float viewHeight = filtered.Count * (BottonHeight + BottonGap);
+        float viewHeight = filtered.Count * (WidgetHeight + BottonGap);
         Rect viewRect = new(
             0f, 0f,
-            viewHeight > outRect.height ? outRect.width - ScrollbarWidth : outRect.width,
+            viewHeight > outRect.height ? outRect.width - MemoryTabWindow.ScrollbarWidth : outRect.width,
             viewHeight
             );
 
@@ -89,7 +75,7 @@ public sealed class MemoryTabPawnSelector : Window
         foreach (Pawn pawn in filtered)
         {
             if (Widgets.ButtonText(
-                new Rect(0f, viewY, viewWidth, BottonHeight),
+                new Rect(0f, viewY, viewWidth, WidgetHeight),
                 // 非殖民者追加所属派系后缀，便于在搜索结果中区分阵营。
                 pawn.LabelShort + (pawn.IsColonist ? string.Empty : $" · {pawn.Faction?.Name ?? "RimTalk.Memory.UI.TabWindow.NoFaction".Translate()}")
                 ))
@@ -99,7 +85,7 @@ public sealed class MemoryTabPawnSelector : Window
                 Find.Selector.Select(pawn);
                 Close();
             }
-            viewY += BottonHeight + BottonGap;
+            viewY += WidgetHeight + BottonGap;
         }
         Widgets.EndScrollView();
     }
