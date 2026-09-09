@@ -238,8 +238,8 @@ public class MemoryTimeline : ScrollUIElement
             _visableCards.Add(_cardMap.GetOrAdd(_timelineMemories[i], _cardFactory));
             if (_yLayout[i] > bottom) break;
         }
-        // 倒序排列
-        _visableCards.SortBy(card => -card.Memory.GameTick);
+        // 倒序排列，同 tick 则总结记忆在前
+        _visableCards.SortBy(card => (-card.Memory.GameTick, card.Memory.Type is not MemoryType.Summarization));
 
         // 直接在 _yLayout 中切片并传递给 UpdateRects 更新布局
         UpdateRects(startIndex);

@@ -165,8 +165,8 @@ public class MemoryTabWindow : UIElement
             TreatedTimelineMemories.AddRange(aBMs.Where(Filter));
             TreatedTimelineMemories.AddRange(sCMs.Where(Filter));
             TreatedTimelineMemories.AddRange(eLSs.Where(Filter));
-            // 按 gametick 降序排列，便于时间轴从上到下展示
-            TreatedTimelineMemories.SortBy(memory => -memory.GameTick);
+            // 按 gametick 降序排列，同 tick 则总结记忆排在前面
+            TreatedTimelineMemories.SortBy(memory => (-memory.GameTick, memory.Type is not MemoryType.Summarization));
         }
 
         public void RaiseRePositionTimeline() => RePositionTimeline?.Invoke();
