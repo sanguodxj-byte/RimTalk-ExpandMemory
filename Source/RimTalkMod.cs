@@ -35,10 +35,6 @@ namespace RimTalk.MemoryPatch
             // ⭐ 初始化提示词规范化器
             Memory.PromptNormalizer.UpdateRules(Settings.normalizationRules);
 
-            var harmony = new Harmony("cj.rimtalk.expandmemory");
-            harmony.PatchAll();
-            Log.Message("[RimTalk-Expand Memory] Loaded successfully");
-
             if (Prefs.DevMode)
             {
                 Log.Message($"[PromptNormalizer] Initialized with {Memory.PromptNormalizer.GetActiveRuleCount()} active rules");
