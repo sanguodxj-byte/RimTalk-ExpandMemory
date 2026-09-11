@@ -83,8 +83,6 @@ public class MemorySummarizer
     {
         if (// 配置项
             !RimTalkMemoryPatchMod.Settings.EnableDailySummarization
-            // 父组件持有者必须是殖民者（暂行）
-            || Parent is not Pawn { IsColonist: true }
             // 每日总结有最小间隔（主要用于防止时差问题）
             || GenTicks.TicksGame - LastSummarizeTick < SummarizeIntervalTicks
             // 如果上次总结 tick 与最近一次潜在总结 tick 相同，则说明今天已经总结过了
@@ -249,8 +247,6 @@ public class MemorySummarizer
     {
         if (// 配置项
             !RimTalkMemoryPatchMod.Settings.EnableAutoArchive
-            // 父组件持有者必须是殖民者（暂行）
-            || Parent is not Pawn { IsColonist: true }
             // 每周期归档间隔
             || !Parent.IsHashIntervalTick(GenDate.TicksPerDay * RimTalkMemoryPatchMod.Settings.ArchiveIntervalDays))
             return;

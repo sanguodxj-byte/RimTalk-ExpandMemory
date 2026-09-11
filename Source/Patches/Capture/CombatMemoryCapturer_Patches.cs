@@ -9,7 +9,7 @@ namespace RimTalk.Memory.Patches.Capture;
 public static class Pawn_Notify_UsedVerb_Patch
 {
     [HarmonyPostfix]
-    public static void Postfix(Pawn __instance, Verb verb)
+    private static void Postfix(Pawn __instance, Verb verb)
     {
         CombatMemoryCapturer.CaptureAttackEnter(__instance, verb);
     }

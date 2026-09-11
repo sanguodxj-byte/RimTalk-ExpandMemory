@@ -188,9 +188,7 @@ public class JobMemoryCapturer
         if (// 配置项
             !RimTalkMemoryPatchMod.Settings.EnableActionMemory
 
-            // 仅殖民者且启用工作记忆捕捉时才激活 capturer
             || pawn is null
-            || !pawn.IsColonist
 
             // job 不过关时提前返回，跳过 GetComp
             || job?.def is not { } jobDef
@@ -212,9 +210,7 @@ public class JobMemoryCapturer
         if (// 配置项
             !RimTalkMemoryPatchMod.Settings.EnableActionMemory
 
-            // 仅殖民者且启用工作记忆捕捉时才激活 capturer
             || pawn is null
-            || !pawn.IsColonist
 
             // job 不过关时提前返回，跳过 GetComp
             || job?.def is not { } jobDef
