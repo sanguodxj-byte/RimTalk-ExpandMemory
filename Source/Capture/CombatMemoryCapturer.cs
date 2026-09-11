@@ -67,9 +67,8 @@ public class CombatMemoryCapturer
         if (// 配置项
             !RimTalkMemoryPatchMod.Settings.EnableCombatMemory
 
-            // 仅捕获殖民者的有效攻击 Verb
+            // 仅捕获有效攻击 Verb
             || pawn is null
-            || !pawn.IsColonist
             || verb is null
 
             // 仅处理 JobCapturer 无法覆盖的 Wait_Combat 自动攻击

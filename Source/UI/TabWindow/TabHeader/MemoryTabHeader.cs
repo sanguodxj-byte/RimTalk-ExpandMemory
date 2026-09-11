@@ -17,6 +17,7 @@ internal sealed class MemoryTabHeader : UIElement
     private const float PawnWidgetWidth = 250f;
     private const float DefaultWidgetWidth = MemoryTabWindow.DefaultWidgetWidth;
     private const float PawnSelectorWidth = 300f;
+    private const float Margin = Window.StandardMargin;
 
     // 成员
     private readonly UIContext _context;
@@ -49,18 +50,15 @@ internal sealed class MemoryTabHeader : UIElement
         if (Widgets.ButtonText(pawnRect, _tabContext.MemoryComp?.parent?.LabelShort ?? "RimTalk.Memory.UI.TabWindow.Need_SelectPawn".Translate()))
         {
             Rect currentWindowRect = Find.WindowStack.currentlyDrawnWindow.windowRect;
-            // 是的，我知道这里 margin 是硬编码直接取默认值，但我懒得折腾了，就这样吧
-            float margin = Window.StandardMargin;
-
             // 计算选择器的**绝对**矩形
-            float selectorY = pawnRect.y + currentWindowRect.y + margin;
-            Rect pawnSelectorRect = new(
-                pawnRect.xMax + currentWindowRect.x + margin,
+            // 是的，我知道这里 margin 是硬编码直接取默认值，但我懒得折腾了，就这样吧
+            float selectorY = pawnRect.y + currentWindowRect.y + Margin;
+            Find.WindowStack.Add(new MemoryTabPawnSelector(new(
+                pawnRect.xMax + currentWindowRect.x + Margin,
                 selectorY,
                 PawnSelectorWidth,
                 Math.Max(currentWindowRect.yMax - selectorY, 0f) // 算下边缘的时候不需要 margin
-                );
-            Find.WindowStack.Add(new MemoryTabPawnSelector(pawnSelectorRect));
+                )));
         }
         x += PawnWidgetWidth + Gap;
 
@@ -82,18 +80,33 @@ internal sealed class MemoryTabHeader : UIElement
 
         // 绘制工具按钮
         float xRight = inRect.xMax;
-        Rect toolsRect = new(xRight - DefaultWidgetWidth, y, DefaultWidgetWidth, height);
-        if (Widgets.ButtonText(toolsRect, "RimTalk.Memory.UI.TabWindow.Tools".Translate()))
+        if (Widgets.ButtonText(new(xRight - DefaultWidgetWidth, y, DefaultWidgetWidth, height), "RimTalk.Memory.UI.TabWindow.Tools".Translate()))
             OpenToolsMenu();
         xRight -= DefaultWidgetWidth + Gap;
 
-        // 绘制记忆统计信息
-        if (_tabContext.MemoryComp is { } memoryComp)
+        // 绘制个性化定制按钮
+        Rect personalizeRect = new(xRight - DefaultWidgetWidth, y, DefaultWidgetWidth, height);
+        var memoryComp = _tabContext.MemoryComp;
+        if (Widgets.ButtonText(personalizeRect, "个性化", active: memoryComp is not null))
         {
-            Rect statsRect = new(x, y, Math.Max(0f, xRight - x), height);
+            Rect currentWindowRect = Find.WindowStack.currentlyDrawnWindow.windowRect;
+
+            // 计算个性化窗口的**绝对**矩形
+            // 是的，我知道这里 margin 是硬编码直接取默认值，但我懒得折腾了，就这样吧
+            Find.WindowStack.Add(new MemoryTabPersonalize(memoryComp, new(
+                personalizeRect.x + currentWindowRect.x + Margin,
+                personalizeRect.yMax + currentWindowRect.y + Margin,
+                DefaultWidgetWidth,
+                MemoryTabWindow.DefaultWidgetHeight * 3f + 2 * Margin // 三个子按钮
+                )));
+        }
+
+        // 绘制记忆统计信息
+        if (memoryComp is not null)
+        {
             using (new TextBlock(GameFont.Tiny, TextAnchor.MiddleLeft))
                 Widgets.Label(
-                    statsRect,
+                    new(x, y, Math.Max(0f, xRight - x), height),
                     $"ABM {memoryComp.ActiveMemories?.Count ?? 0} · SCM {memoryComp.SituationalMemories?.Count ?? 0} · " +
                     $"ELS {memoryComp.EventLogMemories?.Count ?? 0} · CLPA {memoryComp.ArchiveMemories?.Count ?? 0}"
                     );

@@ -22,11 +22,11 @@ public class FourLayerMemoryComp : ThingComp, IExposable
     private HashSet<long> _summarizedIds;
 
     // 业务子模块
-    private readonly JobMemoryCapturer _jobCapturer;
-    private readonly CombatMemoryCapturer _combatCapturer;
     private readonly MemoryMaintainer _maintainer;
-    private readonly MemorySummarizer _summarizer;
     private readonly MemoryInteractor _interactor;
+    private JobMemoryCapturer _jobCapturer;
+    private CombatMemoryCapturer _combatCapturer;
+    private MemorySummarizer _summarizer;
 
     // 对外属性访问
     /// <summary>
@@ -83,11 +83,8 @@ public class FourLayerMemoryComp : ThingComp, IExposable
     // 构造函数，初始化捕获模块和维护器
     public FourLayerMemoryComp()
     {
-        _jobCapturer = new JobMemoryCapturer(this);
-        _combatCapturer = new CombatMemoryCapturer(this);
-        _maintainer = new MemoryMaintainer(this);
-        _summarizer = new MemorySummarizer(this);
-        _interactor = new MemoryInteractor(this);
+        _maintainer = new(this);
+        _interactor = new(this);
     }
 
 
@@ -95,11 +92,12 @@ public class FourLayerMemoryComp : ThingComp, IExposable
     // 向后兼容临时字段
     private bool _summarizedIdsInitialized = true;
     private bool _alreadyUpdateSummarizationType = true;
+    private bool _alreadyUpdateComp = true;
     // 存档读写
     public override void PostExposeData()
     {
         // 存档时，清理 SummarizedIds 中已不存在于主仓库中的条目
-        if (Scribe.mode == LoadSaveMode.Saving)
+        if (Scribe.mode is LoadSaveMode.Saving)
         {
             _summarizedIds?.IntersectWith(
                 _activeMemories.Concat(_situationalMemories).Concat(_eventLogMemories).Concat(_archiveMemories)
@@ -114,8 +112,21 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         Scribe_Collections.Look(ref _eventLogMemories, "eventLogMemories", LookMode.Deep);
         Scribe_Collections.Look(ref _archiveMemories, "archiveMemories", LookMode.Deep);
         Scribe_Collections.Look(ref _summarizedIds, "summarizedIds", LookMode.Value);
+
+        // 是否持有子组件这一状态的存档读写
+        bool hasJobCapturer = _jobCapturer is not null;
+        bool hasCombatCapturer = _combatCapturer is not null;
+        bool hasSummarizer = _summarizer is not null;
+        Scribe_Values.Look(ref hasJobCapturer, "HasJobCapturer", false);
+        Scribe_Values.Look(ref hasCombatCapturer, "HasCombatCapturer", false);
+        Scribe_Values.Look(ref hasSummarizer, "HasSummarizer", false);
+        if (hasJobCapturer) AddJobCapturer();
+        if (hasCombatCapturer) AddCombatCapturer();
+        if (hasSummarizer) AddSummarizer();
+
         Scribe_Values.Look(ref _summarizedIdsInitialized, "summarizedIdsInitialized", false);
         Scribe_Values.Look(ref _alreadyUpdateSummarizationType, "AlreadyUpdateSummarizationType", false);
+        Scribe_Values.Look(ref _alreadyUpdateComp, "AlreadyUpdateComp", false);
 
         // 集合空保护
         _activeMemories ??= new();
@@ -142,6 +153,17 @@ public class FourLayerMemoryComp : ThingComp, IExposable
                     memory?.Type = MemoryType.Summarization;
 
                 _alreadyUpdateSummarizationType = true;
+            }
+
+            if (!_alreadyUpdateComp)
+            {
+                if (parent is Pawn { IsColonist: true })
+                {
+                    AddJobCapturer();
+                    AddCombatCapturer();
+                    AddSummarizer();
+                }
+                _alreadyUpdateComp = true;
             }
         }
     }
@@ -174,6 +196,36 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         SummarizedIds.UnionWith(importComp.SummarizedIds);
     }
 
+    /// <summary>
+    /// 添加 JobCapturer 组件
+    /// </summary>
+    public void AddJobCapturer() => _jobCapturer ??= new(this);
+
+    /// <summary>
+    /// 添加 CombatCapturer 组件
+    /// </summary>
+    public void AddCombatCapturer() => _combatCapturer ??= new(this);
+
+    /// <summary>
+    /// 添加 Summarizer 组件
+    /// </summary>
+    public void AddSummarizer() => _summarizer ??= new(this);
+
+    /// <summary>
+    /// 移除 JobCapturer 组件
+    /// </summary>
+    public void RemoveJobCapturer() => _jobCapturer = null;
+
+    /// <summary>
+    /// 移除 CombatCapturer 组件
+    /// </summary>
+    public void RemoveCombatCapturer() => _combatCapturer = null;
+
+    /// <summary>
+    /// 移除 Summarizer 组件
+    /// </summary>
+    public void RemoveSummarizer() => _summarizer = null;
+
     // 组件 tick
     // 主 comp 只负责控制 tick 粒度和向子 comp 下发任务
     /// <summary>
@@ -186,7 +238,7 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         // 每小时 tick
         if (parent.IsHashIntervalTick(GenDate.TicksPerHour))
         {
-            _summarizer.DailySummarize();
+            _summarizer?.DailySummarize();
 
             _maintainer.RunDecay();
             _maintainer.ConvertActiveMemories();
@@ -196,7 +248,7 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         // 每天 tick
         if (parent.IsHashIntervalTick(GenDate.TicksPerDay))
         {
-            _summarizer.PeriodicArchive();
+            _summarizer?.PeriodicArchive();
 
             _maintainer.EnforceMemoryLimits();
         }
