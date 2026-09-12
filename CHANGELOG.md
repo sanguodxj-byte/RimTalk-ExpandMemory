@@ -5,6 +5,28 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-09-12
+
+### Added
+- 记忆系统支持声连催化剂生物：类人 pawn 生成期注入、读档时为持有声连催化剂的非类人生物补注入并手动读档、运行时植入声连催化剂时即时注入组件；以 HarmonyPrepare 探测 VocalLinkImplant def 实现 RimTalk 本体软依赖。 (`b5a16f1`)
+- 记忆子组件改为动态挂载，支持按 Pawn 个性化开关：JobCapturer/CombatCapturer/Summarizer 由构造期固定创建改为可空动态挂载，挂载状态随存档读写；旧档加载时为殖民者自动补挂全套子组件，新殖民者入队时自动激活。主标签头部新增“个性化”弹窗，可按当前 Pawn 开关工作记忆/战斗记忆/自动总结。 (`a7fa137`)
+
+### Changed
+- Harmony 改用规范的 `PatchAll` 方法。 (`341c7d6`)
+- 将 `MemoryTabPawnSelector` 的侧边栏逻辑抽提为抽象基类 `SideWindow`。 (`d1b7392`)
+- 捕获与总结路径移除 `IsColonist` 门控；`CombatMemoryCapturer` 补丁方法收敛为 private。 (`a7fa137`)
+
+### Fixed
+- 修复记忆主面板中同 tick 记忆排序不稳定的问题。 (`350c196`)
+
+## [1.13.1] - 2026-09-08
+
+### Added
+- Player2 现支持网页端鉴权和使用，RimTalk 继承途径同步；可用 key 的主要来源目前为 RimTalk。 (`edf213f`)
+
+### Fixed
+- 修复一处可能导致 RimTalk 配置继承失败的问题。 (`5968e39`)
+
 ## [1.13.0] - 2026-09-07
 
 ### Added
@@ -198,6 +220,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
+[1.14.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.13.1...v1.14.0
+[1.13.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.10.0...v1.11.0
