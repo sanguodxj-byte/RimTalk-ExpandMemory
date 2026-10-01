@@ -378,6 +378,7 @@
   <RimTalk.Memory.UI.TabWindow.OpenImportFolder>打开导入文件夹</RimTalk.Memory.UI.TabWindow.OpenImportFolder>
   <RimTalk.Memory.UI.TabWindow.ConfirmImport>确认导入？</RimTalk.Memory.UI.TabWindow.ConfirmImport>
   <RimTalk.Memory.UI.TabWindow.SummarizeAll>总结全部</RimTalk.Memory.UI.TabWindow.SummarizeAll>
+  <RimTalk.Memory.UI.TabWindow.ArchiveAll>归档全部</RimTalk.Memory.UI.TabWindow.ArchiveAll>
   <RimTalk.Memory.UI.TabWindow.OperationGuide>操作指南</RimTalk.Memory.UI.TabWindow.OperationGuide>
   <RimTalk.Memory.UI.TabWindow.Selected>已选中 {0} 条记忆</RimTalk.Memory.UI.TabWindow.Selected>
   <RimTalk.Memory.UI.TabWindow.Delete>删除</RimTalk.Memory.UI.TabWindow.Delete>

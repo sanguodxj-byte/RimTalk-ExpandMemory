@@ -135,6 +135,7 @@ internal sealed class MemoryTabHeader : UIElement
             new("RimTalk.Memory.UI.TabWindow.Export".Translate(), () => CustomScribe.Export(memoryComp)),
             new("RimTalk.Memory.UI.TabWindow.Import".Translate(), OpenImportMenu),
             new("RimTalk.Memory.UI.TabWindow.SummarizeAll".Translate(), MemorySummarizer.SummarizeAll),
+            new("RimTalk.Memory.UI.TabWindow.ArchiveAll".Translate(), MemorySummarizer.ArchiveAll),
             new("RimTalk.Memory.UI.TabWindow.OperationGuide".Translate(), () => windowStack.Add(new Dialog_MessageBox("RimTalk.Memory.UI.TabWindow.Guide".Translate())))
         ]));
     }

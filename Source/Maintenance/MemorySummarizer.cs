@@ -63,15 +63,22 @@ public class MemorySummarizer
     // ==================== 静态全局操作 ====================
     public static void SummarizeAll()
     {
-        var comps = PawnsFinder.AllMapsCaravansAndTravellingTransporters_Alive_Colonists
-            .Select(pawn => pawn?.TryGetComp<FourLayerMemoryComp>())
-            .Where(comp => comp is not null)
-            .ToList();
-
-        foreach (FourLayerMemoryComp comp in comps) 
-            comp.Summarizer?.AutoSummarize();
+        foreach (var summarizer in PawnsFinder.AllMapsCaravansAndTravellingTransporters_Alive_Colonists
+            .Select(pawn => pawn?.TryGetComp<FourLayerMemoryComp>()?.Summarizer)
+            .Where(s => s is not null))
+            summarizer.AutoSummarize();
 
         Messages.Message("全局总结已启动", MessageTypeDefOf.TaskCompletion, false);
+    }
+
+    public static void ArchiveAll()
+    {
+        foreach (var summarizer in PawnsFinder.AllMapsCaravansAndTravellingTransporters_Alive_Colonists
+            .Select(pawn => pawn?.TryGetComp<FourLayerMemoryComp>()?.Summarizer)
+            .Where(s => s is not null))
+            summarizer.Archive();
+
+        Messages.Message("全局归档已启动", MessageTypeDefOf.TaskCompletion, false);
     }
 
     // ==================== 总结 Summarize ====================
