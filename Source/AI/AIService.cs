@@ -3,7 +3,9 @@ using RimTalk.Memory.Utils;
 using RimTalk.MemoryPatch;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Verse;
 
 namespace RimTalk.Memory.AI;
@@ -101,12 +103,43 @@ public class AIService : GameComponent
             }
 
             // 所有校验通过，执行回调函数
-            task.callback?.Invoke(payLoad.Response);
+            task.callback?.Invoke(Sanitize(payLoad.Response));
         }
         finally
         {
             // 执行清理函数
             task.dispose?.Invoke();
         }
+    }
+
+    // 处理文本，去除不合法的 XML 字符
+    private static string Sanitize(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return text;
+
+        StringBuilder sanitized = null;
+        for (int i = 0; i < text.Length; i++)
+        {
+            char character = text[i];
+            if (char.IsHighSurrogate(character)
+                && i + 1 < text.Length
+                && char.IsLowSurrogate(text[i + 1]))
+            {
+                sanitized?.Append(character).Append(text[i + 1]);
+                i++;
+                continue;
+            }
+
+            if (XmlConvert.IsXmlChar(character))
+            {
+                sanitized?.Append(character);
+                continue;
+            }
+
+            sanitized ??= new StringBuilder(text.Length).Append(text, 0, i);
+            sanitized.Append(' ');
+        }
+
+        return sanitized?.ToString() ?? text;
     }
 }

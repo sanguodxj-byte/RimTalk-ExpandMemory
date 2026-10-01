@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Cryptography;
-using RimTalk.Memory.Utils;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -142,22 +141,11 @@ public class MemoryEntry : IExposable
     // label 更应当用 PascalCase，但此处屎山已成
     public virtual void ExposeData()
     {
-        if (Scribe.mode == LoadSaveMode.Saving)
-        {
-            // Sanitize at the save boundary so existing/edited/streamed memories
-            // cannot put the XML writer into an unrecoverable error state.
-            Content = XmlTextSanitizer.Sanitize(Content);
-            Notes = XmlTextSanitizer.Sanitize(Notes);
-            relatedPawnId = XmlTextSanitizer.Sanitize(relatedPawnId);
-            relatedPawnName = XmlTextSanitizer.Sanitize(relatedPawnName);
-            location = XmlTextSanitizer.Sanitize(location);
-            XmlTextSanitizer.SanitizeInPlace(tags);
-            XmlTextSanitizer.SanitizeInPlace(keywords);
-
+        if (Scribe.mode is LoadSaveMode.Saving)
             Scribe_Values.Look(ref Id, "id");
-        }
+
 #warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
-        if (Scribe.mode == LoadSaveMode.LoadingVars)
+        if (Scribe.mode is LoadSaveMode.LoadingVars)
         {
             string serializedId = null;
             Scribe_Values.Look(ref serializedId, "id");
