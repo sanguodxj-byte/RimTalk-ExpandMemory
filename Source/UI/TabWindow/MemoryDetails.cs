@@ -12,6 +12,8 @@ namespace RimTalk.Memory.UI.TabWindow;
 /// </summary>
 public class MemoryDetails : UIElement
 {
+    private const string NameSpace = "RimTalk.Memory.UI.TabWindow.";
+
     // 常量配置
     private const float ListingStandardGap = 14f;
     private const float ButtonWidth = MemoryTabWindow.DefaultWidgetWidth;
@@ -69,7 +71,7 @@ public class MemoryDetails : UIElement
         // 没有焦点时仅展示引导文本
         if (_tabContext.Focuse is not { } focuse)
         {
-            Widgets.Label(inRect, "RimTalk.Memory.UI.TabWindow.Guide".Translate());
+            Widgets.Label(inRect, (NameSpace + "Guide").Translate());
             return;
         }
 
@@ -79,7 +81,7 @@ public class MemoryDetails : UIElement
 
         // 标题
         using (new TextBlock(GameFont.Medium))
-            listing.Label("RimTalk.Memory.UI.TabWindow.Details".Translate());
+            listing.Label((NameSpace + "Details").Translate());
         listing.Gap();
 
         // 记忆类型和层级
@@ -120,28 +122,28 @@ public class MemoryDetails : UIElement
         // 重要性
         if (editing)
             _importance = scrollListing.SliderLabeled(
-                "RimTalk.Memory.UI.TabWindow.Importance".Translate(_importance.ToString("F2").Named("IMPORTANCE")),
+                (NameSpace + "Importance").Translate(_importance.ToString("F2").Named("IMPORTANCE")),
                 _importance, 0f, 1f, SliderLabelPct
                 );
         else
-            scrollListing.Label("RimTalk.Memory.UI.TabWindow.Importance".Translate(focuse.Importance.ToString("F2").Named("IMPORTANCE")));
+            scrollListing.Label((NameSpace + "Importance").Translate(focuse.Importance.ToString("F2").Named("IMPORTANCE")));
         scrollListing.Gap();
 
         // 活跃度
         if (editing)
             _activity = scrollListing.SliderLabeled(
-                "RimTalk.Memory.UI.TabWindow.Activity".Translate(_activity.ToString("F2").Named("ACTIVITY")),
+                (NameSpace + "Activity").Translate(_activity.ToString("F2").Named("ACTIVITY")),
                 _activity, 0f, 1f, SliderLabelPct
                 );
         else
-            scrollListing.Label("RimTalk.Memory.UI.TabWindow.Activity".Translate(focuse.Activity.ToString("F2").Named("ACTIVITY")));
+            scrollListing.Label((NameSpace + "Activity").Translate(focuse.Activity.ToString("F2").Named("ACTIVITY")));
         scrollListing.Gap();
 
         // 标签
         if (editing)
             _tags = scrollListing.TextEntry(_tags);
         else
-            scrollListing.Label("RimTalk.Memory.UI.TabWindow.Tags".Translate() + string.Join(", ", focuse.Tags ?? []));
+            scrollListing.Label((NameSpace + "Tags").Translate() + string.Join(", ", focuse.Tags ?? []));
         scrollListing.Gap();
 
         // 备注
@@ -149,22 +151,22 @@ public class MemoryDetails : UIElement
             scrollListing.TextEntry(_notes, 4);
         else
             using (new TextBlock(NoteColor))
-                scrollListing.Label("RimTalk.Memory.UI.TabWindow.Notes".Translate() + focuse.Note);
+                scrollListing.Label((NameSpace + "Notes").Translate() + focuse.Note);
         scrollListing.Gap();
 
         // 记忆状态：是否已固定、是否正在总结/已总结/未总结
         var summarizer = _tabContext.MemoryComp?.Summarizer;
         scrollListing.Label(
             $"{(focuse.IsPinned
-            ? "RimTalk.Memory.UI.TabWindow.Pinned"
-            : "RimTalk.Memory.UI.TabWindow.NotPinned")
-            .Translate()} · " +
+            ? (NameSpace + "Pinned").Translate()
+            : (NameSpace + "NotPinned").Translate())
+            } · " +
             $"{(summarizer?.CheckSummarizing(focuse) ?? false
-            ? "RimTalk.Memory.UI.TabWindow.Summarizing"
+            ? (NameSpace + "Summarizing").Translate()
             : summarizer?.CheckSummarized(focuse) ?? false
-            ? "RimTalk.Memory.UI.TabWindow.Summarized"
-            : "RimTalk.Memory.UI.TabWindow.NotSummarized")
-            .Translate()}"
+            ? (NameSpace + "Summarized").Translate()
+            : (NameSpace + "NotSummarized").Translate())
+            }"
             );
         scrollListing.Gap();
 
@@ -180,14 +182,14 @@ public class MemoryDetails : UIElement
         Rect RightButton = new(inRect.width - ButtonWidth, listing.CurHeight, ButtonWidth, ButtonHeight);
         if (editing)
         {
-            if (Widgets.ButtonText(RightButton, "RimTalk.Memory.UI.TabWindow.CancelEdit".Translate()))
+            if (Widgets.ButtonText(RightButton, (NameSpace + "CancelEdit").Translate()))
                 _editingMemory = null;
 
             Rect LeftButton = new(RightButton.x - ButtonWidth - MemoryTabWindow.Gap, RightButton.y, ButtonWidth, ButtonHeight);
-            if (Widgets.ButtonText(LeftButton, "RimTalk.Memory.UI.TabWindow.SaveEdit".Translate()))
+            if (Widgets.ButtonText(LeftButton, (NameSpace + "SaveEdit").Translate()))
                 SaveEdit();
         }
-        else if (Widgets.ButtonText(RightButton, "RimTalk.Memory.UI.TabWindow.Edit".Translate()))
+        else if (Widgets.ButtonText(RightButton, (NameSpace + "Edit").Translate()))
             BeginEdit(focuse);
 
         listing.End();
