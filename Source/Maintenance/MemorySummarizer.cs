@@ -425,8 +425,6 @@ public class MemorySummarizer
     // 将传入的记忆集合构建为一个新的 MemoryEntry
     private MemoryEntry BuildEmptySummary(List<MemoryEntry> memoryList, MemoryLayer targetLayer)
     {
-        bool isArchive = targetLayer is MemoryLayer.Archive;
-
         var memory = new MemoryEntry(
             content: null,
             MemoryType.Summarization,
@@ -434,14 +432,13 @@ public class MemorySummarizer
             importance: memoryList.Average(m => m.Importance)
         )
         {
-            // 总结时，GameTick 取最晚的条目；归档时，GameTick 取最早的条目
-            GameTick = isArchive ? memoryList[0].GameTick : memoryList[^1].GameTick,
+            GameTick = memoryList[^1].GameTick,
 
             Tags = [.. memoryList.SelectMany(m => m.Tags).Distinct()],
             keywords = [.. memoryList.SelectMany(m => m.keywords).Distinct()]
         };
-        // 归档时，额外赋值 EndGameTick 为最晚的条目 GameTick
-        if (isArchive) memory.EndGameTick = memoryList[^1].GameTick;
+        // 归档时，额外赋值 StartGameTick 为最早的条目 GameTick
+        if (targetLayer is MemoryLayer.Archive) memory.StartGameTick = memoryList[0].GameTick;
 
         return memory;
     }
