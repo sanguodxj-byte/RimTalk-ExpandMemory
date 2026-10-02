@@ -12,6 +12,9 @@ Folder.DotSettings.user
 *.sh
 auto_push_github.ps1
 
+# 输出程序集
+Assemblies/
+
 # ? 本地配置文件（包含用户特定路径，不应提交）
 .rimworld.config
 deploy.ps1
