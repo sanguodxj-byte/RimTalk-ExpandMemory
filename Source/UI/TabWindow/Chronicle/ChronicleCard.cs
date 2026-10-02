@@ -1,7 +1,4 @@
-﻿using RimWorld;
-using UnityEngine;
-
-namespace RimTalk.Memory.UI.TabWindow.Chronicle;
+﻿namespace RimTalk.Memory.UI.TabWindow.Chronicle;
 
 /// <summary>
 /// CLPA 记忆卡片
@@ -32,6 +29,5 @@ public class ChronicleCard : MemoryCard
     public ChronicleCard(UIContext context, MemoryEntry memory) : base(context, memory) { }
     public void SetDepth(int depth) => _depth = depth;
 
-    protected override string GetTitle() =>
-        $"{GenDate.DateFullStringAt(GenDate.TickGameToAbs(Memory.GameTick), Vector2.zero)} - {GenDate.DateFullStringAt(GenDate.TickGameToAbs(Memory.EndGameTick), Vector2.zero)}";
+    protected override string GetTitle() => Memory.AgeString;
 }
