@@ -19,7 +19,7 @@ public class MemoryEntry : IExposable
     public const float DefaultImportance = 0.5f;
 
     // 基本信息
-    public long Id = 0;                 // 唯一ID，0 表示未初始化
+    public long Id = -1L;
     // 复制品的原始 Id（目前仅用于 summarizer）
     private long _originId = 0;
     public long OriginId
@@ -116,7 +116,7 @@ public class MemoryEntry : IExposable
     public string AgeString => Layer switch
     {
         // 以时间段来描述 CLPA age
-        MemoryLayer.Archive => 
+        MemoryLayer.Archive =>
         $"{GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)}" +
         $" - {GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(EndGameTick), Vector2.zero)}",
         _ => (Find.TickManager?.TicksGame - GameTick) switch
@@ -151,17 +151,7 @@ public class MemoryEntry : IExposable
     // label 更应当用 PascalCase，但此处屎山已成
     public virtual void ExposeData()
     {
-        if (Scribe.mode is LoadSaveMode.Saving)
-            Scribe_Values.Look(ref Id, "id");
-
-#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
-        if (Scribe.mode is LoadSaveMode.LoadingVars)
-        {
-            string serializedId = null;
-            Scribe_Values.Look(ref serializedId, "id");
-            Id = ParseId(serializedId);
-        }
-
+        Scribe_Values.Look(ref Id, "id", -1L);
         Scribe_Values.Look(ref _originId, "OriginId", 0L);
         Scribe_Values.Look(ref GameTick, "timestamp", -1);
         Scribe_Values.Look(ref _endGameTick, "EndGameTick", 0); // -1 是初始化后的无效值，而 0 则代表根本未初始化
@@ -169,13 +159,6 @@ public class MemoryEntry : IExposable
 
         Scribe_Values.Look(ref Type, "type");
         Scribe_Values.Look(ref Layer, "layer");
-
-#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
-        if (Scribe.mode is LoadSaveMode.LoadingVars
-            && Layer is MemoryLayer.Archive
-            && EndGameTick == 0)
-            EndGameTick = GameTick + 15 * GenDate.TicksPerDay; // 旧存档 CPLA 默认跨度 15 天
-
         Scribe_Values.Look(ref _importance, "importance", -1);
         Scribe_Values.Look(ref _activity, "activity", -1);
 
@@ -207,34 +190,7 @@ public class MemoryEntry : IExposable
         }
         while (id == 0);
 
-        return id;
-    }
-
-    // ID 向后兼容
-    private static long ParseId(string serializedId)
-    {
-        if (serializedId is null)
-        {
-            Log.Warning($"[RimTalk.Memory] 记忆 ID 为 null，已生成新 ID");
-            return GenerateId();
-        }
-
-        if (long.TryParse(serializedId, NumberStyles.None, CultureInfo.InvariantCulture, out long id) && id > 0)
             return id;
-
-        const string legacyPrefix = "mem-";
-        if (serializedId.StartsWith(legacyPrefix, StringComparison.Ordinal)
-            && long.TryParse(
-                serializedId.Substring(legacyPrefix.Length),
-                NumberStyles.AllowHexSpecifier,
-                CultureInfo.InvariantCulture,
-                out id
-                )
-            && id > 0)
-            return id;
-
-        Log.Warning($"[RimTalk.Memory] 记忆 ID \"{serializedId}\" 无效，已生成新 ID");
-        return GenerateId();
     }
 
     /// <summary>
