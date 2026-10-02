@@ -88,8 +88,8 @@ public class ChronicleCardPainter : UIElement
         {
             var memory = card.Memory;
 
-            float cardLeftX = (Math.Max(memory.GameTick, chronicleStartTick) - chronicleStartTick) / (float)tickRange * width + x;
-            float cardRightX = (Math.Min(memory.EndGameTick, chronicleEndTick) - chronicleStartTick) / (float)tickRange * width + x;
+            float cardLeftX = (Math.Max(memory.StartGameTick, chronicleStartTick) - chronicleStartTick) / (float)tickRange * width + x;
+            float cardRightX = (Math.Min(memory.GameTick, chronicleEndTick) - chronicleStartTick) / (float)tickRange * width + x;
 
             Rect cardRect = new(cardLeftX, y, cardRightX - cardLeftX, height);
 
@@ -115,8 +115,8 @@ public class ChronicleCardPainter : UIElement
         {
             if (memory is null
                 // 在窗口内
-                || memory.GameTick >= _chronicleContext.ChronicleEndTick
-                || memory.EndGameTick <= _chronicleContext.ChronicleStartTick)
+                || memory.StartGameTick >= _chronicleContext.ChronicleEndTick
+                || memory.GameTick <= _chronicleContext.ChronicleStartTick)
                 continue;
 
             if (_cardMap.GetOrAdd(memory, _cardFactory) is not { } card
@@ -131,7 +131,7 @@ public class ChronicleCardPainter : UIElement
         ChronicleCard formerCard = null;
         foreach (var card in _visableCards)
         {
-            if (card.Memory.GameTick < formerCard?.Memory.EndGameTick)
+            if (card.Memory.StartGameTick < formerCard?.Memory.GameTick)
             {
                 card.Depth = formerCard.Depth - DepthGap;
 

@@ -143,8 +143,8 @@ public class MemoryTabWindow : UIElement
             // 刷新全量记忆时间跨度
             if (_allMemories.Count > 0)
             {
-                LifeStartTick = _allMemories.Min(memory => memory.GameTick);
-                LifeCurrentTick = _allMemories.Max(memory => memory.EndGameTick);
+                LifeStartTick = _allMemories.Min(memory => memory.StartGameTick);
+                LifeCurrentTick = _allMemories.Max(memory => memory.GameTick);
             }
 
             // 每帧收束 cursor
