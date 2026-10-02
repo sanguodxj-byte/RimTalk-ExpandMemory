@@ -445,6 +445,10 @@
   <RimTalk.Memory.UI.TabWindow.Activity>活跃度：{ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
   <RimTalk.Memory.UI.TabWindow.Tags>标签：</RimTalk.Memory.UI.TabWindow.Tags>
   <RimTalk.Memory.UI.TabWindow.Notes>备注：</RimTalk.Memory.UI.TabWindow.Notes>
+  <RimTalk.Memory.UI.TabWindow.TimeYear>年</RimTalk.Memory.UI.TabWindow.TimeYear>
+  <RimTalk.Memory.UI.TabWindow.TimeQuadrum>象</RimTalk.Memory.UI.TabWindow.TimeQuadrum>
+  <RimTalk.Memory.UI.TabWindow.TimeDay>日</RimTalk.Memory.UI.TabWindow.TimeDay>
+  <RimTalk.Memory.UI.TabWindow.TimeHour>时</RimTalk.Memory.UI.TabWindow.TimeHour>
   <RimTalk.Memory.UI.TabWindow.Pinned>已固定</RimTalk.Memory.UI.TabWindow.Pinned>
   <RimTalk.Memory.UI.TabWindow.NotPinned>未固定</RimTalk.Memory.UI.TabWindow.NotPinned>
   <RimTalk.Memory.UI.TabWindow.Summarizing>总结中</RimTalk.Memory.UI.TabWindow.Summarizing>

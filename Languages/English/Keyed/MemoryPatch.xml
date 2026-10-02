@@ -444,6 +444,10 @@ This tool previews memory and knowledge injection effects, helping you understan
   <RimTalk.Memory.UI.TabWindow.Activity>Activity: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
   <RimTalk.Memory.UI.TabWindow.Tags>Tags: </RimTalk.Memory.UI.TabWindow.Tags>
   <RimTalk.Memory.UI.TabWindow.Notes>Notes: </RimTalk.Memory.UI.TabWindow.Notes>
+  <RimTalk.Memory.UI.TabWindow.TimeYear>y</RimTalk.Memory.UI.TabWindow.TimeYear>
+  <RimTalk.Memory.UI.TabWindow.TimeQuadrum>q</RimTalk.Memory.UI.TabWindow.TimeQuadrum>
+  <RimTalk.Memory.UI.TabWindow.TimeDay>d</RimTalk.Memory.UI.TabWindow.TimeDay>
+  <RimTalk.Memory.UI.TabWindow.TimeHour>h</RimTalk.Memory.UI.TabWindow.TimeHour>
   <RimTalk.Memory.UI.TabWindow.Pinned>Pinned</RimTalk.Memory.UI.TabWindow.Pinned>
   <RimTalk.Memory.UI.TabWindow.NotPinned>Not pinned</RimTalk.Memory.UI.TabWindow.NotPinned>
   <RimTalk.Memory.UI.TabWindow.Summarizing>Summarizing</RimTalk.Memory.UI.TabWindow.Summarizing>
