@@ -158,7 +158,7 @@ public class MemoryDetails : UIElement
 
         // 备注
         if (editing)
-            scrollListing.TextEntry(_notes, 4);
+            _notes = scrollListing.TextEntry(_notes, 4);
         else
             using (new TextBlock(NoteColor))
                 scrollListing.Label((NameSpace + "Notes").Translate() + focuse.Note);
