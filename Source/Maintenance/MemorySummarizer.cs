@@ -33,11 +33,10 @@ public class MemorySummarizer
     // 上次总结的 GameTick
     // 如果为 -1，则表示尚未计算过，首次访问时会计算最近一次潜在的总结 tick 并缓存
     private int _lastSummarizeTick = -1;
-    private int LastSummarizeTick => _lastSummarizeTick switch
-    {
-        -1 => _lastSummarizeTick = ComputeLatestPotentialSummarizeTick(),
-        _ => _lastSummarizeTick
-    };
+    private int LastSummarizeTick =>
+        _lastSummarizeTick == -1
+        ? _lastSummarizeTick = ComputeLatestPotentialSummarizeTick()
+        : _lastSummarizeTick;
 
     private const int SummarizeIntervalTicks = GenDate.TicksPerDay; // 每日总结间隔，单位 tick
 
