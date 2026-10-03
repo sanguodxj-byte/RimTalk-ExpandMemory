@@ -436,8 +436,8 @@ public class MemorySummarizer
             Tags = [.. memoryList.SelectMany(m => m.Tags).Distinct()],
             keywords = [.. memoryList.SelectMany(m => m.keywords).Distinct()]
         };
-        // 归档时，额外赋值 StartGameTick 为最早的条目 GameTick
-        if (targetLayer is MemoryLayer.Archive) memory.StartGameTick = memoryList[0].GameTick;
+        // 归档时，额外赋值 StartGameTick 为最早的条目 StartGameTick
+        if (targetLayer is MemoryLayer.Archive) memory.StartGameTick = memoryList[0].StartGameTick;
 
         return memory;
     }
