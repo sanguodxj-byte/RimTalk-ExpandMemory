@@ -314,7 +314,7 @@ public class MemoryTimeline : ScrollUIElement
                 );
 
             // 计算时间 gap 和布局 gap
-            int currentTick = card.Memory.GameTick;
+            int currentTick = GenDate.TickGameToAbs(card.Memory.GameTick);
             int gapTick = lastTick - currentTick;
             float currentY = rect.y;
             float gap = currentY - lastYMax;
