@@ -441,8 +441,8 @@
   <RimTalk.Memory.Utils.Layer_Archive>人生篇章 (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
   <RimTalk.Memory.Utils.Layer_Default>未知层级</RimTalk.Memory.Utils.Layer_Default>
   <RimTalk.Memory.UI.TabWindow.Details>记忆详情</RimTalk.Memory.UI.TabWindow.Details>
-  <RimTalk.Memory.UI.TabWindow.Importance>重要性：{IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
-  <RimTalk.Memory.UI.TabWindow.Activity>活跃度：{ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
+  <RimTalk.Memory.UI.TabWindow.Importance>重要性：</RimTalk.Memory.UI.TabWindow.Importance>
+  <RimTalk.Memory.UI.TabWindow.Activity>活跃度：</RimTalk.Memory.UI.TabWindow.Activity>
   <RimTalk.Memory.UI.TabWindow.Tags>标签：</RimTalk.Memory.UI.TabWindow.Tags>
   <RimTalk.Memory.UI.TabWindow.Notes>备注：</RimTalk.Memory.UI.TabWindow.Notes>
   <RimTalk.Memory.UI.TabWindow.TimeYear>年</RimTalk.Memory.UI.TabWindow.TimeYear>

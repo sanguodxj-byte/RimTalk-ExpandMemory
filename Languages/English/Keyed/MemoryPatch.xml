@@ -440,8 +440,8 @@ This tool previews memory and knowledge injection effects, helping you understan
   <RimTalk.Memory.Utils.Layer_Archive>Archive (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
   <RimTalk.Memory.Utils.Layer_Default>Unknown layer</RimTalk.Memory.Utils.Layer_Default>
   <RimTalk.Memory.UI.TabWindow.Details>Memory details</RimTalk.Memory.UI.TabWindow.Details>
-  <RimTalk.Memory.UI.TabWindow.Importance>Importance: {IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
-  <RimTalk.Memory.UI.TabWindow.Activity>Activity: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
+  <RimTalk.Memory.UI.TabWindow.Importance>Importance:</RimTalk.Memory.UI.TabWindow.Importance>
+  <RimTalk.Memory.UI.TabWindow.Activity>Activity:</RimTalk.Memory.UI.TabWindow.Activity>
   <RimTalk.Memory.UI.TabWindow.Tags>Tags: </RimTalk.Memory.UI.TabWindow.Tags>
   <RimTalk.Memory.UI.TabWindow.Notes>Notes: </RimTalk.Memory.UI.TabWindow.Notes>
   <RimTalk.Memory.UI.TabWindow.TimeYear>y</RimTalk.Memory.UI.TabWindow.TimeYear>
