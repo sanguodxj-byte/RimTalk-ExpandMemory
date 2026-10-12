@@ -1,9 +1,23 @@
-﻿using Verse;
+﻿using RimTalk.MemoryPatch;
+using System.IO;
+using TMPro;
+using UnityEngine;
+using Verse;
 
 namespace RimTalk.Memory.Utils
 {
     public static class TextUtil
     {
+        private static TMP_FontAsset _font;
+        public static TMP_FontAsset InternalFont
+        {
+            get
+            {
+                _font ??= GetFont();
+                return _font;
+            }
+        }
+
         public static string Translate(this MemoryLayer? layer) => layer switch
         {
             null => "RimTalk.Memory.Utils.Layers".Translate(),
@@ -33,5 +47,23 @@ namespace RimTalk.Memory.Utils
             MemoryType.Relationship => "RimTalk_Archive_TypeRelationship",
             _ => "RimTalk_Archive_Memory"
         });
+
+        private static TMP_FontAsset GetFont()
+        {
+            string path = Path.Combine(LoadedModManager.GetMod<RimTalkMemoryPatchMod>().Content.RootDir,
+                "Resource", "AssetBundles", "Windows64", "Fonts", "arial_msyh_tmp");
+
+            if (AssetBundle.LoadFromFile(path) is not { } bundle)
+            {
+                Log.Warning($"[RimTalk.Memory] 字体 AssetBundle 加载失败: {path}");
+                return null;
+            }
+
+            var font = bundle.LoadAsset<TMP_FontAsset>("arial");
+            font.fallbackFontAssetTable = [bundle.LoadAsset<TMP_FontAsset>("microsoftyahei")];
+            bundle.Unload(false);
+
+            return font;
+        }
     }
 }
