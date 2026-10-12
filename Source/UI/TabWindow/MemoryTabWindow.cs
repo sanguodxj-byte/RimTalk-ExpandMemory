@@ -1,4 +1,5 @@
 using RimTalk.Memory.UI.TabWindow.Chronicle;
+using RimTalk.Memory.UI.TabWindow.Details;
 using RimTalk.Memory.UI.TabWindow.TabHeader;
 using RimTalk.Memory.UI.TabWindow.Timeline;
 using RimTalk.Memory.Utils;
@@ -90,8 +91,9 @@ public class MemoryTabWindow : UIElement
         /// </summary>
         public void SetFocuse(MemoryEntry memory)
         {
-            if (memory != Focuse) FocuseChanged?.Invoke();
+            var previous = _focuse;
             _focuse = memory;
+            if (Focuse != previous) FocuseChanged?.Invoke();
         }
 
         public override void PostClose()
