@@ -106,6 +106,7 @@
 		<Exec Command="robocopy &quot;$(ProjectDir)About&quot; &quot;$(WinModPath)About&quot; /MIR" IgnoreExitCode="true" />
 		<Exec Command="robocopy &quot;$(ProjectDir)Languages&quot; &quot;$(WinModPath)Languages&quot; /MIR" IgnoreExitCode="true" />
 		<Exec Command="robocopy &quot;$(ProjectDir)Textures&quot; &quot;$(WinModPath)Textures&quot; /MIR" IgnoreExitCode="true" />
+		<Exec Command="robocopy &quot;$(ProjectDir)Resource&quot; &quot;$(WinModPath)Resource&quot; /MIR" IgnoreExitCode="true" />
 		<Exec Command="robocopy &quot;$(ProjectDir)$(GameVersion)&quot; &quot;$(WinModPath)$(GameVersion)&quot; /MIR" IgnoreExitCode="true" />
 		<Copy SourceFiles="$(ProjectDir)LoadFolders.xml" DestinationFolder="$(WinModPath)" SkipUnchangedFiles="true" />
 		<Message Text="--- Windows deployment finished successfully ---" Importance="high" />
