@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace RimTalk.Memory.Utils
 {
@@ -25,24 +26,11 @@ namespace RimTalk.Memory.Utils
         public RimRingBuffer(int newCapacity)
         {
             // 取输入值的下一个 2 的幂，保证数组尺寸是 2 的幂，以使用位运算实现环绕
-            _capacity = CeilPow2(newCapacity);
+            _capacity = (int)BitOperations.RoundUpToPowerOf2((uint)newCapacity);
 
             // 完成初始化
             _buffer = new T[_capacity];
             _capacityMask = _capacity - 1;
-        }
-
-        // 1.7 起 Unity.Mathematics 不再提供 math.ceilpow2，此处按原语义补齐位扩散算法
-        private static int CeilPow2(int x)
-        {
-            if (x <= 1) return 1;
-            x -= 1;
-            x |= x >> 1;
-            x |= x >> 2;
-            x |= x >> 4;
-            x |= x >> 8;
-            x |= x >> 16;
-            return x + 1;
         }
 
         /// <summary>

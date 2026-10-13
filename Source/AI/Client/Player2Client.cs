@@ -41,7 +41,7 @@ public sealed class Player2Client : IAIClient
     /// </summary>
     public async Task<Payload> GetChatCompletionAsync(string prompt)
     {
-        // Player2 使用 OpenAI 风格 messages，但不发送 model（遵守全局禁设 max_tokens 铁律）
+        // Player2 使用 OpenAI 风格 messages，但不发送 model。
         string json = JsonUtil.SerializeToJson(new Player2Request
         {
             Messages = [new() { Role = "user", Content = prompt ?? string.Empty }]
