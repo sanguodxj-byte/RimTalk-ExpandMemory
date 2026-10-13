@@ -38,18 +38,14 @@ public class OpenAIClient : IAIClient
     {
         // 如果 URL 不合法，则会向外层抛出异常
         // 正常管线中会提前校验，一般不会出现这种情况
-        // 对齐 RimTalk 的 FormatEndpointUrl：
-        // 根地址补默认路径；以 /v1 结尾的地址补 /chat/completions；其余原样使用
-        // TrimEnd 用数组重载：单 char 重载是 netstandard2.1 才有的 API，旧运行时没有
-        string baseUrl = config.URL.Trim().TrimEnd(new[] { '/' });
-        var uri = new Uri(baseUrl, UriKind.Absolute);
-        string path = uri.AbsolutePath.TrimEnd(new[] { '/' });
-        _url = path.Length == 0 ? new Uri(baseUrl + DefaultPath, UriKind.Absolute)
-            : path == "/v1" ? new Uri(baseUrl + "/chat/completions", UriKind.Absolute)
-            : uri;
+        _url = new Uri(config.URL, UriKind.Absolute);
+
+        // 如果只指定了基础 URL，则补充默认路径 /v1/chat/completions
+        if (_url.AbsolutePath == "/")
+            _url = new Uri(_url, DefaultPath);
 
         _apiKey = config.ApiKey;
-        _model = config.EffectiveModelName;
+        _model = config.CustomModelName;
         _extraHeaders = config.Provider.GetExtraHeaders();
     }
 
@@ -66,7 +62,7 @@ public class OpenAIClient : IAIClient
         // 获取配置项
         bool isAILogEnabled = RimTalkMemoryPatchMod.Settings.EnableAILog;
 
-        // 构建请求 JSON（严格遵守全局禁设 max_tokens 铁律）
+        // 构建请求 JSON
         string jsonContent = BuildRequestJson(prompt);
 
         // 初始化 payload，此时其 IsValid 默认为 false
@@ -88,7 +84,7 @@ public class OpenAIClient : IAIClient
             if (retry > 0)
             {
                 int delay = RetryDelayMs[retry - 1];
-                Log.Warning($"[RimTalk.Memory.AI.Client] Attempt {retry}/{MaxRetrys + 1} failed (model={_model}). Retrying in {delay} ms.");
+                Log.Message($"[RimTalk.Memory.AI.Client] Attempt {retry}/{MaxRetrys + 1} failed (model={_model}). Retrying in {delay} ms.");
                 await Task.Delay(delay);
             }
 
@@ -230,7 +226,7 @@ public class OpenAIClient : IAIClient
     // ====================================================================
 
     /// <summary>
-    /// 构建 OpenAI 兼容 chat/completions 请求 JSON（严格遵守全局禁设 max_tokens 铁律）
+    /// 构建 OpenAI 兼容 chat/completions 请求 JSON
     /// </summary>
     private string BuildRequestJson(string prompt) =>
          JsonUtil.SerializeToJson(new OpenAIRequest

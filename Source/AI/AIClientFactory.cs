@@ -1,63 +1,56 @@
-using System;
-using System.Collections.Generic;
 using RimTalk.Memory.AI.Client;
 using RimTalk.Memory.AI.Integration;
 using RimTalk.MemoryPatch;
+using System.Collections.Generic;
 
 namespace RimTalk.Memory.AI;
 
 /// <summary>
-/// 客户端工厂：提供客户端构建与可用配置快照提取。
-/// 无状态设计，彻底杜绝游标越界造成的死锁。
+/// 客户端工厂
 /// </summary>
-public static class AIClientFactory
+public class AIClientFactory
 {
-    /// <summary>
-    /// 获取当前模式下应当尝试的所有有效配置候选列表。
-    /// 无论跟随模式还是独立模式，首位元素始终是当前优先级最高的首选配置。
-    /// </summary>
-    public static List<ApiConfig> GetCurrentCandidateConfigs()
+    // 配置项索引，指向已尝试过的最后一个有效 ApiConfig 索引
+    private int _configIndex = -1;
+
+    // RimTalk 的 ApiConfig 列表的深拷贝
+    private List<ApiConfig> _rimTalkApiConfigsCache;
+    private List<ApiConfig> RimTalkApiConfigs
     {
+        get
+        {
+            _rimTalkApiConfigsCache ??= RimTalkApiConfigGetter.GetRimTalkApiConfigs();
+            return _rimTalkApiConfigsCache;
+        }
+    }
+
+    // 尝试新建 client
+    public bool TryGetNewClient(out IAIClient client)
+    {
+        client = null;
+
+        // 获取 configs
         var settings = RimTalkMemoryPatchMod.Settings;
-        if (settings == null) return [];
+        var apiConfigs = settings.UseRimTalkAIConfig ? RimTalkApiConfigs : settings.ApiConfigs;
+        if (apiConfigs is null) return false;
 
-        if (settings.UseRimTalkAIConfig)
+        // 从上次尝试过的索引的下一位开始，寻找下一个有效的 ApiConfig
+        for (_configIndex += 1; _configIndex < apiConfigs.Count; _configIndex++)
         {
-            return RimTalkApiConfigGetter.GetRimTalkApiConfigs();
+            var apiConfig = apiConfigs[_configIndex];
+
+            if (apiConfig is not { IsEnabled: true, IsValid: true }) continue;
+
+            // 创建 client
+            client = BuildClient(apiConfig);
+            return true;
         }
 
-        var list = new List<ApiConfig>();
-        if (settings.ApiConfigs != null)
-        {
-            foreach (var cfg in settings.ApiConfigs)
-            {
-                if (cfg != null && cfg.IsEnabled && cfg.IsValid)
-                {
-                    list.Add(cfg);
-                }
-            }
-        }
-        return list;
+        // 没有找到有效的 ApiConfig，创建失败
+        return false;
     }
 
-    /// <summary>
-    /// 根据配置项构建对应的客户端实例
-    /// </summary>
-    public static IAIClient BuildClient(ApiConfig config)
-    {
-        if (config == null) return null;
-        return config.Provider is AIProvider.Player2
-            ? new Player2Client(config)
-            : new OpenAIClient(config);
-    }
-
-    /// <summary>
-    /// 计算配置项的唯一指纹，用于识别配置是否发生变更
-    /// </summary>
-    public static string GetConfigFingerprint(ApiConfig config)
-    {
-        if (config == null) return "null";
-        return $"{config.Provider}|{config.ApiKey}|{config.EffectiveModelName}|{config.URL}";
-    }
+    // 根据不同的 provider 来决定创建不同的 client
+    private IAIClient BuildClient(ApiConfig config) =>
+        config.Provider is AIProvider.Player2 ? new Player2Client(config) : new OpenAIClient(config);
 }
-

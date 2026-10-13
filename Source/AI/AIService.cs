@@ -40,28 +40,18 @@ public class AIService : GameComponent
     }
 
 
-    // 备用静态 client pool，供主菜单等无 GameComponent 实例的场景使用
-    private static readonly ClientPool _fallbackClientPool = new();
-
     // --- 静态门户 ---
 
     // 入列
     public static void EnqueueAIRequest(string prompt, Action<string> callback, Action dispose = null) =>
         _instance?._aiRequestQueue.Enqueue((prompt, callback, dispose));
 
-    // AI 配置项有效性校验：支持存档内与主菜单等全场景
-    public static async Task<bool> ValidateAIConfigAsync()
-    {
-        var pool = _instance?._clientPool ?? _fallbackClientPool;
-        return await pool.ValidateAsync();
-    }
+    // AI 配置项有效性校验（仅存档内：依赖 AIService GameComponent 实例）
+    public static async Task<bool> ValidateAIConfigAsync() =>
+        await (_instance?._clientPool.ValidateAsync() ?? Task.FromResult(false));
 
     // 外部调用，重置 client pool
-    public static void ResetClientPool()
-    {
-        _instance?._clientPool.Reset();
-        _fallbackClientPool.Reset();
-    }
+    public static void ResetClientPool() => _instance?._clientPool.Reset();
 
 
     // --- 实例方法 ---
