@@ -13,6 +13,7 @@
 		<RimTalkGameVersion Condition=" '$(IsGame17)' == 'true' ">1.6</RimTalkGameVersion>
 		<RimTalkGameVersion Condition=" '$(RimTalkGameVersion)' == '' ">$(GameVersion)</RimTalkGameVersion>
 
+		<!-- 追加一个当前游戏版本的常量，如“V1_7” -->
 		<DefineConstants>$(DefineConstants);V$(GameVersion.Replace('.', '_'))</DefineConstants>
 
 		<RimWorldDir Condition=" '$(RimWorldDir)' == '' ">..\RimWorld</RimWorldDir>
