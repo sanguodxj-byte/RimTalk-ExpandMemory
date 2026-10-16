@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Mathematics;
 using System.Numerics;
 
 namespace RimTalk.Memory.Utils
@@ -26,7 +27,11 @@ namespace RimTalk.Memory.Utils
         public RimRingBuffer(int newCapacity)
         {
             // 取输入值的下一个 2 的幂，保证数组尺寸是 2 的幂，以使用位运算实现环绕
+# if V1_7
             _capacity = (int)BitOperations.RoundUpToPowerOf2((uint)newCapacity);
+#else
+            _capacity = math.ceilpow2(newCapacity);
+#endif
 
             // 完成初始化
             _buffer = new T[_capacity];
