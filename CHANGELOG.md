@@ -5,6 +5,8 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+因项目存在频繁变基，SHA 仅供参考。
+
 ## [1.15.1] - 2026-10-01
 
 ### Added
@@ -82,6 +84,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 移除 OpenAIClient 与 Player2Client 中的 max_tokens 参数设置，避免长文本生成与思考模型输出被截断。
 - 升级部署脚本，支持检测 .NET 10 SDK 并自动化联合编译部署 1.6 与 1.7 双版本。
 - 全面清理运行时高频日志输出，仅保留低频生命周期日志与异常警告，降低控制台噪音与性能开销。
+
+### Fixed
+- 为 LLM 服务返回值添加 XML 合法性校验：在 AI 回调前清洗非法 XML 字符，避免含非法字符的记忆文本在读写存档时引发崩溃。 (`78cad9e`)
 
 ## [1.11.0] - 2026-08-03
 
