@@ -18,6 +18,8 @@ public abstract class UGUIElement : UIElement
         if (EventSystem.current is not null) return;
 
         var eventObject = new GameObject("EventSystem");
+        GameObject.DontDestroyOnLoad(eventObject);
+
         EventSystem.current = eventObject.AddComponent<EventSystem>();
         eventObject.AddComponent<StandaloneInputModule>();
     }
