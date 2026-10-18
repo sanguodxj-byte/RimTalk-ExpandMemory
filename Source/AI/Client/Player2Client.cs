@@ -52,11 +52,12 @@ public sealed class Player2Client : IAIClient
 
         try
         {
-            // 如果没有 API Key，则尝试获取本地连接。
-            if (string.IsNullOrEmpty(_apiKey))
-                await EnsureLocalConnectionAsync();
+            // 优先尝试探测并使用本地 Player2 桌面应用
+            await EnsureLocalConnectionAsync();
+
+            // 若本地未启动且没有配置远程 Key，则抛出异常
             if (string.IsNullOrWhiteSpace(_apiKey))
-                throw new InvalidOperationException("Player2 local app is unavailable.");
+                throw new InvalidOperationException("Player2 local app is unavailable and no API key is configured.");
 
             string responseText = await SendRequestAsync(json);
             payload.URL = $"{_baseUrl}/chat/completions";

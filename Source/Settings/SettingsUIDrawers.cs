@@ -266,11 +266,6 @@ namespace RimTalk.Memory.UI
                     Player2AuthHelper.StartAuth(key =>
                     {
                         config.ApiKey = key;
-                        if (global::RimTalk.Settings.Get() is { } rimTalkSettings)
-                        {
-                            rimTalkSettings.SimplePlayer2ApiKey = key;
-                            rimTalkSettings.Write();
-                        }
                         RimTalkMemoryPatchMod.Settings.Write();
                     });
                 }
