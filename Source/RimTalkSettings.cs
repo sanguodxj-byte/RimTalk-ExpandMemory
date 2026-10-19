@@ -297,7 +297,9 @@ namespace RimTalk.MemoryPatch
             if (Scribe.mode == LoadSaveMode.PostLoadInit && knowledgeMatchingSources != null)
             {
                 int removedCount = knowledgeMatchingSources.RemoveAll(s =>
-                    s == "knowledge" || s.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase));
+                    s == "knowledge" ||
+                    s.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase) ||
+                    s.StartsWith("knowledge_", StringComparison.OrdinalIgnoreCase));
                 if (removedCount > 0)
                 {
                     Log.Message($"[MemoryPatch] Removed {removedCount} 'knowledge' entries from matching sources to prevent self-referencing.");

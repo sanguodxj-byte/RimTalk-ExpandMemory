@@ -93,7 +93,8 @@ namespace RimTalk.Memory.API
                         continue;
                     
                     // ⭐ 过滤掉 knowledge 变量，防止自己匹配自己导致无限递归
-                    if (v.name == "knowledge" || v.name.StartsWith("knowledge."))
+                    // 包括: knowledge, knowledge.xxx（内置/带点）、knowledge_xxx（分变量，如 knowledge_grouped）
+                    if (v.name == "knowledge" || v.name.StartsWith("knowledge.") || v.name.StartsWith("knowledge_"))
                         continue;
                     
                     // 判断是否是 Pawn 属性
