@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace RimTalk.Memory.AI;
@@ -17,7 +18,8 @@ public enum AIProvider
     // 新成员只允许追加到末尾：旧存档按既有序数值反序列化，插入会错位
     OpenRouter,
     Claude,
-    Moonshot
+    Moonshot,
+    OpenCodeGo
 }
 
 public static class AIProviderRegistry
@@ -35,18 +37,20 @@ public static class AIProviderRegistry
         { AIProvider.Player2, "https://api.player2.game/v1/chat/completions" },
         { AIProvider.OpenRouter, "https://openrouter.ai/api/v1/chat/completions" },
         { AIProvider.Claude, "https://api.anthropic.com/v1/chat/completions" },
-        { AIProvider.Moonshot, "https://api.moonshot.ai/v1/chat/completions" }
+        { AIProvider.Moonshot, "https://api.moonshot.ai/v1/chat/completions" },
+        { AIProvider.OpenCodeGo, "https://opencode.ai/inference/go/openai/v1/chat/completions" }
     };
 
     // 个别端点要求的额外请求头（与 RimTalk 本体的 AIProviderRegistry 保持一致）
     private static readonly Dictionary<AIProvider, Dictionary<string, string>> _dictProviderToHeaders = new()
     {
-        { AIProvider.OpenRouter, new Dictionary<string, string>
+        { AIProvider.OpenRouter, new()
         {
             { "HTTP-Referer", "https://github.com/sanguodxj-byte/RimTalk-ExpandMemory" },
             { "X-Title", "RimTalk-ExpandMemory" }
         } },
-        { AIProvider.Claude, new Dictionary<string, string> { { "anthropic-version", "2023-06-01" } } }
+        { AIProvider.Claude, new(){ { "anthropic-version", "2023-06-01" } } },
+        { AIProvider.OpenCodeGo, new(){ { "x-opencode-session", Guid.NewGuid().ToString() } } }
     };
 
     public static string GetEndpointUrl(this AIProvider p)
