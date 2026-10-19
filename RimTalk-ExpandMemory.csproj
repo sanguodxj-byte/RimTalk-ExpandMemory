@@ -91,9 +91,8 @@
 	</ItemGroup>
 
 	<!-- 编译后自动部署 -->
-	<Target Name="DeployToModsFolder" AfterTargets="Build" Condition=" '$(BuildingWithScript)' != 'true' AND '$(RimWorldDir)' != '' ">
+	<Target Name="DeployToModsFolder" AfterTargets="Build" Condition=" '$(AutoDeploy)' == 'true' ">
 		<CallTarget Targets="WinDeploy" Condition=" '$(OS)' == 'Windows_NT' " />
-		<CallTarget Targets="MacDeploy" Condition=" '$(OS)' != 'Windows_NT' " />
 	</Target>
 
 	<!-- Deploy to RimWorld client (Windows) -->
