@@ -159,7 +159,8 @@ namespace RimTalk.Memory.API
             }
             catch (Exception ex)
             {
-                Log.Warning($"[MemoryPatch] Error getting knowledge: {ex.Message}");
+                // ⭐ 记录完整异常信息（含内层栈），便于定位真正出错位置
+                Log.Warning($"[MemoryPatch] Error getting knowledge: {ex}");
                 return "";
             }
         }
@@ -532,26 +533,26 @@ namespace RimTalk.Memory.API
         /// 尝试使用 RimTalk 的 ScribanParser 解析变量
         /// 这允许我们复用 RimTalk 的所有变量解析逻辑，无需手动枚举
         /// ⭐ v5.2: 项目已直接引用 RimTalk 程序集，改为直接调用 ScribanParser.Render，不再走反射
+        /// ⭐ 注意: Render(logErrors: false) 在渲染出错时会抛出异常（RimTalk ScribanParser 内部 `if (!logErrors) throw`），
+        /// 此处统一捕获并记录变量名与完整异常，避免丢失真实出错原因
         /// </summary>
         private static string TryParseScribanVariable(object ctx, string variableName)
         {
             try
             {
                 if (!(ctx is PromptContext promptContext))
-                    {
+                {
                     return null;
-                    }
-                    
+                }
+                
                 // Scriban 使用 {{variableName}} 语法，解析单个变量
                 string template = "{{" + variableName + "}}";
                 string parsed = ScribanParser.Render(template, promptContext, logErrors: false);
-                    
-                    // 如果解析成功且结果不是原模板，返回结果
-                    string parsed = result as string;
-                    if (!string.IsNullOrEmpty(parsed) && parsed != template)
-                    {
-                        return parsed;
-                    }
+                
+                // 如果解析成功且结果不是原模板，返回结果
+                if (!string.IsNullOrEmpty(parsed) && parsed != template)
+                {
+                    return parsed;
                 }
                 
                 return null;
