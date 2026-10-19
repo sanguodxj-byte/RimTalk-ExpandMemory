@@ -6,6 +6,7 @@ using RimTalk.Memory.UI;
 using System;
 using System.Collections.Generic;
 using RimTalk.Memory.AI;
+using RimTalk.Memory.Utils;
 
 namespace RimTalk.MemoryPatch
 {
@@ -620,17 +621,34 @@ namespace RimTalk.MemoryPatch
         /// </summary>
         private async void ValidateAIConfig()
         {
-            AIService.ResetClientPool();
-
-            Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.CautionInput, historical: false);
-
-            if (await AIService.ValidateAIConfigAsync())
+            try
             {
-                Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
-                return;
-            }
+                AIService.ResetClientPool();
 
-            Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
+                Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.CautionInput, historical: false);
+
+                bool success = await AIService.ValidateAIConfigAsync();
+
+                MessageUtil.RunOnMainThread(() =>
+                {
+                    if (success)
+                    {
+                        Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
+                    }
+                    else
+                    {
+                        Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[RimTalk.Memory.AI] ValidateAIConfig exception: {ex}");
+                MessageUtil.RunOnMainThread(() =>
+                {
+                    Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
+                });
+            }
         }
 
         private void DrawMemoryTypesSettings(Listing_Standard listing)

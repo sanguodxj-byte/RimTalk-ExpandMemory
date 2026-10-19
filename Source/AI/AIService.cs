@@ -103,12 +103,19 @@ public class AIService : GameComponent
             }
 
             // 所有校验通过，执行回调函数
-            task.callback?.Invoke(Sanitize(payLoad.Response));
+            string sanitized = Sanitize(payLoad.Response);
+            MessageUtil.RunOnMainThread(() =>
+            {
+                task.callback?.Invoke(sanitized);
+            });
         }
         finally
         {
             // 执行清理函数
-            task.dispose?.Invoke();
+            MessageUtil.RunOnMainThread(() =>
+            {
+                task.dispose?.Invoke();
+            });
         }
     }
 
