@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Verse;
 using RimWorld;
+using RimTalk.Prompt;
 using RimTalk.MemoryPatch;
 using RimTalk.Memory;
 using RimTalk.Memory.UI;
@@ -514,48 +514,20 @@ namespace RimTalk.Memory.API
         /// <summary>
         /// 尝试使用 RimTalk 的 ScribanParser 解析变量
         /// 这允许我们复用 RimTalk 的所有变量解析逻辑，无需手动枚举
-        /// ⭐ v5.0: 优先使用 ScribanParser，兼容旧版 MustacheParser
+        /// ⭐ v5.2: 项目已直接引用 RimTalk 程序集，改为直接调用 ScribanParser.Render，不再走反射
         /// </summary>
         private static string TryParseScribanVariable(object ctx, string variableName)
         {
             try
             {
-                // 查找 RimTalk 程序集
-                var rimTalkAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                    .FirstOrDefault(a => a.GetName().Name == "RimTalk");
-                
-                if (rimTalkAssembly == null) return null;
-                
-                // ⭐ v5.0: 优先使用 ScribanParser
-                var parserType = rimTalkAssembly.GetType("RimTalk.Prompt.ScribanParser")
-                    ?? rimTalkAssembly.GetType("RimTalk.Prompt.MustacheParser");
+                if (!(ctx is PromptContext promptContext))
+                    {
+                    return null;
+                    }
                     
-                if (parserType == null) return null;
-                
-                // 尝试调用 Render/Parse 方法，解析单个变量
-                // Scriban 使用 {{variableName}} 语法
+                // Scriban 使用 {{variableName}} 语法，解析单个变量
                 string template = "{{" + variableName + "}}";
-                
-                // ScribanParser 使用 Render 方法，MustacheParser 使用 Parse 方法
-                var renderMethod = parserType.GetMethod("Render", BindingFlags.Public | BindingFlags.Static)
-                    ?? parserType.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static);
-                
-                if (renderMethod != null)
-                {
-                    // Render(string template, PromptContext context, bool logErrors = true)
-                    // 或 Parse(string template, MustacheContext context)
-                    object[] args;
-                    var parameters = renderMethod.GetParameters();
-                    if (parameters.Length >= 3)
-                    {
-                        args = new object[] { template, ctx, false }; // logErrors = false
-                    }
-                    else
-                    {
-                        args = new object[] { template, ctx };
-                    }
-                    
-                    var result = renderMethod.Invoke(null, args);
+                string parsed = ScribanParser.Render(template, promptContext, logErrors: false);
                     
                     // 如果解析成功且结果不是原模板，返回结果
                     string parsed = result as string;
