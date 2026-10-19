@@ -190,7 +190,7 @@ public static class Player2AuthHelper
 
     private static void ShowMainThreadMessage(string text, MessageTypeDef type, Action action = null)
     {
-        LongEventHandler.ExecuteWhenFinished(() =>
+        MessageUtil.RunOnMainThread(() =>
         {
             action?.Invoke();
             Messages.Message(text, type, historical: false);
