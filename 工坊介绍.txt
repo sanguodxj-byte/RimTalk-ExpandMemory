@@ -26,7 +26,13 @@ RimTalk-Expand Memory 是 RimTalk 的记忆拓展模组，为 AI 提供长期记
 [i]完整功能介绍请参阅 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3608181242]正式版创意工坊页面[/url]。[/i]
 
 
-[h2]🚀 Beta 先行内容（v1.16）[/h2]
+[h2]🚀 Beta 先行内容（v1.16.1）[/h2]
+
+[h3]新增 OpenCodeGo AI Provider[/h3]
+[list]
+[*]新增 OpenCodeGo Provider，接入 OpenCode 推理端点
+[*]请求自动携带会话请求头，配置好 key 即可直接使用
+[/list]
 
 [h3]记忆详情区 UGUI/TMP 重构[/h3]
 右侧"记忆详情"从 IMGUI 迁移到 UGUI 渲染与 TMP 输入框，编辑体验全面升级。
@@ -43,12 +49,20 @@ RimTalk-Expand Memory 是 RimTalk 的记忆拓展模组，为 AI 提供长期记
 [*]旧存档完全兼容，归档记忆的时间区间在读取时自动迁移
 [/list]
 
+[h3]其他改进[/h3]
+[list]
+[*]常识变量的读取改由 RimTalk 解析器直接处理，内部链路更精简
+[*]变量解析报错时日志会指明出错的变量名和完整原因，排查问题更方便
+[/list]
+
 [i]此外，随正式版迭代稳定，本版清理了部分遗留兼容代码，内部结构进一步精简。[/i]
 
 
 [h2]🐛 修复内容[/h2]
 [list]
 [*]修复 UGUI 输入框在特定时序下失效的问题
+[*]修复选中输入框时关闭记忆面板可能报错的问题
+[*]修复常识变量过滤名单不完整导致自匹配的问题
 [*]修复归档篇章起点时间取值有误的问题
 [*]修复时间轴年/象分隔标识有误的问题
 [*]修复无法编辑记忆备注的问题
