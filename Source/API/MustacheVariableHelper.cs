@@ -119,6 +119,13 @@ namespace RimTalk.Memory.API
         {
             if (string.IsNullOrEmpty(propertyName)) return false;
             
+            // 兼容 relations / social 别名
+            if (propertyName.Equals("relations", StringComparison.OrdinalIgnoreCase) ||
+                propertyName.Equals("social", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
             if (_cachedPawnProperties == null)
             {
                 _cachedPawnProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -193,12 +200,9 @@ namespace RimTalk.Memory.API
                 
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                if (Prefs.DevMode)
-                {
-                    Log.Warning($"[MemoryPatch] TryGetPawnPropertyValue failed: {ex.Message}");
-                }
+                // 属性解析失败属正常回退，静默返回 false，避免在 DevMode 下随 Tick 弹黄字
                 return false;
             }
         }
