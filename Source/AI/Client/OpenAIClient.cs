@@ -36,17 +36,36 @@ public class OpenAIClient : IAIClient
 
     public OpenAIClient(ApiConfig config)
     {
-        // 如果 URL 不合法，则会向外层抛出异常
-        // 正常管线中会提前校验，一般不会出现这种情况
-        _url = new Uri(config.URL, UriKind.Absolute);
-
-        // 如果只指定了基础 URL，则补充默认路径 /v1/chat/completions
-        if (_url.AbsolutePath == "/")
-            _url = new Uri(_url, DefaultPath);
+        // 格式化并验证端点 URL，兼容根路径与 /v1 自动补全
+        _url = FormatEndpointUrl(config.URL);
 
         _apiKey = config.ApiKey;
         _model = config.CustomModelName;
         _extraHeaders = config.Provider.GetExtraHeaders();
+    }
+
+    private static Uri FormatEndpointUrl(string rawUrl)
+    {
+        if (string.IsNullOrWhiteSpace(rawUrl))
+            throw new ArgumentException("URL cannot be empty", nameof(rawUrl));
+
+        string trimmed = rawUrl.Trim().TrimEnd('/');
+        var uri = new Uri(trimmed, UriKind.Absolute);
+
+        // 如果只指定了域名根路径（如 http://localhost:8000 或 https://api.openai.com/），补充 /v1/chat/completions
+        if (uri.AbsolutePath == "/" || string.IsNullOrEmpty(uri.AbsolutePath.Trim('/')))
+        {
+            return new Uri(trimmed + DefaultPath);
+        }
+
+        // 如果以 /v1 结尾（如 http://localhost:8000/v1 或 https://api.openai.com/v1），补充 /chat/completions
+        string absolutePath = uri.AbsolutePath.TrimEnd('/');
+        if (absolutePath.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
+        {
+            return new Uri(trimmed + "/chat/completions");
+        }
+
+        return uri;
     }
 
 

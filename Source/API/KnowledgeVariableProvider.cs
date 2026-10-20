@@ -493,19 +493,36 @@ namespace RimTalk.Memory.API
         /// </summary>
         private static string GetDirectContextProperty(object ctx, string variableName)
         {
+            if (ctx == null || string.IsNullOrEmpty(variableName)) return null;
+
             // 映射常用变量名到 PromptContext 属性
-            switch (variableName)
+            switch (variableName.ToLowerInvariant())
             {
                 case "dialogue.prompt":
+                case "dialogue_prompt":
+                case "dialogueprompt":
                 case "prompt":
                     return GetPropertyValue<string>(ctx, "DialoguePrompt");
                 case "dialogue.type":
+                case "dialogue_type":
+                case "dialoguetype":
                     return GetPropertyValue<string>(ctx, "DialogueType");
                 case "dialogue.status":
+                case "dialogue_status":
+                case "dialoguestatus":
                     return GetPropertyValue<string>(ctx, "DialogueStatus");
+                case "dialogue":
+                    return GetPropertyValue<string>(ctx, "DialoguePrompt") ?? GetPropertyValue<string>(ctx, "DialogueType");
                 case "pawn.context":
+                case "pawn_context":
                 case "context":
                     return GetPropertyValue<string>(ctx, "PawnContext");
+                case "topic":
+                case "conversationtopic":
+                case "conversation_topic":
+                    return GetPropertyValue<string>(ctx, "ConversationTopic");
+                case "intent":
+                    return GetPropertyValue<string>(ctx, "Intent");
                 default:
                     return null;
             }
@@ -567,12 +584,9 @@ namespace RimTalk.Memory.API
                 
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                if (Prefs.DevMode)
-                {
-                    Log.Warning($"[MemoryPatch] TryParseScribanVariable failed: {ex.Message}");
-                }
+                // 探测解析失败属正常回退行为，静默返回 null，避免在 DevMode 下随 Tick 弹黄字
                 return null;
             }
         }
