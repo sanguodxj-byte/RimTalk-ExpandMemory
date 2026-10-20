@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 因项目存在频繁变基，SHA 仅供参考。
 
+## [1.16.1] - 2026-10-19
+
+### Added
+- 新增 AI Provider `OpenCodeGo`：接入 OpenCode 推理端点，请求时自动携带 `x-opencode-session` 额外请求头。 (`2d54129`)
+
+### Changed
+- 常识变量读取由反射调用 RimTalk 程序集改为直接调用 `ScribanParser.Render`。 (`72f1970`)
+- Scriban 变量解析失败日志增强：记录出错的变量名与完整异常信息（含内层异常栈）。 (`d036ea7`)
+- 构建部署改为需手动指定才会执行自动部署。 (`814c23a`)
+
+### Fixed
+- 常识过滤名单补全 `knowledge_` 前缀变量（如 `knowledge_grouped`），修复知识匹配来源自匹配导致无限递归的问题。 (`77b0792`)
+- 修复选中 TMP 输入框时关闭记忆主面板，导致访问已销毁 Unity 对象的空引用异常。 (`7688840`)
+
 ## [1.16.0] - 2026-10-17
 
 ### Added
@@ -261,6 +275,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
+[1.16.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.16.0...v1.16.1
 [1.16.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.15.1...v1.16.0
 [1.15.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.14.1...v1.15.0
