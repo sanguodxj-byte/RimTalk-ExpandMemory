@@ -1,130 +1,453 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-    <!-- RimTalk Memory Patch - Русский перевод -->
-    
-    <!-- Filter Buttons -->
-    <RimTalk_Filter_All>Все</RimTalk_Filter_All>
-    <RimTalk_Filter_Conversation>Разговоры</RimTalk_Filter_Conversation>
-    <RimTalk_Filter_Interaction>Взаимодействия</RimTalk_Filter_Interaction>
-    <RimTalk_Filter_Action>Действия</RimTalk_Filter_Action>
-    <RimTalk_Filter_Observation>Наблюдения</RimTalk_Filter_Observation>
-    <RimTalk_Filter_Event>События</RimTalk_Filter_Event>
-    <RimTalk_Filter_Emotion>Эмоции</RimTalk_Filter_Emotion>
-    <RimTalk_Filter_Relationship>Отношения</RimTalk_Filter_Relationship>
-    
-    <!-- Memory Stats -->
-    <RimTalk_MemoryStats>Кратковременная: {0}/{1} | Долговременная: {2}/{3}</RimTalk_MemoryStats>
-    <RimTalk_MemoryTitle>Воспоминания {0}</RimTalk_MemoryTitle>
-    
-    <!-- Four Layer Memory Stats -->
-    <RimTalk_FourLayerMemoryStats>ABM: {0}/{1} | SCM: {2}/{3} | ELS: {4}/{5} | CLPA: {6}</RimTalk_FourLayerMemoryStats>
-    <RimTalk_ActiveBufferMemory>Активная буферная память</RimTalk_ActiveBufferMemory>
-    <RimTalk_SituationalMemory>Ситуативная контекстная память</RimTalk_SituationalMemory>
-    <RimTalk_EventLogSummary>Сводка журнала событий</RimTalk_EventLogSummary>
-    <RimTalk_ArchiveMemory>Архив долговременной личности</RimTalk_ArchiveMemory>
-    
-    <!-- Colonist Selection -->
-    <RimTalk_SelectColonist>Выбрать колониста</RimTalk_SelectColonist>
-    <RimTalk_ChooseColonist>Выбрать...</RimTalk_ChooseColonist>
-    <RimTalk_NoColonists>Нет колонистов</RimTalk_NoColonists>
-    <RimTalk_NoMemoryComponent>У этого колониста нет компонента памяти</RimTalk_NoMemoryComponent>
-    
-    <!-- Time Display -->
-    <RimTalk_JustNow>Только что</RimTalk_JustNow>
-    <RimTalk_MinutesAgo>{0} минут назад</RimTalk_MinutesAgo>
-    <RimTalk_HoursAgo>{0} часов назад</RimTalk_HoursAgo>
-    <RimTalk_DaysAgo>{0} дней назад</RimTalk_DaysAgo>
-    
-    <!-- Memory Types -->
-    <RimTalk_MemoryType_Conversation>Разговор</RimTalk_MemoryType_Conversation>
-    <RimTalk_MemoryType_Interaction>Взаимодействие</RimTalk_MemoryType_Interaction>
-    <RimTalk_MemoryType_Action>Действие</RimTalk_MemoryType_Action>
-    <RimTalk_MemoryType_Observation>Наблюдение</RimTalk_MemoryType_Observation>
-    <RimTalk_MemoryType_Event>Событие</RimTalk_MemoryType_Event>
-    <RimTalk_MemoryType_Emotion>Эмоция</RimTalk_MemoryType_Emotion>
-    <RimTalk_MemoryType_Relationship>Отношение</RimTalk_MemoryType_Relationship>
-    
-    <!-- Memory Tab -->
-    <RimTalk_TabMemory>Память</RimTalk_TabMemory>
-    <RimTalk_TabMemoryDesc>Просмотр воспоминаний этого колониста</RimTalk_TabMemoryDesc>
-    
-    <!-- Settings -->
-    <RimTalk_MemoryPatchSettings>Настройки системы памяти</RimTalk_MemoryPatchSettings>
-    <RimTalk_MemoryPatchDescription>Обеспечивает поддержку системы памяти для RimTalk</RimTalk_MemoryPatchDescription>
-    <RimTalk_OriginalRimTalkSettings>Настройки функции диалогов в оригинальных настройках RimTalk</RimTalk_OriginalRimTalkSettings>
-    
-    <!-- Memory Settings -->
-    <RimTalk_MaxShortTermMemories>Лимит кратковременной памяти</RimTalk_MaxShortTermMemories>
-    <RimTalk_MaxLongTermMemories>Лимит долговременной памяти</RimTalk_MaxLongTermMemories>
-    <RimTalk_MemoryDecayRate>Скорость затухания памяти</RimTalk_MemoryDecayRate>
-    <RimTalk_EnableMemoryUI>Включить интерфейс памяти</RimTalk_EnableMemoryUI>
-    
-    <!-- Four Layer Memory Settings -->
-    <RimTalk_MaxActiveMemories>Лимит активной буферной памяти</RimTalk_MaxActiveMemories>
-    <RimTalk_MaxSituationalMemories>Лимит ситуативной памяти</RimTalk_MaxSituationalMemories>
-    <RimTalk_MaxEventLogMemories>Лимит памяти журнала событий</RimTalk_MaxEventLogMemories>
-    <RimTalk_EnableDailySummarization>Включить ежедневную сводку</RimTalk_EnableDailySummarization>
-    <RimTalk_SummarizationHour>Час создания сводки (игровое время)</RimTalk_SummarizationHour>
-    
-    <!-- Memory Type Toggles -->
-    <RimTalk_MemoryTypeToggles>Настройки типов памяти</RimTalk_MemoryTypeToggles>
-    <RimTalk_EnableInteractionMemory>Включить память взаимодействий</RimTalk_EnableInteractionMemory>
-    <RimTalk_EnableInteractionMemoryDesc>Записывать социальные взаимодействия между колонистами</RimTalk_EnableInteractionMemoryDesc>
-    <RimTalk_EnableActionMemory>Включить память действий</RimTalk_EnableActionMemory>
-    <RimTalk_EnableActionMemoryDesc>Записывать работы, сражения и другие действия</RimTalk_EnableActionMemoryDesc>
-    <RimTalk_Settings_CombatMemory>Память о сражениях</RimTalk_Settings_CombatMemory>
-    <RimTalk_EnableConversationMemory>Включить память разговоров</RimTalk_EnableConversationMemory>
-    <RimTalk_EnableConversationMemoryDesc>Записывать диалоги, созданные RimTalk (требуется интеграция с RimTalk)</RimTalk_EnableConversationMemoryDesc>
-    <RimTalk_EnableObservationMemory>Включить память наблюдений</RimTalk_EnableObservationMemory>
-    <RimTalk_EnableObservationMemoryDesc>Записывать наблюдаемые события</RimTalk_EnableObservationMemoryDesc>
-    <RimTalk_EnableEventMemory>Включить память событий</RimTalk_EnableEventMemory>
-    <RimTalk_EnableEventMemoryDesc>Записывать важные события (рейды, смерти и т.д.)</RimTalk_EnableEventMemoryDesc>
-    <RimTalk_EnableEmotionMemory>Включить память эмоций</RimTalk_EnableEmotionMemory>
-    <RimTalk_EnableEmotionMemoryDesc>Записывать эмоциональные изменения</RimTalk_EnableEmotionMemoryDesc>
-    <RimTalk_EnableRelationshipMemory>Включить память отношений</RimTalk_EnableRelationshipMemory>
-    <RimTalk_EnableRelationshipMemoryDesc>Записывать изменения в отношениях (романтика, конфликты и т.д.)</RimTalk_EnableRelationshipMemoryDesc>
-    
-    <!-- Memory Edit Dialog -->
-    <RimTalk_EditMemory>Редактировать воспоминание</RimTalk_EditMemory>
-    <RimTalk_DeleteMemory>Удалить воспоминание</RimTalk_DeleteMemory>
-    <RimTalk_PinMemory>Закрепить воспоминание</RimTalk_PinMemory>
-    <RimTalk_UnpinMemory>Открепить воспоминание</RimTalk_UnpinMemory>
-    <RimTalk_MemoryContent>Содержание</RimTalk_MemoryContent>
-    <RimTalk_MemoryNotes>Заметки</RimTalk_MemoryNotes>
-    <RimTalk_MemoryTags>Теги</RimTalk_MemoryTags>
-    <RimTalk_AddTag>Добавить тег</RimTalk_AddTag>
-    <RimTalk_RemoveTag>Удалить тег</RimTalk_RemoveTag>
-    <RimTalk_CustomTag>Пользовательский тег</RimTalk_CustomTag>
-    <RimTalk_Save>Сохранить</RimTalk_Save>
-    <RimTalk_Cancel>Отмена</RimTalk_Cancel>
-    <RimTalk_ConfirmDelete>Подтвердить удаление этого воспоминания?</RimTalk_ConfirmDelete>
-    <RimTalk_MemoryUpdated>Воспоминание обновлено</RimTalk_MemoryUpdated>
-    <RimTalk_MemoryDeleted>Воспоминание удалено</RimTalk_MemoryDeleted>
-    
-    <!-- Memory Actions -->
-    <RimTalk_ClearAll>Очистить все</RimTalk_ClearAll>
-    <RimTalk_ClearShortTerm>Очистить кратковременную</RimTalk_ClearShortTerm>
-    <RimTalk_ClearLongTerm>Очистить долговременную</RimTalk_ClearLongTerm>
-    <RimTalk_ConfirmClearAll>Подтвердить очистку всех воспоминаний?</RimTalk_ConfirmClearAll>
-    <RimTalk_ConfirmClearShortTerm>Подтвердить очистку кратковременной памяти?</RimTalk_ConfirmClearShortTerm>
-    <RimTalk_ConfirmClearLongTerm>Подтвердить очистку долговременной памяти?</RimTalk_ConfirmClearLongTerm>
-    
-    <!-- UI Buttons -->
-    <RimTalk_UI_Preview>Предпросмотр</RimTalk_UI_Preview>
-    <RimTalk_UI_Knowledge>Знания</RimTalk_UI_Knowledge>
-    <RimTalk_UI_ImmediateSummarize>Немедленная сводка (SCM → ELS)</RimTalk_UI_ImmediateSummarize>
-    <RimTalk_UI_ImmediateSummarizeNoMemory>Нет SCM для сводки</RimTalk_UI_ImmediateSummarizeNoMemory>
-    <RimTalk_UI_MemorySummarized>Память {0} обобщена</RimTalk_UI_MemorySummarized>
-    <RimTalk_UI_SummarizeAll>Обобщить всех (Очередь)</RimTalk_UI_SummarizeAll>
-    <RimTalk_UI_MemoriesSummarizedCount>Поставлено в очередь {0} колонистов для обобщения памяти</RimTalk_UI_MemoriesSummarizedCount>
-    <RimTalk_UI_NoColonistsNeedSummarize>Нет колонистов, требующих обобщения</RimTalk_UI_NoColonistsNeedSummarize>
-    <RimTalk_UI_ImmediateArchive>Немедленный архив (ELS → CLPA)</RimTalk_UI_ImmediateArchive>
-    <RimTalk_UI_ImmediateArchiveNoMemory>Нет ELS для архивации</RimTalk_UI_ImmediateArchiveNoMemory>
-    <RimTalk_UI_MemoryArchived>Память {0} архивирована</RimTalk_UI_MemoryArchived>
-    <RimTalk_UI_ArchiveAll>Архивировать всех</RimTalk_UI_ArchiveAll>
-    <RimTalk_UI_MemoriesArchivedCount>Архивирована память {0} колонистов</RimTalk_UI_MemoriesArchivedCount>
-    
-    <!-- Other -->
-    <RimTalk_With>с</RimTalk_With>
-    <RimTalk_ObservationPlaceholder>(Заполнитель памяти наблюдения - еще не реализовано)</RimTalk_ObservationPlaceholder>
+  <RimTalk.Memory.ExportSuccessTo>Воспоминания экспортированы в: </RimTalk.Memory.ExportSuccessTo>
+  <RimTalk.Memory.ImportSuccessFrom>Воспоминания импортированы из: </RimTalk.Memory.ImportSuccessFrom>
+  <RimTalk.Memory.UI.TabWindow.Activity>Активность: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
+  <RimTalk.Memory.UI.TabWindow.Archive>Архивировать</RimTalk.Memory.UI.TabWindow.Archive>
+  <RimTalk.Memory.UI.TabWindow.ArchiveAll>Архивировать всех колонистов</RimTalk.Memory.UI.TabWindow.ArchiveAll>
+  <RimTalk.Memory.UI.TabWindow.Cancel>Отмена</RimTalk.Memory.UI.TabWindow.Cancel>
+  <RimTalk.Memory.UI.TabWindow.CancelEdit>Отмена</RimTalk.Memory.UI.TabWindow.CancelEdit>
+  <RimTalk.Memory.UI.TabWindow.ChronicleTitle>Хроника жизни ({COUNT} глав CLPA)</RimTalk.Memory.UI.TabWindow.ChronicleTitle>
+  <RimTalk.Memory.UI.TabWindow.ClearSelection>Снять выделение</RimTalk.Memory.UI.TabWindow.ClearSelection>
+  <RimTalk.Memory.UI.TabWindow.ConfirmArchive>Архивировать выбранные воспоминания?</RimTalk.Memory.UI.TabWindow.ConfirmArchive>
+  <RimTalk.Memory.UI.TabWindow.ConfirmDelete>Удалить выбранные воспоминания ({COUNT})?</RimTalk.Memory.UI.TabWindow.ConfirmDelete>
+  <RimTalk.Memory.UI.TabWindow.ConfirmImport>Подтвердить импорт?</RimTalk.Memory.UI.TabWindow.ConfirmImport>
+  <RimTalk.Memory.UI.TabWindow.ContentLabel>Содержание</RimTalk.Memory.UI.TabWindow.ContentLabel>
+  <RimTalk.Memory.UI.TabWindow.CreateMemory>Новое воспоминание</RimTalk.Memory.UI.TabWindow.CreateMemory>
+  <RimTalk.Memory.UI.TabWindow.CreateTitle>Новое воспоминание для {NAME}</RimTalk.Memory.UI.TabWindow.CreateTitle>
+  <RimTalk.Memory.UI.TabWindow.Created>Воспоминание создано</RimTalk.Memory.UI.TabWindow.Created>
+  <RimTalk.Memory.UI.TabWindow.CurrentImportance>Текущая важность: </RimTalk.Memory.UI.TabWindow.CurrentImportance>
+  <RimTalk.Memory.UI.TabWindow.Delete>Удалить</RimTalk.Memory.UI.TabWindow.Delete>
+  <RimTalk.Memory.UI.TabWindow.Details>Детали воспоминания</RimTalk.Memory.UI.TabWindow.Details>
+  <RimTalk.Memory.UI.TabWindow.Edit>Изменить</RimTalk.Memory.UI.TabWindow.Edit>
+  <RimTalk.Memory.UI.TabWindow.Export>Экспорт</RimTalk.Memory.UI.TabWindow.Export>
+  <RimTalk.Memory.UI.TabWindow.Guide>=== Руководство по архиву воспоминаний ===
+
+[Расположение]
+- Сверху: выбор пешки, фильтры и меню инструментов
+- Слева сверху: навигация по хронике жизни (CLPA)
+- Слева снизу: вертикальная шкала времени (ABM/SCM/ELS)
+- Справа: детали и редактирование воспоминания
+
+[Управление]
+- Нажмите на карточку для фокуса; Ctrl для множественного выбора; перетаскивание по пустому месту для выделения рамкой
+- Колесо мыши прокручивает шкалу времени, панорамирует хронику и масштабирует ось хроники
+- Перетаскивание курсора хроники перемещает шкалу времени
+- Перетащите разделитель, чтобы изменить ширину шкалы времени и панели деталей</RimTalk.Memory.UI.TabWindow.Guide>
+  <RimTalk.Memory.UI.TabWindow.Import>Импорт</RimTalk.Memory.UI.TabWindow.Import>
+  <RimTalk.Memory.UI.TabWindow.Importance>Важность: {IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
+  <RimTalk.Memory.UI.TabWindow.Knowledge>Знания</RimTalk.Memory.UI.TabWindow.Knowledge>
+  <RimTalk.Memory.UI.TabWindow.LayerFilter>Фильтр по слою</RimTalk.Memory.UI.TabWindow.LayerFilter>
+  <RimTalk.Memory.UI.TabWindow.Need_SelectPawn>Выбрать пешку</RimTalk.Memory.UI.TabWindow.Need_SelectPawn>
+  <RimTalk.Memory.UI.TabWindow.NoFaction>Без фракции</RimTalk.Memory.UI.TabWindow.NoFaction>
+  <RimTalk.Memory.UI.TabWindow.NotPinned>Не закреплено</RimTalk.Memory.UI.TabWindow.NotPinned>
+  <RimTalk.Memory.UI.TabWindow.NotSummarized>Не суммировано</RimTalk.Memory.UI.TabWindow.NotSummarized>
+  <RimTalk.Memory.UI.TabWindow.Notes>Заметки: </RimTalk.Memory.UI.TabWindow.Notes>
+  <RimTalk.Memory.UI.TabWindow.NotesLabel>Заметки</RimTalk.Memory.UI.TabWindow.NotesLabel>
+  <RimTalk.Memory.UI.TabWindow.OpenImportFolder>Открыть папку импорта</RimTalk.Memory.UI.TabWindow.OpenImportFolder>
+  <RimTalk.Memory.UI.TabWindow.OperationGuide>Руководство</RimTalk.Memory.UI.TabWindow.OperationGuide>
+  <RimTalk.Memory.UI.TabWindow.Pin>Закрепить</RimTalk.Memory.UI.TabWindow.Pin>
+  <RimTalk.Memory.UI.TabWindow.PinLabel>Закрепить это воспоминание</RimTalk.Memory.UI.TabWindow.PinLabel>
+  <RimTalk.Memory.UI.TabWindow.Pinned>Закреплено</RimTalk.Memory.UI.TabWindow.Pinned>
+  <RimTalk.Memory.UI.TabWindow.Preview>Предпросмотр внедрения</RimTalk.Memory.UI.TabWindow.Preview>
+  <RimTalk.Memory.UI.TabWindow.Save>Сохранить</RimTalk.Memory.UI.TabWindow.Save>
+  <RimTalk.Memory.UI.TabWindow.SaveEdit>Сохранить</RimTalk.Memory.UI.TabWindow.SaveEdit>
+  <RimTalk.Memory.UI.TabWindow.Selected>Выбрано воспоминаний: {0}</RimTalk.Memory.UI.TabWindow.Selected>
+  <RimTalk.Memory.UI.TabWindow.Summarize>Суммировать</RimTalk.Memory.UI.TabWindow.Summarize>
+  <RimTalk.Memory.UI.TabWindow.SummarizeAll>Суммировать все</RimTalk.Memory.UI.TabWindow.SummarizeAll>
+  <RimTalk.Memory.UI.TabWindow.Summarized>Суммировано</RimTalk.Memory.UI.TabWindow.Summarized>
+  <RimTalk.Memory.UI.TabWindow.Summarizing>Суммирование</RimTalk.Memory.UI.TabWindow.Summarizing>
+  <RimTalk.Memory.UI.TabWindow.SummaryPrompt>Редактор промптов</RimTalk.Memory.UI.TabWindow.SummaryPrompt>
+  <RimTalk.Memory.UI.TabWindow.Tags>Теги: </RimTalk.Memory.UI.TabWindow.Tags>
+  <RimTalk.Memory.UI.TabWindow.TagsLabel>Теги (через запятую)</RimTalk.Memory.UI.TabWindow.TagsLabel>
+  <RimTalk.Memory.UI.TabWindow.Tools>Инструменты</RimTalk.Memory.UI.TabWindow.Tools>
+  <RimTalk.Memory.UI.TabWindow.TypeFilter>Фильтр по типу</RimTalk.Memory.UI.TabWindow.TypeFilter>
+  <RimTalk.Memory.UI.TabWindow.Unpin>Открепить</RimTalk.Memory.UI.TabWindow.Unpin>
+  <RimTalk.Memory.Utils.Layer_Active>Активные (ABM)</RimTalk.Memory.Utils.Layer_Active>
+  <RimTalk.Memory.Utils.Layer_Archive>Архив (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
+  <RimTalk.Memory.Utils.Layer_Default>Неизвестный слой</RimTalk.Memory.Utils.Layer_Default>
+  <RimTalk.Memory.Utils.Layer_EventLog>Журнал событий (ELS)</RimTalk.Memory.Utils.Layer_EventLog>
+  <RimTalk.Memory.Utils.Layer_Situational>Ситуативные (SCM)</RimTalk.Memory.Utils.Layer_Situational>
+  <RimTalk.Memory.Utils.Layers>Все слои</RimTalk.Memory.Utils.Layers>
+  <RimTalk.Memory.Utils.Types>Все типы</RimTalk.Memory.Utils.Types>
+  <RimTalk_Archive_ConfirmSummarize>Суммировать выбранные воспоминания?</RimTalk_Archive_ConfirmSummarize>
+  <RimTalk_Archive_Memory>Воспоминание</RimTalk_Archive_Memory>
+  <RimTalk_Archive_TypeEmotion>Эмоция</RimTalk_Archive_TypeEmotion>
+  <RimTalk_Archive_TypeEvent>Событие</RimTalk_Archive_TypeEvent>
+  <RimTalk_Archive_TypeRelationship>Отношение</RimTalk_Archive_TypeRelationship>
+  <RimTalk_Archive_TypeSummary>Сводка</RimTalk_Archive_TypeSummary>
+  <RimTalk_CanBeExtracted>Можно извлечь: </RimTalk_CanBeExtracted>
+  <RimTalk_CanBeExtractedDisabled>Извлечение отключено (нажмите для включения)</RimTalk_CanBeExtractedDisabled>
+  <RimTalk_CanBeExtractedEnabled>Извлечение включено (нажмите для отключения)</RimTalk_CanBeExtractedEnabled>
+  <RimTalk_CanBeMatched>Можно сопоставить: </RimTalk_CanBeMatched>
+  <RimTalk_CanBeMatchedDisabled>Сопоставление отключено (нажмите для включения)</RimTalk_CanBeMatchedDisabled>
+  <RimTalk_CanBeMatchedEnabled>Сопоставление включено (нажмите для отключения)</RimTalk_CanBeMatchedEnabled>
+  <RimTalk_Cancel>Отмена</RimTalk_Cancel>
+  <RimTalk_Close>Закрыть</RimTalk_Close>
+  <RimTalk_DisableAllExtract>Отключить все извлечения</RimTalk_DisableAllExtract>
+  <RimTalk_DisableAllMatch>Отключить все сопоставления</RimTalk_DisableAllMatch>
+  <RimTalk_EnableAllExtract>Включить все извлечения</RimTalk_EnableAllExtract>
+  <RimTalk_EnableAllMatch>Включить все сопоставления</RimTalk_EnableAllMatch>
+  <RimTalk_ExtendedProperties>Расширенные свойства</RimTalk_ExtendedProperties>
+  <RimTalk_Filter_Action>Действия</RimTalk_Filter_Action>
+  <RimTalk_Filter_All>Все</RimTalk_Filter_All>
+  <RimTalk_Filter_Conversation>Разговоры</RimTalk_Filter_Conversation>
+  <RimTalk_Filter_Emotion>Эмоции</RimTalk_Filter_Emotion>
+  <RimTalk_Filter_Event>События</RimTalk_Filter_Event>
+  <RimTalk_Filter_Interaction>Взаимодействия</RimTalk_Filter_Interaction>
+  <RimTalk_Filter_Internal>Внутренние</RimTalk_Filter_Internal>
+  <RimTalk_Filter_Relationship>Отношения</RimTalk_Filter_Relationship>
+  <RimTalk_Filter_Summarization>Суммирование</RimTalk_Filter_Summarization>
+  <RimTalk_Knowledge_AllCleared>Библиотека знаний очищена</RimTalk_Knowledge_AllCleared>
+  <RimTalk_Knowledge_AutoGenerate>Автогенерация знаний</RimTalk_Knowledge_AutoGenerate>
+  <RimTalk_Knowledge_AvgImportance>Средняя важность: {0}</RimTalk_Knowledge_AvgImportance>
+  <RimTalk_Knowledge_Cancel>Отмена</RimTalk_Knowledge_Cancel>
+  <RimTalk_Knowledge_Categories>Категории</RimTalk_Knowledge_Categories>
+  <RimTalk_Knowledge_CategoryAll>Все</RimTalk_Knowledge_CategoryAll>
+  <RimTalk_Knowledge_CategoryHistory>История</RimTalk_Knowledge_CategoryHistory>
+  <RimTalk_Knowledge_CategoryInstructions>Правила</RimTalk_Knowledge_CategoryInstructions>
+  <RimTalk_Knowledge_CategoryLore>Лор</RimTalk_Knowledge_CategoryLore>
+  <RimTalk_Knowledge_CategoryOther>Другое</RimTalk_Knowledge_CategoryOther>
+  <RimTalk_Knowledge_CategoryPawnStatus>Состояние персонажа</RimTalk_Knowledge_CategoryPawnStatus>
+  <RimTalk_Knowledge_CategoryUnknown>Неизвестно</RimTalk_Knowledge_CategoryUnknown>
+  <RimTalk_Knowledge_ClearAll>Очистить всё</RimTalk_Knowledge_ClearAll>
+  <RimTalk_Knowledge_ClearConfirm>Очистить все знания? Это действие нельзя отменить!</RimTalk_Knowledge_ClearConfirm>
+  <RimTalk_Knowledge_Content>Содержание:</RimTalk_Knowledge_Content>
+  <RimTalk_Knowledge_Delete>Удалить</RimTalk_Knowledge_Delete>
+  <RimTalk_Knowledge_DeleteConfirm>Удалить {0} записей знаний?</RimTalk_Knowledge_DeleteConfirm>
+  <RimTalk_Knowledge_DeleteCount>Удалить ({0})</RimTalk_Knowledge_DeleteCount>
+  <RimTalk_Knowledge_DeleteItems>Удалить выбранные ({0})</RimTalk_Knowledge_DeleteItems>
+  <RimTalk_Knowledge_Deleted>Удалено {0} записей</RimTalk_Knowledge_Deleted>
+  <RimTalk_Knowledge_Details>Детали</RimTalk_Knowledge_Details>
+  <RimTalk_Knowledge_DisableAll>Отключить все</RimTalk_Knowledge_DisableAll>
+  <RimTalk_Knowledge_DisabledCount>Отключено: {0}</RimTalk_Knowledge_DisabledCount>
+  <RimTalk_Knowledge_Edit>Редактировать</RimTalk_Knowledge_Edit>
+  <RimTalk_Knowledge_EditEntry>Изменить запись</RimTalk_Knowledge_EditEntry>
+  <RimTalk_Knowledge_EnableAll>Включить все</RimTalk_Knowledge_EnableAll>
+  <RimTalk_Knowledge_Enabled>Включено: {0}</RimTalk_Knowledge_Enabled>
+  <RimTalk_Knowledge_EnabledCount>Включено: {0}</RimTalk_Knowledge_EnabledCount>
+  <RimTalk_Knowledge_EntrySaved>Знания сохранены</RimTalk_Knowledge_EntrySaved>
+  <RimTalk_Knowledge_EventRecord>Знания о записях событий</RimTalk_Knowledge_EventRecord>
+  <RimTalk_Knowledge_EventScanTriggered>Сканирование событий запущено</RimTalk_Knowledge_EventScanTriggered>
+  <RimTalk_Knowledge_ExclusiveTo>Только для {0}</RimTalk_Knowledge_ExclusiveTo>
+  <RimTalk_Knowledge_ExportAll>Экспортировать все</RimTalk_Knowledge_ExportAll>
+  <RimTalk_Knowledge_ExportCount>Экспорт ({0})</RimTalk_Knowledge_ExportCount>
+  <RimTalk_Knowledge_ExportItems>Экспортировать выбранные ({0})</RimTalk_Knowledge_ExportItems>
+  <RimTalk_Knowledge_ExportedToClipboard>Экспортировано записей знаний в буфер обмена: {0}</RimTalk_Knowledge_ExportedToClipboard>
+  <RimTalk_Knowledge_GenerateNow>Сгенерировать сейчас (вручную)</RimTalk_Knowledge_GenerateNow>
+  <RimTalk_Knowledge_GeneratedPawnStatus>Создано записей знаний о состоянии пешек: {0}</RimTalk_Knowledge_GeneratedPawnStatus>
+  <RimTalk_Knowledge_GenerationFailed>Ошибка генерации: {0}</RimTalk_Knowledge_GenerationFailed>
+  <RimTalk_Knowledge_Global>Общие</RimTalk_Knowledge_Global>
+  <RimTalk_Knowledge_GlobalAll>Общие (все пешки)</RimTalk_Knowledge_GlobalAll>
+  <RimTalk_Knowledge_Help>Помощь</RimTalk_Knowledge_Help>
+  <RimTalk_Knowledge_HelpContent>【Логика поиска знаний】
+Библиотека знаний автоматически внедряет релевантные знания во время диалогов ИИ.
+
+1. Сопоставление тегов: извлекает теги из контекста разговора и сопоставляет их с тегами знаний
+   • Режим Any: совпадение при наличии любого тега
+   • Режим All: совпадение только при наличии всех тегов
+   • Используется сопоставление подстрок (без учёта регистра)
+
+2. Сопоставление по векторному сходству (требуется векторный сервис):
+   • Использует алгоритмы семантического сходства для поиска наиболее релевантных знаний
+   • Может находить семантически связанный контент даже без точного совпадения тегов
+
+3. Ранжирование по важности:
+   • Совпавшие знания сортируются по важности (0.0-1.0) по убыванию
+   • Внедряются только N наиболее важных записей (настраивается в параметрах)
+
+【Как писать эффективные знания】
+
+• Используйте теги через запятую (рекомендуется)
+  • Хорошо: [Lore,Ringworld] или [Rules,Dialog]
+  • Хорошо: [CharacterBackground,John] или [Event,Active,Raid]
+  • Почему: запятые — стандартный разделитель, понятный и единообразный
+
+• Теги должны быть понятными, но не слишком короткими
+  • Хорошо: [Lore,PlanetSetting] (3+ символа)
+  • Плохо: [War] или [AI] (1-2 символа, склонны к ложным совпадениям)
+  • Почему: короткие теги совпадают со слишком многими нерелевантными контекстами
+
+• Используйте составные теги для точности
+  • Хорошо: [Lore,Ringworld,Technology] или [CharacterBackground,John,Past]
+  • Плохо: [John] (может срабатывать в несвязанных разговорах)
+
+• Теги должны срабатывать от разговоров
+  • Проблема: тег [Rules,CombatSystem] не сработает в разговорах о «стрельбе» и «ближнем бое»
+  • Решение: используйте [Combat,Shooting,Melee,Dodge], чтобы добавить триггерные теги
+  • Или: [Rules,Combat,Shooting] сохраняет категоризацию и добавляет триггеры
+
+• Не используйте названия навыков как одиночные теги
+  • Проблема: [Shooting] срабатывает во ВСЕХ разговорах пешек с навыком стрельбы (10+)
+  • Причина: текст сопоставления включает названия высокоуровневых навыков пешки
+  • Плохо: [Shooting], [Melee], [Construction] (частые ложные совпадения)
+  • Хорошо: [Rules,ShootingCombat,Aim], [Tips,Melee,Brawl] (требуется явное упоминание)
+
+• Делайте контент конкретным и практичным
+  • Хорошо: Эта планета — кольцевой мир с гравитацией 0.8 от земной
+  • Плохо: Эта планета особенная
+
+• Устанавливайте подходящую важность
+  • Ключевые настройки/правила: 0.8-1.0
+  • Общий фон: 0.5-0.7
+  • Мелкие детали: 0.3-0.5
+
+• Разумно используйте расширенные свойства
+  • Можно сопоставить: включите для участия в поиске по тегам/векторам
+  • Можно извлечь: включите для ссылок в цепочках знаний
+
+【Частые вопросы】
+В: Почему мои знания внедряются слишком часто?
+О: Тег может быть слишком коротким или широким. Используйте составные теги из 3+ символов, например [Lore,ColonyHistory] вместо [History]
+
+В: Почему мои знания не внедряются?
+О: Проверьте, включены ли знания, правильный ли режим сопоставления, не слишком ли низкая важность и относятся ли теги к разговору
+
+В: Как заставить ИИ использовать определённые знания только в конкретных ситуациях?
+О: Используйте точные составные теги (например, [Rules,Combat,RangedWeapons]) и умеренную важность</RimTalk_Knowledge_HelpContent>
+  <RimTalk_Knowledge_HelpTitle>Руководство по библиотеке знаний</RimTalk_Knowledge_HelpTitle>
+  <RimTalk_Knowledge_Import>Импорт</RimTalk_Knowledge_Import>
+  <RimTalk_Knowledge_ImportDescription>Вставьте текст знаний (формат: [Тег]Содержание, по одной записи в строке)</RimTalk_Knowledge_ImportDescription>
+  <RimTalk_Knowledge_ImportTitle>Импорт знаний</RimTalk_Knowledge_ImportTitle>
+  <RimTalk_Knowledge_Importance>Важность:</RimTalk_Knowledge_Importance>
+  <RimTalk_Knowledge_Imported>Импортировано записей знаний: {0}</RimTalk_Knowledge_Imported>
+  <RimTalk_Knowledge_ItemsSelected>Выбрано элементов: {0}</RimTalk_Knowledge_ItemsSelected>
+  <RimTalk_Knowledge_New>Новый</RimTalk_Knowledge_New>
+  <RimTalk_Knowledge_NewEntry>Новая запись</RimTalk_Knowledge_NewEntry>
+  <RimTalk_Knowledge_NoColonists>На текущей карте нет колонистов</RimTalk_Knowledge_NoColonists>
+  <RimTalk_Knowledge_PawnStatus>Знания о состоянии колонистов</RimTalk_Knowledge_PawnStatus>
+  <RimTalk_Knowledge_Save>Сохранить</RimTalk_Knowledge_Save>
+  <RimTalk_Knowledge_SelectOrCreate>Выберите или создайте запись знаний</RimTalk_Knowledge_SelectOrCreate>
+  <RimTalk_Knowledge_Selected>Выбрано: {0}</RimTalk_Knowledge_Selected>
+  <RimTalk_Knowledge_Showing>Показано {0} / {1}</RimTalk_Knowledge_Showing>
+  <RimTalk_Knowledge_Status>Статус:</RimTalk_Knowledge_Status>
+  <RimTalk_Knowledge_StatusDisabled>Отключено</RimTalk_Knowledge_StatusDisabled>
+  <RimTalk_Knowledge_StatusEnabled>Включено</RimTalk_Knowledge_StatusEnabled>
+  <RimTalk_Knowledge_Tag>Тег:</RimTalk_Knowledge_Tag>
+  <RimTalk_Knowledge_TagContentEmpty>Тег и содержание не могут быть пустыми</RimTalk_Knowledge_TagContentEmpty>
+  <RimTalk_Knowledge_TagTest>Тест тегов</RimTalk_Knowledge_TagTest>
+  <RimTalk_Knowledge_TagTestClear>Очистить</RimTalk_Knowledge_TagTestClear>
+  <RimTalk_Knowledge_TagTestInputContext>Содержание разговора:</RimTalk_Knowledge_TagTestInputContext>
+  <RimTalk_Knowledge_TagTestInputTag>Тестовые теги (через запятую):</RimTalk_Knowledge_TagTestInputTag>
+  <RimTalk_Knowledge_TagTestMatchText>Фактический текст совпадения:</RimTalk_Knowledge_TagTestMatchText>
+  <RimTalk_Knowledge_TagTestMatched>Совпало</RimTalk_Knowledge_TagTestMatched>
+  <RimTalk_Knowledge_TagTestNoPawn>Нет (только разговор)</RimTalk_Knowledge_TagTestNoPawn>
+  <RimTalk_Knowledge_TagTestNotMatched>Не совпало</RimTalk_Knowledge_TagTestNotMatched>
+  <RimTalk_Knowledge_TagTestResult>Результат совпадения:</RimTalk_Knowledge_TagTestResult>
+  <RimTalk_Knowledge_TagTestSelectPawn>Выбрать персонажа (необязательно):</RimTalk_Knowledge_TagTestSelectPawn>
+  <RimTalk_Knowledge_TagTestTitle>Инструмент тестирования тегов</RimTalk_Knowledge_TagTestTitle>
+  <RimTalk_Knowledge_Total>Всего: {0}</RimTalk_Knowledge_Total>
+  <RimTalk_Knowledge_Visibility>Видимость</RimTalk_Knowledge_Visibility>
+  <RimTalk_Knowledge_VisibilityDeleted>(Пешка удалена)</RimTalk_Knowledge_VisibilityDeleted>
+  <RimTalk_Knowledge_VisibilityExclusive>Только для {0}</RimTalk_Knowledge_VisibilityExclusive>
+  <RimTalk_Knowledge_VisibilityGlobal>Общие (все пешки)</RimTalk_Knowledge_VisibilityGlobal>
+  <RimTalk_LongTermMemories>Долгосрочная память</RimTalk_LongTermMemories>
+  <RimTalk_MemoryTitle>Воспоминания {0}</RimTalk_MemoryTitle>
+  <RimTalk_MemoryType_Action>Действие</RimTalk_MemoryType_Action>
+  <RimTalk_MemoryType_Conversation>Разговор</RimTalk_MemoryType_Conversation>
+  <RimTalk_MemoryType_Emotion>Эмоция</RimTalk_MemoryType_Emotion>
+  <RimTalk_MemoryType_Event>Событие</RimTalk_MemoryType_Event>
+  <RimTalk_MemoryType_Interaction>Взаимодействие</RimTalk_MemoryType_Interaction>
+  <RimTalk_MemoryType_Internal>Внутренние</RimTalk_MemoryType_Internal>
+  <RimTalk_MemoryType_Relationship>Отношение</RimTalk_MemoryType_Relationship>
+  <RimTalk_MemoryType_Summarization>Суммирование</RimTalk_MemoryType_Summarization>
+  <RimTalk_Memory_NoMemories>Нет воспоминаний для отображения</RimTalk_Memory_NoMemories>
+  <RimTalk_MindStream_Action>Действие</RimTalk_MindStream_Action>
+  <RimTalk_MindStream_Conversation>Разговор</RimTalk_MindStream_Conversation>
+  <RimTalk_No>Нет</RimTalk_No>
+  <RimTalk_Preview_Clear>Очистить</RimTalk_Preview_Clear>
+  <RimTalk_Preview_ClickRefresh>Нажмите «Обновить предпросмотр», чтобы увидеть результаты</RimTalk_Preview_ClickRefresh>
+  <RimTalk_Preview_Colonist>(Колонист)</RimTalk_Preview_Colonist>
+  <RimTalk_Preview_CurrentPawn>Текущая пешка:</RimTalk_Preview_CurrentPawn>
+  <RimTalk_Preview_Error>Ошибка: {0}</RimTalk_Preview_Error>
+  <RimTalk_Preview_Guest>(Гость)</RimTalk_Preview_Guest>
+  <RimTalk_Preview_Help>Помощь</RimTalk_Preview_Help>
+  <RimTalk_Preview_HelpContent>=== Помощь по предпросмотру внедрения ===
+
+【Обзор】
+Этот инструмент показывает предпросмотр внедрения воспоминаний и знаний, помогая понять, какая информация будет использоваться во время диалогов ИИ.
+
+【Внедрение знаний】
+• Источники сопоставления: выберите переменные для сопоставления знаний
+• Переменные свойств пешек анализируются для всех участников
+• Разобранный текст сопоставления используется для поиска по ключевым словам в библиотеке знаний
+• Результаты сортируются по оценке
+
+【Внедрение воспоминаний】
+• ABM: сверхкратковременная память диалогов
+• SCM: краткосрочная память (устарела, теперь суммируется в ELS)
+• ELS: хранилище журнала событий (воспоминания, суммированные ИИ)
+• CLPA: долгосрочный архив (архивы важных событий)
+
+【Как использовать】
+1. Выберите текущую пешку (обязательно)
+2. Необязательно: выберите целевую пешку (имитирует разговор)
+3. Отметьте нужные источники сопоставления
+4. Нажмите «Обновить предпросмотр», чтобы увидеть результаты
+
+【Советы】
+• Настройки источников сопоставления синхронизируются с глобальными настройками
+• Переменные свойств пешек требуют только информации о пешке
+• Переменные окружения требуют информации о карте
+• Другие переменные требуют хотя бы одного созданного диалога</RimTalk_Preview_HelpContent>
+  <RimTalk_Preview_InjectionConfig>Настройки внедрения:</RimTalk_Preview_InjectionConfig>
+  <RimTalk_Preview_KnowledgeSection>Внедрение знаний</RimTalk_Preview_KnowledgeSection>
+  <RimTalk_Preview_MatchedKnowledge>Совпавшие знания:</RimTalk_Preview_MatchedKnowledge>
+  <RimTalk_Preview_MatchingSource>Источник сопоставления</RimTalk_Preview_MatchingSource>
+  <RimTalk_Preview_MemoryLayers>Слои памяти:</RimTalk_Preview_MemoryLayers>
+  <RimTalk_Preview_MemorySection>Внедрение воспоминаний</RimTalk_Preview_MemorySection>
+  <RimTalk_Preview_NoColonist>Нет доступных колонистов</RimTalk_Preview_NoColonist>
+  <RimTalk_Preview_NoContext>[Нет контекста. Сначала запустите диалог]</RimTalk_Preview_NoContext>
+  <RimTalk_Preview_NoHumanlikes>Нет доступных гуманоидов для выбора</RimTalk_Preview_NoHumanlikes>
+  <RimTalk_Preview_NoMatchedKnowledge>Совпавших знаний нет</RimTalk_Preview_NoMatchedKnowledge>
+  <RimTalk_Preview_NoMatchingSources>Источники сопоставления не настроены</RimTalk_Preview_NoMatchingSources>
+  <RimTalk_Preview_NoMemoriesAboveThreshold>Нет воспоминаний выше порога</RimTalk_Preview_NoMemoriesAboveThreshold>
+  <RimTalk_Preview_NoMemoryComp>У выбранной пешки нет компонента памяти</RimTalk_Preview_NoMemoryComp>
+  <RimTalk_Preview_NoParsedText>(Нет разобранного текста)</RimTalk_Preview_NoParsedText>
+  <RimTalk_Preview_None>Нет</RimTalk_Preview_None>
+  <RimTalk_Preview_NoneClickToSelect>Нет (нажмите для выбора)</RimTalk_Preview_NoneClickToSelect>
+  <RimTalk_Preview_ParsedMatchText>Разобранный текст сопоставления:</RimTalk_Preview_ParsedMatchText>
+  <RimTalk_Preview_Prisoner>(Заключённый)</RimTalk_Preview_Prisoner>
+  <RimTalk_Preview_Refresh>Обновить предпросмотр</RimTalk_Preview_Refresh>
+  <RimTalk_Preview_SameAsCurrent>(Как текущая)</RimTalk_Preview_SameAsCurrent>
+  <RimTalk_Preview_Score>Оценка: {0}</RimTalk_Preview_Score>
+  <RimTalk_Preview_ScoreDetail>Оценка: {0}</RimTalk_Preview_ScoreDetail>
+  <RimTalk_Preview_SelectedMemories>Выбранные воспоминания:</RimTalk_Preview_SelectedMemories>
+  <RimTalk_Preview_Slave>(Раб)</RimTalk_Preview_Slave>
+  <RimTalk_Preview_StaticMode>Статический режим (динамическое внедрение отключено)</RimTalk_Preview_StaticMode>
+  <RimTalk_Preview_TargetPawn>Целевая пешка:</RimTalk_Preview_TargetPawn>
+  <RimTalk_Preview_Title>Предпросмотр внедрения</RimTalk_Preview_Title>
+  <RimTalk_PromptEditor_DailySummary>Ежедневный промпт сводки</RimTalk_PromptEditor_DailySummary>
+  <RimTalk_PromptEditor_DailySummaryDesc>Используется для ежедневного суммирования SCM в ELS (обрабатывает ~20 воспоминаний)</RimTalk_PromptEditor_DailySummaryDesc>
+  <RimTalk_PromptEditor_DeepArchive>Промпт глубокого архивирования</RimTalk_PromptEditor_DeepArchive>
+  <RimTalk_PromptEditor_DeepArchiveDesc>Используется для глубокого архивирования ELS в CLPA (обрабатывает ~15 воспоминаний)</RimTalk_PromptEditor_DeepArchiveDesc>
+  <RimTalk_PromptEditor_Desc>Настройте шаблоны промптов, которые ИИ использует для суммирования воспоминаний.</RimTalk_PromptEditor_Desc>
+  <RimTalk_PromptEditor_MaxTokens>Максимальное количество выходных токенов</RimTalk_PromptEditor_MaxTokens>
+  <RimTalk_PromptEditor_MaxTokensDesc>Управляет максимальной длиной сводки, создаваемой ИИ.</RimTalk_PromptEditor_MaxTokensDesc>
+  <RimTalk_PromptEditor_MaxTokensLabel>Макс. токенов: {0}</RimTalk_PromptEditor_MaxTokensLabel>
+  <RimTalk_PromptEditor_Placeholders>Плейсхолдеры: {0}=имя колониста, {1}=список воспоминаний</RimTalk_PromptEditor_Placeholders>
+  <RimTalk_PromptEditor_ResetConfirm>Вы уверены, что хотите восстановить промпты по умолчанию?</RimTalk_PromptEditor_ResetConfirm>
+  <RimTalk_PromptEditor_ResetDefault>Сбросить по умолчанию</RimTalk_PromptEditor_ResetDefault>
+  <RimTalk_PromptEditor_Saved>Настройки промптов сводки сохранены</RimTalk_PromptEditor_Saved>
+  <RimTalk_PromptEditor_Tip1>• Малые значения (100-500) для кратких сводок</RimTalk_PromptEditor_Tip1>
+  <RimTalk_PromptEditor_Tip2>• Большие значения (1000-4000) для подробных сводок</RimTalk_PromptEditor_Tip2>
+  <RimTalk_PromptEditor_Tip3>• Очень большие значения увеличат расходы API</RimTalk_PromptEditor_Tip3>
+  <RimTalk_PromptEditor_Tips>Советы:</RimTalk_PromptEditor_Tips>
+  <RimTalk_PromptEditor_Title>Настройка промптов сводки</RimTalk_PromptEditor_Title>
+  <RimTalk_Save>Сохранить</RimTalk_Save>
+  <RimTalk_Settings_ABMLifespanLabel>Время жизни ABM: {0} ч (0=отключено, разговоры в SCM, остальные удаляются)</RimTalk_Settings_ABMLifespanLabel>
+  <RimTalk_Settings_AIConfigSection>Настройки ИИ</RimTalk_Settings_AIConfigSection>
+  <RimTalk_Settings_APIConfigTitle>Настройки API</RimTalk_Settings_APIConfigTitle>
+  <RimTalk_Settings_ActionMemory>Память действий (работа, бой)</RimTalk_Settings_ActionMemory>
+  <RimTalk_Settings_AddNewRule>+ Добавить правило</RimTalk_Settings_AddNewRule>
+  <RimTalk_Settings_AdvancedSettings>Дополнительные настройки...</RimTalk_Settings_AdvancedSettings>
+  <RimTalk_Settings_AdvancedSettingsDesc>Включает подробные настройки внедрения, ёмкости памяти, затухания и т. д.</RimTalk_Settings_AdvancedSettingsDesc>
+  <RimTalk_Settings_AdvancedSettingsTitle>Дополнительные настройки</RimTalk_Settings_AdvancedSettingsTitle>
+  <RimTalk_Settings_ApiConfigInvalid>Неверная конфигурация: проверьте URL и заполнение модели</RimTalk_Settings_ApiConfigInvalid>
+  <RimTalk_Settings_ApiKeyHeader>API-ключ</RimTalk_Settings_ApiKeyHeader>
+  <RimTalk_Settings_AtLeastOneSource>Необходимо выбрать хотя бы один источник сопоставления</RimTalk_Settings_AtLeastOneSource>
+  <RimTalk_Settings_BaseUrlTooltip>Базовый URL пользовательского эндпоинта (только для пользовательского провайдера)</RimTalk_Settings_BaseUrlTooltip>
+  <RimTalk_Settings_CLPADecayLabel>Скорость затухания CLPA: {0}</RimTalk_Settings_CLPADecayLabel>
+  <RimTalk_Settings_CannotFindManager>Невозможно найти менеджер памяти</RimTalk_Settings_CannotFindManager>
+  <RimTalk_Settings_CloudApiConfigurations>Конфигурации API</RimTalk_Settings_CloudApiConfigurations>
+  <RimTalk_Settings_CloudApiConfigurationsDesc>Добавьте одного или нескольких провайдеров. Они образуют упорядоченную резервную цепочку: при сбое вызова автоматически пробуется следующий включённый провайдер.</RimTalk_Settings_CloudApiConfigurationsDesc>
+  <RimTalk_Settings_CloudEmbeddingConfig>Настройки облачных эмбеддингов</RimTalk_Settings_CloudEmbeddingConfig>
+  <RimTalk_Settings_CombatMemory>Память о сражениях</RimTalk_Settings_CombatMemory>
+  <RimTalk_Settings_ConversationMemory>Память разговоров (диалоги RimTalk)</RimTalk_Settings_ConversationMemory>
+  <RimTalk_Settings_DynamicInjectionDesc>Автоматически выбирать наиболее релевантные воспоминания и знания на основе времени, важности и совпадения ключевых слов</RimTalk_Settings_DynamicInjectionDesc>
+  <RimTalk_Settings_DynamicInjectionSection>Настройки динамического внедрения</RimTalk_Settings_DynamicInjectionSection>
+  <RimTalk_Settings_ELSCapacityLabel>ELS (среднесрочная память): {0} записей</RimTalk_Settings_ELSCapacityLabel>
+  <RimTalk_Settings_ELSDecayLabel>Скорость затухания ELS: {0}</RimTalk_Settings_ELSDecayLabel>
+  <RimTalk_Settings_EmbeddingAPIKey>API-ключ</RimTalk_Settings_EmbeddingAPIKey>
+  <RimTalk_Settings_EmbeddingAPIKeyTip>Совет: оставьте API-ключ пустым, чтобы использовать ключ из настроек ИИ выше.</RimTalk_Settings_EmbeddingAPIKeyTip>
+  <RimTalk_Settings_EmbeddingAPIURL>API URL</RimTalk_Settings_EmbeddingAPIURL>
+  <RimTalk_Settings_EmbeddingModel>Модель</RimTalk_Settings_EmbeddingModel>
+  <RimTalk_Settings_EnableAILog>Включить журналирование запросов ИИ</RimTalk_Settings_EnableAILog>
+  <RimTalk_Settings_EnableAutoArchive>Включить автоархивирование</RimTalk_Settings_EnableAutoArchive>
+  <RimTalk_Settings_EnableDailySummarization>Включить ежедневное суммирование</RimTalk_Settings_EnableDailySummarization>
+  <RimTalk_Settings_EnableDisableTooltip>Включить/отключить этого провайдера как резервного кандидата</RimTalk_Settings_EnableDisableTooltip>
+  <RimTalk_Settings_EnableDynamicInjection>Включить динамическое внедрение (рекомендуется)</RimTalk_Settings_EnableDynamicInjection>
+  <RimTalk_Settings_EnableKnowledgeChaining>Включить цепочки знаний (экспериментально)</RimTalk_Settings_EnableKnowledgeChaining>
+  <RimTalk_Settings_EnableProactiveRecall>Включить активное припоминание воспоминаний</RimTalk_Settings_EnableProactiveRecall>
+  <RimTalk_Settings_EnableVectorEnhancement>Включить векторное улучшение</RimTalk_Settings_EnableVectorEnhancement>
+  <RimTalk_Settings_EnabledHeader>Включено</RimTalk_Settings_EnabledHeader>
+  <RimTalk_Settings_EnabledRulesCount>Включено: {0} / {1} правил</RimTalk_Settings_EnabledRulesCount>
+  <RimTalk_Settings_ExperimentalSection>Экспериментальные функции</RimTalk_Settings_ExperimentalSection>
+  <RimTalk_Settings_FallbackEnabledDesc>Активна независимая резервная цепочка. При сбое вызов автоматически перейдёт к следующему провайдеру.</RimTalk_Settings_FallbackEnabledDesc>
+  <RimTalk_Settings_FeatureEntries>Функциональные разделы</RimTalk_Settings_FeatureEntries>
+  <RimTalk_Settings_InjectionPreviewer>Предпросмотр внедрения</RimTalk_Settings_InjectionPreviewer>
+  <RimTalk_Settings_InjectionPreviewerTip>Просмотр внедрения воспоминаний и знаний в реальном времени</RimTalk_Settings_InjectionPreviewerTip>
+  <RimTalk_Settings_IsPlayerDialogueInject>Записывать диалоги игрока</RimTalk_Settings_IsPlayerDialogueInject>
+  <RimTalk_Settings_IsPlayerDialogueInjectDesc>При включении сообщения, отправленные игроком через диалоговое окно, также будут записываться в память раунда</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+  <RimTalk_Settings_IsRoundMemoryActive>Включить память раундов</RimTalk_Settings_IsRoundMemoryActive>
+  <RimTalk_Settings_IsRoundMemoryActiveDesc>При включении расширение памяти захватывает и внедряет воспоминания по раундам разговора, а не по отдельным сообщениям</RimTalk_Settings_IsRoundMemoryActiveDesc>
+  <RimTalk_Settings_KnowledgeChainingDesc>Позволяет знаниям запускать другие знания для многораундового сопоставления.</RimTalk_Settings_KnowledgeChainingDesc>
+  <RimTalk_Settings_KnowledgeLibrary>Библиотека знаний</RimTalk_Settings_KnowledgeLibrary>
+  <RimTalk_Settings_KnowledgeLibraryTip>Открыть и управлять глобальной библиотекой знаний</RimTalk_Settings_KnowledgeLibraryTip>
+  <RimTalk_Settings_KnowledgeMatchingSources>Выбор источников сопоставления знаний</RimTalk_Settings_KnowledgeMatchingSources>
+  <RimTalk_Settings_KnowledgeMatchingSourcesDesc>Выберите переменные для сопоставления знаний. Свойства пешек автоматически сопоставляются для всех участников диалога.</RimTalk_Settings_KnowledgeMatchingSourcesDesc>
+  <RimTalk_Settings_KnowledgeScoreThresholdLabel>Порог оценки знаний: {0}</RimTalk_Settings_KnowledgeScoreThresholdLabel>
+  <RimTalk_Settings_ListRefreshed>Список переменных обновлён</RimTalk_Settings_ListRefreshed>
+  <RimTalk_Settings_MaxABMInjectionRoundsDesc>Управляет количеством последних раундов разговора, внедряемых в контекст ИИ</RimTalk_Settings_MaxABMInjectionRoundsDesc>
+  <RimTalk_Settings_MaxABMInjectionRoundsLabel>Раунды внедрения ABM: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
+  <RimTalk_Settings_MaxChainingRoundsLabel>Макс. раундов: {0}</RimTalk_Settings_MaxChainingRoundsLabel>
+  <RimTalk_Settings_MaxInjectedKnowledgeLabel>Макс. внедряемых знаний: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
+  <RimTalk_Settings_MaxInjectedMemoriesLabel>Макс. внедряемых воспоминаний: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
+  <RimTalk_Settings_MaxVectorResultsLabel>Макс. дополнительных результатов: {0}</RimTalk_Settings_MaxVectorResultsLabel>
+  <RimTalk_Settings_MemoryCapacitySection>Настройка ёмкости памяти</RimTalk_Settings_MemoryCapacitySection>
+  <RimTalk_Settings_MemoryDecaySection>Настройка затухания памяти</RimTalk_Settings_MemoryDecaySection>
+  <RimTalk_Settings_MemoryScoreThresholdLabel>Порог оценки воспоминаний: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
+  <RimTalk_Settings_MemoryTypesSection>Переключатели типов памяти</RimTalk_Settings_MemoryTypesSection>
+  <RimTalk_Settings_ModelHeader>Модель</RimTalk_Settings_ModelHeader>
+  <RimTalk_Settings_MustEnterGame>Сначала необходимо войти в игру</RimTalk_Settings_MustEnterGame>
+  <RimTalk_Settings_PawnPropertyTooltip>Свойство: {0}\nТип: свойство пешки\n\n{1}\n\nПри включении это свойство автоматически сопоставляется для всех пешек в диалоге.</RimTalk_Settings_PawnPropertyTooltip>
+  <RimTalk_Settings_PlaceholderApiKey>Вставьте API-ключ...</RimTalk_Settings_PlaceholderApiKey>
+  <RimTalk_Settings_PlaceholderModelId>ID модели</RimTalk_Settings_PlaceholderModelId>
+  <RimTalk_Settings_PlaceholderPlayer2Key>Веб-ключ (необязательно для локального приложения)</RimTalk_Settings_PlaceholderPlayer2Key>
+  <RimTalk_Settings_Player2AuthCancel>Отменить авторизацию</RimTalk_Settings_Player2AuthCancel>
+  <RimTalk_Settings_Player2AuthReopen>Снова открыть страницу подтверждения</RimTalk_Settings_Player2AuthReopen>
+  <RimTalk_Settings_Player2AuthWaiting>Ожидание подтверждения...</RimTalk_Settings_Player2AuthWaiting>
+  <RimTalk_Settings_Player2GetWebKey>Получить бесплатный API-ключ</RimTalk_Settings_Player2GetWebKey>
+  <RimTalk_Settings_Player2OpenWebsite>Открыть сайт Player2</RimTalk_Settings_Player2OpenWebsite>
+  <RimTalk_Settings_Player2WebDesc>Получите бесплатный веб-API-ключ без настольного приложения. Необязательно при использовании локального приложения.</RimTalk_Settings_Player2WebDesc>
+  <RimTalk_Settings_PreferRimTalkAI>Приоритет настройкам ИИ из RimTalk</RimTalk_Settings_PreferRimTalkAI>
+  <RimTalk_Settings_PresetApplied>Применён пресет: {0} (воспоминания {1}, знания {2})</RimTalk_Settings_PresetApplied>
+  <RimTalk_Settings_PresetBalanced>Сбалансированный</RimTalk_Settings_PresetBalanced>
+  <RimTalk_Settings_PresetCardContent>{0}\nВоспоминания {1} | Знания {2}\n~{3} токенов</RimTalk_Settings_PresetCardContent>
+  <RimTalk_Settings_PresetCardTooltip>{0} воспоминаний + {1} знаний\nОжидаемое потребление ~{2} токенов</RimTalk_Settings_PresetCardTooltip>
+  <RimTalk_Settings_PresetConfig>Настройка пресетов</RimTalk_Settings_PresetConfig>
+  <RimTalk_Settings_PresetConfigDesc>Быстрое переключение между лёгким и тяжёлым внедрением воспоминаний/знаний с оценкой расхода токенов.</RimTalk_Settings_PresetConfigDesc>
+  <RimTalk_Settings_PresetEnhanced>Усиленный</RimTalk_Settings_PresetEnhanced>
+  <RimTalk_Settings_PresetLight>Лёгкий</RimTalk_Settings_PresetLight>
+  <RimTalk_Settings_PromptReplacement>Замена промптов</RimTalk_Settings_PromptReplacement>
+  <RimTalk_Settings_PromptReplacementDesc>Автоматически нормализовать промпты перед отправкой ИИ.</RimTalk_Settings_PromptReplacementDesc>
+  <RimTalk_Settings_PromptReplacementTip>Редактировать правила замены/нормализации промптов</RimTalk_Settings_PromptReplacementTip>
+  <RimTalk_Settings_PromptReplacementTitle>Замена промптов</RimTalk_Settings_PromptReplacementTitle>
+  <RimTalk_Settings_ProviderHeader>Провайдер</RimTalk_Settings_ProviderHeader>
+  <RimTalk_Settings_RefreshList>Обновить список</RimTalk_Settings_RefreshList>
+  <RimTalk_Settings_RegexSupport>Поддерживает регулярные выражения (без учёта регистра)</RimTalk_Settings_RegexSupport>
+  <RimTalk_Settings_ReplacementRulesList>Список правил замены</RimTalk_Settings_ReplacementRulesList>
+  <RimTalk_Settings_RuleExample>Пример: шаблон \(Player\) заменяется на Master</RimTalk_Settings_RuleExample>
+  <RimTalk_Settings_SCMCapacityLabel>SCM (краткосрочная память): {0} записей</RimTalk_Settings_SCMCapacityLabel>
+  <RimTalk_Settings_SCMDecayLabel>Скорость затухания SCM: {0}</RimTalk_Settings_SCMDecayLabel>
+  <RimTalk_Settings_SelectedCount>Выбрано: {0} (свойства пешек: {1}, другое: {2})</RimTalk_Settings_SelectedCount>
+  <RimTalk_Settings_SimilarityThresholdLabel>Порог сходства: {0}</RimTalk_Settings_SimilarityThresholdLabel>
+  <RimTalk_Settings_SummarizationSection>Настройки суммирования памяти</RimTalk_Settings_SummarizationSection>
+  <RimTalk_Settings_TriggerChanceLabel>Шанс срабатывания: {0}</RimTalk_Settings_TriggerChanceLabel>
+  <RimTalk_Settings_TriggerTimeLabel>Время срабатывания: {0}:00</RimTalk_Settings_TriggerTimeLabel>
+  <RimTalk_Settings_ValidateConfig>Проверить конфигурацию</RimTalk_Settings_ValidateConfig>
+  <RimTalk_Settings_ValidateConfigTip>Совет: проверка отправляет реальный запрос API по резервной цепочке (только в сохранённой игре)</RimTalk_Settings_ValidateConfigTip>
+  <RimTalk_Settings_ValidateInSaveOnly>Проверка работает только в сохранённой игре. Сначала загрузите или начните игру.</RimTalk_Settings_ValidateInSaveOnly>
+  <RimTalk_Settings_Validating>Проверка конфигурации...</RimTalk_Settings_Validating>
+  <RimTalk_Settings_ValidationFailed>Проверка конфигурации не удалась. Проверьте API-ключ и URL.</RimTalk_Settings_ValidationFailed>
+  <RimTalk_Settings_ValidationSuccessAny>Проверка пройдена: хотя бы одна конфигурация пригодна. Подробности в логах.</RimTalk_Settings_ValidationSuccessAny>
+  <RimTalk_Settings_VariableCount>Всего переменных: {0} (свойства пешек: {1})</RimTalk_Settings_VariableCount>
+  <RimTalk_Settings_VariableTooltip>Переменная: {0}\n\n{1}</RimTalk_Settings_VariableTooltip>
+  <RimTalk_Settings_VectorEnhancementDesc>Использовать семантический векторный поиск для улучшения сопоставления знаний.</RimTalk_Settings_VectorEnhancementDesc>
+  <RimTalk_Settings_VectorEnhancementSection>Настройки векторного улучшения</RimTalk_Settings_VectorEnhancementSection>
+  <RimTalk_Settings_WillFollowRimTalkConfig>Автоматически следовать настройкам ИИ мода RimTalk</RimTalk_Settings_WillFollowRimTalkConfig>
+  <RimTalk_ShortTermMemories>Краткосрочная память</RimTalk_ShortTermMemories>
+  <RimTalk_TabMemory>Память</RimTalk_TabMemory>
+  <RimTalk_With>с</RimTalk_With>
+  <RimTalk_Yes>Да</RimTalk_Yes>
 </LanguageData>

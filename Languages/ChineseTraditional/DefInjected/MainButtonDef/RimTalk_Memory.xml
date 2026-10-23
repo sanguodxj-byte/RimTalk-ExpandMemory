@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <RimTalk_Memory.label>ӛ��</RimTalk_Memory.label>
-  <RimTalk_Memory.description>�鿴ֳ���ߵĻ����c�Є�ӛ������Ԓ�� RimTalk ���ɣ��^�칦��δ���F����</RimTalk_Memory.description>
+  <RimTalk_Memory.label>記憶</RimTalk_Memory.label>
+  <RimTalk_Memory.description>檢視殖民者的互動與行動記憶（對話需 RimTalk 整合，觀察功能尚未實作）</RimTalk_Memory.description>
 </LanguageData>

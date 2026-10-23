@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <RimTalk_Memory.label>ӛ��</RimTalk_Memory.label>
-  <RimTalk_Memory.description>�������ЄӤ�ӛ�����ʾ����Ԓ��RimTalk�y�Ϥ���Ҫ���Q���δ�gװ����</RimTalk_Memory.description>
+  <RimTalk_Memory.label>メモリ</RimTalk_Memory.label>
+  <RimTalk_Memory.description>入植者の交流と行動のメモリを表示（会話には RimTalk 連携が必要、観察機能は未実装）</RimTalk_Memory.description>
 </LanguageData>
