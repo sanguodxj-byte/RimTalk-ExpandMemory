@@ -1,363 +1,269 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <!-- ==================== Common UI ==================== -->
+  <RimTalk.Memory.ExportSuccessTo>Memories exported to: </RimTalk.Memory.ExportSuccessTo>
+  <RimTalk.Memory.ImportSuccessFrom>Memories imported from: </RimTalk.Memory.ImportSuccessFrom>
+  <RimTalk.Memory.UI.TabWindow.Activity>Activity: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
+  <RimTalk.Memory.UI.TabWindow.Archive>Archive</RimTalk.Memory.UI.TabWindow.Archive>
+  <RimTalk.Memory.UI.TabWindow.ArchiveAll>Archive All Colonists</RimTalk.Memory.UI.TabWindow.ArchiveAll>
+  <RimTalk.Memory.UI.TabWindow.Cancel>Cancel</RimTalk.Memory.UI.TabWindow.Cancel>
+  <RimTalk.Memory.UI.TabWindow.CancelEdit>Cancel</RimTalk.Memory.UI.TabWindow.CancelEdit>
+  <RimTalk.Memory.UI.TabWindow.ChronicleTitle>Life chronicle ({COUNT} CLPA chapters)</RimTalk.Memory.UI.TabWindow.ChronicleTitle>
+  <RimTalk.Memory.UI.TabWindow.ClearSelection>Clear selection</RimTalk.Memory.UI.TabWindow.ClearSelection>
+  <RimTalk.Memory.UI.TabWindow.ConfirmArchive>Archive the selected memories?</RimTalk.Memory.UI.TabWindow.ConfirmArchive>
+  <RimTalk.Memory.UI.TabWindow.ConfirmDelete>Delete {COUNT} selected memories?</RimTalk.Memory.UI.TabWindow.ConfirmDelete>
+  <RimTalk.Memory.UI.TabWindow.ConfirmImport>Confirm import?</RimTalk.Memory.UI.TabWindow.ConfirmImport>
+  <RimTalk.Memory.UI.TabWindow.ContentLabel>Content</RimTalk.Memory.UI.TabWindow.ContentLabel>
+  <RimTalk.Memory.UI.TabWindow.CreateMemory>New memory</RimTalk.Memory.UI.TabWindow.CreateMemory>
+  <RimTalk.Memory.UI.TabWindow.CreateTitle>New memory for {NAME}</RimTalk.Memory.UI.TabWindow.CreateTitle>
+  <RimTalk.Memory.UI.TabWindow.Created>Memory created</RimTalk.Memory.UI.TabWindow.Created>
+  <RimTalk.Memory.UI.TabWindow.CurrentImportance>Current importance: </RimTalk.Memory.UI.TabWindow.CurrentImportance>
+  <RimTalk.Memory.UI.TabWindow.Delete>Delete</RimTalk.Memory.UI.TabWindow.Delete>
+  <RimTalk.Memory.UI.TabWindow.Details>Memory details</RimTalk.Memory.UI.TabWindow.Details>
+  <RimTalk.Memory.UI.TabWindow.Edit>Edit</RimTalk.Memory.UI.TabWindow.Edit>
+  <RimTalk.Memory.UI.TabWindow.Export>Export</RimTalk.Memory.UI.TabWindow.Export>
+  <RimTalk.Memory.UI.TabWindow.Guide>=== Memory Archive Workbench Guide ===
 
-  <!-- ITab Memory -->
-  <RimTalk_Memory_NoMemories>No memories to display</RimTalk_Memory_NoMemories>
-  
-  <!-- ==================== Mind Stream UI Tabs ==================== -->
-  
-  <!-- Control Panel -->
+[Layout]
+- Top: pawn selector, filters and tools menu
+- Top-left: life chronicle navigation (CLPA)
+- Bottom-left: vertical timeline (ABM/SCM/ELS)
+- Right: memory details and editing
 
-  <RimTalk_MindStream_Conversation>Conversation</RimTalk_MindStream_Conversation>
-  <RimTalk_MindStream_Action>Action</RimTalk_MindStream_Action>
-
-
-
-  
-  <!-- Memory Export/Import -->
-
-  <!-- Timeline -->
-
-  <!-- Messages -->
-
-  <!-- ==================== Knowledge Library UI ==================== -->
-  <RimTalk_Knowledge_Categories>Categories</RimTalk_Knowledge_Categories>
-  <RimTalk_Knowledge_CategoryAll>All</RimTalk_Knowledge_CategoryAll>
-  <RimTalk_Knowledge_CategoryInstructions>Instructions</RimTalk_Knowledge_CategoryInstructions>
-  <RimTalk_Knowledge_CategoryLore>Lore</RimTalk_Knowledge_CategoryLore>
-  <RimTalk_Knowledge_CategoryPawnStatus>Pawn Status</RimTalk_Knowledge_CategoryPawnStatus>
-  <RimTalk_Knowledge_CategoryHistory>History</RimTalk_Knowledge_CategoryHistory>
-  <RimTalk_Knowledge_CategoryOther>Other</RimTalk_Knowledge_CategoryOther>
-  <RimTalk_Knowledge_CategoryUnknown>Unknown</RimTalk_Knowledge_CategoryUnknown>
-  
-  <RimTalk_Knowledge_AutoGenerate>Auto Generate</RimTalk_Knowledge_AutoGenerate>
-  <RimTalk_Knowledge_PawnStatus>Pawn Status</RimTalk_Knowledge_PawnStatus>
-  <RimTalk_Knowledge_GenerateNow>Generate Now</RimTalk_Knowledge_GenerateNow>
-  <RimTalk_Knowledge_EventRecord>Event Record</RimTalk_Knowledge_EventRecord>
-  
-  <RimTalk_Knowledge_Total>Total: {0}</RimTalk_Knowledge_Total>
-  <RimTalk_Knowledge_Enabled>Enabled: {0}</RimTalk_Knowledge_Enabled>
-  <RimTalk_Knowledge_Selected>Selected: {0}</RimTalk_Knowledge_Selected>
-  
-  <!-- Toolbar -->
-  <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
-  <RimTalk_Knowledge_Import>Import</RimTalk_Knowledge_Import>
-  <RimTalk_Knowledge_Export>Export</RimTalk_Knowledge_Export>
-  <RimTalk_Knowledge_ExportAll>Export All</RimTalk_Knowledge_ExportAll>
-  <RimTalk_Knowledge_ExportCount>Export ({0})</RimTalk_Knowledge_ExportCount>
-  <RimTalk_Knowledge_Delete>Delete</RimTalk_Knowledge_Delete>
-  <RimTalk_Knowledge_DeleteCount>Delete ({0})</RimTalk_Knowledge_DeleteCount>
-  <RimTalk_Knowledge_ClearAll>Clear All</RimTalk_Knowledge_ClearAll>
-  
-  <!-- List -->
-  <RimTalk_Knowledge_Showing>Showing {0} / {1}</RimTalk_Knowledge_Showing>
-  
-  <!-- Right Panel -->
-  <RimTalk_Knowledge_SelectOrCreate>Select or create a knowledge entry</RimTalk_Knowledge_SelectOrCreate>
-  <RimTalk_Knowledge_ItemsSelected>{0} items selected</RimTalk_Knowledge_ItemsSelected>
-  <RimTalk_Knowledge_EnabledCount>Enabled: {0}</RimTalk_Knowledge_EnabledCount>
-  <RimTalk_Knowledge_DisabledCount>Disabled: {0}</RimTalk_Knowledge_DisabledCount>
-  <RimTalk_Knowledge_AvgImportance>Avg. Importance: {0}</RimTalk_Knowledge_AvgImportance>
-  <RimTalk_Knowledge_EnableAll>Enable All</RimTalk_Knowledge_EnableAll>
-  <RimTalk_Knowledge_DisableAll>Disable All</RimTalk_Knowledge_DisableAll>
-  <RimTalk_Knowledge_ExportItems>Export ({0})</RimTalk_Knowledge_ExportItems>
-  <RimTalk_Knowledge_DeleteItems>Delete ({0})</RimTalk_Knowledge_DeleteItems>
-  
-  <RimTalk_Knowledge_Details>Details</RimTalk_Knowledge_Details>
-  <RimTalk_Knowledge_Edit>Edit</RimTalk_Knowledge_Edit>
-  <RimTalk_Knowledge_Tag>Tag</RimTalk_Knowledge_Tag>
-  <RimTalk_Knowledge_Importance>Importance</RimTalk_Knowledge_Importance>
-  <RimTalk_Knowledge_Status>Status</RimTalk_Knowledge_Status>
-  <RimTalk_Knowledge_StatusEnabled>Enabled</RimTalk_Knowledge_StatusEnabled>
-  <RimTalk_Knowledge_StatusDisabled>Disabled</RimTalk_Knowledge_StatusDisabled>
-  <RimTalk_Knowledge_Visibility>Visibility</RimTalk_Knowledge_Visibility>
-  <RimTalk_Knowledge_VisibilityGlobal>Global (All Pawns)</RimTalk_Knowledge_VisibilityGlobal>
-  <RimTalk_Knowledge_VisibilityExclusive>Exclusive to {0}</RimTalk_Knowledge_VisibilityExclusive>
-  <RimTalk_Knowledge_VisibilityDeleted>Pawn #{0} (Deleted)</RimTalk_Knowledge_VisibilityDeleted>
-  <RimTalk_Knowledge_Content>Content</RimTalk_Knowledge_Content>
-  
-  <!-- Edit Panel -->
-  <RimTalk_Knowledge_NewEntry>New Entry</RimTalk_Knowledge_NewEntry>
-  <RimTalk_Knowledge_EditEntry>Edit Entry</RimTalk_Knowledge_EditEntry>
-  <RimTalk_Knowledge_Save>Save</RimTalk_Knowledge_Save>
-  <RimTalk_Knowledge_Cancel>Cancel</RimTalk_Knowledge_Cancel>
-  <RimTalk_Knowledge_Global>Global</RimTalk_Knowledge_Global>
-  <RimTalk_Knowledge_GlobalAll>Global (All Pawns)</RimTalk_Knowledge_GlobalAll>
-  <RimTalk_Knowledge_ExclusiveTo>Exclusive to {0}</RimTalk_Knowledge_ExclusiveTo>
-  
-  <!-- Messages -->
-  <RimTalk_Knowledge_TagContentEmpty>Tag and content cannot be empty</RimTalk_Knowledge_TagContentEmpty>
-  <RimTalk_Knowledge_EntrySaved>Knowledge entry saved</RimTalk_Knowledge_EntrySaved>
-  <RimTalk_Knowledge_DeleteConfirm>Delete {0} knowledge entries?</RimTalk_Knowledge_DeleteConfirm>
-  <RimTalk_Knowledge_Deleted>Deleted {0} entries</RimTalk_Knowledge_Deleted>
-  <RimTalk_Knowledge_ExportedToClipboard>Exported {0} entries to clipboard</RimTalk_Knowledge_ExportedToClipboard>
-  <RimTalk_Knowledge_ImportTitle>Import Knowledge</RimTalk_Knowledge_ImportTitle>
-  <RimTalk_Knowledge_ImportDescription>Paste knowledge entries in format: [Tag|Importance]Content</RimTalk_Knowledge_ImportDescription>
-  <RimTalk_Knowledge_Imported>Imported {0} entries</RimTalk_Knowledge_Imported>
-  <RimTalk_Knowledge_ClearConfirm>Clear all knowledge entries?</RimTalk_Knowledge_ClearConfirm>
-  <RimTalk_Knowledge_AllCleared>All entries cleared</RimTalk_Knowledge_AllCleared>
-  <RimTalk_Knowledge_NoColonists>No colonists found</RimTalk_Knowledge_NoColonists>
-  <RimTalk_Knowledge_GeneratedPawnStatus>Generated status for {0} colonists</RimTalk_Knowledge_GeneratedPawnStatus>
-  <RimTalk_Knowledge_EventScanTriggered>Event scan triggered</RimTalk_Knowledge_EventScanTriggered>
-  <RimTalk_Knowledge_GenerationFailed>Generation failed: {0}</RimTalk_Knowledge_GenerationFailed>
-  
-  <!-- Legacy Translations (for compatibility) -->
-  <RimTalk_MemoryTitle>{0}'s Memories</RimTalk_MemoryTitle>
+[Controls]
+- Click a card to focus; Ctrl for multi-select; drag on empty space to box-select
+- Scroll wheel scrolls the timeline, pans the chronicle, zooms the chronicle axis
+- Dragging the chronicle cursor repositions the timeline
+- Drag the splitter to resize timeline vs. details
+</RimTalk.Memory.UI.TabWindow.Guide>
+  <RimTalk.Memory.UI.TabWindow.Import>Import</RimTalk.Memory.UI.TabWindow.Import>
+  <RimTalk.Memory.UI.TabWindow.Importance>Importance: {IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
+  <RimTalk.Memory.UI.TabWindow.Knowledge>Knowledge</RimTalk.Memory.UI.TabWindow.Knowledge>
+  <RimTalk.Memory.UI.TabWindow.LayerFilter>Layer filter</RimTalk.Memory.UI.TabWindow.LayerFilter>
+  <RimTalk.Memory.UI.TabWindow.Need_SelectPawn>Select pawn</RimTalk.Memory.UI.TabWindow.Need_SelectPawn>
+  <RimTalk.Memory.UI.TabWindow.NoFaction>No faction</RimTalk.Memory.UI.TabWindow.NoFaction>
+  <RimTalk.Memory.UI.TabWindow.NotPinned>Not pinned</RimTalk.Memory.UI.TabWindow.NotPinned>
+  <RimTalk.Memory.UI.TabWindow.NotSummarized>Not summarized</RimTalk.Memory.UI.TabWindow.NotSummarized>
+  <RimTalk.Memory.UI.TabWindow.Notes>Notes: </RimTalk.Memory.UI.TabWindow.Notes>
+  <RimTalk.Memory.UI.TabWindow.NotesLabel>Notes</RimTalk.Memory.UI.TabWindow.NotesLabel>
+  <RimTalk.Memory.UI.TabWindow.OpenImportFolder>Open import folder</RimTalk.Memory.UI.TabWindow.OpenImportFolder>
+  <RimTalk.Memory.UI.TabWindow.OperationGuide>Operation guide</RimTalk.Memory.UI.TabWindow.OperationGuide>
+  <RimTalk.Memory.UI.TabWindow.Pin>Pin</RimTalk.Memory.UI.TabWindow.Pin>
+  <RimTalk.Memory.UI.TabWindow.PinLabel>Pin this memory</RimTalk.Memory.UI.TabWindow.PinLabel>
+  <RimTalk.Memory.UI.TabWindow.Pinned>Pinned</RimTalk.Memory.UI.TabWindow.Pinned>
+  <RimTalk.Memory.UI.TabWindow.Preview>Injection preview</RimTalk.Memory.UI.TabWindow.Preview>
+  <RimTalk.Memory.UI.TabWindow.Save>Save</RimTalk.Memory.UI.TabWindow.Save>
+  <RimTalk.Memory.UI.TabWindow.SaveEdit>Save</RimTalk.Memory.UI.TabWindow.SaveEdit>
+  <RimTalk.Memory.UI.TabWindow.Selected>{0} memories selected</RimTalk.Memory.UI.TabWindow.Selected>
+  <RimTalk.Memory.UI.TabWindow.Summarize>Summarize</RimTalk.Memory.UI.TabWindow.Summarize>
+  <RimTalk.Memory.UI.TabWindow.SummarizeAll>Summarize all</RimTalk.Memory.UI.TabWindow.SummarizeAll>
+  <RimTalk.Memory.UI.TabWindow.Summarized>Summarized</RimTalk.Memory.UI.TabWindow.Summarized>
+  <RimTalk.Memory.UI.TabWindow.Summarizing>Summarizing</RimTalk.Memory.UI.TabWindow.Summarizing>
+  <RimTalk.Memory.UI.TabWindow.SummaryPrompt>Prompt editor</RimTalk.Memory.UI.TabWindow.SummaryPrompt>
+  <RimTalk.Memory.UI.TabWindow.Tags>Tags: </RimTalk.Memory.UI.TabWindow.Tags>
+  <RimTalk.Memory.UI.TabWindow.TagsLabel>Tags (comma separated)</RimTalk.Memory.UI.TabWindow.TagsLabel>
+  <RimTalk.Memory.UI.TabWindow.Tools>Tools</RimTalk.Memory.UI.TabWindow.Tools>
+  <RimTalk.Memory.UI.TabWindow.TypeFilter>Type filter</RimTalk.Memory.UI.TabWindow.TypeFilter>
+  <RimTalk.Memory.UI.TabWindow.Unpin>Unpin</RimTalk.Memory.UI.TabWindow.Unpin>
+  <RimTalk.Memory.Utils.Layer_Active>Active (ABM)</RimTalk.Memory.Utils.Layer_Active>
+  <RimTalk.Memory.Utils.Layer_Archive>Archive (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
+  <RimTalk.Memory.Utils.Layer_Default>Unknown layer</RimTalk.Memory.Utils.Layer_Default>
+  <RimTalk.Memory.Utils.Layer_EventLog>Event Log (ELS)</RimTalk.Memory.Utils.Layer_EventLog>
+  <RimTalk.Memory.Utils.Layer_Situational>Situational (SCM)</RimTalk.Memory.Utils.Layer_Situational>
+  <RimTalk.Memory.Utils.Layers>All layers</RimTalk.Memory.Utils.Layers>
+  <RimTalk.Memory.Utils.Types>All types</RimTalk.Memory.Utils.Types>
+  <RimTalk_Archive_ConfirmSummarize>Summarize the selected memories?</RimTalk_Archive_ConfirmSummarize>
+  <RimTalk_Archive_Memory>Memory</RimTalk_Archive_Memory>
+  <RimTalk_Archive_TypeEmotion>Emotion</RimTalk_Archive_TypeEmotion>
+  <RimTalk_Archive_TypeEvent>Event</RimTalk_Archive_TypeEvent>
+  <RimTalk_Archive_TypeRelationship>Relationship</RimTalk_Archive_TypeRelationship>
+  <RimTalk_Archive_TypeSummary>Summary</RimTalk_Archive_TypeSummary>
+  <RimTalk_CanBeExtracted>Can Be Extracted: </RimTalk_CanBeExtracted>
+  <RimTalk_CanBeExtractedDisabled>Content extraction for lore chain disabled (Click to enable)</RimTalk_CanBeExtractedDisabled>
+  <RimTalk_CanBeExtractedEnabled>Content extraction for lore chain enabled (Click to disable)</RimTalk_CanBeExtractedEnabled>
+  <RimTalk_CanBeMatched>Can Be Matched: </RimTalk_CanBeMatched>
+  <RimTalk_CanBeMatchedDisabled>Keyword matching disabled (Click to enable)</RimTalk_CanBeMatchedDisabled>
+  <RimTalk_CanBeMatchedEnabled>Keyword matching enabled (Click to disable)</RimTalk_CanBeMatchedEnabled>
+  <RimTalk_Cancel>Cancel</RimTalk_Cancel>
+  <RimTalk_Close>Close</RimTalk_Close>
+  <RimTalk_DisableAllExtract>Disable All Extraction</RimTalk_DisableAllExtract>
+  <RimTalk_DisableAllMatch>Disable All Matching</RimTalk_DisableAllMatch>
+  <RimTalk_EnableAllExtract>Enable All Extraction</RimTalk_EnableAllExtract>
+  <RimTalk_EnableAllMatch>Enable All Matching</RimTalk_EnableAllMatch>
+  <RimTalk_ExtendedProperties>Extended Properties</RimTalk_ExtendedProperties>
+  <RimTalk_Filter_Action>Action</RimTalk_Filter_Action>
   <RimTalk_Filter_All>All</RimTalk_Filter_All>
   <RimTalk_Filter_Conversation>Conversation</RimTalk_Filter_Conversation>
-  <RimTalk_Filter_Action>Action</RimTalk_Filter_Action>
-  
-  
-  
-  
-  
-  <RimTalk_Cancel>Cancel</RimTalk_Cancel>
-  <RimTalk_Save>Save</RimTalk_Save>
-  <RimTalk_With>with</RimTalk_With>
-  <RimTalk_MemoryType_Conversation>Conversation</RimTalk_MemoryType_Conversation>
+  <RimTalk_Filter_Emotion>Emotion</RimTalk_Filter_Emotion>
+  <RimTalk_Filter_Event>Event</RimTalk_Filter_Event>
+  <RimTalk_Filter_Interaction>Interaction</RimTalk_Filter_Interaction>
+  <RimTalk_Filter_Internal>Internal</RimTalk_Filter_Internal>
+  <RimTalk_Filter_Relationship>Relationship</RimTalk_Filter_Relationship>
+  <RimTalk_Filter_Summarization>Summarization</RimTalk_Filter_Summarization>
+  <RimTalk_Knowledge_AllCleared>Knowledge library cleared</RimTalk_Knowledge_AllCleared>
+  <RimTalk_Knowledge_AutoGenerate>Auto Generate Knowledge</RimTalk_Knowledge_AutoGenerate>
+  <RimTalk_Knowledge_AvgImportance>Avg. Importance: {0}</RimTalk_Knowledge_AvgImportance>
+  <RimTalk_Knowledge_Cancel>Cancel</RimTalk_Knowledge_Cancel>
+  <RimTalk_Knowledge_Categories>Categories</RimTalk_Knowledge_Categories>
+  <RimTalk_Knowledge_CategoryAll>All</RimTalk_Knowledge_CategoryAll>
+  <RimTalk_Knowledge_CategoryHistory>History</RimTalk_Knowledge_CategoryHistory>
+  <RimTalk_Knowledge_CategoryInstructions>Instructions</RimTalk_Knowledge_CategoryInstructions>
+  <RimTalk_Knowledge_CategoryLore>Lore</RimTalk_Knowledge_CategoryLore>
+  <RimTalk_Knowledge_CategoryOther>Other</RimTalk_Knowledge_CategoryOther>
+  <RimTalk_Knowledge_CategoryPawnStatus>Pawn Status</RimTalk_Knowledge_CategoryPawnStatus>
+  <RimTalk_Knowledge_CategoryUnknown>Unknown</RimTalk_Knowledge_CategoryUnknown>
+  <RimTalk_Knowledge_ClearAll>Clear All</RimTalk_Knowledge_ClearAll>
+  <RimTalk_Knowledge_ClearConfirm>Clear all knowledge? This cannot be undone!</RimTalk_Knowledge_ClearConfirm>
+  <RimTalk_Knowledge_Content>Content:</RimTalk_Knowledge_Content>
+  <RimTalk_Knowledge_Delete>Delete</RimTalk_Knowledge_Delete>
+  <RimTalk_Knowledge_DeleteConfirm>Delete {0} knowledge entries?</RimTalk_Knowledge_DeleteConfirm>
+  <RimTalk_Knowledge_DeleteCount>Delete ({0})</RimTalk_Knowledge_DeleteCount>
+  <RimTalk_Knowledge_DeleteItems>Delete Selected ({0})</RimTalk_Knowledge_DeleteItems>
+  <RimTalk_Knowledge_Deleted>Deleted {0} knowledge entries</RimTalk_Knowledge_Deleted>
+  <RimTalk_Knowledge_Details>Details</RimTalk_Knowledge_Details>
+  <RimTalk_Knowledge_DisableAll>Disable All</RimTalk_Knowledge_DisableAll>
+  <RimTalk_Knowledge_DisabledCount>Disabled: {0}</RimTalk_Knowledge_DisabledCount>
+  <RimTalk_Knowledge_Edit>Edit</RimTalk_Knowledge_Edit>
+  <RimTalk_Knowledge_EditEntry>Edit Entry</RimTalk_Knowledge_EditEntry>
+  <RimTalk_Knowledge_EnableAll>Enable All</RimTalk_Knowledge_EnableAll>
+  <RimTalk_Knowledge_Enabled>Enabled: {0}</RimTalk_Knowledge_Enabled>
+  <RimTalk_Knowledge_EnabledCount>Enabled: {0}</RimTalk_Knowledge_EnabledCount>
+  <RimTalk_Knowledge_EntrySaved>Knowledge saved</RimTalk_Knowledge_EntrySaved>
+  <RimTalk_Knowledge_EventRecord>Event Record Knowledge</RimTalk_Knowledge_EventRecord>
+  <RimTalk_Knowledge_EventScanTriggered>Event scan triggered</RimTalk_Knowledge_EventScanTriggered>
+  <RimTalk_Knowledge_ExclusiveTo>Exclusive to {0}</RimTalk_Knowledge_ExclusiveTo>
+  <RimTalk_Knowledge_ExportAll>Export All</RimTalk_Knowledge_ExportAll>
+  <RimTalk_Knowledge_ExportCount>Export ({0})</RimTalk_Knowledge_ExportCount>
+  <RimTalk_Knowledge_ExportItems>Export Selected ({0})</RimTalk_Knowledge_ExportItems>
+  <RimTalk_Knowledge_ExportedToClipboard>Exported {0} knowledge entries to clipboard</RimTalk_Knowledge_ExportedToClipboard>
+  <RimTalk_Knowledge_GenerateNow>Generate Now (Manual)</RimTalk_Knowledge_GenerateNow>
+  <RimTalk_Knowledge_GeneratedPawnStatus>Generated {0} pawn status knowledge entries</RimTalk_Knowledge_GeneratedPawnStatus>
+  <RimTalk_Knowledge_GenerationFailed>Generation failed: {0}</RimTalk_Knowledge_GenerationFailed>
+  <RimTalk_Knowledge_Global>Global</RimTalk_Knowledge_Global>
+  <RimTalk_Knowledge_GlobalAll>Global (All Pawns)</RimTalk_Knowledge_GlobalAll>
+  <RimTalk_Knowledge_Help>Help</RimTalk_Knowledge_Help>
+  <RimTalk_Knowledge_HelpContent>【Knowledge Retrieval Logic】
+The knowledge library automatically injects relevant knowledge during AI conversations:
+
+1. Tag Matching: Extracts tags from conversation context and matches knowledge tags
+   • Any Mode: Matches if any tag is found
+   • All Mode: Matches only if all tags are found
+   • Uses substring matching (case-insensitive)
+
+2. Vector Similarity Matching (requires vector service):
+   • Uses semantic similarity algorithms to find most relevant knowledge
+   • Can find semantically related content even without exact tag matches
+
+3. Importance Ranking:
+   • Matched knowledge is sorted by importance (0.0-1.0) in descending order
+   • Only top N most important entries are injected (configurable in settings)
+
+【How to Write Effective Knowledge】
+
+• Use comma-separated tags (recommended)
+  • Good: [Lore,Ringworld] or [Rules,Dialog]
+  • Good: [CharacterBackground,John] or [Event,Active,Raid]
+  • Why: Commas are standard separators, clear and consistent
+
+• Keep tags clear but avoid too short
+  • Good: [Lore,PlanetSetting] (3+ chars)
+  • Bad: [War] or [AI] (1-2 chars, prone to false matches)
+  • Why: Short tags match too many unrelated contexts
+
+• Use compound tags for precision
+  • Good: [Lore,Ringworld,Technology] or [CharacterBackground,John,Past]
+  • Bad: [John] (may trigger in unrelated conversations)
+
+• Tags must be triggerable by conversations
+  • Problem: Tag [Rules,CombatSystem] won't trigger in "shooting" "melee" conversations
+  • Solution: Use [Combat,Shooting,Melee,Dodge] to add trigger tags
+  • Or: [Rules,Combat,Shooting] keeps categorization while adding triggers
+
+• Avoid using skill names as single tags
+  • Problem: [Shooting] triggers in ALL conversations of pawns with Shooting skill (≥10)
+  • Reason: Match text includes pawn's high-level skill names
+  • Bad: [Shooting], [Melee], [Construction] (frequent false matches)
+  • Good: [Rules,ShootingCombat,Aim], [Tips,Melee,Brawl] (requires explicit mention)
+
+• Make content specific and actionable
+  • Good: This planet is a ringworld with 0.8x Earth gravity
+  • Bad: This planet is special
+
+• Set appropriate importance levels
+  • Core settings/rules: 0.8-1.0
+  • General background: 0.5-0.7
+  • Minor details: 0.3-0.5
+
+• Use extended properties wisely
+  • Can Be Matched: Enable to participate in tag/vector retrieval
+  • Can Be Extracted: Enable for knowledge chain referencing
+
+【Common Questions】
+Q: Why is my knowledge injected too frequently?
+A: Tag might be too short or too broad. Use 3+ character compound tags like [Lore,ColonyHistory] instead of [History]
+
+Q: Why isn't my knowledge being injected?
+A: Check if knowledge is enabled, matching mode is correct, importance isn't too low, and tags are relevant to conversation
+
+Q: How to make AI use certain knowledge only in specific scenarios?
+A: Use precise compound tags (e.g., [Rules,Combat,RangedWeapons]) and moderate importance
+</RimTalk_Knowledge_HelpContent>
+  <RimTalk_Knowledge_HelpTitle>Common Knowledge Library Guide</RimTalk_Knowledge_HelpTitle>
+  <RimTalk_Knowledge_Import>Import</RimTalk_Knowledge_Import>
+  <RimTalk_Knowledge_ImportDescription>Paste knowledge text (Format: [Tag]Content, one per line)</RimTalk_Knowledge_ImportDescription>
+  <RimTalk_Knowledge_ImportTitle>Import Knowledge</RimTalk_Knowledge_ImportTitle>
+  <RimTalk_Knowledge_Importance>Importance:</RimTalk_Knowledge_Importance>
+  <RimTalk_Knowledge_Imported>Imported {0} knowledge entries</RimTalk_Knowledge_Imported>
+  <RimTalk_Knowledge_ItemsSelected>{0} Items Selected</RimTalk_Knowledge_ItemsSelected>
+  <RimTalk_Knowledge_New>New</RimTalk_Knowledge_New>
+  <RimTalk_Knowledge_NewEntry>New Entry</RimTalk_Knowledge_NewEntry>
+  <RimTalk_Knowledge_NoColonists>No colonists on current map</RimTalk_Knowledge_NoColonists>
+  <RimTalk_Knowledge_PawnStatus>Colonist Status Knowledge</RimTalk_Knowledge_PawnStatus>
+  <RimTalk_Knowledge_Save>Save</RimTalk_Knowledge_Save>
+  <RimTalk_Knowledge_SelectOrCreate>Select or create a knowledge entry</RimTalk_Knowledge_SelectOrCreate>
+  <RimTalk_Knowledge_Selected>Selected: {0}</RimTalk_Knowledge_Selected>
+  <RimTalk_Knowledge_Showing>Showing {0} / {1}</RimTalk_Knowledge_Showing>
+  <RimTalk_Knowledge_Status>Status:</RimTalk_Knowledge_Status>
+  <RimTalk_Knowledge_StatusDisabled>Disabled</RimTalk_Knowledge_StatusDisabled>
+  <RimTalk_Knowledge_StatusEnabled>Enabled</RimTalk_Knowledge_StatusEnabled>
+  <RimTalk_Knowledge_Tag>Tag:</RimTalk_Knowledge_Tag>
+  <RimTalk_Knowledge_TagContentEmpty>Tag and content cannot be empty</RimTalk_Knowledge_TagContentEmpty>
+  <RimTalk_Knowledge_TagTest>Tag Test</RimTalk_Knowledge_TagTest>
+  <RimTalk_Knowledge_TagTestClear>Clear</RimTalk_Knowledge_TagTestClear>
+  <RimTalk_Knowledge_TagTestInputContext>Conversation Content:</RimTalk_Knowledge_TagTestInputContext>
+  <RimTalk_Knowledge_TagTestInputTag>Test Tags (comma-separated):</RimTalk_Knowledge_TagTestInputTag>
+  <RimTalk_Knowledge_TagTestMatchText>Actual Match Text:</RimTalk_Knowledge_TagTestMatchText>
+  <RimTalk_Knowledge_TagTestMatched>Matched</RimTalk_Knowledge_TagTestMatched>
+  <RimTalk_Knowledge_TagTestNoPawn>None (conversation only)</RimTalk_Knowledge_TagTestNoPawn>
+  <RimTalk_Knowledge_TagTestNotMatched>Not Matched</RimTalk_Knowledge_TagTestNotMatched>
+  <RimTalk_Knowledge_TagTestResult>Match Result:</RimTalk_Knowledge_TagTestResult>
+  <RimTalk_Knowledge_TagTestSelectPawn>Select Pawn (optional):</RimTalk_Knowledge_TagTestSelectPawn>
+  <RimTalk_Knowledge_TagTestTitle>Tag Matching Test Tool</RimTalk_Knowledge_TagTestTitle>
+  <RimTalk_Knowledge_Total>Total: {0}</RimTalk_Knowledge_Total>
+  <RimTalk_Knowledge_Visibility>Visibility</RimTalk_Knowledge_Visibility>
+  <RimTalk_Knowledge_VisibilityDeleted>(Pawn Deleted)</RimTalk_Knowledge_VisibilityDeleted>
+  <RimTalk_Knowledge_VisibilityExclusive>Exclusive to {0}</RimTalk_Knowledge_VisibilityExclusive>
+  <RimTalk_Knowledge_VisibilityGlobal>Global (All Pawns)</RimTalk_Knowledge_VisibilityGlobal>
+  <RimTalk_LongTermMemories>Long-term Memory</RimTalk_LongTermMemories>
+  <RimTalk_MemoryTitle>{0}'s Memories</RimTalk_MemoryTitle>
   <RimTalk_MemoryType_Action>Action</RimTalk_MemoryType_Action>
-  
-  <RimTalk_Settings_MustEnterGame>Must enter game first</RimTalk_Settings_MustEnterGame>
-  <RimTalk_Settings_CannotFindManager>Cannot find memory manager</RimTalk_Settings_CannotFindManager>
-  
-  
-  
-  <!-- ==================== Matching Source Categories ==================== -->
-  
-  <!-- ==================== Settings UI ==================== -->
-  <!-- Main UI -->
-  <RimTalk_Settings_APIConfigTitle>API Configuration</RimTalk_Settings_APIConfigTitle>
-  <RimTalk_Settings_AdvancedSettings>Advanced Settings...</RimTalk_Settings_AdvancedSettings>
-  
-  <!-- Preset Configuration -->
-  <RimTalk_Settings_PresetConfig>Preset Configuration</RimTalk_Settings_PresetConfig>
-  <RimTalk_Settings_PresetConfigDesc>Quickly switch between light to heavy memory/knowledge injection, with estimated token usage.</RimTalk_Settings_PresetConfigDesc>
-  <RimTalk_Settings_PresetLight>Light</RimTalk_Settings_PresetLight>
-  <RimTalk_Settings_PresetBalanced>Balanced</RimTalk_Settings_PresetBalanced>
-  <RimTalk_Settings_PresetEnhanced>Enhanced</RimTalk_Settings_PresetEnhanced>
-  <RimTalk_Settings_PresetCardContent>{0}\nMemories {1} | Knowledge {2}\n~{3} tokens</RimTalk_Settings_PresetCardContent>
-  <RimTalk_Settings_PresetCardTooltip>{0} memories + {1} knowledge\nEstimated consumption ~{2} tokens</RimTalk_Settings_PresetCardTooltip>
-  <RimTalk_Settings_PresetApplied>Applied preset: {0} (Memory {1}, Knowledge {2})</RimTalk_Settings_PresetApplied>
-  
-  <!-- Feature Entries -->
-  <RimTalk_Settings_FeatureEntries>Feature Entries</RimTalk_Settings_FeatureEntries>
-  <RimTalk_Settings_KnowledgeLibrary>Knowledge Library</RimTalk_Settings_KnowledgeLibrary>
-  <RimTalk_Settings_KnowledgeLibraryTip>Open and manage the global knowledge library</RimTalk_Settings_KnowledgeLibraryTip>
-  <RimTalk_Settings_PromptReplacement>Prompt Replacement</RimTalk_Settings_PromptReplacement>
-  <RimTalk_Settings_PromptReplacementTip>Edit prompt replacement/normalization rules</RimTalk_Settings_PromptReplacementTip>
-  <RimTalk_Settings_InjectionPreviewer>Injection Previewer</RimTalk_Settings_InjectionPreviewer>
-  <RimTalk_Settings_InjectionPreviewerTip>View real-time memory/knowledge injection effects</RimTalk_Settings_InjectionPreviewerTip>
-  
-  <!-- Dynamic Injection Settings -->
-  <RimTalk_Settings_DynamicInjectionSection>Dynamic Injection Settings</RimTalk_Settings_DynamicInjectionSection>
-  <RimTalk_Settings_EnableDynamicInjection>Enable Dynamic Injection</RimTalk_Settings_EnableDynamicInjection>
-  <RimTalk_Settings_DynamicInjectionDesc>Intelligently select the most relevant memories and knowledge to inject into AI conversations.</RimTalk_Settings_DynamicInjectionDesc>
-  <RimTalk_Settings_MaxInjectedMemoriesLabel>Max Injected Memories: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
-  <RimTalk_Settings_MaxInjectedKnowledgeLabel>Max Injected Knowledge: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
-  <RimTalk_Settings_MemoryScoreThresholdLabel>Memory Score Threshold: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
-  <RimTalk_Settings_KnowledgeScoreThresholdLabel>Knowledge Score Threshold: {0}</RimTalk_Settings_KnowledgeScoreThresholdLabel>
-  
-  <!-- Memory Capacity Settings -->
-  <RimTalk_Settings_MemoryCapacitySection>Memory Capacity Configuration</RimTalk_Settings_MemoryCapacitySection>
-  <RimTalk_Settings_SCMCapacityLabel>SCM (Short-term Memory): {0} entries</RimTalk_Settings_SCMCapacityLabel>
-  <RimTalk_Settings_ELSCapacityLabel>ELS (Mid-term Memory): {0} entries</RimTalk_Settings_ELSCapacityLabel>
-  
-  <!-- Decay Settings -->
-  <RimTalk_Settings_MemoryDecaySection>Memory Decay Configuration</RimTalk_Settings_MemoryDecaySection>
-  <RimTalk_Settings_SCMDecayLabel>SCM Decay Rate: {0}</RimTalk_Settings_SCMDecayLabel>
-  <RimTalk_Settings_ELSDecayLabel>ELS Decay Rate: {0}</RimTalk_Settings_ELSDecayLabel>
-  <RimTalk_Settings_CLPADecayLabel>CLPA Decay Rate: {0}</RimTalk_Settings_CLPADecayLabel>
-  <RimTalk_Settings_ABMLifespanLabel>ABM Lifespan: {0} hours (0=disabled, Conversation→SCM, others removed)</RimTalk_Settings_ABMLifespanLabel>
-  
-  <!-- Summarization Settings -->
-  <RimTalk_Settings_SummarizationSection>Memory Summarization Settings</RimTalk_Settings_SummarizationSection>
-  <RimTalk_Settings_EnableDailySummarization>Enable Daily Summarization</RimTalk_Settings_EnableDailySummarization>
-  <RimTalk_Settings_TriggerTimeLabel>Trigger Time: {0}:00</RimTalk_Settings_TriggerTimeLabel>
-  <RimTalk_Settings_EnableAutoArchive>Enable Auto Archive</RimTalk_Settings_EnableAutoArchive>
-  
-  <!-- AI Configuration -->
-  <RimTalk_Settings_AIConfigSection>AI Configuration</RimTalk_Settings_AIConfigSection>
-  <RimTalk_Settings_PreferRimTalkAI>Prefer RimTalk Configuration</RimTalk_Settings_PreferRimTalkAI>
-  <RimTalk_Settings_EnableAILog>Enable AI request logging</RimTalk_Settings_EnableAILog>
-  <RimTalk_Settings_WillFollowRimTalkConfig>Will automatically follow RimTalk Mod's AI configuration</RimTalk_Settings_WillFollowRimTalkConfig>
-  <RimTalk_Settings_FallbackEnabledDesc>Independent fallback chain is active. Calls will move to the next provider automatically on failure.</RimTalk_Settings_FallbackEnabledDesc>
-  <RimTalk_Settings_ApiConfigInvalid>Invalid config: check that the URL is valid and the model is filled in</RimTalk_Settings_ApiConfigInvalid>
-  <RimTalk_Settings_ValidationSuccessAny>Validation passed: at least one config is usable. See logs for details.</RimTalk_Settings_ValidationSuccessAny>
-  <RimTalk_Settings_ValidateInSaveOnly>Validation only works in a save. Load or start a game first.</RimTalk_Settings_ValidateInSaveOnly>
-  <RimTalk_Settings_CloudApiConfigurations>API Configurations</RimTalk_Settings_CloudApiConfigurations>
-  <RimTalk_Settings_CloudApiConfigurationsDesc>Add one or more providers. They form an ordered fallback chain: if a call fails, the next enabled provider is tried automatically.</RimTalk_Settings_CloudApiConfigurationsDesc>
-  <RimTalk_Settings_ProviderHeader>Provider</RimTalk_Settings_ProviderHeader>
-  <RimTalk_Settings_ApiKeyHeader>API Key</RimTalk_Settings_ApiKeyHeader>
-  <RimTalk_Settings_ModelHeader>Model</RimTalk_Settings_ModelHeader>
-  <RimTalk_Settings_EnabledHeader>Enabled</RimTalk_Settings_EnabledHeader>
-  <RimTalk_Settings_EnableDisableTooltip>Enable/Disable this provider as a fallback candidate</RimTalk_Settings_EnableDisableTooltip>
-  <RimTalk_Settings_PlaceholderApiKey>Paste API Key...</RimTalk_Settings_PlaceholderApiKey>
-  <RimTalk_Settings_PlaceholderModelId>Model ID</RimTalk_Settings_PlaceholderModelId>
-  <RimTalk_Settings_BaseUrlTooltip>Custom endpoint base URL (only for Custom provider)</RimTalk_Settings_BaseUrlTooltip>
-  <RimTalk_Settings_ChooseModel>(choose model...)</RimTalk_Settings_ChooseModel>
-  <RimTalk_Settings_DefaultModel>default</RimTalk_Settings_DefaultModel>
-  <RimTalk_Settings_CustomModel>Custom...</RimTalk_Settings_CustomModel>
-  <RimTalk_Settings_QuotaExceeded>AI quota exhausted, please check your provider account</RimTalk_Settings_QuotaExceeded>
-  <RimTalk_Settings_APIKey>API Key</RimTalk_Settings_APIKey>
-  <RimTalk_Settings_APIURL>API URL</RimTalk_Settings_APIURL>
-  <RimTalk_Settings_ModelName>Model</RimTalk_Settings_ModelName>
-  <RimTalk_Settings_EnablePromptCaching>Enable Prompt Caching</RimTalk_Settings_EnablePromptCaching>
-  <RimTalk_Settings_EnablePromptCachingUnavailable>Enable Prompt Caching (Unavailable)</RimTalk_Settings_EnablePromptCachingUnavailable>
-  <RimTalk_Settings_OpenAICachingSupport>✓ OpenAI Supports Prompt Caching (Beta)</RimTalk_Settings_OpenAICachingSupport>
-  <RimTalk_Settings_OpenAICachingModels>Applicable models: gpt-4o, gpt-4-turbo</RimTalk_Settings_OpenAICachingModels>
-  <RimTalk_Settings_DeepSeekCachingSupport>✓ DeepSeek Supports Prompt Caching</RimTalk_Settings_DeepSeekCachingSupport>
-  <RimTalk_Settings_DeepSeekCachingSavings>Can save ~50% in costs</RimTalk_Settings_DeepSeekCachingSavings>
-  <RimTalk_Settings_Player2NoCaching>✗ Player2 does not support Prompt Caching</RimTalk_Settings_Player2NoCaching>
-  <RimTalk_Settings_Player2LocalNoCache>Local client does not require caching</RimTalk_Settings_Player2LocalNoCache>
-  <RimTalk_Settings_Player2GetWebKey>Get Free API Key</RimTalk_Settings_Player2GetWebKey>
-  <RimTalk_Settings_Player2AuthWaiting>Waiting for approval...</RimTalk_Settings_Player2AuthWaiting>
-  <RimTalk_Settings_Player2AuthReopen>Re-open approval page</RimTalk_Settings_Player2AuthReopen>
-  <RimTalk_Settings_Player2AuthCancel>Cancel authorization</RimTalk_Settings_Player2AuthCancel>
-  <RimTalk_Settings_Player2OpenWebsite>Open Player2 Website</RimTalk_Settings_Player2OpenWebsite>
-  <RimTalk_Settings_Player2WebDesc>Get a free web API key without the desktop app. Optional when using the local app.</RimTalk_Settings_Player2WebDesc>
-  <RimTalk_Settings_PlaceholderPlayer2Key>Web Key (Optional for local app)</RimTalk_Settings_PlaceholderPlayer2Key>
-  <RimTalk_Settings_GoogleNoCaching>✗ Google Gemini does not support Prompt Caching</RimTalk_Settings_GoogleNoCaching>
-  <RimTalk_Settings_CustomNoCaching>✗ Custom API does not support Prompt Caching</RimTalk_Settings_CustomNoCaching>
-  <RimTalk_Settings_CustomCachingDepends>Depends on your API implementation</RimTalk_Settings_CustomCachingDepends>
-  <RimTalk_Settings_ValidateConfig>✓ Validate Configuration</RimTalk_Settings_ValidateConfig>
-  <RimTalk_Settings_ValidateConfigTip>Tip: Validation sends a real API request along the fallback chain (in-save only)</RimTalk_Settings_ValidateConfigTip>
-  <RimTalk_Settings_Validating>Validating configuration...</RimTalk_Settings_Validating>
-  <RimTalk_Settings_ValidationFailed>✗ Configuration validation failed, please check API Key and URL</RimTalk_Settings_ValidationFailed>
-  
-  <!-- Memory Types -->
-  <RimTalk_Settings_IsRoundMemoryActive>Enable Round Memory</RimTalk_Settings_IsRoundMemoryActive>
-  <RimTalk_Settings_IsRoundMemoryActiveDesc>When enabled, memory extension captures and injects memories per conversation round instead of individual messages</RimTalk_Settings_IsRoundMemoryActiveDesc>
-  <RimTalk_Settings_IsPlayerDialogueInject>Record Player Dialogue</RimTalk_Settings_IsPlayerDialogueInject>
-  <RimTalk_Settings_IsPlayerDialogueInjectDesc>When enabled, messages sent by the player via the dialogue box will also be recorded into round memory</RimTalk_Settings_IsPlayerDialogueInjectDesc>
-  <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM Injection Rounds: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
-  <RimTalk_Settings_MaxABMInjectionRoundsDesc>Controls how many recent conversation rounds are injected into the AI context</RimTalk_Settings_MaxABMInjectionRoundsDesc>
-  <RimTalk_Settings_MemoryTypesSection>Memory Type Toggles</RimTalk_Settings_MemoryTypesSection>
-  <RimTalk_Settings_ActionMemory>Action Memory</RimTalk_Settings_ActionMemory>
-  <RimTalk_Settings_CombatMemory>Combat Memory</RimTalk_Settings_CombatMemory>
-  <RimTalk_Settings_ConversationMemory>Conversation Memory</RimTalk_Settings_ConversationMemory>
-  
-  <!-- Experimental Features -->
-  <RimTalk_Settings_ExperimentalSection>🚀 Experimental Features</RimTalk_Settings_ExperimentalSection>
-  <RimTalk_Settings_EnableProactiveRecall>Enable Proactive Memory Recall</RimTalk_Settings_EnableProactiveRecall>
-  <RimTalk_Settings_TriggerChanceLabel>Trigger Chance: {0}</RimTalk_Settings_TriggerChanceLabel>
-  
-  <!-- Vector Enhancement -->
-  <RimTalk_Settings_VectorEnhancementSection>🔬 Vector Enhancement Settings</RimTalk_Settings_VectorEnhancementSection>
-  
-  <!-- Advanced Settings Window -->
-  <RimTalk_Settings_AdvancedSettingsTitle>Advanced Settings</RimTalk_Settings_AdvancedSettingsTitle>
-  <RimTalk_Settings_AdvancedSettingsDesc>Includes detailed configurations for injection, memory capacity, decay, etc.</RimTalk_Settings_AdvancedSettingsDesc>
-  
-  <!-- Prompt Replacement Window -->
-  <RimTalk_Settings_PromptReplacementTitle>Prompt Replacement</RimTalk_Settings_PromptReplacementTitle>
-  <RimTalk_Settings_PromptReplacementDesc>Automatically normalize prompts before sending to AI.</RimTalk_Settings_PromptReplacementDesc>
-  
-  <!-- ==================== SettingsUIDrawers Translations ==================== -->
-  <!-- AI Provider Selection -->
-  
-  <!-- Provider Descriptions -->
-  
-  <!-- Knowledge Matching Sources -->
-  <RimTalk_Settings_KnowledgeMatchingSources>Knowledge Matching Source Selection</RimTalk_Settings_KnowledgeMatchingSources>
-  <RimTalk_Settings_KnowledgeMatchingSourcesDesc>Select variables for knowledge matching. Pawn properties will automatically match for all dialogue participants.</RimTalk_Settings_KnowledgeMatchingSourcesDesc>
-  <RimTalk_Settings_RefreshList>Refresh List</RimTalk_Settings_RefreshList>
-  <RimTalk_Settings_ListRefreshed>Variable list refreshed</RimTalk_Settings_ListRefreshed>
-  <RimTalk_Settings_VariableCount>Total {0} variables (Pawn properties: {1})</RimTalk_Settings_VariableCount>
-  <RimTalk_Settings_PawnPropertyTooltip>Property: {0}\nType: Pawn Property\n\n{1}\n\nWhen checked, automatically matches this property for all Pawns in the dialogue.</RimTalk_Settings_PawnPropertyTooltip>
-  <RimTalk_Settings_VariableTooltip>Variable: {0}\n\n{1}</RimTalk_Settings_VariableTooltip>
-  <RimTalk_Settings_AtLeastOneSource>At least one matching source must be selected</RimTalk_Settings_AtLeastOneSource>
-  <RimTalk_Settings_SelectedCount>Selected: {0} (Pawn properties: {1}, Other: {2})</RimTalk_Settings_SelectedCount>
-  
-  <!-- Knowledge Chaining Settings -->
-  <RimTalk_Settings_EnableKnowledgeChaining>Enable Knowledge Chaining (Experimental)</RimTalk_Settings_EnableKnowledgeChaining>
-  <RimTalk_Settings_KnowledgeChainingDesc>Allows knowledge to trigger other knowledge for multi-round matching.</RimTalk_Settings_KnowledgeChainingDesc>
-  <RimTalk_Settings_MaxChainingRoundsLabel>Max Rounds: {0}</RimTalk_Settings_MaxChainingRoundsLabel>
-  
-  <!-- Prompt Normalization -->
-  <RimTalk_Settings_ReplacementRulesList>Replacement Rules List</RimTalk_Settings_ReplacementRulesList>
-  <RimTalk_Settings_AddNewRule>+ Add New Rule</RimTalk_Settings_AddNewRule>
-  <RimTalk_Settings_EnabledRulesCount>Enabled: {0} / {1} rules</RimTalk_Settings_EnabledRulesCount>
-  <RimTalk_Settings_RuleExample>✦ Example: Pattern \(Player\) → Replace Master</RimTalk_Settings_RuleExample>
-  <RimTalk_Settings_RegexSupport>Supports Regular Expressions (case-insensitive)</RimTalk_Settings_RegexSupport>
-  
-  <!-- Vector Enhancement Settings -->
-  <RimTalk_Settings_EnableVectorEnhancement>Enable Vector Enhancement</RimTalk_Settings_EnableVectorEnhancement>
-  <RimTalk_Settings_VectorEnhancementDesc>Use semantic vector retrieval to enhance knowledge matching.</RimTalk_Settings_VectorEnhancementDesc>
-  <RimTalk_Settings_SimilarityThresholdLabel>Similarity Threshold: {0}</RimTalk_Settings_SimilarityThresholdLabel>
-  <RimTalk_Settings_MaxVectorResultsLabel>Max Supplemental Results: {0}</RimTalk_Settings_MaxVectorResultsLabel>
-  <RimTalk_Settings_CloudEmbeddingConfig>Cloud Embedding Configuration</RimTalk_Settings_CloudEmbeddingConfig>
-  <RimTalk_Settings_EmbeddingAPIKey>API Key</RimTalk_Settings_EmbeddingAPIKey>
-  <RimTalk_Settings_EmbeddingAPIURL>API URL</RimTalk_Settings_EmbeddingAPIURL>
-  <RimTalk_Settings_EmbeddingModel>Model</RimTalk_Settings_EmbeddingModel>
-  <RimTalk_Settings_EmbeddingAPIKeyTip>Tip: Leave API Key blank to use the key from the AI Configuration above.</RimTalk_Settings_EmbeddingAPIKeyTip>
-  
-  <!-- ==================== MainTabWindow_Memory Translations ==================== -->
-  <!-- Controls -->
-  
-  <!-- TopBar -->
-  
-  <!-- Utilities -->
-  <RimTalk_Close>Close</RimTalk_Close>
-  
-  <!-- ==================== Dialog_PromptEditor Translations ==================== -->
-  <RimTalk_PromptEditor_Title>Summary Prompt Configuration</RimTalk_PromptEditor_Title>
-  <RimTalk_PromptEditor_Desc>Customize the prompt templates used by the AI for summarizing memories.</RimTalk_PromptEditor_Desc>
-  <RimTalk_PromptEditor_ResetDefault>Reset to Default</RimTalk_PromptEditor_ResetDefault>
-  <RimTalk_PromptEditor_ResetConfirm>Are you sure you want to restore the default prompts?</RimTalk_PromptEditor_ResetConfirm>
-  <RimTalk_PromptEditor_DailySummary>Daily Summary Prompt</RimTalk_PromptEditor_DailySummary>
-  <RimTalk_PromptEditor_DailySummaryDesc>Used for daily SCM → ELS summarization (processes ~20 memories)</RimTalk_PromptEditor_DailySummaryDesc>
-  <RimTalk_PromptEditor_Placeholders>Placeholders: {0}=Colonist Name, {1}=Memory List</RimTalk_PromptEditor_Placeholders>
-  <RimTalk_PromptEditor_DeepArchive>Deep Archive Prompt</RimTalk_PromptEditor_DeepArchive>
-  <RimTalk_PromptEditor_DeepArchiveDesc>Used for deep ELS → CLPA archiving (processes ~15 memories)</RimTalk_PromptEditor_DeepArchiveDesc>
-  <RimTalk_PromptEditor_MaxTokens>Maximum Output Tokens</RimTalk_PromptEditor_MaxTokens>
-  <RimTalk_PromptEditor_MaxTokensDesc>Controls the maximum length of the AI-generated summary.</RimTalk_PromptEditor_MaxTokensDesc>
-  <RimTalk_PromptEditor_MaxTokensLabel>Max Tokens: {0}</RimTalk_PromptEditor_MaxTokensLabel>
-  <RimTalk_PromptEditor_Tips>💡 Tips:</RimTalk_PromptEditor_Tips>
-  <RimTalk_PromptEditor_Tip1>• Small values (100-500) for brief summaries</RimTalk_PromptEditor_Tip1>
-  <RimTalk_PromptEditor_Tip2>• Large values (1000-4000) for detailed summaries</RimTalk_PromptEditor_Tip2>
-  <RimTalk_PromptEditor_Tip3>• Very large values will increase API costs</RimTalk_PromptEditor_Tip3>
-  <RimTalk_PromptEditor_Saved>Summary prompt configuration saved</RimTalk_PromptEditor_Saved>
-  
-  <!-- ==================== Dialog_InjectionPreview Translations ==================== -->
-  <RimTalk_Preview_Title>Injection Preview</RimTalk_Preview_Title>
-  <RimTalk_Preview_CurrentPawn>Current Pawn:</RimTalk_Preview_CurrentPawn>
-  <RimTalk_Preview_TargetPawn>Target Pawn:</RimTalk_Preview_TargetPawn>
-  <RimTalk_Preview_None>None</RimTalk_Preview_None>
-  <RimTalk_Preview_NoneClickToSelect>None (Click to select)</RimTalk_Preview_NoneClickToSelect>
+  <RimTalk_MemoryType_Conversation>Conversation</RimTalk_MemoryType_Conversation>
+  <RimTalk_MemoryType_Emotion>Emotion</RimTalk_MemoryType_Emotion>
+  <RimTalk_MemoryType_Event>Event</RimTalk_MemoryType_Event>
+  <RimTalk_MemoryType_Interaction>Interaction</RimTalk_MemoryType_Interaction>
+  <RimTalk_MemoryType_Internal>Internal</RimTalk_MemoryType_Internal>
+  <RimTalk_MemoryType_Relationship>Relationship</RimTalk_MemoryType_Relationship>
+  <RimTalk_MemoryType_Summarization>Summarization</RimTalk_MemoryType_Summarization>
+  <RimTalk_Memory_NoMemories>No memories to display</RimTalk_Memory_NoMemories>
+  <RimTalk_MindStream_Action>Action</RimTalk_MindStream_Action>
+  <RimTalk_MindStream_Conversation>Conversation</RimTalk_MindStream_Conversation>
+  <RimTalk_No>No</RimTalk_No>
   <RimTalk_Preview_Clear>Clear</RimTalk_Preview_Clear>
-  <RimTalk_Preview_Refresh>Refresh Preview</RimTalk_Preview_Refresh>
-  <RimTalk_Preview_NoColonist>No colonists available</RimTalk_Preview_NoColonist>
-  
-  <RimTalk_Preview_KnowledgeSection>Knowledge Injection</RimTalk_Preview_KnowledgeSection>
-  <RimTalk_Preview_MatchingSource>Matching Source</RimTalk_Preview_MatchingSource>
-  <RimTalk_Preview_ParsedMatchText>Parsed Match Text:</RimTalk_Preview_ParsedMatchText>
-  <RimTalk_Preview_NoParsedText>(No parsed text)</RimTalk_Preview_NoParsedText>
-  <RimTalk_Preview_MatchedKnowledge>Matched Knowledge:</RimTalk_Preview_MatchedKnowledge>
-  <RimTalk_Preview_NoMatchedKnowledge>No knowledge matched</RimTalk_Preview_NoMatchedKnowledge>
-  <RimTalk_Preview_NoMatchingSources>No matching sources configured</RimTalk_Preview_NoMatchingSources>
-  <RimTalk_Preview_Score>Score: {0}</RimTalk_Preview_Score>
-  
-  <RimTalk_Preview_MemorySection>Memory Injection</RimTalk_Preview_MemorySection>
-  <RimTalk_Preview_MemoryLayers>Memory Layers:</RimTalk_Preview_MemoryLayers>
-  <RimTalk_Preview_InjectionConfig>Injection Config:</RimTalk_Preview_InjectionConfig>
   <RimTalk_Preview_ClickRefresh>Click "Refresh Preview" to see results</RimTalk_Preview_ClickRefresh>
-  <RimTalk_Preview_NoMemoryComp>Selected pawn has no memory component</RimTalk_Preview_NoMemoryComp>
-  <RimTalk_Preview_SelectedMemories>Selected Memories:</RimTalk_Preview_SelectedMemories>
-  <RimTalk_Preview_ScoreDetail>Score: {0}</RimTalk_Preview_ScoreDetail>
-  <RimTalk_Preview_NoMemoriesAboveThreshold>No memories above threshold</RimTalk_Preview_NoMemoriesAboveThreshold>
-  <RimTalk_Preview_StaticMode>Static mode (Dynamic injection disabled)</RimTalk_Preview_StaticMode>
-  <RimTalk_Preview_Error>Error: {0}</RimTalk_Preview_Error>
-  
-  
   <RimTalk_Preview_Colonist>(Colonist)</RimTalk_Preview_Colonist>
-  <RimTalk_Preview_Prisoner>(Prisoner)</RimTalk_Preview_Prisoner>
-  <RimTalk_Preview_Slave>(Slave)</RimTalk_Preview_Slave>
+  <RimTalk_Preview_CurrentPawn>Current Pawn:</RimTalk_Preview_CurrentPawn>
+  <RimTalk_Preview_Error>Error: {0}</RimTalk_Preview_Error>
   <RimTalk_Preview_Guest>(Guest)</RimTalk_Preview_Guest>
-  <RimTalk_Preview_SameAsCurrent>(Same as current)</RimTalk_Preview_SameAsCurrent>
-  <RimTalk_Preview_NoHumanlikes>No humanlikes available to select</RimTalk_Preview_NoHumanlikes>
   <RimTalk_Preview_Help>Help</RimTalk_Preview_Help>
-  <RimTalk_Preview_NoContext>[No Context, please trigger a dialogue first]</RimTalk_Preview_NoContext>
   <RimTalk_Preview_HelpContent>=== Injection Previewer Help ===
 
 【Overview】
@@ -387,81 +293,164 @@ This tool previews memory and knowledge injection effects, helping you understan
 • Environment variables require map information
 • Other variables require at least one generated conversation to parse
 </RimTalk_Preview_HelpContent>
-
-  <!-- ==================== New Memory Archive Workbench UI ==================== -->
-  <RimTalk.Memory.UI.TabWindow.Need_SelectPawn>Select pawn</RimTalk.Memory.UI.TabWindow.Need_SelectPawn>
-  <RimTalk.Memory.UI.TabWindow.NoFaction>No faction</RimTalk.Memory.UI.TabWindow.NoFaction>
-  <RimTalk.Memory.UI.TabWindow.LayerFilter>Layer filter</RimTalk.Memory.UI.TabWindow.LayerFilter>
-  <RimTalk.Memory.UI.TabWindow.TypeFilter>Type filter</RimTalk.Memory.UI.TabWindow.TypeFilter>
-  <RimTalk.Memory.UI.TabWindow.Tools>Tools</RimTalk.Memory.UI.TabWindow.Tools>
-  <RimTalk.Memory.UI.TabWindow.Knowledge>Knowledge</RimTalk.Memory.UI.TabWindow.Knowledge>
-  <RimTalk.Memory.UI.TabWindow.CreateMemory>New memory</RimTalk.Memory.UI.TabWindow.CreateMemory>
-  <RimTalk.Memory.UI.TabWindow.Preview>Injection preview</RimTalk.Memory.UI.TabWindow.Preview>
-  <RimTalk.Memory.UI.TabWindow.SummaryPrompt>Prompt editor</RimTalk.Memory.UI.TabWindow.SummaryPrompt>
-  <RimTalk.Memory.UI.TabWindow.Export>Export</RimTalk.Memory.UI.TabWindow.Export>
-  <RimTalk.Memory.UI.TabWindow.Import>Import</RimTalk.Memory.UI.TabWindow.Import>
-  <RimTalk.Memory.UI.TabWindow.OpenImportFolder>Open import folder</RimTalk.Memory.UI.TabWindow.OpenImportFolder>
-  <RimTalk.Memory.UI.TabWindow.ConfirmImport>Confirm import?</RimTalk.Memory.UI.TabWindow.ConfirmImport>
-  <RimTalk.Memory.UI.TabWindow.SummarizeAll>Summarize all</RimTalk.Memory.UI.TabWindow.SummarizeAll>
-  <RimTalk.Memory.UI.TabWindow.OperationGuide>Operation guide</RimTalk.Memory.UI.TabWindow.OperationGuide>
-  <RimTalk.Memory.UI.TabWindow.Selected>{0} memories selected</RimTalk.Memory.UI.TabWindow.Selected>
-  <RimTalk.Memory.UI.TabWindow.Delete>Delete</RimTalk.Memory.UI.TabWindow.Delete>
-  <RimTalk.Memory.UI.TabWindow.ChronicleTitle>Life chronicle ({COUNT} CLPA chapters)</RimTalk.Memory.UI.TabWindow.ChronicleTitle>
-  <RimTalk.Memory.UI.TabWindow.Pin>Pin</RimTalk.Memory.UI.TabWindow.Pin>
-  <RimTalk.Memory.UI.TabWindow.Unpin>Unpin</RimTalk.Memory.UI.TabWindow.Unpin>
-  <RimTalk.Memory.UI.TabWindow.CreateTitle>New memory for {NAME}</RimTalk.Memory.UI.TabWindow.CreateTitle>
-  <RimTalk.Memory.UI.TabWindow.ContentLabel>Content</RimTalk.Memory.UI.TabWindow.ContentLabel>
-  <RimTalk.Memory.UI.TabWindow.TagsLabel>Tags (comma separated)</RimTalk.Memory.UI.TabWindow.TagsLabel>
-  <RimTalk.Memory.UI.TabWindow.NotesLabel>Notes</RimTalk.Memory.UI.TabWindow.NotesLabel>
-  <RimTalk.Memory.UI.TabWindow.CurrentImportance>Current importance: </RimTalk.Memory.UI.TabWindow.CurrentImportance>
-  <RimTalk.Memory.UI.TabWindow.PinLabel>Pin this memory</RimTalk.Memory.UI.TabWindow.PinLabel>
-  <RimTalk.Memory.UI.TabWindow.Cancel>Cancel</RimTalk.Memory.UI.TabWindow.Cancel>
-  <RimTalk.Memory.UI.TabWindow.Save>Save</RimTalk.Memory.UI.TabWindow.Save>
-  <RimTalk.Memory.UI.TabWindow.Created>Memory created</RimTalk.Memory.UI.TabWindow.Created>
-  <RimTalk.Memory.UI.TabWindow.Guide>=== Memory Archive Workbench Guide ===
-
-[Layout]
-- Top: pawn selector, filters and tools menu
-- Top-left: life chronicle navigation (CLPA)
-- Bottom-left: vertical timeline (ABM/SCM/ELS)
-- Right: memory details and editing
-
-[Controls]
-- Click a card to focus; Ctrl for multi-select; drag on empty space to box-select
-- Scroll wheel scrolls the timeline, pans the chronicle, zooms the chronicle axis
-- Dragging the chronicle cursor repositions the timeline
-- Drag the splitter to resize timeline vs. details
-</RimTalk.Memory.UI.TabWindow.Guide>
-  <RimTalk.Memory.Utils.Layers>All layers</RimTalk.Memory.Utils.Layers>
-  <RimTalk.Memory.Utils.Types>All types</RimTalk.Memory.Utils.Types>
-  <RimTalk.Memory.Utils.Layer_Active>Active (ABM)</RimTalk.Memory.Utils.Layer_Active>
-  <RimTalk.Memory.Utils.Layer_Situational>Situational (SCM)</RimTalk.Memory.Utils.Layer_Situational>
-  <RimTalk.Memory.Utils.Layer_EventLog>Event Log (ELS)</RimTalk.Memory.Utils.Layer_EventLog>
-  <RimTalk.Memory.Utils.Layer_Archive>Archive (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
-  <RimTalk.Memory.Utils.Layer_Default>Unknown layer</RimTalk.Memory.Utils.Layer_Default>
-  <RimTalk.Memory.UI.TabWindow.Details>Memory details</RimTalk.Memory.UI.TabWindow.Details>
-  <RimTalk.Memory.UI.TabWindow.Importance>Importance: {IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
-  <RimTalk.Memory.UI.TabWindow.Activity>Activity: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
-  <RimTalk.Memory.UI.TabWindow.Tags>Tags: </RimTalk.Memory.UI.TabWindow.Tags>
-  <RimTalk.Memory.UI.TabWindow.Notes>Notes: </RimTalk.Memory.UI.TabWindow.Notes>
-  <RimTalk.Memory.UI.TabWindow.Pinned>Pinned</RimTalk.Memory.UI.TabWindow.Pinned>
-  <RimTalk.Memory.UI.TabWindow.NotPinned>Not pinned</RimTalk.Memory.UI.TabWindow.NotPinned>
-  <RimTalk.Memory.UI.TabWindow.Summarizing>Summarizing</RimTalk.Memory.UI.TabWindow.Summarizing>
-  <RimTalk.Memory.UI.TabWindow.Summarized>Summarized</RimTalk.Memory.UI.TabWindow.Summarized>
-  <RimTalk.Memory.UI.TabWindow.NotSummarized>Not summarized</RimTalk.Memory.UI.TabWindow.NotSummarized>
-  <RimTalk.Memory.UI.TabWindow.Edit>Edit</RimTalk.Memory.UI.TabWindow.Edit>
-  <RimTalk.Memory.UI.TabWindow.SaveEdit>Save</RimTalk.Memory.UI.TabWindow.SaveEdit>
-  <RimTalk.Memory.UI.TabWindow.CancelEdit>Cancel</RimTalk.Memory.UI.TabWindow.CancelEdit>
-  <RimTalk.Memory.UI.TabWindow.ClearSelection>Clear selection</RimTalk.Memory.UI.TabWindow.ClearSelection>
-  <RimTalk.Memory.UI.TabWindow.Archive>Archive</RimTalk.Memory.UI.TabWindow.Archive>
-  <RimTalk.Memory.UI.TabWindow.Summarize>Summarize</RimTalk.Memory.UI.TabWindow.Summarize>
-  <RimTalk.Memory.UI.TabWindow.ConfirmDelete>Delete {COUNT} selected memories?</RimTalk.Memory.UI.TabWindow.ConfirmDelete>
-  <RimTalk.Memory.UI.TabWindow.ConfirmArchive>Archive the selected memories?</RimTalk.Memory.UI.TabWindow.ConfirmArchive>
-
-  <RimTalk_Archive_Memory>Memory</RimTalk_Archive_Memory>
-  <RimTalk_Archive_TypeSummary>Summary</RimTalk_Archive_TypeSummary>
-  <RimTalk_Archive_TypeEvent>Event</RimTalk_Archive_TypeEvent>
-  <RimTalk_Archive_TypeEmotion>Emotion</RimTalk_Archive_TypeEmotion>
-  <RimTalk_Archive_TypeRelationship>Relationship</RimTalk_Archive_TypeRelationship>
-  <RimTalk_Archive_ConfirmSummarize>Summarize the selected memories?</RimTalk_Archive_ConfirmSummarize>
+  <RimTalk_Preview_InjectionConfig>Injection Config:</RimTalk_Preview_InjectionConfig>
+  <RimTalk_Preview_KnowledgeSection>Knowledge Injection</RimTalk_Preview_KnowledgeSection>
+  <RimTalk_Preview_MatchedKnowledge>Matched Knowledge:</RimTalk_Preview_MatchedKnowledge>
+  <RimTalk_Preview_MatchingSource>Matching Source</RimTalk_Preview_MatchingSource>
+  <RimTalk_Preview_MemoryLayers>Memory Layers:</RimTalk_Preview_MemoryLayers>
+  <RimTalk_Preview_MemorySection>Memory Injection</RimTalk_Preview_MemorySection>
+  <RimTalk_Preview_NoColonist>No colonists available</RimTalk_Preview_NoColonist>
+  <RimTalk_Preview_NoContext>[No Context, please trigger a dialogue first]</RimTalk_Preview_NoContext>
+  <RimTalk_Preview_NoHumanlikes>No humanlikes available to select</RimTalk_Preview_NoHumanlikes>
+  <RimTalk_Preview_NoMatchedKnowledge>No knowledge matched</RimTalk_Preview_NoMatchedKnowledge>
+  <RimTalk_Preview_NoMatchingSources>No matching sources configured</RimTalk_Preview_NoMatchingSources>
+  <RimTalk_Preview_NoMemoriesAboveThreshold>No memories above threshold</RimTalk_Preview_NoMemoriesAboveThreshold>
+  <RimTalk_Preview_NoMemoryComp>Selected pawn has no memory component</RimTalk_Preview_NoMemoryComp>
+  <RimTalk_Preview_NoParsedText>(No parsed text)</RimTalk_Preview_NoParsedText>
+  <RimTalk_Preview_None>None</RimTalk_Preview_None>
+  <RimTalk_Preview_NoneClickToSelect>None (Click to select)</RimTalk_Preview_NoneClickToSelect>
+  <RimTalk_Preview_ParsedMatchText>Parsed Match Text:</RimTalk_Preview_ParsedMatchText>
+  <RimTalk_Preview_Prisoner>(Prisoner)</RimTalk_Preview_Prisoner>
+  <RimTalk_Preview_Refresh>Refresh Preview</RimTalk_Preview_Refresh>
+  <RimTalk_Preview_SameAsCurrent>(Same as current)</RimTalk_Preview_SameAsCurrent>
+  <RimTalk_Preview_Score>Score: {0}</RimTalk_Preview_Score>
+  <RimTalk_Preview_ScoreDetail>Score: {0}</RimTalk_Preview_ScoreDetail>
+  <RimTalk_Preview_SelectedMemories>Selected Memories:</RimTalk_Preview_SelectedMemories>
+  <RimTalk_Preview_Slave>(Slave)</RimTalk_Preview_Slave>
+  <RimTalk_Preview_StaticMode>Static mode (Dynamic injection disabled)</RimTalk_Preview_StaticMode>
+  <RimTalk_Preview_TargetPawn>Target Pawn:</RimTalk_Preview_TargetPawn>
+  <RimTalk_Preview_Title>Injection Preview</RimTalk_Preview_Title>
+  <RimTalk_PromptEditor_DailySummary>Daily Summary Prompt</RimTalk_PromptEditor_DailySummary>
+  <RimTalk_PromptEditor_DailySummaryDesc>Used for daily SCM to ELS summarization (processes ~20 memories)</RimTalk_PromptEditor_DailySummaryDesc>
+  <RimTalk_PromptEditor_DeepArchive>Deep Archive Prompt</RimTalk_PromptEditor_DeepArchive>
+  <RimTalk_PromptEditor_DeepArchiveDesc>Used for deep ELS to CLPA archiving (processes ~15 memories)</RimTalk_PromptEditor_DeepArchiveDesc>
+  <RimTalk_PromptEditor_Desc>Customize the prompt templates used by the AI for summarizing memories.</RimTalk_PromptEditor_Desc>
+  <RimTalk_PromptEditor_MaxTokens>Maximum Output Tokens</RimTalk_PromptEditor_MaxTokens>
+  <RimTalk_PromptEditor_MaxTokensDesc>Controls the maximum length of the AI-generated summary.</RimTalk_PromptEditor_MaxTokensDesc>
+  <RimTalk_PromptEditor_MaxTokensLabel>Max Tokens: {0}</RimTalk_PromptEditor_MaxTokensLabel>
+  <RimTalk_PromptEditor_Placeholders>Placeholders: {0}=Colonist Name, {1}=Memory List</RimTalk_PromptEditor_Placeholders>
+  <RimTalk_PromptEditor_ResetConfirm>Are you sure you want to restore the default prompts?</RimTalk_PromptEditor_ResetConfirm>
+  <RimTalk_PromptEditor_ResetDefault>Reset to Default</RimTalk_PromptEditor_ResetDefault>
+  <RimTalk_PromptEditor_Saved>Summary prompt configuration saved</RimTalk_PromptEditor_Saved>
+  <RimTalk_PromptEditor_Tip1>• Small values (100-500) for brief summaries</RimTalk_PromptEditor_Tip1>
+  <RimTalk_PromptEditor_Tip2>• Large values (1000-4000) for detailed summaries</RimTalk_PromptEditor_Tip2>
+  <RimTalk_PromptEditor_Tip3>• Very large values will increase API costs</RimTalk_PromptEditor_Tip3>
+  <RimTalk_PromptEditor_Tips>Tips:</RimTalk_PromptEditor_Tips>
+  <RimTalk_PromptEditor_Title>Summary Prompt Configuration</RimTalk_PromptEditor_Title>
+  <RimTalk_Save>Save</RimTalk_Save>
+  <RimTalk_Settings_ABMLifespanLabel>ABM Lifespan: {0} hours (0=disabled, Conversation to SCM, others removed)</RimTalk_Settings_ABMLifespanLabel>
+  <RimTalk_Settings_AIConfigSection>AI Configuration</RimTalk_Settings_AIConfigSection>
+  <RimTalk_Settings_APIConfigTitle>API Configuration</RimTalk_Settings_APIConfigTitle>
+  <RimTalk_Settings_ActionMemory>Action Memory (work, combat)</RimTalk_Settings_ActionMemory>
+  <RimTalk_Settings_AddNewRule>+ Add New Rule</RimTalk_Settings_AddNewRule>
+  <RimTalk_Settings_AdvancedSettings>Advanced Settings...</RimTalk_Settings_AdvancedSettings>
+  <RimTalk_Settings_AdvancedSettingsDesc>Includes detailed configurations for injection, memory capacity, decay, etc.</RimTalk_Settings_AdvancedSettingsDesc>
+  <RimTalk_Settings_AdvancedSettingsTitle>Advanced Settings</RimTalk_Settings_AdvancedSettingsTitle>
+  <RimTalk_Settings_ApiConfigInvalid>Invalid config: check that the URL is valid and the model is filled in</RimTalk_Settings_ApiConfigInvalid>
+  <RimTalk_Settings_ApiKeyHeader>API Key</RimTalk_Settings_ApiKeyHeader>
+  <RimTalk_Settings_AtLeastOneSource>At least one matching source must be selected</RimTalk_Settings_AtLeastOneSource>
+  <RimTalk_Settings_BaseUrlTooltip>Custom endpoint base URL (only for Custom provider)</RimTalk_Settings_BaseUrlTooltip>
+  <RimTalk_Settings_CLPADecayLabel>CLPA Decay Rate: {0}</RimTalk_Settings_CLPADecayLabel>
+  <RimTalk_Settings_CannotFindManager>Cannot find memory manager</RimTalk_Settings_CannotFindManager>
+  <RimTalk_Settings_CloudApiConfigurations>API Configurations</RimTalk_Settings_CloudApiConfigurations>
+  <RimTalk_Settings_CloudApiConfigurationsDesc>Add one or more providers. They form an ordered fallback chain: if a call fails, the next enabled provider is tried automatically.</RimTalk_Settings_CloudApiConfigurationsDesc>
+  <RimTalk_Settings_CloudEmbeddingConfig>Cloud Embedding Configuration</RimTalk_Settings_CloudEmbeddingConfig>
+  <RimTalk_Settings_CombatMemory>Combat Memory</RimTalk_Settings_CombatMemory>
+  <RimTalk_Settings_ConversationMemory>Conversation Memory (RimTalk dialogues)</RimTalk_Settings_ConversationMemory>
+  <RimTalk_Settings_DynamicInjectionDesc>Dynamically select the most relevant memories and knowledge based on time, importance and keyword matching</RimTalk_Settings_DynamicInjectionDesc>
+  <RimTalk_Settings_DynamicInjectionSection>Dynamic Injection Settings</RimTalk_Settings_DynamicInjectionSection>
+  <RimTalk_Settings_ELSCapacityLabel>ELS (Mid-term Memory): {0} entries</RimTalk_Settings_ELSCapacityLabel>
+  <RimTalk_Settings_ELSDecayLabel>ELS Decay Rate: {0}</RimTalk_Settings_ELSDecayLabel>
+  <RimTalk_Settings_EmbeddingAPIKey>API Key</RimTalk_Settings_EmbeddingAPIKey>
+  <RimTalk_Settings_EmbeddingAPIKeyTip>Tip: Leave API Key blank to use the key from the AI Configuration above.</RimTalk_Settings_EmbeddingAPIKeyTip>
+  <RimTalk_Settings_EmbeddingAPIURL>API URL</RimTalk_Settings_EmbeddingAPIURL>
+  <RimTalk_Settings_EmbeddingModel>Model</RimTalk_Settings_EmbeddingModel>
+  <RimTalk_Settings_EnableAILog>Enable AI request logging</RimTalk_Settings_EnableAILog>
+  <RimTalk_Settings_EnableAutoArchive>Enable Auto Archive</RimTalk_Settings_EnableAutoArchive>
+  <RimTalk_Settings_EnableDailySummarization>Enable Daily Summarization</RimTalk_Settings_EnableDailySummarization>
+  <RimTalk_Settings_EnableDisableTooltip>Enable/Disable this provider as a fallback candidate</RimTalk_Settings_EnableDisableTooltip>
+  <RimTalk_Settings_EnableDynamicInjection>Enable Dynamic Memory Injection (Recommended)</RimTalk_Settings_EnableDynamicInjection>
+  <RimTalk_Settings_EnableKnowledgeChaining>Enable Knowledge Chaining (Experimental)</RimTalk_Settings_EnableKnowledgeChaining>
+  <RimTalk_Settings_EnableProactiveRecall>Enable Proactive Memory Recall</RimTalk_Settings_EnableProactiveRecall>
+  <RimTalk_Settings_EnableVectorEnhancement>Enable Vector Enhancement</RimTalk_Settings_EnableVectorEnhancement>
+  <RimTalk_Settings_EnabledHeader>Enabled</RimTalk_Settings_EnabledHeader>
+  <RimTalk_Settings_EnabledRulesCount>Enabled: {0} / {1} rules</RimTalk_Settings_EnabledRulesCount>
+  <RimTalk_Settings_ExperimentalSection>Experimental Features</RimTalk_Settings_ExperimentalSection>
+  <RimTalk_Settings_FallbackEnabledDesc>Independent fallback chain is active. Calls will move to the next provider automatically on failure.</RimTalk_Settings_FallbackEnabledDesc>
+  <RimTalk_Settings_FeatureEntries>Feature Entries</RimTalk_Settings_FeatureEntries>
+  <RimTalk_Settings_InjectionPreviewer>Injection Previewer</RimTalk_Settings_InjectionPreviewer>
+  <RimTalk_Settings_InjectionPreviewerTip>View real-time memory/knowledge injection effects</RimTalk_Settings_InjectionPreviewerTip>
+  <RimTalk_Settings_IsPlayerDialogueInject>Record Player Dialogue</RimTalk_Settings_IsPlayerDialogueInject>
+  <RimTalk_Settings_IsPlayerDialogueInjectDesc>When enabled, messages sent by the player via the dialogue box will also be recorded into round memory</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+  <RimTalk_Settings_IsRoundMemoryActive>Enable Round Memory</RimTalk_Settings_IsRoundMemoryActive>
+  <RimTalk_Settings_IsRoundMemoryActiveDesc>When enabled, memory extension captures and injects memories per conversation round instead of individual messages</RimTalk_Settings_IsRoundMemoryActiveDesc>
+  <RimTalk_Settings_KnowledgeChainingDesc>Allows knowledge to trigger other knowledge for multi-round matching.</RimTalk_Settings_KnowledgeChainingDesc>
+  <RimTalk_Settings_KnowledgeLibrary>Knowledge Library</RimTalk_Settings_KnowledgeLibrary>
+  <RimTalk_Settings_KnowledgeLibraryTip>Open and manage the global knowledge library</RimTalk_Settings_KnowledgeLibraryTip>
+  <RimTalk_Settings_KnowledgeMatchingSources>Knowledge Matching Source Selection</RimTalk_Settings_KnowledgeMatchingSources>
+  <RimTalk_Settings_KnowledgeMatchingSourcesDesc>Select variables for knowledge matching. Pawn properties will automatically match for all dialogue participants.</RimTalk_Settings_KnowledgeMatchingSourcesDesc>
+  <RimTalk_Settings_KnowledgeScoreThresholdLabel>Knowledge Score Threshold: {0}</RimTalk_Settings_KnowledgeScoreThresholdLabel>
+  <RimTalk_Settings_ListRefreshed>Variable list refreshed</RimTalk_Settings_ListRefreshed>
+  <RimTalk_Settings_MaxABMInjectionRoundsDesc>Controls how many recent conversation rounds are injected into the AI context</RimTalk_Settings_MaxABMInjectionRoundsDesc>
+  <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM Injection Rounds: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
+  <RimTalk_Settings_MaxChainingRoundsLabel>Max Rounds: {0}</RimTalk_Settings_MaxChainingRoundsLabel>
+  <RimTalk_Settings_MaxInjectedKnowledgeLabel>Max Injected Knowledge: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
+  <RimTalk_Settings_MaxInjectedMemoriesLabel>Max Injected Memories: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
+  <RimTalk_Settings_MaxVectorResultsLabel>Max Supplemental Results: {0}</RimTalk_Settings_MaxVectorResultsLabel>
+  <RimTalk_Settings_MemoryCapacitySection>Memory Capacity Configuration</RimTalk_Settings_MemoryCapacitySection>
+  <RimTalk_Settings_MemoryDecaySection>Memory Decay Configuration</RimTalk_Settings_MemoryDecaySection>
+  <RimTalk_Settings_MemoryScoreThresholdLabel>Memory Score Threshold: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
+  <RimTalk_Settings_MemoryTypesSection>Memory Type Toggles</RimTalk_Settings_MemoryTypesSection>
+  <RimTalk_Settings_ModelHeader>Model</RimTalk_Settings_ModelHeader>
+  <RimTalk_Settings_MustEnterGame>Must enter game to manage knowledge library</RimTalk_Settings_MustEnterGame>
+  <RimTalk_Settings_PawnPropertyTooltip>Property: {0}\nType: Pawn Property\n\n{1}\n\nWhen checked, automatically matches this property for all Pawns in the dialogue.</RimTalk_Settings_PawnPropertyTooltip>
+  <RimTalk_Settings_PlaceholderApiKey>Paste API Key...</RimTalk_Settings_PlaceholderApiKey>
+  <RimTalk_Settings_PlaceholderModelId>Model ID</RimTalk_Settings_PlaceholderModelId>
+  <RimTalk_Settings_PlaceholderPlayer2Key>Web Key (Optional for local app)</RimTalk_Settings_PlaceholderPlayer2Key>
+  <RimTalk_Settings_Player2AuthCancel>Cancel authorization</RimTalk_Settings_Player2AuthCancel>
+  <RimTalk_Settings_Player2AuthReopen>Re-open approval page</RimTalk_Settings_Player2AuthReopen>
+  <RimTalk_Settings_Player2AuthWaiting>Waiting for approval...</RimTalk_Settings_Player2AuthWaiting>
+  <RimTalk_Settings_Player2GetWebKey>Get Free API Key</RimTalk_Settings_Player2GetWebKey>
+  <RimTalk_Settings_Player2OpenWebsite>Open Player2 Website</RimTalk_Settings_Player2OpenWebsite>
+  <RimTalk_Settings_Player2WebDesc>Get a free web API key without the desktop app. Optional when using the local app.</RimTalk_Settings_Player2WebDesc>
+  <RimTalk_Settings_PreferRimTalkAI>Prefer RimTalk's AI Configuration</RimTalk_Settings_PreferRimTalkAI>
+  <RimTalk_Settings_PresetApplied>Applied preset: {0} (Memory {1}, Knowledge {2})</RimTalk_Settings_PresetApplied>
+  <RimTalk_Settings_PresetBalanced>Balanced</RimTalk_Settings_PresetBalanced>
+  <RimTalk_Settings_PresetCardContent>{0}\nMemories {1} | Knowledge {2}\n~{3} tokens</RimTalk_Settings_PresetCardContent>
+  <RimTalk_Settings_PresetCardTooltip>{0} memories + {1} knowledge\nEstimated consumption ~{2} tokens</RimTalk_Settings_PresetCardTooltip>
+  <RimTalk_Settings_PresetConfig>Preset Configuration</RimTalk_Settings_PresetConfig>
+  <RimTalk_Settings_PresetConfigDesc>Quickly switch between light to heavy memory/knowledge injection, with estimated token usage.</RimTalk_Settings_PresetConfigDesc>
+  <RimTalk_Settings_PresetEnhanced>Enhanced</RimTalk_Settings_PresetEnhanced>
+  <RimTalk_Settings_PresetLight>Light</RimTalk_Settings_PresetLight>
+  <RimTalk_Settings_PromptReplacement>Prompt Replacement</RimTalk_Settings_PromptReplacement>
+  <RimTalk_Settings_PromptReplacementDesc>Automatically normalize prompts before sending to AI.</RimTalk_Settings_PromptReplacementDesc>
+  <RimTalk_Settings_PromptReplacementTip>Edit prompt replacement/normalization rules</RimTalk_Settings_PromptReplacementTip>
+  <RimTalk_Settings_PromptReplacementTitle>Prompt Replacement</RimTalk_Settings_PromptReplacementTitle>
+  <RimTalk_Settings_ProviderHeader>Provider</RimTalk_Settings_ProviderHeader>
+  <RimTalk_Settings_RefreshList>Refresh List</RimTalk_Settings_RefreshList>
+  <RimTalk_Settings_RegexSupport>Supports Regular Expressions (case-insensitive)</RimTalk_Settings_RegexSupport>
+  <RimTalk_Settings_ReplacementRulesList>Replacement Rules List</RimTalk_Settings_ReplacementRulesList>
+  <RimTalk_Settings_RuleExample>Example: Pattern \(Player\) replaced with Master</RimTalk_Settings_RuleExample>
+  <RimTalk_Settings_SCMCapacityLabel>SCM (Short-term Memory): {0} entries</RimTalk_Settings_SCMCapacityLabel>
+  <RimTalk_Settings_SCMDecayLabel>SCM Decay Rate: {0}</RimTalk_Settings_SCMDecayLabel>
+  <RimTalk_Settings_SelectedCount>Selected: {0} (Pawn properties: {1}, Other: {2})</RimTalk_Settings_SelectedCount>
+  <RimTalk_Settings_SimilarityThresholdLabel>Similarity Threshold: {0}</RimTalk_Settings_SimilarityThresholdLabel>
+  <RimTalk_Settings_SummarizationSection>Memory Summarization Settings</RimTalk_Settings_SummarizationSection>
+  <RimTalk_Settings_TriggerChanceLabel>Trigger Chance: {0}</RimTalk_Settings_TriggerChanceLabel>
+  <RimTalk_Settings_TriggerTimeLabel>Trigger Time: {0}:00</RimTalk_Settings_TriggerTimeLabel>
+  <RimTalk_Settings_ValidateConfig>Validate Configuration</RimTalk_Settings_ValidateConfig>
+  <RimTalk_Settings_ValidateConfigTip>Tip: Validation sends a real API request along the fallback chain (in-save only)</RimTalk_Settings_ValidateConfigTip>
+  <RimTalk_Settings_ValidateInSaveOnly>Validation only works in a save. Load or start a game first.</RimTalk_Settings_ValidateInSaveOnly>
+  <RimTalk_Settings_Validating>Validating configuration...</RimTalk_Settings_Validating>
+  <RimTalk_Settings_ValidationFailed>Configuration validation failed, please check API Key and URL</RimTalk_Settings_ValidationFailed>
+  <RimTalk_Settings_ValidationSuccessAny>Validation passed: at least one config is usable. See logs for details.</RimTalk_Settings_ValidationSuccessAny>
+  <RimTalk_Settings_VariableCount>Total {0} variables (Pawn properties: {1})</RimTalk_Settings_VariableCount>
+  <RimTalk_Settings_VariableTooltip>Variable: {0}\n\n{1}</RimTalk_Settings_VariableTooltip>
+  <RimTalk_Settings_VectorEnhancementDesc>Use semantic vector retrieval to enhance knowledge matching.</RimTalk_Settings_VectorEnhancementDesc>
+  <RimTalk_Settings_VectorEnhancementSection>Vector Enhancement Settings</RimTalk_Settings_VectorEnhancementSection>
+  <RimTalk_Settings_WillFollowRimTalkConfig>Will automatically follow RimTalk Mod's AI configuration</RimTalk_Settings_WillFollowRimTalkConfig>
+  <RimTalk_ShortTermMemories>Short-term Memory</RimTalk_ShortTermMemories>
+  <RimTalk_TabMemory>Memory</RimTalk_TabMemory>
+  <RimTalk_With>with</RimTalk_With>
+  <RimTalk_Yes>Yes</RimTalk_Yes>
 </LanguageData>
