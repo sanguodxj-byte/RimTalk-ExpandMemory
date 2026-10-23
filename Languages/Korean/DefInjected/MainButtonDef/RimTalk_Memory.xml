@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <RimTalk_Memory.label>??</RimTalk_Memory.label>
-  <RimTalk_Memory.description>???? ? ?? ?? ?? (??? RimTalk ?? ??, ??? ?? ???? ??).</RimTalk_Memory.description>
+  <RimTalk_Memory.label>기억</RimTalk_Memory.label>
+  <RimTalk_Memory.description>정착민의 상호작용 및 행동 기억 보기 (대화에는 RimTalk 연동 필요, 관찰 기능은 아직 구현되지 않음)</RimTalk_Memory.description>
 </LanguageData>

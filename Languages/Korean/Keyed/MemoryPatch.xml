@@ -1,130 +1,453 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-    <!-- RimTalk Memory Patch - 한국어 번역 (Machine Translated) -->
-    
-    <!-- Filter Buttons -->
-    <RimTalk_Filter_All>모두</RimTalk_Filter_All>
-    <RimTalk_Filter_Conversation>대화</RimTalk_Filter_Conversation>
-    <RimTalk_Filter_Interaction>상호작용</RimTalk_Filter_Interaction>
-    <RimTalk_Filter_Action>행동</RimTalk_Filter_Action>
-    <RimTalk_Filter_Observation>관찰</RimTalk_Filter_Observation>
-    <RimTalk_Filter_Event>이벤트</RimTalk_Filter_Event>
-    <RimTalk_Filter_Emotion>감정</RimTalk_Filter_Emotion>
-    <RimTalk_Filter_Relationship>관계</RimTalk_Filter_Relationship>
-    
-    <!-- Memory Stats -->
-    <RimTalk_MemoryStats>단기 기억: {0}/{1} | 장기 기억: {2}/{3}</RimTalk_MemoryStats>
-    <RimTalk_MemoryTitle>{0}의 기억</RimTalk_MemoryTitle>
-    
-    <!-- Four Layer Memory Stats -->
-    <RimTalk_FourLayerMemoryStats>ABM: {0}/{1} | SCM: {2}/{3} | ELS: {4}/{5} | CLPA: {6}</RimTalk_FourLayerMemoryStats>
-    <RimTalk_ActiveBufferMemory>활성 버퍼 메모리</RimTalk_ActiveBufferMemory>
-    <RimTalk_SituationalMemory>상황적 맥락 메모리</RimTalk_SituationalMemory>
-    <RimTalk_EventLogSummary>이벤트 로그 요약</RimTalk_EventLogSummary>
-    <RimTalk_ArchiveMemory>식민지 역사 및 인물 기록</RimTalk_ArchiveMemory>
-    
-    <!-- Colonist Selection -->
-    <RimTalk_SelectColonist>정착민 선택</RimTalk_SelectColonist>
-    <RimTalk_ChooseColonist>선택...</RimTalk_ChooseColonist>
-    <RimTalk_NoColonists>정착민 없음</RimTalk_NoColonists>
-    <RimTalk_NoMemoryComponent>이 정착민은 메모리 구성 요소가 없습니다</RimTalk_NoMemoryComponent>
-    
-    <!-- Time Display -->
-    <RimTalk_JustNow>방금</RimTalk_JustNow>
-    <RimTalk_MinutesAgo>{0}분 전</RimTalk_MinutesAgo>
-    <RimTalk_HoursAgo>{0}시간 전</RimTalk_HoursAgo>
-    <RimTalk_DaysAgo>{0}일 전</RimTalk_DaysAgo>
-    
-    <!-- Memory Types -->
-    <RimTalk_MemoryType_Conversation>대화</RimTalk_MemoryType_Conversation>
-    <RimTalk_MemoryType_Interaction>상호작용</RimTalk_MemoryType_Interaction>
-    <RimTalk_MemoryType_Action>행동</RimTalk_MemoryType_Action>
-    <RimTalk_MemoryType_Observation>관찰</RimTalk_MemoryType_Observation>
-    <RimTalk_MemoryType_Event>이벤트</RimTalk_MemoryType_Event>
-    <RimTalk_MemoryType_Emotion>감정</RimTalk_MemoryType_Emotion>
-    <RimTalk_MemoryType_Relationship>관계</RimTalk_MemoryType_Relationship>
-    
-    <!-- Memory Tab -->
-    <RimTalk_TabMemory>기억</RimTalk_TabMemory>
-    <RimTalk_TabMemoryDesc>이 정착민의 기억 보기</RimTalk_TabMemoryDesc>
-    
-    <!-- Settings -->
-    <RimTalk_MemoryPatchSettings>메모리 시스템 설정</RimTalk_MemoryPatchSettings>
-    <RimTalk_MemoryPatchDescription>RimTalk용 메모리 시스템 지원 제공</RimTalk_MemoryPatchDescription>
-    <RimTalk_OriginalRimTalkSettings>대화 기능은 원본 RimTalk 설정에 있습니다</RimTalk_OriginalRimTalkSettings>
-    
-    <!-- Memory Settings -->
-    <RimTalk_MaxShortTermMemories>단기 메모리 한도</RimTalk_MaxShortTermMemories>
-    <RimTalk_MaxLongTermMemories>장기 메모리 한도</RimTalk_MaxLongTermMemories>
-    <RimTalk_MemoryDecayRate>메모리 감쇠율</RimTalk_MemoryDecayRate>
-    <RimTalk_EnableMemoryUI>메모리 UI 활성화</RimTalk_EnableMemoryUI>
-    
-    <!-- Four Layer Memory Settings -->
-    <RimTalk_MaxActiveMemories>활성 버퍼 메모리 한도</RimTalk_MaxActiveMemories>
-    <RimTalk_MaxSituationalMemories>상황적 메모리 한도</RimTalk_MaxSituationalMemories>
-    <RimTalk_MaxEventLogMemories>이벤트 로그 메모리 한도</RimTalk_MaxEventLogMemories>
-    <RimTalk_EnableDailySummarization>일일 요약 활성화</RimTalk_EnableDailySummarization>
-    <RimTalk_SummarizationHour>요약 시간 (게임 시간)</RimTalk_SummarizationHour>
-    
-    <!-- Memory Type Toggles -->
-    <RimTalk_MemoryTypeToggles>메모리 유형 설정</RimTalk_MemoryTypeToggles>
-    <RimTalk_EnableInteractionMemory>상호작용 메모리 활성화</RimTalk_EnableInteractionMemory>
-    <RimTalk_EnableInteractionMemoryDesc>정착민 간의 사회적 상호작용 기록</RimTalk_EnableInteractionMemoryDesc>
-    <RimTalk_EnableActionMemory>행동 메모리 활성화</RimTalk_EnableActionMemory>
-    <RimTalk_EnableActionMemoryDesc>작업, 전투 및 기타 행동 기록</RimTalk_EnableActionMemoryDesc>
-    <RimTalk_Settings_CombatMemory>전투 메모리</RimTalk_Settings_CombatMemory>
-    <RimTalk_EnableConversationMemory>대화 메모리 활성화</RimTalk_EnableConversationMemory>
-    <RimTalk_EnableConversationMemoryDesc>RimTalk에서 생성된 대화 기록 (RimTalk 통합 필요)</RimTalk_EnableConversationMemoryDesc>
-    <RimTalk_EnableObservationMemory>관찰 메모리 활성화</RimTalk_EnableObservationMemory>
-    <RimTalk_EnableObservationMemoryDesc>관찰된 이벤트 기록</RimTalk_EnableObservationMemoryDesc>
-    <RimTalk_EnableEventMemory>이벤트 메모리 활성화</RimTalk_EnableEventMemory>
-    <RimTalk_EnableEventMemoryDesc>중요한 이벤트 기록 (습격, 사망 등)</RimTalk_EnableEventMemoryDesc>
-    <RimTalk_EnableEmotionMemory>감정 메모리 활성화</RimTalk_EnableEmotionMemory>
-    <RimTalk_EnableEmotionMemoryDesc>감정 변화 기록</RimTalk_EnableEmotionMemoryDesc>
-    <RimTalk_EnableRelationshipMemory>관계 메모리 활성화</RimTalk_EnableRelationshipMemory>
-    <RimTalk_EnableRelationshipMemoryDesc>관계 변화 기록 (연애, 갈등 등)</RimTalk_EnableRelationshipMemoryDesc>
-    
-    <!-- Memory Edit Dialog -->
-    <RimTalk_EditMemory>기억 편집</RimTalk_EditMemory>
-    <RimTalk_DeleteMemory>기억 삭제</RimTalk_DeleteMemory>
-    <RimTalk_PinMemory>기억 고정</RimTalk_PinMemory>
-    <RimTalk_UnpinMemory>기억 고정 해제</RimTalk_UnpinMemory>
-    <RimTalk_MemoryContent>내용</RimTalk_MemoryContent>
-    <RimTalk_MemoryNotes>메모</RimTalk_MemoryNotes>
-    <RimTalk_MemoryTags>태그</RimTalk_MemoryTags>
-    <RimTalk_AddTag>태그 추가</RimTalk_AddTag>
-    <RimTalk_RemoveTag>태그 제거</RimTalk_RemoveTag>
-    <RimTalk_CustomTag>사용자 정의 태그</RimTalk_CustomTag>
-    <RimTalk_Save>저장</RimTalk_Save>
-    <RimTalk_Cancel>취소</RimTalk_Cancel>
-    <RimTalk_ConfirmDelete>이 기억을 삭제하시겠습니까?</RimTalk_ConfirmDelete>
-    <RimTalk_MemoryUpdated>기억이 업데이트되었습니다</RimTalk_MemoryUpdated>
-    <RimTalk_MemoryDeleted>기억이 삭제되었습니다</RimTalk_MemoryDeleted>
-    
-    <!-- Memory Actions -->
-    <RimTalk_ClearAll>모두 지우기</RimTalk_ClearAll>
-    <RimTalk_ClearShortTerm>단기 기억 지우기</RimTalk_ClearShortTerm>
-    <RimTalk_ClearLongTerm>장기 기억 지우기</RimTalk_ClearLongTerm>
-    <RimTalk_ConfirmClearAll>모든 기억을 지우시겠습니까?</RimTalk_ConfirmClearAll>
-    <RimTalk_ConfirmClearShortTerm>단기 기억을 지우시겠습니까?</RimTalk_ConfirmClearShortTerm>
-    <RimTalk_ConfirmClearLongTerm>장기 기억을 지우시겠습니까?</RimTalk_ConfirmClearLongTerm>
-    
-    <!-- UI Buttons -->
-    <RimTalk_UI_Preview>미리보기</RimTalk_UI_Preview>
-    <RimTalk_UI_Knowledge>지식</RimTalk_UI_Knowledge>
-    <RimTalk_UI_ImmediateSummarize>즉시 요약 (SCM → ELS)</RimTalk_UI_ImmediateSummarize>
-    <RimTalk_UI_ImmediateSummarizeNoMemory>요약할 SCM 없음</RimTalk_UI_ImmediateSummarizeNoMemory>
-    <RimTalk_UI_MemorySummarized>{0}의 메모리 요약됨</RimTalk_UI_MemorySummarized>
-    <RimTalk_UI_SummarizeAll>모두 요약 (대기열)</RimTalk_UI_SummarizeAll>
-    <RimTalk_UI_MemoriesSummarizedCount>{0}명의 정착민이 메모리 요약 대기열에 추가됨</RimTalk_UI_MemoriesSummarizedCount>
-    <RimTalk_UI_NoColonistsNeedSummarize>요약이 필요한 정착민 없음</RimTalk_UI_NoColonistsNeedSummarize>
-    <RimTalk_UI_ImmediateArchive>즉시 아카이브 (ELS → CLPA)</RimTalk_UI_ImmediateArchive>
-    <RimTalk_UI_ImmediateArchiveNoMemory>아카이브할 ELS 없음</RimTalk_UI_ImmediateArchiveNoMemory>
-    <RimTalk_UI_MemoryArchived>{0}의 메모리 아카이브됨</RimTalk_UI_MemoryArchived>
-    <RimTalk_UI_ArchiveAll>모두 아카이브</RimTalk_UI_ArchiveAll>
-    <RimTalk_UI_MemoriesArchivedCount>{0}명의 정착민 메모리 아카이브됨</RimTalk_UI_MemoriesArchivedCount>
-    
-    <!-- Other -->
-    <RimTalk_With>와(과)</RimTalk_With>
-    <RimTalk_ObservationPlaceholder>(관찰 메모리 플레이스홀더 - 아직 구현되지 않음)</RimTalk_ObservationPlaceholder>
+  <RimTalk.Memory.ExportSuccessTo>기억 내보내기 위치: </RimTalk.Memory.ExportSuccessTo>
+  <RimTalk.Memory.ImportSuccessFrom>기억 가져오기 위치: </RimTalk.Memory.ImportSuccessFrom>
+  <RimTalk.Memory.UI.TabWindow.Activity>활동: {ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
+  <RimTalk.Memory.UI.TabWindow.Archive>보관</RimTalk.Memory.UI.TabWindow.Archive>
+  <RimTalk.Memory.UI.TabWindow.ArchiveAll>모든 정착민 보관</RimTalk.Memory.UI.TabWindow.ArchiveAll>
+  <RimTalk.Memory.UI.TabWindow.Cancel>취소</RimTalk.Memory.UI.TabWindow.Cancel>
+  <RimTalk.Memory.UI.TabWindow.CancelEdit>취소</RimTalk.Memory.UI.TabWindow.CancelEdit>
+  <RimTalk.Memory.UI.TabWindow.ChronicleTitle>인생 연대기 (CLPA {COUNT}장)</RimTalk.Memory.UI.TabWindow.ChronicleTitle>
+  <RimTalk.Memory.UI.TabWindow.ClearSelection>선택 해제</RimTalk.Memory.UI.TabWindow.ClearSelection>
+  <RimTalk.Memory.UI.TabWindow.ConfirmArchive>선택한 기억을 보관하시겠습니까?</RimTalk.Memory.UI.TabWindow.ConfirmArchive>
+  <RimTalk.Memory.UI.TabWindow.ConfirmDelete>선택한 기억 {COUNT}개를 삭제하시겠습니까?</RimTalk.Memory.UI.TabWindow.ConfirmDelete>
+  <RimTalk.Memory.UI.TabWindow.ConfirmImport>가져오기를 실행하시겠습니까?</RimTalk.Memory.UI.TabWindow.ConfirmImport>
+  <RimTalk.Memory.UI.TabWindow.ContentLabel>내용</RimTalk.Memory.UI.TabWindow.ContentLabel>
+  <RimTalk.Memory.UI.TabWindow.CreateMemory>새 기억</RimTalk.Memory.UI.TabWindow.CreateMemory>
+  <RimTalk.Memory.UI.TabWindow.CreateTitle>{NAME}의 새 기억</RimTalk.Memory.UI.TabWindow.CreateTitle>
+  <RimTalk.Memory.UI.TabWindow.Created>기억이 생성되었습니다</RimTalk.Memory.UI.TabWindow.Created>
+  <RimTalk.Memory.UI.TabWindow.CurrentImportance>현재 중요도: </RimTalk.Memory.UI.TabWindow.CurrentImportance>
+  <RimTalk.Memory.UI.TabWindow.Delete>삭제</RimTalk.Memory.UI.TabWindow.Delete>
+  <RimTalk.Memory.UI.TabWindow.Details>기억 상세</RimTalk.Memory.UI.TabWindow.Details>
+  <RimTalk.Memory.UI.TabWindow.Edit>편집</RimTalk.Memory.UI.TabWindow.Edit>
+  <RimTalk.Memory.UI.TabWindow.Export>내보내기</RimTalk.Memory.UI.TabWindow.Export>
+  <RimTalk.Memory.UI.TabWindow.Guide>=== 기억 보관 작업대 안내 ===
+
+[배치]
+- 상단: 폰 선택, 필터, 도구 메뉴
+- 좌측 상단: 인생 연대기 탐색 (CLPA)
+- 좌측 하단: 세로 타임라인 (ABM/SCM/ELS)
+- 우측: 기억 상세 및 편집
+
+[조작]
+- 카드를 클릭하여 포커스, Ctrl로 다중 선택, 빈 공간 드래그로 범위 선택
+- 휠로 타임라인 스크롤, 연대기 이동, 연대기 축 확대/축소
+- 연대기 커서를 드래그하면 타임라인 위치가 이동
+- 분할 막대를 드래그하여 타임라인과 상세 영역의 너비 조정</RimTalk.Memory.UI.TabWindow.Guide>
+  <RimTalk.Memory.UI.TabWindow.Import>가져오기</RimTalk.Memory.UI.TabWindow.Import>
+  <RimTalk.Memory.UI.TabWindow.Importance>중요도: {IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
+  <RimTalk.Memory.UI.TabWindow.Knowledge>지식</RimTalk.Memory.UI.TabWindow.Knowledge>
+  <RimTalk.Memory.UI.TabWindow.LayerFilter>계층 필터</RimTalk.Memory.UI.TabWindow.LayerFilter>
+  <RimTalk.Memory.UI.TabWindow.Need_SelectPawn>폰 선택</RimTalk.Memory.UI.TabWindow.Need_SelectPawn>
+  <RimTalk.Memory.UI.TabWindow.NoFaction>소속 없음</RimTalk.Memory.UI.TabWindow.NoFaction>
+  <RimTalk.Memory.UI.TabWindow.NotPinned>고정 안 됨</RimTalk.Memory.UI.TabWindow.NotPinned>
+  <RimTalk.Memory.UI.TabWindow.NotSummarized>요약 안 됨</RimTalk.Memory.UI.TabWindow.NotSummarized>
+  <RimTalk.Memory.UI.TabWindow.Notes>메모: </RimTalk.Memory.UI.TabWindow.Notes>
+  <RimTalk.Memory.UI.TabWindow.NotesLabel>메모</RimTalk.Memory.UI.TabWindow.NotesLabel>
+  <RimTalk.Memory.UI.TabWindow.OpenImportFolder>가져오기 폴더 열기</RimTalk.Memory.UI.TabWindow.OpenImportFolder>
+  <RimTalk.Memory.UI.TabWindow.OperationGuide>조작 안내</RimTalk.Memory.UI.TabWindow.OperationGuide>
+  <RimTalk.Memory.UI.TabWindow.Pin>고정</RimTalk.Memory.UI.TabWindow.Pin>
+  <RimTalk.Memory.UI.TabWindow.PinLabel>이 기억 고정</RimTalk.Memory.UI.TabWindow.PinLabel>
+  <RimTalk.Memory.UI.TabWindow.Pinned>고정됨</RimTalk.Memory.UI.TabWindow.Pinned>
+  <RimTalk.Memory.UI.TabWindow.Preview>주입 미리보기</RimTalk.Memory.UI.TabWindow.Preview>
+  <RimTalk.Memory.UI.TabWindow.Save>저장</RimTalk.Memory.UI.TabWindow.Save>
+  <RimTalk.Memory.UI.TabWindow.SaveEdit>저장</RimTalk.Memory.UI.TabWindow.SaveEdit>
+  <RimTalk.Memory.UI.TabWindow.Selected>기억 {0}개 선택됨</RimTalk.Memory.UI.TabWindow.Selected>
+  <RimTalk.Memory.UI.TabWindow.Summarize>요약</RimTalk.Memory.UI.TabWindow.Summarize>
+  <RimTalk.Memory.UI.TabWindow.SummarizeAll>모두 요약</RimTalk.Memory.UI.TabWindow.SummarizeAll>
+  <RimTalk.Memory.UI.TabWindow.Summarized>요약됨</RimTalk.Memory.UI.TabWindow.Summarized>
+  <RimTalk.Memory.UI.TabWindow.Summarizing>요약 중</RimTalk.Memory.UI.TabWindow.Summarizing>
+  <RimTalk.Memory.UI.TabWindow.SummaryPrompt>프롬프트 편집기</RimTalk.Memory.UI.TabWindow.SummaryPrompt>
+  <RimTalk.Memory.UI.TabWindow.Tags>태그: </RimTalk.Memory.UI.TabWindow.Tags>
+  <RimTalk.Memory.UI.TabWindow.TagsLabel>태그 (쉼표로 구분)</RimTalk.Memory.UI.TabWindow.TagsLabel>
+  <RimTalk.Memory.UI.TabWindow.Tools>도구</RimTalk.Memory.UI.TabWindow.Tools>
+  <RimTalk.Memory.UI.TabWindow.TypeFilter>유형 필터</RimTalk.Memory.UI.TabWindow.TypeFilter>
+  <RimTalk.Memory.UI.TabWindow.Unpin>고정 해제</RimTalk.Memory.UI.TabWindow.Unpin>
+  <RimTalk.Memory.Utils.Layer_Active>활성 (ABM)</RimTalk.Memory.Utils.Layer_Active>
+  <RimTalk.Memory.Utils.Layer_Archive>보관 (CLPA)</RimTalk.Memory.Utils.Layer_Archive>
+  <RimTalk.Memory.Utils.Layer_Default>알 수 없는 계층</RimTalk.Memory.Utils.Layer_Default>
+  <RimTalk.Memory.Utils.Layer_EventLog>이벤트 로그 (ELS)</RimTalk.Memory.Utils.Layer_EventLog>
+  <RimTalk.Memory.Utils.Layer_Situational>상황 (SCM)</RimTalk.Memory.Utils.Layer_Situational>
+  <RimTalk.Memory.Utils.Layers>모든 계층</RimTalk.Memory.Utils.Layers>
+  <RimTalk.Memory.Utils.Types>모든 유형</RimTalk.Memory.Utils.Types>
+  <RimTalk_Archive_ConfirmSummarize>선택한 기억을 요약하시겠습니까?</RimTalk_Archive_ConfirmSummarize>
+  <RimTalk_Archive_Memory>기억</RimTalk_Archive_Memory>
+  <RimTalk_Archive_TypeEmotion>감정</RimTalk_Archive_TypeEmotion>
+  <RimTalk_Archive_TypeEvent>이벤트</RimTalk_Archive_TypeEvent>
+  <RimTalk_Archive_TypeRelationship>관계</RimTalk_Archive_TypeRelationship>
+  <RimTalk_Archive_TypeSummary>요약</RimTalk_Archive_TypeSummary>
+  <RimTalk_CanBeExtracted>추출 가능: </RimTalk_CanBeExtracted>
+  <RimTalk_CanBeExtractedDisabled>로어 체인 콘텐츠 추출이 비활성화되었습니다 (클릭하여 활성화)</RimTalk_CanBeExtractedDisabled>
+  <RimTalk_CanBeExtractedEnabled>로어 체인 콘텐츠 추출이 활성화되었습니다 (클릭하여 비활성화)</RimTalk_CanBeExtractedEnabled>
+  <RimTalk_CanBeMatched>매칭 가능: </RimTalk_CanBeMatched>
+  <RimTalk_CanBeMatchedDisabled>키워드 매칭이 비활성화되었습니다 (클릭하여 활성화)</RimTalk_CanBeMatchedDisabled>
+  <RimTalk_CanBeMatchedEnabled>키워드 매칭이 활성화되었습니다 (클릭하여 비활성화)</RimTalk_CanBeMatchedEnabled>
+  <RimTalk_Cancel>취소</RimTalk_Cancel>
+  <RimTalk_Close>닫기</RimTalk_Close>
+  <RimTalk_DisableAllExtract>모든 추출 비활성화</RimTalk_DisableAllExtract>
+  <RimTalk_DisableAllMatch>모든 매칭 비활성화</RimTalk_DisableAllMatch>
+  <RimTalk_EnableAllExtract>모든 추출 활성화</RimTalk_EnableAllExtract>
+  <RimTalk_EnableAllMatch>모든 매칭 활성화</RimTalk_EnableAllMatch>
+  <RimTalk_ExtendedProperties>확장 속성</RimTalk_ExtendedProperties>
+  <RimTalk_Filter_Action>행동</RimTalk_Filter_Action>
+  <RimTalk_Filter_All>모두</RimTalk_Filter_All>
+  <RimTalk_Filter_Conversation>대화</RimTalk_Filter_Conversation>
+  <RimTalk_Filter_Emotion>감정</RimTalk_Filter_Emotion>
+  <RimTalk_Filter_Event>이벤트</RimTalk_Filter_Event>
+  <RimTalk_Filter_Interaction>상호작용</RimTalk_Filter_Interaction>
+  <RimTalk_Filter_Internal>내부</RimTalk_Filter_Internal>
+  <RimTalk_Filter_Relationship>관계</RimTalk_Filter_Relationship>
+  <RimTalk_Filter_Summarization>요약</RimTalk_Filter_Summarization>
+  <RimTalk_Knowledge_AllCleared>지식 라이브러리를 비웠습니다</RimTalk_Knowledge_AllCleared>
+  <RimTalk_Knowledge_AutoGenerate>지식 자동 생성</RimTalk_Knowledge_AutoGenerate>
+  <RimTalk_Knowledge_AvgImportance>평균 중요도: {0}</RimTalk_Knowledge_AvgImportance>
+  <RimTalk_Knowledge_Cancel>취소</RimTalk_Knowledge_Cancel>
+  <RimTalk_Knowledge_Categories>카테고리</RimTalk_Knowledge_Categories>
+  <RimTalk_Knowledge_CategoryAll>모두</RimTalk_Knowledge_CategoryAll>
+  <RimTalk_Knowledge_CategoryHistory>기록</RimTalk_Knowledge_CategoryHistory>
+  <RimTalk_Knowledge_CategoryInstructions>지침</RimTalk_Knowledge_CategoryInstructions>
+  <RimTalk_Knowledge_CategoryLore>로어</RimTalk_Knowledge_CategoryLore>
+  <RimTalk_Knowledge_CategoryOther>기타</RimTalk_Knowledge_CategoryOther>
+  <RimTalk_Knowledge_CategoryPawnStatus>폰 상태</RimTalk_Knowledge_CategoryPawnStatus>
+  <RimTalk_Knowledge_CategoryUnknown>알 수 없음</RimTalk_Knowledge_CategoryUnknown>
+  <RimTalk_Knowledge_ClearAll>모두 지우기</RimTalk_Knowledge_ClearAll>
+  <RimTalk_Knowledge_ClearConfirm>모든 지식을 지우시겠습니까? 이 작업은 되돌릴 수 없습니다!</RimTalk_Knowledge_ClearConfirm>
+  <RimTalk_Knowledge_Content>내용:</RimTalk_Knowledge_Content>
+  <RimTalk_Knowledge_Delete>삭제</RimTalk_Knowledge_Delete>
+  <RimTalk_Knowledge_DeleteConfirm>지식 {0}개를 삭제하시겠습니까?</RimTalk_Knowledge_DeleteConfirm>
+  <RimTalk_Knowledge_DeleteCount>삭제 ({0})</RimTalk_Knowledge_DeleteCount>
+  <RimTalk_Knowledge_DeleteItems>선택 항목 삭제 ({0})</RimTalk_Knowledge_DeleteItems>
+  <RimTalk_Knowledge_Deleted>지식 {0}개를 삭제했습니다</RimTalk_Knowledge_Deleted>
+  <RimTalk_Knowledge_Details>상세</RimTalk_Knowledge_Details>
+  <RimTalk_Knowledge_DisableAll>모두 비활성화</RimTalk_Knowledge_DisableAll>
+  <RimTalk_Knowledge_DisabledCount>비활성: {0}</RimTalk_Knowledge_DisabledCount>
+  <RimTalk_Knowledge_Edit>편집</RimTalk_Knowledge_Edit>
+  <RimTalk_Knowledge_EditEntry>항목 편집</RimTalk_Knowledge_EditEntry>
+  <RimTalk_Knowledge_EnableAll>모두 활성화</RimTalk_Knowledge_EnableAll>
+  <RimTalk_Knowledge_Enabled>활성: {0}</RimTalk_Knowledge_Enabled>
+  <RimTalk_Knowledge_EnabledCount>활성: {0}</RimTalk_Knowledge_EnabledCount>
+  <RimTalk_Knowledge_EntrySaved>지식을 저장했습니다</RimTalk_Knowledge_EntrySaved>
+  <RimTalk_Knowledge_EventRecord>이벤트 기록 지식</RimTalk_Knowledge_EventRecord>
+  <RimTalk_Knowledge_EventScanTriggered>이벤트 스캔을 실행했습니다</RimTalk_Knowledge_EventScanTriggered>
+  <RimTalk_Knowledge_ExclusiveTo>{0} 전용</RimTalk_Knowledge_ExclusiveTo>
+  <RimTalk_Knowledge_ExportAll>모두 내보내기</RimTalk_Knowledge_ExportAll>
+  <RimTalk_Knowledge_ExportCount>내보내기 ({0})</RimTalk_Knowledge_ExportCount>
+  <RimTalk_Knowledge_ExportItems>선택 항목 내보내기 ({0})</RimTalk_Knowledge_ExportItems>
+  <RimTalk_Knowledge_ExportedToClipboard>지식 {0}개를 클립보드로 내보냈습니다</RimTalk_Knowledge_ExportedToClipboard>
+  <RimTalk_Knowledge_GenerateNow>지금 생성 (수동)</RimTalk_Knowledge_GenerateNow>
+  <RimTalk_Knowledge_GeneratedPawnStatus>폰 상태 지식 {0}개를 생성했습니다</RimTalk_Knowledge_GeneratedPawnStatus>
+  <RimTalk_Knowledge_GenerationFailed>생성 실패: {0}</RimTalk_Knowledge_GenerationFailed>
+  <RimTalk_Knowledge_Global>전체</RimTalk_Knowledge_Global>
+  <RimTalk_Knowledge_GlobalAll>전체 (모든 폰)</RimTalk_Knowledge_GlobalAll>
+  <RimTalk_Knowledge_Help>도움말</RimTalk_Knowledge_Help>
+  <RimTalk_Knowledge_HelpContent>【지식 검색 로직】
+지식 라이브러리는 AI 대화 중 관련 지식을 자동으로 주입합니다.
+
+1. 태그 매칭: 대화 문맥에서 태그를 추출하여 지식 태그와 대조합니다
+   • Any 모드: 태그 중 하나라도 일치하면 매칭
+   • All 모드: 모든 태그가 일치해야 매칭
+   • 부분 문자열 매칭 사용 (대소문자 구분 안 함)
+
+2. 벡터 유사도 매칭 (벡터 서비스 필요):
+   • 의미적 유사도 알고리즘으로 가장 관련성 높은 지식을 검색
+   • 태그가 정확히 일치하지 않아도 의미적으로 관련된 내용을 찾을 수 있음
+
+3. 중요도 정렬:
+   • 일치한 지식은 중요도(0.0-1.0) 내림차순으로 정렬
+   • 상위 N개의 중요한 항목만 주입됨 (설정에서 변경 가능)
+
+【효과적인 지식 작성법】
+
+• 태그는 쉼표로 구분 (권장)
+  • 좋은 예: [Lore,Ringworld] 또는 [Rules,Dialog]
+  • 좋은 예: [CharacterBackground,John] 또는 [Event,Active,Raid]
+  • 이유: 쉼표는 표준 구분자이며 명확하고 일관적입니다
+
+• 태그는 명확하게, 너무 짧지 않게
+  • 좋은 예: [Lore,PlanetSetting] (3자 이상)
+  • 나쁜 예: [War] 또는 [AI] (1-2자는 오매칭되기 쉬움)
+  • 이유: 짧은 태그는 무관한 문맥에 너무 많이 일치합니다
+
+• 정밀도를 높이려면 복합 태그 사용
+  • 좋은 예: [Lore,Ringworld,Technology] 또는 [CharacterBackground,John,Past]
+  • 나쁜 예: [John] (무관한 대화에서도 발동될 수 있음)
+
+• 태그는 대화에서 발동 가능해야 함
+  • 문제: [Rules,CombatSystem] 태그는 "사격" "근접" 대화에서 발동되지 않습니다
+  • 해결: [Combat,Shooting,Melee,Dodge]처럼 발동용 태그 추가
+  • 또는: [Rules,Combat,Shooting]으로 분류를 유지하면서 발동 태그 추가
+
+• 스킬 이름을 단일 태그로 사용하지 말 것
+  • 문제: [Shooting]은 사격 스킬(10 이상)을 가진 폰의 모든 대화에서 발동됩니다
+  • 이유: 매칭 텍스트에 폰의 고급 스킬 이름이 포함되기 때문
+  • 나쁜 예: [Shooting], [Melee], [Construction] (오매칭 빈번)
+  • 좋은 예: [Rules,ShootingCombat,Aim], [Tips,Melee,Brawl] (명시적 언급 필요)
+
+• 내용은 구체적이고 실용적으로
+  • 좋은 예: 이 행성은 지구 중력의 0.8배인 링월드입니다
+  • 나쁜 예: 이 행성은 특별합니다
+
+• 적절한 중요도 설정
+  • 핵심 설정/규칙: 0.8-1.0
+  • 일반 배경: 0.5-0.7
+  • 세부 사항: 0.3-0.5
+
+• 확장 속성 활용
+  • 매칭 가능: 태그/벡터 검색 대상으로 포함하려면 활성화
+  • 추출 가능: 지식 체인 참조 대상으로 포함하려면 활성화
+
+【자주 묻는 질문】
+Q: 지식이 너무 자주 주입됩니다
+A: 태그가 너무 짧거나 넓을 수 있습니다. [History] 대신 [Lore,ColonyHistory]처럼 3자 이상의 복합 태그를 사용하세요
+
+Q: 지식이 주입되지 않습니다
+A: 지식이 활성화되어 있는지, 매칭 모드가 올바른지, 중요도가 너무 낮지 않은지, 태그가 대화와 관련 있는지 확인하세요
+
+Q: 특정 상황에서만 AI가 지식을 사용하게 하려면?
+A: 정밀한 복합 태그(예: [Rules,Combat,RangedWeapons])와 적절한 중요도를 사용하세요</RimTalk_Knowledge_HelpContent>
+  <RimTalk_Knowledge_HelpTitle>지식 라이브러리 안내</RimTalk_Knowledge_HelpTitle>
+  <RimTalk_Knowledge_Import>가져오기</RimTalk_Knowledge_Import>
+  <RimTalk_Knowledge_ImportDescription>지식 텍스트 붙여넣기 (형식: [태그]내용, 한 줄에 하나)</RimTalk_Knowledge_ImportDescription>
+  <RimTalk_Knowledge_ImportTitle>지식 가져오기</RimTalk_Knowledge_ImportTitle>
+  <RimTalk_Knowledge_Importance>중요도:</RimTalk_Knowledge_Importance>
+  <RimTalk_Knowledge_Imported>지식 {0}개를 가져왔습니다</RimTalk_Knowledge_Imported>
+  <RimTalk_Knowledge_ItemsSelected>{0}개 선택됨</RimTalk_Knowledge_ItemsSelected>
+  <RimTalk_Knowledge_New>새로 만들기</RimTalk_Knowledge_New>
+  <RimTalk_Knowledge_NewEntry>새 항목</RimTalk_Knowledge_NewEntry>
+  <RimTalk_Knowledge_NoColonists>현재 맵에 정착민이 없습니다</RimTalk_Knowledge_NoColonists>
+  <RimTalk_Knowledge_PawnStatus>정착민 상태 지식</RimTalk_Knowledge_PawnStatus>
+  <RimTalk_Knowledge_Save>저장</RimTalk_Knowledge_Save>
+  <RimTalk_Knowledge_SelectOrCreate>지식 항목을 선택하거나 생성하세요</RimTalk_Knowledge_SelectOrCreate>
+  <RimTalk_Knowledge_Selected>선택: {0}</RimTalk_Knowledge_Selected>
+  <RimTalk_Knowledge_Showing>표시 중 {0} / {1}</RimTalk_Knowledge_Showing>
+  <RimTalk_Knowledge_Status>상태:</RimTalk_Knowledge_Status>
+  <RimTalk_Knowledge_StatusDisabled>비활성</RimTalk_Knowledge_StatusDisabled>
+  <RimTalk_Knowledge_StatusEnabled>활성</RimTalk_Knowledge_StatusEnabled>
+  <RimTalk_Knowledge_Tag>태그:</RimTalk_Knowledge_Tag>
+  <RimTalk_Knowledge_TagContentEmpty>태그와 내용은 비워둘 수 없습니다</RimTalk_Knowledge_TagContentEmpty>
+  <RimTalk_Knowledge_TagTest>태그 테스트</RimTalk_Knowledge_TagTest>
+  <RimTalk_Knowledge_TagTestClear>지우기</RimTalk_Knowledge_TagTestClear>
+  <RimTalk_Knowledge_TagTestInputContext>대화 내용:</RimTalk_Knowledge_TagTestInputContext>
+  <RimTalk_Knowledge_TagTestInputTag>테스트 태그 (쉼표로 구분):</RimTalk_Knowledge_TagTestInputTag>
+  <RimTalk_Knowledge_TagTestMatchText>실제 매칭 텍스트:</RimTalk_Knowledge_TagTestMatchText>
+  <RimTalk_Knowledge_TagTestMatched>일치</RimTalk_Knowledge_TagTestMatched>
+  <RimTalk_Knowledge_TagTestNoPawn>없음 (대화만)</RimTalk_Knowledge_TagTestNoPawn>
+  <RimTalk_Knowledge_TagTestNotMatched>불일치</RimTalk_Knowledge_TagTestNotMatched>
+  <RimTalk_Knowledge_TagTestResult>매칭 결과:</RimTalk_Knowledge_TagTestResult>
+  <RimTalk_Knowledge_TagTestSelectPawn>폰 선택 (선택 사항):</RimTalk_Knowledge_TagTestSelectPawn>
+  <RimTalk_Knowledge_TagTestTitle>태그 매칭 테스트 도구</RimTalk_Knowledge_TagTestTitle>
+  <RimTalk_Knowledge_Total>총계: {0}</RimTalk_Knowledge_Total>
+  <RimTalk_Knowledge_Visibility>공개 범위</RimTalk_Knowledge_Visibility>
+  <RimTalk_Knowledge_VisibilityDeleted>(폰 삭제됨)</RimTalk_Knowledge_VisibilityDeleted>
+  <RimTalk_Knowledge_VisibilityExclusive>{0} 전용</RimTalk_Knowledge_VisibilityExclusive>
+  <RimTalk_Knowledge_VisibilityGlobal>전체 (모든 폰)</RimTalk_Knowledge_VisibilityGlobal>
+  <RimTalk_LongTermMemories>장기 기억</RimTalk_LongTermMemories>
+  <RimTalk_MemoryTitle>{0}의 기억</RimTalk_MemoryTitle>
+  <RimTalk_MemoryType_Action>행동</RimTalk_MemoryType_Action>
+  <RimTalk_MemoryType_Conversation>대화</RimTalk_MemoryType_Conversation>
+  <RimTalk_MemoryType_Emotion>감정</RimTalk_MemoryType_Emotion>
+  <RimTalk_MemoryType_Event>이벤트</RimTalk_MemoryType_Event>
+  <RimTalk_MemoryType_Interaction>상호작용</RimTalk_MemoryType_Interaction>
+  <RimTalk_MemoryType_Internal>내부</RimTalk_MemoryType_Internal>
+  <RimTalk_MemoryType_Relationship>관계</RimTalk_MemoryType_Relationship>
+  <RimTalk_MemoryType_Summarization>요약</RimTalk_MemoryType_Summarization>
+  <RimTalk_Memory_NoMemories>표시할 기억이 없습니다</RimTalk_Memory_NoMemories>
+  <RimTalk_MindStream_Action>행동</RimTalk_MindStream_Action>
+  <RimTalk_MindStream_Conversation>대화</RimTalk_MindStream_Conversation>
+  <RimTalk_No>아니요</RimTalk_No>
+  <RimTalk_Preview_Clear>지우기</RimTalk_Preview_Clear>
+  <RimTalk_Preview_ClickRefresh>"미리보기 새로고침"을 클릭하면 결과가 표시됩니다</RimTalk_Preview_ClickRefresh>
+  <RimTalk_Preview_Colonist>(정착민)</RimTalk_Preview_Colonist>
+  <RimTalk_Preview_CurrentPawn>현재 폰:</RimTalk_Preview_CurrentPawn>
+  <RimTalk_Preview_Error>오류: {0}</RimTalk_Preview_Error>
+  <RimTalk_Preview_Guest>(손님)</RimTalk_Preview_Guest>
+  <RimTalk_Preview_Help>도움말</RimTalk_Preview_Help>
+  <RimTalk_Preview_HelpContent>=== 주입 미리보기 도움말 ===
+
+【개요】
+이 도구는 기억과 지식의 주입 결과를 미리 보여주어 AI 대화 중 어떤 정보가 사용되는지 확인할 수 있습니다.
+
+【지식 주입】
+• 매칭 소스: 지식 매칭에 사용할 변수 선택
+• 폰 속성 변수는 대화 참가자 전원에 대해 파싱됩니다
+• 파싱된 매칭 텍스트로 지식 라이브러리와 키워드 대조를 수행합니다
+• 매칭 결과는 점수순으로 정렬됩니다
+
+【기억 주입】
+• ABM: 초단기 대화 기억
+• SCM: 단기 기억 (더 이상 사용되지 않음, 현재 ELS로 요약)
+• ELS: 이벤트 로그 저장소 (AI가 요약한 기억)
+• CLPA: 장기 보관 (중요 이벤트 기록)
+
+【사용 방법】
+1. 현재 폰 선택 (필수)
+2. 선택 사항: 대상 폰 선택 (대화 시뮬레이션)
+3. 필요한 매칭 소스 확인
+4. "미리보기 새로고침"을 클릭하여 결과 확인
+
+【팁】
+• 매칭 소스 설정은 전역 설정에 동기화됩니다
+• 폰 속성 변수는 폰 정보만으로 파싱할 수 있습니다
+• 환경 변수는 맵 정보가 필요합니다
+• 기타 변수는 최소 한 번의 대화 생성이 필요합니다</RimTalk_Preview_HelpContent>
+  <RimTalk_Preview_InjectionConfig>주입 설정:</RimTalk_Preview_InjectionConfig>
+  <RimTalk_Preview_KnowledgeSection>지식 주입</RimTalk_Preview_KnowledgeSection>
+  <RimTalk_Preview_MatchedKnowledge>일치한 지식:</RimTalk_Preview_MatchedKnowledge>
+  <RimTalk_Preview_MatchingSource>매칭 소스</RimTalk_Preview_MatchingSource>
+  <RimTalk_Preview_MemoryLayers>기억 계층:</RimTalk_Preview_MemoryLayers>
+  <RimTalk_Preview_MemorySection>기억 주입</RimTalk_Preview_MemorySection>
+  <RimTalk_Preview_NoColonist>선택 가능한 정착민이 없습니다</RimTalk_Preview_NoColonist>
+  <RimTalk_Preview_NoContext>[문맥 없음. 먼저 대화를 발생시키세요]</RimTalk_Preview_NoContext>
+  <RimTalk_Preview_NoHumanlikes>선택 가능한 휴머노이드가 없습니다</RimTalk_Preview_NoHumanlikes>
+  <RimTalk_Preview_NoMatchedKnowledge>일치한 지식이 없습니다</RimTalk_Preview_NoMatchedKnowledge>
+  <RimTalk_Preview_NoMatchingSources>매칭 소스가 설정되지 않았습니다</RimTalk_Preview_NoMatchingSources>
+  <RimTalk_Preview_NoMemoriesAboveThreshold>임계값을 초과하는 기억이 없습니다</RimTalk_Preview_NoMemoriesAboveThreshold>
+  <RimTalk_Preview_NoMemoryComp>선택한 폰에 기억 구성 요소가 없습니다</RimTalk_Preview_NoMemoryComp>
+  <RimTalk_Preview_NoParsedText>(파싱된 텍스트 없음)</RimTalk_Preview_NoParsedText>
+  <RimTalk_Preview_None>없음</RimTalk_Preview_None>
+  <RimTalk_Preview_NoneClickToSelect>없음 (클릭하여 선택)</RimTalk_Preview_NoneClickToSelect>
+  <RimTalk_Preview_ParsedMatchText>파싱된 매칭 텍스트:</RimTalk_Preview_ParsedMatchText>
+  <RimTalk_Preview_Prisoner>(포로)</RimTalk_Preview_Prisoner>
+  <RimTalk_Preview_Refresh>미리보기 새로고침</RimTalk_Preview_Refresh>
+  <RimTalk_Preview_SameAsCurrent>(현재와 동일)</RimTalk_Preview_SameAsCurrent>
+  <RimTalk_Preview_Score>점수: {0}</RimTalk_Preview_Score>
+  <RimTalk_Preview_ScoreDetail>점수: {0}</RimTalk_Preview_ScoreDetail>
+  <RimTalk_Preview_SelectedMemories>선택된 기억:</RimTalk_Preview_SelectedMemories>
+  <RimTalk_Preview_Slave>(노예)</RimTalk_Preview_Slave>
+  <RimTalk_Preview_StaticMode>정적 모드 (동적 주입 비활성)</RimTalk_Preview_StaticMode>
+  <RimTalk_Preview_TargetPawn>대상 폰:</RimTalk_Preview_TargetPawn>
+  <RimTalk_Preview_Title>주입 미리보기</RimTalk_Preview_Title>
+  <RimTalk_PromptEditor_DailySummary>일일 요약 프롬프트</RimTalk_PromptEditor_DailySummary>
+  <RimTalk_PromptEditor_DailySummaryDesc>일일 SCM에서 ELS로 요약에 사용 (약 20개 기억 처리)</RimTalk_PromptEditor_DailySummaryDesc>
+  <RimTalk_PromptEditor_DeepArchive>심층 보관 프롬프트</RimTalk_PromptEditor_DeepArchive>
+  <RimTalk_PromptEditor_DeepArchiveDesc>심층 ELS에서 CLPA로 보관에 사용 (약 15개 기억 처리)</RimTalk_PromptEditor_DeepArchiveDesc>
+  <RimTalk_PromptEditor_Desc>AI가 기억을 요약할 때 사용하는 프롬프트 템플릿을 사용자 지정합니다.</RimTalk_PromptEditor_Desc>
+  <RimTalk_PromptEditor_MaxTokens>최대 출력 토큰</RimTalk_PromptEditor_MaxTokens>
+  <RimTalk_PromptEditor_MaxTokensDesc>AI가 생성하는 요약의 최대 길이를 제어합니다.</RimTalk_PromptEditor_MaxTokensDesc>
+  <RimTalk_PromptEditor_MaxTokensLabel>최대 토큰: {0}</RimTalk_PromptEditor_MaxTokensLabel>
+  <RimTalk_PromptEditor_Placeholders>자리표시자: {0}=정착민 이름, {1}=기억 목록</RimTalk_PromptEditor_Placeholders>
+  <RimTalk_PromptEditor_ResetConfirm>기본 프롬프트로 복원하시겠습니까?</RimTalk_PromptEditor_ResetConfirm>
+  <RimTalk_PromptEditor_ResetDefault>기본값으로 재설정</RimTalk_PromptEditor_ResetDefault>
+  <RimTalk_PromptEditor_Saved>요약 프롬프트 설정을 저장했습니다</RimTalk_PromptEditor_Saved>
+  <RimTalk_PromptEditor_Tip1>• 짧은 요약에는 작은 값(100-500)</RimTalk_PromptEditor_Tip1>
+  <RimTalk_PromptEditor_Tip2>• 상세한 요약에는 큰 값(1000-4000)</RimTalk_PromptEditor_Tip2>
+  <RimTalk_PromptEditor_Tip3>• 매우 큰 값은 API 비용을 증가시킵니다</RimTalk_PromptEditor_Tip3>
+  <RimTalk_PromptEditor_Tips>팁:</RimTalk_PromptEditor_Tips>
+  <RimTalk_PromptEditor_Title>요약 프롬프트 설정</RimTalk_PromptEditor_Title>
+  <RimTalk_Save>저장</RimTalk_Save>
+  <RimTalk_Settings_ABMLifespanLabel>ABM 수명: {0}시간 (0=비활성, 대화는 SCM으로, 기타는 삭제)</RimTalk_Settings_ABMLifespanLabel>
+  <RimTalk_Settings_AIConfigSection>AI 설정</RimTalk_Settings_AIConfigSection>
+  <RimTalk_Settings_APIConfigTitle>API 설정</RimTalk_Settings_APIConfigTitle>
+  <RimTalk_Settings_ActionMemory>행동 메모리 (작업, 전투)</RimTalk_Settings_ActionMemory>
+  <RimTalk_Settings_AddNewRule>+ 새 규칙 추가</RimTalk_Settings_AddNewRule>
+  <RimTalk_Settings_AdvancedSettings>고급 설정...</RimTalk_Settings_AdvancedSettings>
+  <RimTalk_Settings_AdvancedSettingsDesc>주입, 기억 용량, 감소 등의 세부 설정을 포함합니다.</RimTalk_Settings_AdvancedSettingsDesc>
+  <RimTalk_Settings_AdvancedSettingsTitle>고급 설정</RimTalk_Settings_AdvancedSettingsTitle>
+  <RimTalk_Settings_ApiConfigInvalid>잘못된 설정: URL이 유효하고 모델이 입력되었는지 확인하세요</RimTalk_Settings_ApiConfigInvalid>
+  <RimTalk_Settings_ApiKeyHeader>API 키</RimTalk_Settings_ApiKeyHeader>
+  <RimTalk_Settings_AtLeastOneSource>매칭 소스를 하나 이상 선택해야 합니다</RimTalk_Settings_AtLeastOneSource>
+  <RimTalk_Settings_BaseUrlTooltip>사용자 지정 엔드포인트 기본 URL (사용자 지정 제공자 전용)</RimTalk_Settings_BaseUrlTooltip>
+  <RimTalk_Settings_CLPADecayLabel>CLPA 감소율: {0}</RimTalk_Settings_CLPADecayLabel>
+  <RimTalk_Settings_CannotFindManager>메모리 관리자를 찾을 수 없습니다</RimTalk_Settings_CannotFindManager>
+  <RimTalk_Settings_CloudApiConfigurations>API 설정</RimTalk_Settings_CloudApiConfigurations>
+  <RimTalk_Settings_CloudApiConfigurationsDesc>하나 이상의 제공자를 추가합니다. 순서가 있는 대체 체인을 형성하며, 호출이 실패하면 다음 활성 제공자가 자동으로 시도됩니다.</RimTalk_Settings_CloudApiConfigurationsDesc>
+  <RimTalk_Settings_CloudEmbeddingConfig>클라우드 임베딩 설정</RimTalk_Settings_CloudEmbeddingConfig>
+  <RimTalk_Settings_CombatMemory>전투 메모리</RimTalk_Settings_CombatMemory>
+  <RimTalk_Settings_ConversationMemory>대화 메모리 (RimTalk 대화)</RimTalk_Settings_ConversationMemory>
+  <RimTalk_Settings_DynamicInjectionDesc>시간, 중요도, 키워드 일치를 기반으로 가장 관련성 높은 기억과 지식을 자동 선택</RimTalk_Settings_DynamicInjectionDesc>
+  <RimTalk_Settings_DynamicInjectionSection>동적 주입 설정</RimTalk_Settings_DynamicInjectionSection>
+  <RimTalk_Settings_ELSCapacityLabel>ELS(중기 기억): {0}개</RimTalk_Settings_ELSCapacityLabel>
+  <RimTalk_Settings_ELSDecayLabel>ELS 감소율: {0}</RimTalk_Settings_ELSDecayLabel>
+  <RimTalk_Settings_EmbeddingAPIKey>API 키</RimTalk_Settings_EmbeddingAPIKey>
+  <RimTalk_Settings_EmbeddingAPIKeyTip>팁: API 키를 비워두면 위의 AI 설정 키를 사용합니다.</RimTalk_Settings_EmbeddingAPIKeyTip>
+  <RimTalk_Settings_EmbeddingAPIURL>API URL</RimTalk_Settings_EmbeddingAPIURL>
+  <RimTalk_Settings_EmbeddingModel>모델</RimTalk_Settings_EmbeddingModel>
+  <RimTalk_Settings_EnableAILog>AI 요청 로깅 활성화</RimTalk_Settings_EnableAILog>
+  <RimTalk_Settings_EnableAutoArchive>자동 보관 활성화</RimTalk_Settings_EnableAutoArchive>
+  <RimTalk_Settings_EnableDailySummarization>일일 요약 활성화</RimTalk_Settings_EnableDailySummarization>
+  <RimTalk_Settings_EnableDisableTooltip>이 제공자를 대체 후보로 활성화/비활성화</RimTalk_Settings_EnableDisableTooltip>
+  <RimTalk_Settings_EnableDynamicInjection>동적 주입 활성화 (권장)</RimTalk_Settings_EnableDynamicInjection>
+  <RimTalk_Settings_EnableKnowledgeChaining>지식 체인 활성화 (실험적)</RimTalk_Settings_EnableKnowledgeChaining>
+  <RimTalk_Settings_EnableProactiveRecall>능동적 기억 회상 활성화</RimTalk_Settings_EnableProactiveRecall>
+  <RimTalk_Settings_EnableVectorEnhancement>벡터 강화 활성화</RimTalk_Settings_EnableVectorEnhancement>
+  <RimTalk_Settings_EnabledHeader>활성</RimTalk_Settings_EnabledHeader>
+  <RimTalk_Settings_EnabledRulesCount>활성: {0} / {1} 규칙</RimTalk_Settings_EnabledRulesCount>
+  <RimTalk_Settings_ExperimentalSection>실험적 기능</RimTalk_Settings_ExperimentalSection>
+  <RimTalk_Settings_FallbackEnabledDesc>독립 대체 체인이 활성화되었습니다. 실패하면 자동으로 다음 제공자로 이동합니다.</RimTalk_Settings_FallbackEnabledDesc>
+  <RimTalk_Settings_FeatureEntries>기능 항목</RimTalk_Settings_FeatureEntries>
+  <RimTalk_Settings_InjectionPreviewer>주입 미리보기</RimTalk_Settings_InjectionPreviewer>
+  <RimTalk_Settings_InjectionPreviewerTip>기억/지식 주입 결과를 실시간으로 표시</RimTalk_Settings_InjectionPreviewerTip>
+  <RimTalk_Settings_IsPlayerDialogueInject>플레이어 대화 기록</RimTalk_Settings_IsPlayerDialogueInject>
+  <RimTalk_Settings_IsPlayerDialogueInjectDesc>활성화하면 플레이어가 대화 상자로 보낸 메시지도 라운드 기억에 기록됩니다</RimTalk_Settings_IsPlayerDialogueInjectDesc>
+  <RimTalk_Settings_IsRoundMemoryActive>라운드 기억 활성화</RimTalk_Settings_IsRoundMemoryActive>
+  <RimTalk_Settings_IsRoundMemoryActiveDesc>활성화하면 개별 메시지 대신 대화 라운드 단위로 기억을 캡처하고 주입합니다</RimTalk_Settings_IsRoundMemoryActiveDesc>
+  <RimTalk_Settings_KnowledgeChainingDesc>지식이 다른 지식을 트리거하여 여러 라운드 매칭을 가능하게 합니다.</RimTalk_Settings_KnowledgeChainingDesc>
+  <RimTalk_Settings_KnowledgeLibrary>지식 라이브러리</RimTalk_Settings_KnowledgeLibrary>
+  <RimTalk_Settings_KnowledgeLibraryTip>전역 지식 라이브러리를 열고 관리</RimTalk_Settings_KnowledgeLibraryTip>
+  <RimTalk_Settings_KnowledgeMatchingSources>지식 매칭 소스 선택</RimTalk_Settings_KnowledgeMatchingSources>
+  <RimTalk_Settings_KnowledgeMatchingSourcesDesc>지식 매칭에 사용할 변수를 선택합니다. 폰 속성은 대화 참가자 전원에 대해 자동으로 매칭됩니다.</RimTalk_Settings_KnowledgeMatchingSourcesDesc>
+  <RimTalk_Settings_KnowledgeScoreThresholdLabel>지식 점수 임계값: {0}</RimTalk_Settings_KnowledgeScoreThresholdLabel>
+  <RimTalk_Settings_ListRefreshed>변수 목록을 새로고침했습니다</RimTalk_Settings_ListRefreshed>
+  <RimTalk_Settings_MaxABMInjectionRoundsDesc>최근 대화 라운드를 몇 개까지 AI 컨텍스트에 주입할지 제어합니다</RimTalk_Settings_MaxABMInjectionRoundsDesc>
+  <RimTalk_Settings_MaxABMInjectionRoundsLabel>ABM 주입 라운드: {0}</RimTalk_Settings_MaxABMInjectionRoundsLabel>
+  <RimTalk_Settings_MaxChainingRoundsLabel>최대 라운드: {0}</RimTalk_Settings_MaxChainingRoundsLabel>
+  <RimTalk_Settings_MaxInjectedKnowledgeLabel>최대 주입 지식: {0}</RimTalk_Settings_MaxInjectedKnowledgeLabel>
+  <RimTalk_Settings_MaxInjectedMemoriesLabel>최대 주입 기억: {0}</RimTalk_Settings_MaxInjectedMemoriesLabel>
+  <RimTalk_Settings_MaxVectorResultsLabel>최대 보조 결과: {0}</RimTalk_Settings_MaxVectorResultsLabel>
+  <RimTalk_Settings_MemoryCapacitySection>기억 용량 설정</RimTalk_Settings_MemoryCapacitySection>
+  <RimTalk_Settings_MemoryDecaySection>기억 감소 설정</RimTalk_Settings_MemoryDecaySection>
+  <RimTalk_Settings_MemoryScoreThresholdLabel>기억 점수 임계값: {0}</RimTalk_Settings_MemoryScoreThresholdLabel>
+  <RimTalk_Settings_MemoryTypesSection>기억 유형 토글</RimTalk_Settings_MemoryTypesSection>
+  <RimTalk_Settings_ModelHeader>모델</RimTalk_Settings_ModelHeader>
+  <RimTalk_Settings_MustEnterGame>먼저 게임에 입장해야 합니다</RimTalk_Settings_MustEnterGame>
+  <RimTalk_Settings_PawnPropertyTooltip>속성: {0}\n유형: 폰 속성\n\n{1}\n\n체크하면 대화 내 모든 폰에 대해 이 속성을 자동으로 매칭합니다.</RimTalk_Settings_PawnPropertyTooltip>
+  <RimTalk_Settings_PlaceholderApiKey>API 키 붙여넣기...</RimTalk_Settings_PlaceholderApiKey>
+  <RimTalk_Settings_PlaceholderModelId>모델 ID</RimTalk_Settings_PlaceholderModelId>
+  <RimTalk_Settings_PlaceholderPlayer2Key>웹 키 (로컬 앱에서는 선택 사항)</RimTalk_Settings_PlaceholderPlayer2Key>
+  <RimTalk_Settings_Player2AuthCancel>인증 취소</RimTalk_Settings_Player2AuthCancel>
+  <RimTalk_Settings_Player2AuthReopen>승인 페이지 다시 열기</RimTalk_Settings_Player2AuthReopen>
+  <RimTalk_Settings_Player2AuthWaiting>승인 대기 중...</RimTalk_Settings_Player2AuthWaiting>
+  <RimTalk_Settings_Player2GetWebKey>무료 API 키 받기</RimTalk_Settings_Player2GetWebKey>
+  <RimTalk_Settings_Player2OpenWebsite>Player2 웹사이트 열기</RimTalk_Settings_Player2OpenWebsite>
+  <RimTalk_Settings_Player2WebDesc>데스크톱 앱 없이 무료 웹 API 키를 받을 수 있습니다. 로컬 앱을 사용하는 경우 선택 사항입니다.</RimTalk_Settings_Player2WebDesc>
+  <RimTalk_Settings_PreferRimTalkAI>RimTalk의 AI 설정 우선</RimTalk_Settings_PreferRimTalkAI>
+  <RimTalk_Settings_PresetApplied>적용된 프리셋: {0} (기억 {1}, 지식 {2})</RimTalk_Settings_PresetApplied>
+  <RimTalk_Settings_PresetBalanced>균형</RimTalk_Settings_PresetBalanced>
+  <RimTalk_Settings_PresetCardContent>{0}\n기억 {1} | 지식 {2}\n약 {3} 토큰</RimTalk_Settings_PresetCardContent>
+  <RimTalk_Settings_PresetCardTooltip>기억 {0}개 + 지식 {1}개\n예상 소비량 약 {2} 토큰</RimTalk_Settings_PresetCardTooltip>
+  <RimTalk_Settings_PresetConfig>프리셋 설정</RimTalk_Settings_PresetConfig>
+  <RimTalk_Settings_PresetConfigDesc>경량에서 중량까지 기억/지식 주입을 빠르게 전환합니다. 예상 토큰 사용량 포함.</RimTalk_Settings_PresetConfigDesc>
+  <RimTalk_Settings_PresetEnhanced>강화</RimTalk_Settings_PresetEnhanced>
+  <RimTalk_Settings_PresetLight>경량</RimTalk_Settings_PresetLight>
+  <RimTalk_Settings_PromptReplacement>프롬프트 교체</RimTalk_Settings_PromptReplacement>
+  <RimTalk_Settings_PromptReplacementDesc>AI로 보내기 전에 프롬프트를 자동으로 정규화합니다.</RimTalk_Settings_PromptReplacementDesc>
+  <RimTalk_Settings_PromptReplacementTip>프롬프트 교체/정규화 규칙 편집</RimTalk_Settings_PromptReplacementTip>
+  <RimTalk_Settings_PromptReplacementTitle>프롬프트 교체</RimTalk_Settings_PromptReplacementTitle>
+  <RimTalk_Settings_ProviderHeader>제공자</RimTalk_Settings_ProviderHeader>
+  <RimTalk_Settings_RefreshList>목록 새로고침</RimTalk_Settings_RefreshList>
+  <RimTalk_Settings_RegexSupport>정규식 지원 (대소문자 구분 안 함)</RimTalk_Settings_RegexSupport>
+  <RimTalk_Settings_ReplacementRulesList>교체 규칙 목록</RimTalk_Settings_ReplacementRulesList>
+  <RimTalk_Settings_RuleExample>예: 패턴 \(Player\)을(를) Master로 교체</RimTalk_Settings_RuleExample>
+  <RimTalk_Settings_SCMCapacityLabel>SCM(단기 기억): {0}개</RimTalk_Settings_SCMCapacityLabel>
+  <RimTalk_Settings_SCMDecayLabel>SCM 감소율: {0}</RimTalk_Settings_SCMDecayLabel>
+  <RimTalk_Settings_SelectedCount>선택: {0} (폰 속성: {1}, 기타: {2})</RimTalk_Settings_SelectedCount>
+  <RimTalk_Settings_SimilarityThresholdLabel>유사도 임계값: {0}</RimTalk_Settings_SimilarityThresholdLabel>
+  <RimTalk_Settings_SummarizationSection>기억 요약 설정</RimTalk_Settings_SummarizationSection>
+  <RimTalk_Settings_TriggerChanceLabel>발동 확률: {0}</RimTalk_Settings_TriggerChanceLabel>
+  <RimTalk_Settings_TriggerTimeLabel>발동 시간: {0}:00</RimTalk_Settings_TriggerTimeLabel>
+  <RimTalk_Settings_ValidateConfig>설정 검증</RimTalk_Settings_ValidateConfig>
+  <RimTalk_Settings_ValidateConfigTip>팁: 검증은 대체 체인을 따라 실제 API 요청을 보냅니다 (저장 게임 내에서만)</RimTalk_Settings_ValidateConfigTip>
+  <RimTalk_Settings_ValidateInSaveOnly>검증은 저장 게임에서만 작동합니다. 먼저 게임을 불러오거나 시작하세요.</RimTalk_Settings_ValidateInSaveOnly>
+  <RimTalk_Settings_Validating>설정 검증 중...</RimTalk_Settings_Validating>
+  <RimTalk_Settings_ValidationFailed>설정 검증에 실패했습니다. API 키와 URL을 확인하세요</RimTalk_Settings_ValidationFailed>
+  <RimTalk_Settings_ValidationSuccessAny>검증 통과: 하나 이상의 설정을 사용할 수 있습니다. 자세한 내용은 로그를 확인하세요.</RimTalk_Settings_ValidationSuccessAny>
+  <RimTalk_Settings_VariableCount>총 변수 {0}개 (폰 속성: {1})</RimTalk_Settings_VariableCount>
+  <RimTalk_Settings_VariableTooltip>변수: {0}\n\n{1}</RimTalk_Settings_VariableTooltip>
+  <RimTalk_Settings_VectorEnhancementDesc>의미적 벡터 검색으로 지식 매칭을 강화합니다.</RimTalk_Settings_VectorEnhancementDesc>
+  <RimTalk_Settings_VectorEnhancementSection>벡터 강화 설정</RimTalk_Settings_VectorEnhancementSection>
+  <RimTalk_Settings_WillFollowRimTalkConfig>RimTalk 모드의 AI 설정을 자동으로 따릅니다</RimTalk_Settings_WillFollowRimTalkConfig>
+  <RimTalk_ShortTermMemories>단기 기억</RimTalk_ShortTermMemories>
+  <RimTalk_TabMemory>기억</RimTalk_TabMemory>
+  <RimTalk_With>와(과)</RimTalk_With>
+  <RimTalk_Yes>예</RimTalk_Yes>
 </LanguageData>
