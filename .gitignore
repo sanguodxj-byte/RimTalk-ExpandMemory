@@ -7,7 +7,6 @@
 .DS_Store
 bin
 .vs/
-PublishedFileId.txt
 Folder.DotSettings.user
 *.sh
 auto_push_github.ps1
