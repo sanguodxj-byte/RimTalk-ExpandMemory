@@ -92,7 +92,7 @@ public class FourLayerMemoryComp : ThingComp, IExposable
     // 向后兼容临时字段
     private bool _summarizedIdsInitialized = true;
     private bool _alreadyUpdateSummarizationType = true;
-    private bool _alreadyUpdateComp = false;
+    private bool _alreadyUpdateComp = true;
     // 存档读写
     public override void PostExposeData()
     {
@@ -121,6 +121,13 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         Scribe_Values.Look(ref hasCombatCapturer, "HasCombatCapturer", false);
         Scribe_Values.Look(ref hasSummarizer, "HasSummarizer", false);
 
+        if (Scribe.mode is LoadSaveMode.LoadingVars)
+        {
+            if (hasJobCapturer) AddJobCapturer(); else RemoveJobCapturer();
+            if (hasCombatCapturer) AddCombatCapturer(); else RemoveCombatCapturer();
+            if (hasSummarizer) AddSummarizer(); else RemoveSummarizer();
+        }
+
         Scribe_Values.Look(ref _summarizedIdsInitialized, "summarizedIdsInitialized", false);
         Scribe_Values.Look(ref _alreadyUpdateSummarizationType, "AlreadyUpdateSummarizationType", false);
         Scribe_Values.Look(ref _alreadyUpdateComp, "AlreadyUpdateComp", false);
@@ -131,8 +138,7 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         _eventLogMemories ??= new();
         _archiveMemories ??= new();
 
-        // 读档反序列化与向后兼容迁移
-        if (Scribe.mode is LoadSaveMode.LoadingVars)
+        if (Scribe.mode is LoadSaveMode.PostLoadInit)
         {
             if (!_summarizedIdsInitialized)
             {
@@ -154,19 +160,14 @@ public class FourLayerMemoryComp : ThingComp, IExposable
 
             if (!_alreadyUpdateComp)
             {
-                // 旧档迁移：如果该存档尚未持久化过组件挂载状态，且该 Pawn 是殖民者，自动补挂全部子组件
                 if (parent is Pawn { IsColonist: true })
                 {
-                    hasJobCapturer = true;
-                    hasCombatCapturer = true;
-                    hasSummarizer = true;
+                    AddJobCapturer();
+                    AddCombatCapturer();
+                    AddSummarizer();
                 }
                 _alreadyUpdateComp = true;
             }
-
-            if (hasJobCapturer) AddJobCapturer(); else RemoveJobCapturer();
-            if (hasCombatCapturer) AddCombatCapturer(); else RemoveCombatCapturer();
-            if (hasSummarizer) AddSummarizer(); else RemoveSummarizer();
         }
     }
     public void ExposeData() => PostExposeData();
@@ -227,20 +228,6 @@ public class FourLayerMemoryComp : ThingComp, IExposable
     /// 移除 Summarizer 组件
     /// </summary>
     public void RemoveSummarizer() => _summarizer = null;
-
-    // 组件生命周期
-    public override void PostSpawnSetup(bool respawningAfterLoad)
-    {
-        base.PostSpawnSetup(respawningAfterLoad);
-
-        // 如果不是读档重生（例如新生成/初始开局角色），只要是殖民者，默认激活全套子组件
-        if (!respawningAfterLoad && parent is Pawn { IsColonist: true })
-        {
-            AddJobCapturer();
-            AddCombatCapturer();
-            AddSummarizer();
-        }
-    }
 
     // 组件 tick
     // 主 comp 只负责控制 tick 粒度和向子 comp 下发任务
