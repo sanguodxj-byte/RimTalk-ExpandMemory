@@ -6,7 +6,6 @@ using RimTalk.Memory.UI;
 using System;
 using System.Collections.Generic;
 using RimTalk.Memory.AI;
-using RimTalk.Memory.Utils;
 
 namespace RimTalk.MemoryPatch
 {
@@ -629,25 +628,19 @@ namespace RimTalk.MemoryPatch
 
                 bool success = await AIService.ValidateAIConfigAsync();
 
-                MessageUtil.RunOnMainThread(() =>
+                if (success)
                 {
-                    if (success)
-                    {
-                        Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
-                    }
-                    else
-                    {
-                        Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
-                    }
-                });
+                    Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
+                }
+                else
+                {
+                    Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
+                }
             }
             catch (Exception ex)
             {
                 Log.Error($"[RimTalk.Memory.AI] ValidateAIConfig exception: {ex}");
-                MessageUtil.RunOnMainThread(() =>
-                {
-                    Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
-                });
+                Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
             }
         }
 
