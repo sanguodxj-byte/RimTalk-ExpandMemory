@@ -297,7 +297,9 @@ namespace RimTalk.MemoryPatch
             if (Scribe.mode == LoadSaveMode.PostLoadInit && knowledgeMatchingSources != null)
             {
                 int removedCount = knowledgeMatchingSources.RemoveAll(s =>
-                    s == "knowledge" || s.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase));
+                    s == "knowledge" ||
+                    s.StartsWith("knowledge.", StringComparison.OrdinalIgnoreCase) ||
+                    s.StartsWith("knowledge_", StringComparison.OrdinalIgnoreCase));
                 if (removedCount > 0)
                 {
                     Log.Message($"[MemoryPatch] Removed {removedCount} 'knowledge' entries from matching sources to prevent self-referencing.");
@@ -620,28 +622,17 @@ namespace RimTalk.MemoryPatch
         /// </summary>
         private async void ValidateAIConfig()
         {
-            try
+            AIService.ResetClientPool();
+
+            Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.CautionInput, historical: false);
+
+            if (await AIService.ValidateAIConfigAsync())
             {
-                AIService.ResetClientPool();
-
-                Messages.Message("RimTalk_Settings_Validating".Translate(), MessageTypeDefOf.CautionInput, historical: false);
-
-                bool success = await AIService.ValidateAIConfigAsync();
-
-                if (success)
-                {
-                    Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
-                }
-                else
-                {
-                    Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
-                }
+                Messages.Message("RimTalk_Settings_ValidationSuccessAny".Translate(), MessageTypeDefOf.PositiveEvent, historical: false);
+                return;
             }
-            catch (Exception ex)
-            {
-                Log.Error($"[RimTalk.Memory.AI] ValidateAIConfig exception: {ex}");
-                Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
-            }
+
+            Messages.Message("RimTalk_Settings_ValidationFailed".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
         }
 
         private void DrawMemoryTypesSettings(Listing_Standard listing)

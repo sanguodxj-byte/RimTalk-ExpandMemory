@@ -120,13 +120,9 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         Scribe_Values.Look(ref hasJobCapturer, "HasJobCapturer", false);
         Scribe_Values.Look(ref hasCombatCapturer, "HasCombatCapturer", false);
         Scribe_Values.Look(ref hasSummarizer, "HasSummarizer", false);
-
-        if (Scribe.mode is LoadSaveMode.LoadingVars)
-        {
-            if (hasJobCapturer) AddJobCapturer(); else RemoveJobCapturer();
-            if (hasCombatCapturer) AddCombatCapturer(); else RemoveCombatCapturer();
-            if (hasSummarizer) AddSummarizer(); else RemoveSummarizer();
-        }
+        if (hasJobCapturer) AddJobCapturer();
+        if (hasCombatCapturer) AddCombatCapturer();
+        if (hasSummarizer) AddSummarizer();
 
         Scribe_Values.Look(ref _summarizedIdsInitialized, "summarizedIdsInitialized", false);
         Scribe_Values.Look(ref _alreadyUpdateSummarizationType, "AlreadyUpdateSummarizationType", false);
@@ -138,6 +134,7 @@ public class FourLayerMemoryComp : ThingComp, IExposable
         _eventLogMemories ??= new();
         _archiveMemories ??= new();
 
+        // 向后兼容
         if (Scribe.mode is LoadSaveMode.PostLoadInit)
         {
             if (!_summarizedIdsInitialized)
@@ -153,7 +150,7 @@ public class FourLayerMemoryComp : ThingComp, IExposable
             if (!_alreadyUpdateSummarizationType)
             {
                 foreach (var memory in EventLogMemories.Concat(ArchiveMemories))
-                    if (memory is not null) memory.Type = MemoryType.Summarization;
+                    memory?.Type = MemoryType.Summarization;
 
                 _alreadyUpdateSummarizationType = true;
             }

@@ -1,14 +1,15 @@
-using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using RimTalk.Memory.AI.Client.Dto;
 using RimTalk.Memory.Utils;
 using RimTalk.MemoryPatch;
+using RimWorld;
+using System;
+using System.Collections.Concurrent;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using Verse;
-using RimWorld;
 
 namespace RimTalk.Memory.AI.Integration;
 
@@ -190,10 +191,24 @@ public static class Player2AuthHelper
 
     private static void ShowMainThreadMessage(string text, MessageTypeDef type, Action action = null)
     {
-        MessageUtil.RunOnMainThread(() =>
+        RunOnMainThread(() =>
         {
             action?.Invoke();
             Messages.Message(text, type, historical: false);
         });
+    }
+
+    private static readonly ConcurrentQueue<Action> pendingActions = new();
+    private static void RunOnMainThread(Action action)
+    {
+        if (action == null) return;
+        if (UnityData.IsInMainThread)
+        {
+            action();
+        }
+        else
+        {
+            pendingActions.Enqueue(action);
+        }
     }
 }
