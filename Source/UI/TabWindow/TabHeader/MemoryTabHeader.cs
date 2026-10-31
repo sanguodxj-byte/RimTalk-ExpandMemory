@@ -1,3 +1,4 @@
+using RimTalk.Memory.Compat;
 using RimTalk.Memory.Debug;
 using RimTalk.Memory.Maintenance;
 using RimTalk.Memory.Utils;
@@ -134,6 +135,7 @@ internal sealed class MemoryTabHeader : UIElement
             new("RimTalk.Memory.UI.TabWindow.SummaryPrompt".Translate(), () => windowStack.Add(new Dialog_PromptEditor())),
             new("RimTalk.Memory.UI.TabWindow.Export".Translate(), () => CustomScribe.Export(memoryComp)),
             new("RimTalk.Memory.UI.TabWindow.Import".Translate(), OpenImportMenu),
+            new("RimTalk.Memory.UI.TabWindow.ImportLegacy".Translate(), OpenImportMenuLegacy),
             new("RimTalk.Memory.UI.TabWindow.SummarizeAll".Translate(), MemorySummarizer.SummarizeAll),
             new("RimTalk.Memory.UI.TabWindow.ArchiveAll".Translate(), MemorySummarizer.ArchiveAll),
             new("RimTalk.Memory.UI.TabWindow.OperationGuide".Translate(), () => windowStack.Add(new Dialog_MessageBox("RimTalk.Memory.UI.TabWindow.Guide".Translate())))
@@ -148,6 +150,19 @@ internal sealed class MemoryTabHeader : UIElement
                 .Select(path => new FloatMenuOption(Path.GetFileName(path), () => windowStack.Add(Dialog_MessageBox.CreateConfirmation(
                     "RimTalk.Memory.UI.TabWindow.ConfirmImport".Translate(),
                     () => CustomScribe.Import(path, targetComp)
+                    ))))
+                .Prepend(new FloatMenuOption("RimTalk.Memory.UI.TabWindow.OpenImportFolder".Translate(), CustomScribe.OpenExportFolder))
+                .ToList()));
+    }
+
+    private void OpenImportMenuLegacy()
+    {
+        var targetComp = _tabContext.MemoryComp;
+        var windowStack = Find.WindowStack;
+        windowStack.Add(new FloatMenu((CustomScribeLegacy.GetImportFiles() ?? [])
+                .Select(path => new FloatMenuOption(Path.GetFileName(path), () => windowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                    "RimTalk.Memory.UI.TabWindow.ConfirmImport".Translate(),
+                    () => CustomScribeLegacy.Import(path, targetComp)
                     ))))
                 .Prepend(new FloatMenuOption("RimTalk.Memory.UI.TabWindow.OpenImportFolder".Translate(), CustomScribe.OpenExportFolder))
                 .ToList()));
