@@ -1,4 +1,5 @@
 using RimTalk.Memory.UI.TabWindow.Chronicle;
+using RimTalk.Memory.UI.TabWindow.Details;
 using RimTalk.Memory.UI.TabWindow.TabHeader;
 using RimTalk.Memory.UI.TabWindow.Timeline;
 using RimTalk.Memory.Utils;
@@ -90,8 +91,9 @@ public class MemoryTabWindow : UIElement
         /// </summary>
         public void SetFocuse(MemoryEntry memory)
         {
-            if (memory != Focuse) FocuseChanged?.Invoke();
+            var previous = _focuse;
             _focuse = memory;
+            if (Focuse != previous) FocuseChanged?.Invoke();
         }
 
         public override void PostClose()
@@ -143,8 +145,8 @@ public class MemoryTabWindow : UIElement
             // 刷新全量记忆时间跨度
             if (_allMemories.Count > 0)
             {
-                LifeStartTick = _allMemories.Min(memory => memory.GameTick);
-                LifeCurrentTick = _allMemories.Max(memory => memory.EndGameTick);
+                LifeStartTick = _allMemories.Min(memory => memory.StartGameTick);
+                LifeCurrentTick = _allMemories.Max(memory => memory.GameTick);
             }
 
             // 每帧收束 cursor

@@ -19,7 +19,7 @@ public class MemoryEntry : IExposable
     public const float DefaultImportance = 0.5f;
 
     // 基本信息
-    public long Id = 0;                 // 唯一ID，0 表示未初始化
+    public long Id = -1L;
     // 复制品的原始 Id（目前仅用于 summarizer）
     private long _originId = 0;
     public long OriginId
@@ -28,12 +28,16 @@ public class MemoryEntry : IExposable
         set => _originId = value;
     }
     // 更应当存储 AbsTick，无奈屎山已经堆起来了
-    public int GameTick = -1;           // 时间戳（单位 tick）
-    private int _endGameTick = -1;        // 结束时间戳，CLPA 独有
-    public int EndGameTick
+    public int GameTick = -1;           // 记忆**产生**的时间点
+    private int _startGameTick;        // 开始时间戳，CLPA 独有
+    public int StartGameTick
     {
-        get => _endGameTick == -1 ? GameTick : _endGameTick;
-        set => _endGameTick = value;
+        get => Layer is MemoryLayer.Archive ? _startGameTick : GameTick;
+        set
+        {
+            if (Layer is MemoryLayer.Archive)
+                _startGameTick = Math.Min(GameTick, value);
+        }
     }
     public string Content;              // 内容
 
@@ -113,13 +117,12 @@ public class MemoryEntry : IExposable
     /// 如果层级为 Archive，则直接返回年月日期
     /// 根据年龄大小返回相对描述（如“刚刚”、“一天前”）或具体日期（如“5501年素象1日”）
     /// </summary>
-    public string AgeString => Layer switch
-    {
-        // 以时间段来描述 CLPA age
-        MemoryLayer.Archive => 
-        $"{GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)}" +
-        $" - {GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(EndGameTick), Vector2.zero)}",
-        _ => (Find.TickManager?.TicksGame - GameTick) switch
+    public string AgeString => Layer is MemoryLayer.Archive
+        ?
+        $"{GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(StartGameTick), Vector2.zero)}" +
+        $" - {GenDate.DateMonthYearStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)}"
+        :
+        (Find.TickManager?.TicksGame - GameTick) switch
         {
             null or < 0 => "异常时间",
             < GenDate.TicksPerHour => "刚刚",
@@ -128,8 +131,7 @@ public class MemoryEntry : IExposable
             < GenDate.TicksPerDay * 2 => "昨天",
             < GenDate.TicksPerDay * 3 => "前天",
             _ => GenDate.DateFullStringAt(GenDate.TickGameToAbs(GameTick), Vector2.zero)
-        }
-    };
+        };
 
     public MemoryEntry() { }
 
@@ -142,40 +144,29 @@ public class MemoryEntry : IExposable
         Type = type;
         Layer = layer;
 
+        if (Layer is MemoryLayer.Archive) StartGameTick = GameTick;
+
         Activity = 1f;
         Importance = importance;
         relatedPawnName = relatedPawn;
     }
 
+#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
+    // 向后兼容临时字段
+    private bool _startGameTickInitialized = true;
+
     // 存档读写
     // label 更应当用 PascalCase，但此处屎山已成
     public virtual void ExposeData()
     {
-        if (Scribe.mode is LoadSaveMode.Saving)
-            Scribe_Values.Look(ref Id, "id");
-
-#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
-        if (Scribe.mode is LoadSaveMode.LoadingVars)
-        {
-            string serializedId = null;
-            Scribe_Values.Look(ref serializedId, "id");
-            Id = ParseId(serializedId);
-        }
-
+        Scribe_Values.Look(ref Id, "id", -1L);
         Scribe_Values.Look(ref _originId, "OriginId", 0L);
         Scribe_Values.Look(ref GameTick, "timestamp", -1);
-        Scribe_Values.Look(ref _endGameTick, "EndGameTick", 0); // -1 是初始化后的无效值，而 0 则代表根本未初始化
+        Scribe_Values.Look(ref _startGameTick, "StartGameTick");
         Scribe_Values.Look(ref Content, "content");
 
         Scribe_Values.Look(ref Type, "type");
         Scribe_Values.Look(ref Layer, "layer");
-
-#warning 等正式版迭代稳定后，将移除此处的向后兼容逻辑
-        if (Scribe.mode is LoadSaveMode.LoadingVars
-            && Layer is MemoryLayer.Archive
-            && EndGameTick == 0)
-            EndGameTick = GameTick + 15 * GenDate.TicksPerDay; // 旧存档 CPLA 默认跨度 15 天
-
         Scribe_Values.Look(ref _importance, "importance", -1);
         Scribe_Values.Look(ref _activity, "activity", -1);
 
@@ -192,6 +183,18 @@ public class MemoryEntry : IExposable
         // 集合型字段应当在读档后进行防空处理
         Tags ??= new();
         keywords ??= new();
+
+        // 向后兼容逻辑
+        Scribe_Values.Look(ref _startGameTickInitialized, "StartGameTickInitialized", false);
+        if (!_startGameTickInitialized)
+        {
+            if (Layer is MemoryLayer.Archive)
+            {
+                Scribe_Values.Look(ref _startGameTick, "EndGameTick");
+                (GameTick, _startGameTick) = (_startGameTick, GameTick);
+            }
+            _startGameTickInitialized = true;
+        }
     }
 
     // 静态工具方法
@@ -208,33 +211,6 @@ public class MemoryEntry : IExposable
         while (id == 0);
 
         return id;
-    }
-
-    // ID 向后兼容
-    private static long ParseId(string serializedId)
-    {
-        if (serializedId is null)
-        {
-            Log.Warning($"[RimTalk.Memory] 记忆 ID 为 null，已生成新 ID");
-            return GenerateId();
-        }
-
-        if (long.TryParse(serializedId, NumberStyles.None, CultureInfo.InvariantCulture, out long id) && id > 0)
-            return id;
-
-        const string legacyPrefix = "mem-";
-        if (serializedId.StartsWith(legacyPrefix, StringComparison.Ordinal)
-            && long.TryParse(
-                serializedId.Substring(legacyPrefix.Length),
-                NumberStyles.AllowHexSpecifier,
-                CultureInfo.InvariantCulture,
-                out id
-                )
-            && id > 0)
-            return id;
-
-        Log.Warning($"[RimTalk.Memory] 记忆 ID \"{serializedId}\" 无效，已生成新 ID");
-        return GenerateId();
     }
 
     /// <summary>

@@ -5,6 +5,45 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+因项目存在频繁变基，SHA 仅供参考。
+
+## [1.16.1] - 2026-10-19
+
+### Added
+- 新增 AI Provider `OpenCodeGo`：接入 OpenCode 推理端点，请求时自动携带 `x-opencode-session` 额外请求头。 (`2d54129`)
+
+### Changed
+- 常识变量读取由反射调用 RimTalk 程序集改为直接调用 `ScribanParser.Render`。 (`72f1970`)
+- Scriban 变量解析失败日志增强：记录出错的变量名与完整异常信息（含内层异常栈）。 (`d036ea7`)
+- 构建部署改为需手动指定才会执行自动部署。 (`814c23a`)
+
+### Fixed
+- 常识过滤名单补全 `knowledge_` 前缀变量（如 `knowledge_grouped`），修复知识匹配来源自匹配导致无限递归的问题。 (`77b0792`)
+- 修复选中 TMP 输入框时关闭记忆主面板，导致访问已销毁 Unity 对象的空引用异常。 (`7688840`)
+
+## [1.16.0] - 2026-10-17
+
+### Added
+- 记忆详情支持编辑记忆时间：编辑态提供年/象/日/时数字输入（Quadrum 1-4、日 1-15、时 0-23）；CLPA 归档记忆额外提供起点象输入，保持区间语义。 (`34f8d2c`)
+- 新增模组内置 TMP 字体资产（arial_msyh），为记忆详情的 TMP 输入框提供开箱即用的中文支持。 (`7238e16`)
+
+### Changed
+- 记忆详情区迁移至 UGUI 与 TMP 输入框：拆分容器与正文编辑组件，输入框聚焦时清除 IMGUI 文本焦点并屏蔽游戏快捷键，滚轮事件转交外层滚动列表。 (`3179954`)
+- 时间字段语义重构：`MemoryEntry` 移除 `EndGameTick`、新增 `StartGameTick`（仅归档层有效，其余层回退 `GameTick`），统一 `GameTick` 为记忆产生时间，归档区间起点取最早条目 `StartGameTick`；旧存档读取时对归档条目单向一次性迁移（`StartGameTickInitialized` 标记）。 (`45b0f59`)
+- 人生篇章卡片简化记忆时间显示。 (`e80d4d6`)
+- 正式版迭代已稳定，随本版清理部分遗留的向后兼容代码。 (`ee73557`)
+
+### Fixed
+- 修复归档 CLPA 时区间起点误取条目 `GameTick` 而非起点时间的问题。 (`bc592d4`)
+- 修复时间轴自然时间分隔标识因游戏 tick 换算口径不一致而错位的问题。 (`68469cc`)
+- 修复无法编辑记忆备注（note）的问题。 (`a74142c`)
+- 切换记忆层级/组件守卫时正确定位时间轴滚动位置。 (`41c07d4`)
+
+## [1.15.1] - 2026-10-01
+
+### Added
+- 工具菜单新增"归档全部"，可一键对全体殖民者触发归档。 (`1ecadec`)
+
 ## [1.15.0] - 2026-09-12
 
 ### Added
@@ -77,6 +116,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 移除 OpenAIClient 与 Player2Client 中的 max_tokens 参数设置，避免长文本生成与思考模型输出被截断。
 - 升级部署脚本，支持检测 .NET 10 SDK 并自动化联合编译部署 1.6 与 1.7 双版本。
 - 全面清理运行时高频日志输出，仅保留低频生命周期日志与异常警告，降低控制台噪音与性能开销。
+
+### Fixed
+- 为 LLM 服务返回值添加 XML 合法性校验：在 AI 回调前清洗非法 XML 字符，避免含非法字符的记忆文本在读写存档时引发崩溃。 (`78cad9e`)
 
 ## [1.11.0] - 2026-08-03
 
@@ -233,6 +275,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
+[1.16.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.16.0...v1.16.1
+[1.16.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.15.1...v1.16.0
+[1.15.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.14.1...v1.15.0
 [1.14.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.13.0...v1.14.0

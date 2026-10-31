@@ -56,6 +56,10 @@ public class MemoryTimeline : ScrollUIElement
     private void MemoryCompReseted()
     {
         _cardMap.Clear();
+
+        // 切换记忆组件时还需要重置时间轴，否则会保留前一目标的 scroll position
+        UpdateLayout();
+        RePositionTimeline();
     }
 
     // 篇章光标移动了核心锚点，滚动视图重新定位到离锚点最近的卡片，并更新可见卡片集合
@@ -310,7 +314,7 @@ public class MemoryTimeline : ScrollUIElement
                 );
 
             // 计算时间 gap 和布局 gap
-            int currentTick = card.Memory.GameTick;
+            int currentTick = GenDate.TickGameToAbs(card.Memory.GameTick);
             int gapTick = lastTick - currentTick;
             float currentY = rect.y;
             float gap = currentY - lastYMax;
