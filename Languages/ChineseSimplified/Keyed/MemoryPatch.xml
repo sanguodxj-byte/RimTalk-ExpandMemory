@@ -36,6 +36,7 @@
 • 拖动分隔条调整时间轴与详情区宽度
 </RimTalk.Memory.UI.TabWindow.Guide>
   <RimTalk.Memory.UI.TabWindow.Import>导入</RimTalk.Memory.UI.TabWindow.Import>
+  <RimTalk.Memory.UI.TabWindow.ImportLegacy>旧版导入</RimTalk.Memory.UI.TabWindow.ImportLegacy>
   <RimTalk.Memory.UI.TabWindow.Importance>重要性：{IMPORTANCE}</RimTalk.Memory.UI.TabWindow.Importance>
   <RimTalk.Memory.UI.TabWindow.Knowledge>常识库</RimTalk.Memory.UI.TabWindow.Knowledge>
   <RimTalk.Memory.UI.TabWindow.LayerFilter>层级过滤</RimTalk.Memory.UI.TabWindow.LayerFilter>

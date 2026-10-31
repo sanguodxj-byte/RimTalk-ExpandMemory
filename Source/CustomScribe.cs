@@ -12,8 +12,6 @@ namespace RimTalk.Memory
     {
         // 导出文件夹路径：<SaveData>\RimTalkMemory\MemoryExports\
         public static readonly string ExportFolder = Path.Combine(GenFilePaths.SaveDataFolderPath, "RimTalkMemory\\MemoryExports");
-        // 旧版导出文件夹路径：<SaveData>\MemoryExports\
-        public static readonly string LegacyExportFolder = Path.Combine(GenFilePaths.SaveDataFolderPath, "MemoryExports");
 
 
         // 导出
@@ -55,24 +53,15 @@ namespace RimTalk.Memory
 
         // 导入
         /// <summary>
-        /// 获取可导入 XML，按最后修改时间从新到旧排列。同时扫描新版与旧版导出目录。
+        /// 获取可导入 XML，按最后修改时间从新到旧排列。
         /// </summary>
         /// <remarks>
         /// 可能返空，表示导入文件夹不存在。
         /// </remarks>
-        public static IEnumerable<string> GetImportFiles()
-        {
-            var files = new List<string>();
-            if (Directory.Exists(ExportFolder))
-            {
-                files.AddRange(Directory.GetFiles(ExportFolder, "*.xml"));
-            }
-            if (Directory.Exists(LegacyExportFolder))
-            {
-                files.AddRange(Directory.GetFiles(LegacyExportFolder, "*.xml"));
-            }
-            return files.Count > 0 ? files.Distinct().OrderByDescending(File.GetLastWriteTime) : null;
-        }
+        public static IEnumerable<string> GetImportFiles() =>
+            Directory.Exists(ExportFolder)
+            ? Directory.GetFiles(ExportFolder, "*.xml").OrderByDescending(File.GetLastWriteTime)
+            : null;
 
         /// <summary>
         /// 打开导出文件夹，若不存在则创建。
@@ -84,85 +73,37 @@ namespace RimTalk.Memory
         }
 
         /// <summary>
-        /// 执行导入，同时兼容新版 FourLayerMemoryComp XML 与旧版 memories 列表 XML
+        /// 执行导入
         /// </summary>
         public static void Import(string path, FourLayerMemoryComp targetComp)
         {
             try
             {
-                if (targetComp is null || string.IsNullOrEmpty(path) || !File.Exists(path)) return;
-
-                FourLayerMemoryComp importComp = null;
-                List<MemoryEntry> legacyMemories = null;
-
-                Scribe.loader.InitLoading(path);
-                try
+                if (targetComp is null || string.IsNullOrEmpty(path))
                 {
-                    // 尝试新版导出格式
-                    Scribe_Deep.Look(ref importComp, "MemoryComp");
-
-                    // 兼容旧版导出格式（直接存储 memories 列表）
-                    if (importComp == null)
-                    {
-                        Scribe_Collections.Look(ref legacyMemories, "memories", LookMode.Deep);
-                    }
-                }
-                finally
-                {
-                    Scribe.loader.FinalizeLoading();
-                }
-
-                if (importComp != null)
-                {
-                    targetComp.Import(importComp);
-                }
-                else if (legacyMemories != null && legacyMemories.Count > 0)
-                {
-                    ImportLegacyMemories(legacyMemories, targetComp);
-                }
-                else
-                {
-                    Log.Warning($"[RimTalk.Memory] No valid memories loaded from {path}");
+                    Messages.Message("Import failed from " + path, MessageTypeDefOf.RejectInput, false);
                     return;
                 }
+
+                FourLayerMemoryComp importComp = null;
+
+                Scribe.loader.InitLoading(path);
+                Scribe_Deep.Look(ref importComp, "MemoryComp");
+                Scribe.loader.FinalizeLoading();
+
+                if (importComp is null)
+                {
+                    Messages.Message("Import failed from " + path, MessageTypeDefOf.RejectInput, false);
+                    return;
+                }
+
+                targetComp.Import(importComp);
 
                 Messages.Message("RimTalk.Memory.ImportSuccessFrom".Translate() + path, MessageTypeDefOf.TaskCompletion, false);
             }
             catch (Exception exception)
             {
                 Log.Error($"[RimTalk.Memory] Import failed: {exception}");
-            }
-        }
-
-        private static void ImportLegacyMemories(List<MemoryEntry> legacyMemories, FourLayerMemoryComp targetComp)
-        {
-            targetComp.ActiveMemories.Clear();
-            targetComp.SituationalMemories.Clear();
-            targetComp.EventLogMemories.Clear();
-            targetComp.ArchiveMemories.Clear();
-            targetComp.SummarizedIds.Clear();
-
-            foreach (var memory in legacyMemories)
-            {
-                if (memory == null) continue;
-                switch (memory.Layer)
-                {
-                    case MemoryLayer.Active:
-                        targetComp.ActiveMemories.Add(memory);
-                        break;
-                    case MemoryLayer.Situational:
-                        targetComp.SituationalMemories.Add(memory);
-                        break;
-                    case MemoryLayer.EventLog:
-                        targetComp.EventLogMemories.Add(memory);
-                        break;
-                    case MemoryLayer.Archive:
-                        targetComp.ArchiveMemories.Add(memory);
-                        break;
-                    default:
-                        targetComp.ActiveMemories.Add(memory);
-                        break;
-                }
             }
         }
     }
