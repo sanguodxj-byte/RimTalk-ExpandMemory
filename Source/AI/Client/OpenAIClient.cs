@@ -40,8 +40,8 @@ public class OpenAIClient : IAIClient
         // 正常管线中会提前校验，一般不会出现这种情况
         _url = new Uri(config.URL, UriKind.Absolute);
 
-        // 如果只指定了基础 URL，则补充默认路径 /v1/chat/completions
-        if (_url.AbsolutePath == "/")
+        // 如果只指定了基础 URL 或 v1，则补充默认路径 /v1/chat/completions
+        if (_url.AbsolutePath == "/" || _url.AbsolutePath == "/v1")
             _url = new Uri(_url, DefaultPath);
 
         _apiKey = config.ApiKey;
