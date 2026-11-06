@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.16.2] - 2026-11-06
 
+### Added
+- 新增 AI Provider `OpenCodeZen`：接入 OpenCode Zen 端点，与 `OpenCodeGo` 一致自动携带 `x-opencode-session` 额外请求头。
+- RimTalk 本体新增的 `OpenRouter`/`Claude`/`Moonshot`/`OpenCodeZen`/`OpenCodeGo` Provider 支持直通使用，按原名映射，不再回退为 Custom。
+
 ### Changed
+- 修正 `OpenCodeGo` 端点与本体一致 (`https://opencode.ai/zen/go/v1/chat/completions`)。
 - 记忆详情区回退至 IMGUI 实现，移除不可用的 UGUI/TMP 输入框、相关焦点补丁及内置字体资源。
 
 ## [1.16.1] - 2026-10-19

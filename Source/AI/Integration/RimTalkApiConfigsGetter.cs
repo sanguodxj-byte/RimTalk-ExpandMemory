@@ -56,6 +56,11 @@ public static class RimTalkApiConfigGetter
         global::RimTalk.AIProvider.AlibabaIntl => AIProvider.AlibabaIntl,
         global::RimTalk.AIProvider.AlibabaCN => AIProvider.AlibabaCN,
         global::RimTalk.AIProvider.Player2 => AIProvider.Player2,
+        global::RimTalk.AIProvider.OpenRouter => AIProvider.OpenRouter,
+        global::RimTalk.AIProvider.Claude => AIProvider.Claude,
+        global::RimTalk.AIProvider.Moonshot => AIProvider.Moonshot,
+        global::RimTalk.AIProvider.OpenCodeZen => AIProvider.OpenCodeZen,
+        global::RimTalk.AIProvider.OpenCodeGo => AIProvider.OpenCodeGo,
         _ => AIProvider.Custom
     };
 }
