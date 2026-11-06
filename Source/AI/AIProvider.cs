@@ -19,7 +19,8 @@ public enum AIProvider
     OpenRouter,
     Claude,
     Moonshot,
-    OpenCodeGo
+    OpenCodeGo,
+    OpenCodeZen
 }
 
 public static class AIProviderRegistry
@@ -38,7 +39,8 @@ public static class AIProviderRegistry
         { AIProvider.OpenRouter, "https://openrouter.ai/api/v1/chat/completions" },
         { AIProvider.Claude, "https://api.anthropic.com/v1/chat/completions" },
         { AIProvider.Moonshot, "https://api.moonshot.ai/v1/chat/completions" },
-        { AIProvider.OpenCodeGo, "https://opencode.ai/inference/go/openai/v1/chat/completions" }
+        { AIProvider.OpenCodeZen, "https://opencode.ai/zen/v1/chat/completions" },
+        { AIProvider.OpenCodeGo, "https://opencode.ai/zen/go/v1/chat/completions" }
     };
 
     // 个别端点要求的额外请求头（与 RimTalk 本体的 AIProviderRegistry 保持一致）
@@ -50,6 +52,7 @@ public static class AIProviderRegistry
             { "X-Title", "RimTalk-ExpandMemory" }
         } },
         { AIProvider.Claude, new(){ { "anthropic-version", "2023-06-01" } } },
+        { AIProvider.OpenCodeZen, new(){ { "x-opencode-session", Guid.NewGuid().ToString() } } },
         { AIProvider.OpenCodeGo, new(){ { "x-opencode-session", Guid.NewGuid().ToString() } } }
     };
 
