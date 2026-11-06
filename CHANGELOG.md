@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - 新增 AI Provider `OpenCodeZen`：接入 OpenCode Zen 端点，与 `OpenCodeGo` 一致自动携带 `x-opencode-session` 额外请求头。
 - RimTalk 本体新增的 `OpenRouter`/`Claude`/`Moonshot`/`OpenCodeZen`/`OpenCodeGo` Provider 支持直通使用，按原名映射，不再回退为 Custom。
+- Api url 自动补全新增支持 base url + `v1/`
 
 ### Changed
 - 修正 `OpenCodeGo` 端点与本体一致 (`https://opencode.ai/zen/go/v1/chat/completions`)。
