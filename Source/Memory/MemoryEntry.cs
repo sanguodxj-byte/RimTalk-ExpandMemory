@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Security.Cryptography;
+using RimTalk.MemoryPatch;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -144,7 +144,8 @@ public class MemoryEntry : IExposable
         Type = type;
         Layer = layer;
 
-        if (Layer is MemoryLayer.Archive) StartGameTick = GameTick;
+        // 如果是 Archive 层，则 StartGameTick 默认初始化为当前时间减去归档间隔
+        if (Layer is MemoryLayer.Archive) StartGameTick = GameTick - GenDate.TicksPerDay * RimTalkMemoryPatchMod.Settings.ArchiveIntervalDays;
 
         Activity = 1f;
         Importance = importance;
