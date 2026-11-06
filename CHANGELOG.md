@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 因项目存在频繁变基，SHA 仅供参考。
 
+## [1.16.2] - 2026-11-06
+
+### Changed
+- 记忆详情区回退至 IMGUI 实现，移除不可用的 UGUI/TMP 输入框、相关焦点补丁及内置字体资源。
+
 ## [1.16.1] - 2026-10-19
 
 ### Added
@@ -275,6 +280,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 接手项目，基于前作代码开始后续维护与迭代。
 
+[1.16.2]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.16.1...v1.16.2
 [1.16.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.16.0...v1.16.1
 [1.16.0]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.15.1...v1.16.0
 [1.15.1]: https://github.com/mantuoluo911/RimTalk-ExpandMemory/compare/v1.15.0...v1.15.1
