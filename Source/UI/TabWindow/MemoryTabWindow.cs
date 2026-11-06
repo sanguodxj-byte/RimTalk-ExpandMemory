@@ -1,5 +1,4 @@
 using RimTalk.Memory.UI.TabWindow.Chronicle;
-using RimTalk.Memory.UI.TabWindow.Details;
 using RimTalk.Memory.UI.TabWindow.TabHeader;
 using RimTalk.Memory.UI.TabWindow.Timeline;
 using RimTalk.Memory.Utils;
