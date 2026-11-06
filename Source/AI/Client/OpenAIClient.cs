@@ -41,7 +41,8 @@ public class OpenAIClient : IAIClient
         _url = new Uri(config.URL, UriKind.Absolute);
 
         // 如果只指定了基础 URL 或 v1，则补充默认路径 /v1/chat/completions
-        if (_url.AbsolutePath == "/" || _url.AbsolutePath == "/v1")
+        string absPath = _url.AbsolutePath;
+        if (absPath is "/" or "/v1" or "/v1/")
             _url = new Uri(_url, DefaultPath);
 
         _apiKey = config.ApiKey;
