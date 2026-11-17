@@ -13,7 +13,7 @@ public static class MessageUtil
     {
         Messages.Message(
             $"[RimTalk.Memory.AI] {message}",
-            MessageTypeDefOf.RejectInput,
+            MessageTypeDefOf.SilentInput,
             historical: false
             );
         Log.Error($"[RimTalk.Memory.AI] {message}");
