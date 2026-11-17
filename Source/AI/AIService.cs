@@ -87,20 +87,22 @@ public class AIService : GameComponent
             // payLoad 为空时，打印错误信息并返回
             if (payLoad is null)
             {
-                MessageUtil.MessageAndError("[RimTalk.Memory.AI] 请求失败，Get a empty payLoad.");
+                MessageUtil.MessageAndError("[RimTalk.Memory.AI] 请求失败，请查看日志中的完整错误信息");
                 return;
             }
-
-            // 这里可以打印 payLoad 信息，包括 Error 的 payLoad
-            if (RimTalkMemoryPatchMod.Settings.EnableAILog)
-                Log.Message(payLoad.ToString());
 
             // payLoad 无效时，打印错误信息并返回
             if (!payLoad.IsValid)
             {
-                MessageUtil.MessageAndError("[RimTalk.Memory.AI] 请求失败，Get a error payLoad.");
+                MessageUtil.MessageAndError("[RimTalk.Memory.AI] 请求失败，请查看日志中的完整错误信息");
+                // 出错时，总是打印 payLoad 内容
+                Log.Message(payLoad.ToString());
                 return;
             }
+
+            // 设置中启用时，非 Error 的 payLoad 也会打印
+            if (RimTalkMemoryPatchMod.Settings.EnableAILog)
+                Log.Message(payLoad.ToString());
 
             // 所有校验通过，执行回调函数
             task.callback?.Invoke(Sanitize(payLoad.Response));
