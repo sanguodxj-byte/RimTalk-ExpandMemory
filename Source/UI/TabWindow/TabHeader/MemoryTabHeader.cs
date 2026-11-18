@@ -1,6 +1,7 @@
 using RimTalk.Memory.Compat;
 using RimTalk.Memory.Debug;
 using RimTalk.Memory.Maintenance;
+using RimTalk.MemoryPatch;
 using RimTalk.Memory.Utils;
 using System;
 using System.Collections.Generic;
@@ -79,8 +80,24 @@ internal sealed class MemoryTabHeader : UIElement
 
         TooltipHandler.TipRegion(typeRect, "RimTalk.Memory.UI.TabWindow.TypeFilter".Translate());
 
-        // 绘制工具按钮
+        // 绘制自动总结开关按钮（右上角，全局设置）
         float xRight = inRect.xMax;
+        Rect autoSummarizeRect = new(xRight - DefaultWidgetWidth, y, DefaultWidgetWidth, height);
+        var settings = RimTalkMemoryPatchMod.Settings;
+        bool autoSummarizationEnabled = settings.EnableDailySummarization || settings.EnableAutoArchive;
+        bool switchEnabled = autoSummarizationEnabled;
+        Widgets.CheckboxLabeled(autoSummarizeRect, "RimTalk.Memory.UI.TabWindow.AutoSummarize".Translate(), ref switchEnabled);
+        // 如果开关状态发生变化，则立即更新全局设置并持久化
+        if (switchEnabled != autoSummarizationEnabled)
+        {
+            settings.EnableDailySummarization = switchEnabled;
+            settings.EnableAutoArchive = switchEnabled;
+            settings.Write(); // 立即持久化
+        }
+        TooltipHandler.TipRegion(autoSummarizeRect, "RimTalk.Memory.UI.TabWindow.AutoSummarizeTip".Translate());
+        xRight -= DefaultWidgetWidth + Gap;
+
+        // 绘制工具按钮
         if (Widgets.ButtonText(new(xRight - DefaultWidgetWidth, y, DefaultWidgetWidth, height), "RimTalk.Memory.UI.TabWindow.Tools".Translate()))
             OpenToolsMenu();
         xRight -= DefaultWidgetWidth + Gap;

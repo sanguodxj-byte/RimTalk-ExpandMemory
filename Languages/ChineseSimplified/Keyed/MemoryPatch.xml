@@ -5,6 +5,8 @@
   <RimTalk.Memory.UI.TabWindow.Activity>活跃度：{ACTIVITY}</RimTalk.Memory.UI.TabWindow.Activity>
   <RimTalk.Memory.UI.TabWindow.Archive>归档</RimTalk.Memory.UI.TabWindow.Archive>
   <RimTalk.Memory.UI.TabWindow.ArchiveAll>归档全部</RimTalk.Memory.UI.TabWindow.ArchiveAll>
+  <RimTalk.Memory.UI.TabWindow.AutoSummarize>自动总结</RimTalk.Memory.UI.TabWindow.AutoSummarize>
+  <RimTalk.Memory.UI.TabWindow.AutoSummarizeTip>开关全局自动总结/归档</RimTalk.Memory.UI.TabWindow.AutoSummarizeTip>
   <RimTalk.Memory.UI.TabWindow.Cancel>取消</RimTalk.Memory.UI.TabWindow.Cancel>
   <RimTalk.Memory.UI.TabWindow.CancelEdit>取消</RimTalk.Memory.UI.TabWindow.CancelEdit>
   <RimTalk.Memory.UI.TabWindow.ChronicleTitle>人生篇章（{COUNT} 个 CLPA 篇章）</RimTalk.Memory.UI.TabWindow.ChronicleTitle>
