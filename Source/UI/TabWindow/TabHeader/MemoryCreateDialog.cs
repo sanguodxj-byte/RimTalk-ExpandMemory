@@ -37,7 +37,7 @@ public sealed class MemoryCreateDialog : Window
     private float _importance = MemoryEntry.DefaultImportance;
     private bool _pinned = false;
 
-    public override Vector2 InitialSize => new(620f, 560f);
+    public override Vector2 InitialSize => new(620f, 600);
 
     public MemoryCreateDialog(FourLayerMemoryComp memoryComp)
     {
